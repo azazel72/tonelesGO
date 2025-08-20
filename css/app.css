@@ -1,0 +1,46 @@
+html,
+body {
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    height: 100vh;
+}
+
+a {
+    color: #006bb7;
+}
+
+.btn-primary {
+    color: #fff;
+    background-color: #1b6ec2;
+    border-color: #1861ac;
+}
+
+.btn:focus,
+.btn:active:focus {
+    box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+h1:focus {
+    outline: none;
+}
+
+main {
+    background-color: #5f6f7b;
+    /* gris azulado "sucio" */
+}
+
+.logo-navbar {
+    max-height: 40px;
+    /* ocupa máximo la altura del navbar */
+    filter: invert(1);
+    /* invierte los colores (blanco ↔ negro)  invert(1) hue-rotate(180deg); */
+}
+
+section {
+    display: none;
+    overflow: auto;
+}
+
+section.pagina-activa {
+    display: flex;
+    flex-direction: column;
+}

@@ -1,0 +1,13 @@
+#vista_recepcion {
+    /*justify-content: space-evenly;*/
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+#vista_recepcion[modo="listado_pedidos"] table#tabla_contenido_pedido_recepcion{
+    display: none;
+}
+
+#vista_recepcion[modo="contenido_pedido"] table#tabla_pedidos_recepcion{
+    display: none;
+}

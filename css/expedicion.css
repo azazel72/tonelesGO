@@ -1,0 +1,15 @@
+#vista_expedicion {
+    /*justify-content: space-evenly;*/
+    padding: 20px;
+    /*color: white;*/
+    /*background-color: rgba(200, 170, 50, 0.3);*/
+}
+
+
+#vista_expedicion[modo="listado_ventas"] table#tabla_contenido_orden_venta{
+    display: none;
+}
+
+#vista_expedicion[modo="contenido_venta"] table#tabla_ordenes_venta{
+    display: none;
+}

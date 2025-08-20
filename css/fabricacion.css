@@ -1,0 +1,13 @@
+#vista_fabricacion {
+    /*justify-content: space-evenly;*/
+    padding: 20px;
+    box-sizing: border-box;
+}
+
+#vista_fabricacion[modo="listado_ordenes"] table#tabla_contenido_orden_fabricacion{
+    display: none;
+}
+
+#vista_fabricacion[modo="contenido_orden"] table#tabla_ordenes_fabricacion{
+    display: none;
+}
