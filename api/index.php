@@ -41,7 +41,7 @@ if ($action === 'logout' && $_SERVER['REQUEST_METHOD']==='POST') { logoutHandler
 // Meta
 if (isset($_GET['tables'])) {
   ensureSessionFresh();
-  require_once __DIR__.'/../config.php';
+  require_once __DIR__.'/config.php';
   global $ALLOWED_TABLES, $ACL;
   if (!can('meta','_meta', $ACL)) error(403, 'Sin permiso de metadatos.');
 

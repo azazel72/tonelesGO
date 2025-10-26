@@ -8,100 +8,119 @@
   <link rel="stylesheet" href="./static/css/bootstrap.min.css" />
   <link rel="stylesheet" href="./static/font/bootstrap-icons.css">
 
-  <!-- Tabulator -->
-  <link href="https://unpkg.com/tabulator-tables/dist/css/tabulator.min.css" rel="stylesheet">
-  <script src="https://unpkg.com/tabulator-tables/dist/js/tabulator.min.js"></script>
+  <link rel="stylesheet" href="./css/gestion.css">
 
-  <style>
-    /* Compensar navbar y footer fijos */
-    body { padding-top: 56px; padding-bottom: 44px; }
-    /* Contenedor central ocupa todo el alto disponible */
-    #content {
-      height: calc(100vh - 56px - 44px);
-      display: flex;
-      flex-direction: column;
-    }
-    #tabla {
-      flex: 1 1 auto;
-      min-height: 0; /* importante para que Tabulator se ajuste */
-    }
-  </style>
 </head>
 <body class="bg-light">
 
   <!-- Menú superior fijo -->
-  <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+  <nav id="topbar" class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
     <div class="container-fluid">
       <a class="navbar-brand" href="#">Paez Lobato</a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#topbar" aria-controls="topbar" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
 
-    <div class="collapse navbar-collapse" id="topbar">
-      <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-        <!-- Menú Datos -->
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Datos
-          </a>
-          <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="#" data-action="nuevo">
-              <i class="bi bi-plus-circle me-1"></i> Nuevo registro
-            </a></li>
-            <li><a class="dropdown-item" href="#" data-action="refrescar">
-              <i class="bi bi-arrow-clockwise me-1"></i> Refrescar
-            </a></li>
-            <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item text-danger" href="#" data-action="eliminar-seleccion">
-              <i class="bi bi-trash me-1"></i> Eliminar selección
-            </a></li>
-          </ul>
-        </li>
+      <div class="collapse navbar-collapse" id="topbar">
+        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+          <!-- Menú Datos -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Ficheros maestros
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#" data-action="ver-usuarios">
+                <i class="bi bi-plus-circle me-1"></i> Ver usuarios
+              </a></li>
+              <li><a class="dropdown-item" href="#" data-action="ver-proveedores">
+                <i class="bi bi-arrow-clockwise me-1"></i> Ver proveedores
+              </a></li>
+              <li><a class="dropdown-item" href="#" data-action="ver-clientes">
+                <i class="bi bi-arrow-clockwise me-1"></i> Ver proveedores
+              </a></li>
+              <li><a class="dropdown-item" href="#" data-action="ver-materiales">
+                <i class="bi bi-arrow-clockwise me-1"></i> Ver proveedores
+              </a></li>
+              <li><a class="dropdown-item" href="#" data-action="ver-entradas">
+                <i class="bi bi-arrow-clockwise me-1"></i> Ver proveedores
+              </a></li>
 
-        <!-- Menú Exportar -->
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Exportar
-          </a>
-          <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="#" data-action="exportar-csv">
-              <i class="bi bi-filetype-csv me-1"></i> CSV
-            </a></li>
-            <li><a class="dropdown-item" href="#" data-action="exportar-json">
-              <i class="bi bi-filetype-json me-1"></i> JSON
-            </a></li>
-          </ul>
-        </li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item text-danger" href="#" data-action="eliminar-seleccion">
+                <i class="bi bi-trash me-1"></i> Eliminar selección
+              </a></li>
+            </ul>
+          </li>
 
-        <!-- Menú Ver -->
-        <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-            Ver
-          </a>
-          <ul class="dropdown-menu">
-            <li><a class="dropdown-item" href="#" data-action="auto-ajustar">
-              <i class="bi bi-arrows-fullscreen me-1"></i> Ajustar columnas
-            </a></li>
-            <li><a class="dropdown-item" href="#" data-action="limpiar-filtros">
-              <i class="bi bi-funnel me-1"></i> Limpiar filtros
-            </a></li>
-          </ul>
-        </li>
+          <!-- Menú Datos -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Datos
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#" data-action="nuevo">
+                <i class="bi bi-plus-circle me-1"></i> Nuevo registro
+              </a></li>
+              <li><a class="dropdown-item" href="#" data-action="refrescar">
+                <i class="bi bi-arrow-clockwise me-1"></i> Refrescar
+              </a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item text-danger" href="#" data-action="eliminar-seleccion">
+                <i class="bi bi-trash me-1"></i> Eliminar selección
+              </a></li>
+            </ul>
+          </li>
 
-      </ul>
+          <!-- Menú Exportar -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Exportar
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#" data-action="exportar-csv">
+                <i class="bi bi-filetype-csv me-1"></i> CSV
+              </a></li>
+              <li><a class="dropdown-item" href="#" data-action="exportar-json">
+                <i class="bi bi-filetype-json me-1"></i> JSON
+              </a></li>
+            </ul>
+          </li>
 
-      <div class="d-flex gap-2">
-        <button id="btn-add" class="btn btn-success btn-sm">
-          <i class="bi bi-plus-circle"></i> Añadir persona
-        </button>
-        <button id="btn-refresh" class="btn btn-outline-light btn-sm">
-          <i class="bi bi-arrow-clockwise"></i> Refrescar
-        </button>
-      </div>
+          <!-- Menú Ver -->
+          <li class="nav-item dropdown">
+            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+              Ver
+            </a>
+            <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#" data-action="auto-ajustar">
+                <i class="bi bi-arrows-fullscreen me-1"></i> Ajustar columnas
+              </a></li>
+              <li><a class="dropdown-item" href="#" data-action="limpiar-filtros">
+                <i class="bi bi-funnel me-1"></i> Limpiar filtros
+              </a></li>
+            </ul>
+          </li>
 
-      <!-- (Opcional) acciones a la derecha -->
-      <div class="d-flex">
-        <span class="navbar-text text-white-50 small">Usuario: Rafa</span>
+        </ul>
+
+        <!-- Bloque usuario (oculto hasta login) -->
+        <div class="navbar-nav me-3">
+          <!-- Login -->
+          <form id="nav-login" class="d-flex align-items-center gap-2">
+            <input id="login-user" class="form-control form-control-sm" type="text" placeholder="Usuario" autocomplete="username">
+            <input id="login-pass" class="form-control form-control-sm" type="password" placeholder="Password" autocomplete="current-password">
+            <button id="btn-login" class="btn btn-sm btn-outline-light" type="submit">Entrar</button>
+          </form>
+
+          <!-- Usuario logueado -->
+          <div id="nav-user" class="d-none align-items-center gap-2">
+            <span class="navbar-text text-white-50 small">
+              <i class="bi bi-person-circle me-1"></i> <span id="nav-username">Usuario</span>
+            </span>
+            <button id="btn-logout" class="btn btn-sm btn-outline-warning" type="button">Salir</button>
+          </div>
+        </div>
+
       </div>
 
     </div>
@@ -109,97 +128,32 @@
 
   <!-- Centro -->
   <main id="content" class="container-fluid py-2">
-    <div id="tabla" class="border rounded bg-white"></div>
+
   </main>
 
   <!-- Pie fijo -->
-  <footer class="bg-dark text-white-50 text-center py-2 fixed-bottom small">
+  <footer id="bottombar" class="bg-dark text-white-50 text-center py-2 fixed-bottom small">
     Ejemplo Bootstrap + Tabulator + PHP (CRUD). Edita celdas para guardar, usa “Añadir” o el icono de papelera para borrar.
   </footer>
 
-  <script>
-    // URL del backend PHP
-    const API_URL = "api.php";
 
-    // Definir tabla
-    const tabla = new Tabulator("#tabla", {
-      height: "100%",
-      layout: "fitColumns",
-      index: "id",              // clave primaria
-      ajaxURL: API_URL,         // GET datos
-      ajaxConfig: "GET",
-      placeholder: "Sin datos",
-      columns: [
-        { title: "ID", field: "id", hozAlign: "right", width: 80, headerSort:false, editor:false }, // ID no editable (clave)
-        { title: "Nombre", field: "nombre", editor: "input" },
-        { title: "Apellidos", field: "apellidos", editor: "input" },
-        { title: "Email", field: "email", editor: "input" },
-        { title: "Teléfono", field: "telefono", editor: "input" },
-        { title: "Edad", field: "edad", hozAlign: "right", editor: "number", validator:["integer", {type:"min", parameters:{min:0}}] },
-        { title: "Acciones", field: "acciones", width: 100, headerSort:false, hozAlign:"center",
-          formatter: () => `<button class="btn btn-sm btn-outline-danger" title="Eliminar"><i class="bi bi-trash"></i></button>`,
-          cellClick: async (e, cell) => {
-            const row = cell.getRow().getData();
-            if (!confirm(`¿Eliminar a ${row.nombre} ${row.apellidos}?`)) return;
-            try {
-              const res = await fetch(API_URL + "?id=" + encodeURIComponent(row.id), { method: "DELETE" });
-              if (!res.ok) throw new Error(await res.text());
-              cell.getRow().delete();
-            } catch (err) {
-              alert("Error al eliminar: " + err.message);
-            }
-          }
-        },
-      ],
-    });
-
-    // Guardar al editar una celda (PUT)
-    tabla.on("cellEdited", async (cell) => {
-      const data = cell.getRow().getData();
-      try {
-        const res = await fetch(API_URL, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(data),
-        });
-        if (!res.ok) throw new Error(await res.text());
-        const updated = await res.json();
-        // Aseguramos reflejar datos normalizados desde el servidor
-        cell.getRow().update(updated);
-      } catch (err) {
-        alert("Error al guardar: " + err.message);
-        // Opcional: revertir valor
-        tabla.replaceData(API_URL);
-      }
-    });
-
-    // Botón: añadir persona (POST)
-    document.getElementById("btn-add").addEventListener("click", async () => {
-      const nueva = {
-        nombre: "Nuevo",
-        apellidos: "Usuario",
-        email: "",
-        telefono: "",
-        edad: 0
-      };
-      try {
-        const res = await fetch(API_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(nueva),
-        });
-        if (!res.ok) throw new Error(await res.text());
-        const creada = await res.json();
-        tabla.addData([creada], true); // al inicio
-      } catch (err) {
-        alert("Error al crear: " + err.message);
-      }
-    });
-
-    // Botón: refrescar
-    document.getElementById("btn-refresh").addEventListener("click", () => tabla.replaceData(API_URL));
-  </script>
 
   <script src="./static/js/bootstrap.bundle.min.js"></script>
+  <!-- Tabulator -->
+  <link href="./static/css/tabulator.min.css" rel="stylesheet">
+  <script src="./static/js/tabulator.min.js"></script>
+
+  <!-- winbox-->
+  <link rel="stylesheet" href="./static/css/winbox.min.css">
+  <script defer src="./static/js/winbox.min.js"></script>
+
+
+
+  <script src="./js/gestion.js"></script>
+  <script src="./js/gestion-auth.js"></script>
+  <script src="./js/gestion-tablas.js"></script>
+  <script src="./js/gestion-usuarios.js"></script>
+  <script src="./js/gestion-proveedores.js"></script>
+
 </body>
 </html>
