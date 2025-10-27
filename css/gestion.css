@@ -14,3 +14,12 @@ body {
     flex: 1 1 auto;
     min-height: 0; /* importante para que Tabulator se ajuste */
 }
+
+button[aria-pressed="false"] i.bi-lock,
+button[aria-pressed="true"] i.bi-unlock {
+    display: inline;
+}
+button[aria-pressed="true"] i.bi-lock,
+button[aria-pressed="false"] i.bi-unlock {
+    display: none;
+}

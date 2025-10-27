@@ -30,24 +30,21 @@
             </a>
             <ul class="dropdown-menu">
               <li><a class="dropdown-item" href="#" data-action="ver-usuarios">
-                <i class="bi bi-plus-circle me-1"></i> Ver usuarios
+                <i class="bi bi-people me-1"></i> Ver usuarios
               </a></li>
               <li><a class="dropdown-item" href="#" data-action="ver-proveedores">
-                <i class="bi bi-arrow-clockwise me-1"></i> Ver proveedores
+                <i class="bi bi-person-rolodex me-1"></i> Ver proveedores
               </a></li>
               <li><a class="dropdown-item" href="#" data-action="ver-clientes">
-                <i class="bi bi-arrow-clockwise me-1"></i> Ver proveedores
-              </a></li>
-              <li><a class="dropdown-item" href="#" data-action="ver-materiales">
-                <i class="bi bi-arrow-clockwise me-1"></i> Ver proveedores
-              </a></li>
-              <li><a class="dropdown-item" href="#" data-action="ver-entradas">
-                <i class="bi bi-arrow-clockwise me-1"></i> Ver proveedores
+                <i class="bi bi-person-vcard me-1"></i> Ver clientes
               </a></li>
 
               <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item text-danger" href="#" data-action="eliminar-seleccion">
-                <i class="bi bi-trash me-1"></i> Eliminar selección
+              <li><a class="dropdown-item" href="#" data-action="ver-instalaciones">
+                <i class="bi bi-house-down me-1"></i> Ver instalaciones
+              </a></li>
+              <li><a class="dropdown-item" href="#" data-action="ver-estados">
+                <i class="bi bi-arrow-clockwise me-1"></i> Ver estados
               </a></li>
             </ul>
           </li>
@@ -55,9 +52,18 @@
           <!-- Menú Datos -->
           <li class="nav-item dropdown">
             <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-              Datos
+              Entradas
             </a>
             <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#" data-action="ver-entradas">
+                <i class="bi bi-calendar3 me-1"></i> Ver entradas
+              </a></li>
+
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item text-danger" href="#" data-action="eliminar-seleccion">
+                <i class="bi bi-trash me-1"></i> Eliminar selección
+              </a></li>
+
               <li><a class="dropdown-item" href="#" data-action="nuevo">
                 <i class="bi bi-plus-circle me-1"></i> Nuevo registro
               </a></li>
@@ -154,6 +160,12 @@
   <script src="./js/gestion-tablas.js"></script>
   <script src="./js/gestion-usuarios.js"></script>
   <script src="./js/gestion-proveedores.js"></script>
+  <script src="./js/gestion-clientes.js"></script>
+  <script src="./js/gestion-instalaciones.js"></script>
+  <script src="./js/gestion-estados.js"></script>
+  <script src="./js/gestion-materiales.js"></script>
+  <script src="./js/gestion-entradas.js"></script>
+  <script src="./js/gestion-salidas.js"></script>
 
 </body>
 </html>

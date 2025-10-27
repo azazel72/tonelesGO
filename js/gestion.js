@@ -9,18 +9,27 @@ window.onload = () => {
         },
 
         async "ver-clientes"() {
-            console.log("Crear nuevo registro");
+            await openClientesWin();
         },
 
+        async "ver-instalaciones"() {
+            await openInstalacionesWin();
+        },
+
+        async "ver-estados"() {
+            await openEstadosWin();
+        },
+
+
         async "ver-materiales"() {
-            console.log("Crear nuevo registro");
+            await openMaterialesWin();
         },
 
         async "ver-entradas"() {
-            console.log("Crear nuevo registro");
+            await openEntradasWin();
         },
         async "ver-salidas"() {
-            console.log("Crear nuevo registro");
+            await openSalidasWin();
         },
         // Acción con parámetros vía data-*
         filtrar(el) {
@@ -46,7 +55,6 @@ window.onload = () => {
 
         // Manejo uniforme de errores y estado de UI
         try {
-            console.log(el);
             el.classList.add("disabled", "pe-none"); // evita clics repetidos
             await fn();                             // pasa el elemento por si necesita data-*
         } catch (e) {
