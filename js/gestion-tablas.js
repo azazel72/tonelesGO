@@ -50,6 +50,13 @@ function crearWinBox(KEY, title, tablaBD, columns, options={}) {
     return wb;
   }
 
+  if (!options.winbox?.x) options.winbox.x = "center";
+  options.winbox.y = options.winbox?.y ? (options.winbox.y + 56) : "center";
+  if (!options.winbox.width) options.winbox.width = "800px";
+  if (!options.winbox.height) options.winbox.height = "520px";
+
+
+
   // Contenedor del contenido
   const mount = document.createElement("div");
   mount.style.height = "100%";
@@ -84,15 +91,12 @@ function crearWinBox(KEY, title, tablaBD, columns, options={}) {
   // Ventana
   const wb = new WinBox({
     title: title,
-    root: document.getElementById("content"),
+    root: document.getElementById("escritorio"),
     top: 56,
     right: 0,
     bottom: 40,
     left: 0,
-    width: options.winbox?.width || "800px",
-    height: options.winbox?.height || "520px",
-    x: options.winbox?.x || "center",
-    y: options.winbox?.y ? (options.winbox.y + 56) : "center",
+    ...options.winbox,
     mount,
     onclose: () => {
       if (CLOSE_PRESERVES_STATE) { wb.hide(); return true; } // oculta, no destruye
@@ -133,17 +137,6 @@ function crearWinBox(KEY, title, tablaBD, columns, options={}) {
     persistenceID:"examplePerststance",
     placeholder: "Sin datos",
     columns: columns,
-  cellClick: (e, cell) => {
-    const col = cell.getColumn();
-    const field = col.getField();                // nombre del field
-    const value = cell.getValue();               // valor de la celda
-    const rowData = cell.getRow().getData();     // datos de la fila
-
-    console.log('click celda', { field, value, rowData });
-
-    // ejemplo: si el click fue sobre un enlace interno, evitar navegación
-    if (e.target.closest('a')) e.preventDefault();
-  },
   });
 
   // Guardar al editar
@@ -183,7 +176,6 @@ function crearWinBox(KEY, title, tablaBD, columns, options={}) {
     const rowComp = await tabla.addRow({}, true);
     tabla.getColumns().forEach(col => {
       if (col.getDefinition()?.editable !== undefined) {
-          console.log(col.getField());
           rowComp.getCell(col.getField())?.edit(true);
       }
     });
@@ -195,7 +187,7 @@ function crearWinBox(KEY, title, tablaBD, columns, options={}) {
       if (col.getDefinition()?.filtrable) {
         if (activo) {
           col.updateDefinition({
-            headerFilter: "input",        // o "select" según columna
+            headerFilter: col.getDefinition()?.editor ?? "input",        // o "select" según columna or list
           });
         } else {
           col.setHeaderFilterValue("");

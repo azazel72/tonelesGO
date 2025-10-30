@@ -16,10 +16,13 @@ window.onload = () => {
             await openInstalacionesWin();
         },
 
+        async "ver-ubicaciones"() {
+            await openUbicacionesWin();
+        },
+
         async "ver-estados"() {
             await openEstadosWin();
         },
-
 
         async "ver-materiales"() {
             await openMaterialesWin();
