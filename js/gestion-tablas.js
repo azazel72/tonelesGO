@@ -97,7 +97,7 @@ function crearWinBox(KEY, title, tablaBD, columns, options={}) {
     bottom: 40,
     left: 0,
     ...options.winbox,
-    mount,
+    mount: mount,
     onclose: () => {
       if (CLOSE_PRESERVES_STATE) { wb.hide(); return true; } // oculta, no destruye
       windowsRegistry.delete(KEY); // destruye: borra del registro

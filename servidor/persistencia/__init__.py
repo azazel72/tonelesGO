@@ -1,6 +1,6 @@
-from .DictRepository import DictRepository
-from .GenericRepository import GenericRepository
-from .DB import DB
+from .dict_repository import DictRepository
+from .generic_repository import GenericRepository
+from .db import DB
 
 __all__ = [
     "DictRepository",

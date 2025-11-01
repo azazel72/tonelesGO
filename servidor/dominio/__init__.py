@@ -1,7 +1,13 @@
-from .DatosDTO import DatosDTO
-from .EntradasDTO import EntradasDTO
-
+from .logica import EntradasDTO, MaestrosDTO
+from .maestros import ClienteDTO, EstadoDTO, InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO
+    
 __all__ = [
     "EntradasDTO",
-    "DatosDTO",
+    "MaestrosDTO",
+    "ClienteDTO",
+    "EstadoDTO",
+    "InstalacionDTO",
+    "UbicacionDTO",
+    "ProveedorDTO",
+    "UsuarioDTO",
 ]

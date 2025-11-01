@@ -16,5 +16,14 @@ function openEntradasWin(el) {
       y: 35,
     }
   }
-  return crearWinBox(KEY, title, tablaBD, columns, options);
+  var wb = crearWinBox(KEY, title, tablaBD, columns, options);
+  wb.maximize();    
+}
+
+function crearTablaEntradas(tablaBD, columns) {
+
+
+
+
+  
 }

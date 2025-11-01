@@ -2,15 +2,13 @@
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, HTTPException
 from fastapi.responses import JSONResponse
 
-from ..dominio.InMemoryService import InMemoryService
-
 class CrudRoutes:
 
     @staticmethod
     def get_router():
         router = APIRouter(tags=["CRUD"])
 
-        svc = InMemoryService()
+        svc = {}
         clients = set()
 
         # =======================
