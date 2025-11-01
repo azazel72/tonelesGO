@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Plan anual</title>
+  <link href="https://unpkg.com/tabulator-tables@6.3.1/dist/css/tabulator.min.css" rel="stylesheet">
+  <script src="https://unpkg.com/tabulator-tables@6.3.1/dist/js/tabulator.min.js"></script>
+  <style>
+    body{font-family:sans-serif;margin:16px}
+    .tipo-camion    { background:#f3f8ff; }
+    .tipo-facturacion{ background:#e9ffe9; font-weight:600; }
+    .tipo-material  { background:#fff8e5; }
+    .mini{font-size:11px; opacity:.8}
+  </style>
+</head>
+<body>
+  <h2>Consolidado anual</h2>
+  <div id="tabla"></div>
+
+  <script>
+    // --- datos de ejemplo (adapta a tu API) ---
+    const datos = [
+      { tipo:"camion", nombre:"Camión 1", enero_esperado:10, enero_entregado:9,  febrero_esperado:12, febrero_entregado:12, marzo_esperado:14, marzo_entregado:13 },
+      { tipo:"camion", nombre:"Camión 2", enero_esperado:8,  enero_entregado:7,  febrero_esperado:9,  febrero_entregado:8,  marzo_esperado:10, marzo_entregado:9  },
+      { tipo:"facturacion", nombre:"Plan facturación", enero:2500, febrero:2600, marzo:2400 },
+      { tipo:"material", nombre:"Fleje",      enero:35,  febrero:38,  marzo:37 },
+      { tipo:"material", nombre:"Remaches",   enero:120, febrero:110, marzo:130 },
+      { tipo:"material", nombre:"Puntafitas", enero:90,  febrero:95,  marzo:88  },
+    ];
+
+    const meses = ["enero","febrero","marzo"];
+
+    // Columna por mes con formatter adaptable al tipo de fila
+    function colMes(m){
+      return {
+        title: m.charAt(0).toUpperCase()+m.slice(1),
+        field: m,           // se usa solo para facturación/material
+        hozAlign: "right",
+        headerHozAlign: "center",
+        width: 120,
+        formatter: (cell) => {
+          const row = cell.getRow().getData();
+          if (row.tipo === "camion") {
+            const esp = row[`${m}_esperado`] ?? "";
+            const ent = row[`${m}_entregado`] ?? "";
+            return `<div class="mini">Esp: <b>${esp}</b></div><div class="mini">Ent: <b>${ent}</b></div>`;
+          } else {
+            const val = row[m] ?? "";
+            return `<b>${val}</b>`;
+          }
+        },
+        // editor sencillo: solo para filas no-camión (valor único)
+        editor: (cell) => {
+          const row = cell.getRow().getData();
+          return row.tipo === "camion" ? false : "number";
+        },
+      };
+    }
+
+    const columnas = [
+      { title:"Tipo",   field:"tipo", width:120, frozen:true },
+      { title:"Nombre", field:"nombre", width:220, editor:"input" },
+      ...meses.map(colMes),
+    ];
+
+    const tabla = new Tabulator("#tabla", {
+      data: datos,
+      layout: "fitDataStretch",
+      reactiveData: true,
+      columns: columnas,
+      rowFormatter(row){
+        const t = row.getData().tipo, el = row.getElement();
+        if (t==="camion") el.classList.add("tipo-camion");
+        if (t==="facturacion") el.classList.add("tipo-facturacion");
+        if (t==="material") el.classList.add("tipo-material");
+      },
+    });
+
+    // Si quieres edición también para camiones: captura doble clic y abre prompt para ambos valores
+    tabla.on("cellDblClick", (cell) => {
+      const row = cell.getRow().getData();
+      const field = cell.getColumn().getField(); // 'enero', 'febrero', ...
+      if (row.tipo !== "camion") return;
+      const espKey = `${field}_esperado`, entKey = `${field}_entregado`;
+      const esp = row[espKey] ?? "", ent = row[entKey] ?? "";
+      const nuevoEsp = prompt(`Esperado (${field})`, esp);
+      if (nuevoEsp === null) return;
+      const nuevoEnt = prompt(`Entregado (${field})`, ent);
+      if (nuevoEnt === null) return;
+      row[espKey] = Number(nuevoEsp);
+      row[entKey] = Number(nuevoEnt);
+      cell.getRow().update(row);
+    });
+  </script>
+</body>
+</html>
