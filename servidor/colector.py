@@ -1,5 +1,5 @@
 from modelos import PlanCamionesDB, PlanFacturacionDB, PlanMaterialDB
-from persistencia import GenericRepository, Utils
+from persistencia import GenericRepository, DB
 from dominio import EntradasDTO
 
 
@@ -11,7 +11,7 @@ class Colector:
         self.repo_materiales = GenericRepository(PlanMaterialDB)
 
     def obtener_entradas(self, año: int) -> EntradasDTO:
-        with Utils.crear_sesion_bd() as session:
+        with DB.crear_sesion() as session:
             camiones = self.repo_camiones.list_by_year(session, año)
             plan_facturacion = self.repo_facturacion.list_by_year(session, año)
             materiales = self.repo_materiales.list_by_year(session, año)

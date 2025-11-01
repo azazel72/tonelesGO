@@ -3,6 +3,8 @@ from sqlmodel import SQLModel, Field
 from typing import Optional
 
 class PlanFacturacionDB(SQLModel, table=True):
+    __tablename__ = "plan_facturacion"
+    
     id: Optional[int] = Field(default=None, primary_key=True)
     año: int
     enero: float = 0

@@ -3,9 +3,13 @@ from sqlmodel import SQLModel, Field
 from typing import Optional
 
 class PlanMaterialDB(SQLModel, table=True):
+    __tablename__ = "plan_material"
+    
     id: Optional[int] = Field(default=None, primary_key=True)
     año: int
     tipo_material: str
+    total_pactados: float = 0
+    total_descontar: float = 0
     enero: float = 0
     febrero: float = 0
     marzo: float = 0
