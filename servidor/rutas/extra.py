@@ -1,5 +1,6 @@
 # app/routes/extra_routes.py
 from fastapi import APIRouter
+from servidor.dominio.DatosDTO import DatosDTO
 
 class ExtraRoutes:
 
@@ -7,11 +8,8 @@ class ExtraRoutes:
     def get_router():
         router = APIRouter(tags=["Extra"])
 
-        @router.get("/object")
+        @router.get("/object", response_model=DatosDTO)
         async def get_object():
-            return {
-                "meta": {"version": "1.0"},
-                "payload": {"mensaje": "Aquí devolveré el objeto que definas más adelante"}
-            }
+            return DatosDTO.datos
 
         return router

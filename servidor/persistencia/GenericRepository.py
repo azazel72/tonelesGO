@@ -5,6 +5,10 @@ class GenericRepository:
     def __init__(self, model: Type):
         self.model = model
 
+    def list_all(self, session: Session) -> List:
+        statement = select(self.model)
+        return session.exec(statement).all()
+
     def list_by_year(self, session: Session, año: int) -> List:
         statement = select(self.model).where(self.model.año == año)
         return session.exec(statement).all()
