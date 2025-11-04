@@ -6,6 +6,7 @@ from servidor.dominio.maestros.estado_dto import EstadoDTO
 from servidor.dominio.maestros.instalacion_dto import InstalacionDTO
 from servidor.dominio.maestros.ubicacion_dto import UbicacionDTO
 from servidor.dominio.maestros.proveedor_dto import ProveedorDTO
+from servidor.dominio.maestros.usuario_dto import UsuarioDTO
 
 class MaestrosDTO(BaseModel):
     clientes: Optional[Dict[int, "ClienteDTO"]] = {}
@@ -13,3 +14,10 @@ class MaestrosDTO(BaseModel):
     instalaciones: Optional[Dict[int, InstalacionDTO]] = {}
     ubicaciones: Optional[Dict[int, UbicacionDTO]] = {}
     proveedores: Optional[Dict[int, ProveedorDTO]] = {}
+    usuarios: Optional[Dict[int, "UsuarioDTO"]] = {}
+
+    def buscar_usuario_por_username(self, username: str) -> UsuarioDTO | None:
+        for usuario in (self.usuarios.values() if self.usuarios else []):
+            if usuario.username == username:
+                return usuario
+        return None

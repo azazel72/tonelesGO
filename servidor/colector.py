@@ -1,9 +1,12 @@
-from .modelos import ClienteDB, EstadoDB, InstalacionDB, UbicacionDB, ProveedorDB
+import logging
+
+from .modelos import ClienteDB, EstadoDB, InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB
 from .modelos import PlanCamionesDB, PlanFacturacionDB, PlanMaterialDB
 from .persistencia import GenericRepository, DB
 from .dominio import EntradasDTO, MaestrosDTO
-from .dominio import ClienteDTO, EstadoDTO, InstalacionDTO, UbicacionDTO, ProveedorDTO
+from .dominio import ClienteDTO, EstadoDTO, InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO
 
+logger = logging.getLogger("paezlobato_colector")
 
 class Colector:
 
@@ -26,6 +29,8 @@ class Colector:
         self.repo_ubicaciones = GenericRepository(UbicacionDB)
         self.repo_proveedores = GenericRepository(ProveedorDB)
 
+        self.repo_usuarios = GenericRepository(UsuarioDB)
+
 
     def obtener_datos_maestros(self) -> dict:
         with DB.crear_sesion() as session:
@@ -34,15 +39,17 @@ class Colector:
             instalaciones = self.repo_instalaciones.list_all(session)
             ubicaciones = self.repo_ubicaciones.list_all(session)
             proveedores = self.repo_proveedores.list_all(session)
+            usuarios = self.repo_usuarios.list_all(session)
 
             self.maestros.clientes = {cliente.id: ClienteDTO.from_db(cliente) for cliente in clientes}
             self.maestros.estados = {estado.id: EstadoDTO.from_db(estado) for estado in estados}
             self.maestros.instalaciones = {instalacion.id: InstalacionDTO.from_db(instalacion) for instalacion in instalaciones}
             self.maestros.ubicaciones = {ubicacion.id: UbicacionDTO.from_db(ubicacion) for ubicacion in ubicaciones}
             self.maestros.proveedores = {proveedor.id: ProveedorDTO.from_db(proveedor) for proveedor in proveedores}
+            self.maestros.usuarios = {usuario.id: UsuarioDTO.from_db(usuario) for usuario in usuarios}
 
-            print("Datos maestros cargados:", self.maestros)
-            print("Datos clientes cargados:", self.maestros.clientes)
+            #print("Datos maestros cargados:", self.maestros)
+            #print("Datos clientes cargados:", self.maestros.clientes)
 
 
     def obtener_entradas(self, año: int) -> EntradasDTO:
@@ -61,4 +68,3 @@ class Colector:
     def limpiar_datos(self):
         #self.datos.clear()
         pass
-

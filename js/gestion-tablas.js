@@ -103,19 +103,13 @@ function crearWinBox(KEY, title, tablaBD, columns, options={}) {
       windowsRegistry.delete(KEY); // destruye: borra del registro
     },
   });
-
+console.log(DATOS[tablaBD]);
   // Tabulator
   const tabla = new Tabulator(tableEl, {
     height: "100%",
     layout: "fitColumns",
     index: "id",
-    ajaxURL: `${BASE}?table=${tablaBD}&all=1`,
-    ajaxConfig: "GET",
-    ajaxConfigFetch: { credentials: "same-origin" },
-    ajaxResponse: function(url, params, response) {
-      this.metaInfo = response.meta;
-      return response.data;
-    },
+    data: Object.values(DATOS["maestros"][tablaBD]) || [],
     /*
     pagination: "remote",
     paginationSize: 5,                      // por defecto

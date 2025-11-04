@@ -2,6 +2,7 @@
 body {
     padding-top: 56px;
     padding-bottom: 44px;
+    overflow: hidden;
 }
 /* Contenedor central ocupa todo el alto disponible */
 #content {
@@ -23,3 +24,112 @@ button[aria-pressed="true"] i.bi-lock,
 button[aria-pressed="false"] i.bi-unlock {
     display: none;
 }
+
+
+/* LOGIN */
+  /* Overlay de pantalla completa */
+  .overlay {
+    position: fixed;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    z-index: 9999;
+    backdrop-filter: blur(2px);
+  }
+  /* Oscurecido */
+  .overlay::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,.55);
+    pointer-events: none;
+  }
+
+  /* Caja de login centrada */
+  .login-box {
+    position: relative;
+    width: min(420px, 92vw);
+    border-radius: 18px;
+    background: #101317;
+    color: #e8eef6;
+    box-shadow: 0 20px 60px rgba(0,0,0,.45);
+    padding: 22px 22px 18px;
+    outline: 1px solid rgba(255,255,255,.06);
+    font-family: system-ui, -apple-system, Segoe UI, Roboto, sans-serif;
+  }
+  .login-box h2 {
+    margin: 0 0 12px;
+    font-weight: 650;
+    font-size: 18px;
+    line-height: 1.2;
+  }
+  .login-box label {
+    display: block;
+    font-weight: 550;
+    font-size: 13px;
+    line-height: 1.3;
+    margin: 10px 0 6px;
+    color: #cbd5e1;
+  }
+  .login-box input[type="text"],
+  .login-box input[type="password"] {
+    width: 100%;
+    padding: 10px 12px;
+    border-radius: 10px;
+    border: 1px solid #2a3240;
+    background: #0c0f13;
+    color: #e8eef6;
+    outline: none;
+  }
+  .login-box input:focus {
+    border-color: #4f8cff;
+    box-shadow: 0 0 0 3px rgba(79,140,255,.15);
+  }
+  .login-box .row {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: 10px;
+  }
+  .login-box button {
+    width: 100%;
+    margin-top: 14px;
+    padding: 10px 12px;
+    font-weight: 650;
+    font-size: 14px;
+  }
+  .login-box button:disabled {
+  background: #2a3240;
+  color: #868686;
+  cursor: not-allowed !important;
+}
+
+button#btn-logout span * {
+    color: rgba(255,255,255,.5);
+}
+button#btn-logout:hover span * {
+    color: black;
+}
+
+
+  /* Indicador de estado WebSocket */
+  .ws-status {
+    position: absolute;
+    top: 10px; right: 10px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 6px 10px;
+    border-radius: 999px;
+    background: #0b0e12;
+    border: 1px solid #222a36;
+    font-weight: 600;
+    font-size: 12px;
+    line-height: 1;
+    color: #cbd5e1;
+  }
+  .ws-dot { width: 10px; height: 10px; border-radius: 999px; background: #777; }
+  .ws--connecting .ws-dot { background: #eab308; } /* amarillo */
+  .ws--open .ws-dot       { background: #22c55e; } /* verde */
+  .ws--closed .ws-dot     { background: #ef4444; } /* rojo */

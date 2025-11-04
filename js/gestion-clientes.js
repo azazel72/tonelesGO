@@ -5,7 +5,7 @@ function openClientesWin(el) {
   const tablaBD = "clientes";
   const columns = [
       { title:"ID", field:"id", width:70, hozAlign:"right", headerSort:false },
-      { title:"Nombre", field:"name", editor:"input", editable: false, filtrable:true },
+      { title:"Nombre", field:"nombre", editor:"input", editable: false, filtrable:true },
       CeldaAcciones,
     ];
   const options = {

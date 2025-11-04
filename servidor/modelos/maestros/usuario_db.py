@@ -8,4 +8,5 @@ class UsuarioDB(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     username: str
     fullname: str
-    rol: str
+    role: str
+    password_hash: str

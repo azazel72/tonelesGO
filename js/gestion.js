@@ -1,3 +1,5 @@
+const DATOS = {};
+
 window.onload = () => {
     const actions = {
         async "ver-usuarios"() {
@@ -34,6 +36,15 @@ window.onload = () => {
         async "ver-salidas"() {
             await openSalidasWin();
         },
+
+
+        async "login"() {
+            enviarLogin();
+        },
+        async "logout"() {
+            enviarLogout();
+        },
+
         // Acción con parámetros vía data-*
         filtrar(el) {
             const field = el.dataset.filterField;
@@ -68,11 +79,15 @@ window.onload = () => {
         }
     });
 
-
+    conexionInicial();
 }
 
 
-
-function cargarDatosIniciales() {
-    
+function respuesta_maestros(response) {
+    if (response.data) {
+        DATOS.maestros = response.data;
+        console.log("Maestros recibidos:", DATOS.maestros);
+    } else {
+        alert("Error al recibir maestros: " + response.error);
+    }
 }

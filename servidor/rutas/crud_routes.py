@@ -1,6 +1,18 @@
 # app/routes/crud_routes.py
+import logging
+from typing import Any
 from fastapi import APIRouter, WebSocket, WebSocketDisconnect, HTTPException
+from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
+from pydantic import ValidationError
+
+
+from servidor.colector import Colector
+from servidor.logica.acciones import obtener_acciones
+from servidor.rutas.request_message import RequestMessage
+from servidor.rutas.response_message import ResponseMessage
+
+logger = logging.getLogger("paezlobato_crud_routes")
 
 class CrudRoutes:
 
@@ -10,13 +22,15 @@ class CrudRoutes:
 
         svc = {}
         clients = set()
+        ACCIONES = obtener_acciones()
 
         # =======================
         # CRUD Endpoints
         # =======================
         @router.get("/items")
         async def list_items():
-            return await svc.list()
+            await broadcast({"type": "list_request"})
+            return len(clients)
 
 
         @router.post("/items")
@@ -54,15 +68,17 @@ class CrudRoutes:
             await ws.accept()
             clients.add(ws)
             try:
-                items = await svc.list()
-                await ws.send_json({"type": "init", "items": items})
-
                 while True:
-                    msg = await ws.receive_text()
-                    if msg == "ping":
-                        await ws.send_json({"type": "pong"})
-                    else:
-                        await ws.send_json({"type": "echo", "msg": msg})
+                    raw = await ws.receive_text()
+                    print(raw)
+                    try:
+                        msg = ResponseMessage[Any].model_validate_json(raw)
+                    except ValidationError as e:
+                        await ws.send_json(ResponseMessage.fail("error", "invalid_payload").model_dump())
+                        continue
+
+                    await accion_recibida(ws, msg)
+
             except WebSocketDisconnect:
                 clients.discard(ws)
 
@@ -82,4 +98,22 @@ class CrudRoutes:
             for ws in to_remove:
                 clients.discard(ws)
 
+
+        async def accion_recibida(ws: WebSocket, msg: "RequestMessage"):
+            # Procesa el mensaje recibido vía WebSocket
+            logger.info("Acción recibida: %s", msg.action)
+            try:
+                handler = ACCIONES.get(msg.action)
+                if handler:
+                    result = handler(ws, msg)
+                    if result is not None:
+                        await ws.send_json(ResponseMessage.ok(msg.action, result).model_dump())
+                    else:
+                        await ws.send_json(ResponseMessage.fail(msg.action, "no_result").model_dump())
+                else:
+                    await ws.send_json(ResponseMessage.fail("unknown_action", msg.action).model_dump())
+            except Exception as e:
+                logger.error("Error al procesar la acción %s: %s", msg.action, str(e))
+                await ws.send_json(ResponseMessage.fail(msg.action, str(e)).model_dump())
+        
         return router

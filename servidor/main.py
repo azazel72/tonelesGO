@@ -41,7 +41,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
 crud_routes = CrudRoutes.get_router()
 extra_routes = ExtraRoutes.get_router()
 # Montar routers
