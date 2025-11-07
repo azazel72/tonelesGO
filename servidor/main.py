@@ -4,9 +4,11 @@ from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
 
+from servidor.conexiones.sesiones import Sesiones
+
 from .colector import Colector
 
-from .rutas import ExtraRoutes, CrudRoutes
+from .conexiones import ExtraRoutes, CrudRoutes
 import logging
 from .configurar_logs import configurar_logs
 

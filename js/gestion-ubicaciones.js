@@ -1,37 +1,50 @@
 // ====== CREAR VENTANA UBICACIONES ======
-function openUbicacionesWin(el) {
-  const KEY = "ubicaciones";
-  const title = "Ubicaciones";
-  const tablaBD = "ubicaciones";
-  const columns = [
-      { title:"ID", field:"id", width:70, hozAlign:"right", headerSort:false },
-      { title:"Descripción", field:"descripcion", editor:"input", editable:false, filtrable:true  },
-      { title:"Instalación", field:"instalacion_id", editable:false, filtrable:true,
-        editor: "list",
-        editorParams: {
-          values: async () => {
-            const r = await fetch(`${BASE}?table=instalaciones&all=1`, { credentials:"same-origin" });
-            const j = await r.json();
-            return Object.fromEntries(j.data.map(i => [i.id, i.nombre]));
-          },
-          autocomplete: true,
-           allowEmpty: true,
-        },
-        formatter: "lookup",
-        formatterParams: async () => {
-          const res = await fetch(`${BASE}?table=instalaciones&all=1`);
-          const data = await res.json();
-          return Object.fromEntries(data.data.map(c => [c.id, c.nombre]));
-        }        
-      },
-      { title:"Orden", field:"orden", editor:"input", editable:false, filtrable:true  },
-      CeldaAcciones,
-    ];
-  const options = {
+function openUbicacionesWin() {
+  const configuracion = {
+    KEY: "ubicaciones",
     winbox: {
-      x: 265,
-      y: 90,
-    }
+      tipo: "generico",
+      options: {
+        title: "Ubicaciones",
+        x: 265,
+        y: 90,
+      }
+    },
+    tabulator: {
+      options: {
+        columns: [
+          { title:"ID", field:"id", width:70, hozAlign:"right", headerSort:false },
+          { title:"Descripción", field:"descripcion", editor:"input", editable:false, filtrable:true  },
+          { title:"Instalación", field:"instalacion_id", editable:false, filtrable:true,
+            
+            editor: "list",
+            editorParams: {
+              values: [{"id":"1", "nombre":"Instalación A"},{"id":"2", "nombre":"Instalación B"}],//Object.values(DATOS.maestros.instalaciones || {}),
+              valueField: "id",
+              labelField: "nombre",
+              autocomplete: true,
+              allowEmpty: true,
+            },
+            formatter: "lookup",
+            formatterParams: {
+              values: {"1": "Instalación A", "2": "Instalación B"}, // ejemplo estático
+              // dinámico desde datos maestros
+              
+              values: Object.values(DATOS.maestros.instalaciones || {}).reduce((acc, instalacion) => {
+                acc[instalacion.id] = instalacion.nombre;
+                return acc;
+              }, {}),
+              valueField: "id",
+              labelField: "nombre",
+            },
+          },
+          { title:"Orden", field:"orden", editor:"input", editable:false, filtrable:true  },
+          CeldaAcciones,
+        ],
+        data: Object.values(DATOS.maestros.ubicaciones || {}),
+      },
+    },
   }
-  return crearWinBox(KEY, title, tablaBD, columns, options);
+
+  return crearVentana(configuracion);
 }

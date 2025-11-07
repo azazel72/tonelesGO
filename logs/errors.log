@@ -709,3 +709,49 @@ AttributeError: 'UsuarioDB' object has no attribute 'rol'. Did you mean: 'role'?
 2025-11-04 03:35:23 [ERROR] paezlobato_crud_routes: Error al procesar la acción login: 'dict' object has no attribute 'data'
 2025-11-04 03:35:39 [ERROR] paezlobato_crud_routes: Error al procesar la acción login: 'dict' object has no attribute 'msg'
 2025-11-04 03:36:08 [ERROR] paezlobato_crud_routes: Error al procesar la acción login: 'dict' object has no attribute 'data'
+2025-11-04 17:37:29 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\TonelesGO\servidor\main.py", line 27, in lifespan
+    colector.obtener_datos_maestros()  # puede fallar
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\TonelesGO\servidor\colector.py", line 48, in obtener_datos_maestros
+    self.maestros.proveedores = {proveedor.id: ProveedorDTO.from_db(proveedor) for proveedor in proveedores}
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\TonelesGO\servidor\dominio\maestros\proveedor_dto.py", line 12, in from_db
+    nombre=proveedor_db.name,
+           ^^^^^^^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\main.py", line 1026, in __getattr__
+    raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+AttributeError: 'ProveedorDB' object has no attribute 'name'
+2025-11-05 02:49:46 [ERROR] paezlobato_crud_routes: Error al procesar la acción cargar_entradas: 1 validation error for EntradasDTO
+año
+  Input should be a valid integer, unable to parse string as an integer [type=int_parsing, input_value='', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_parsing
+2025-11-05 02:49:53 [ERROR] paezlobato_crud_routes: Error al procesar la acción cargar_entradas: 1 validation error for EntradasDTO
+año
+  Input should be a valid integer, unable to parse string as an integer [type=int_parsing, input_value='', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_parsing
+2025-11-05 02:57:56 [ERROR] paezlobato_crud_routes: Error al procesar la acción cargar_entradas: 1 validation error for EntradasDTO
+año
+  Input should be a valid integer, unable to parse string as an integer [type=int_parsing, input_value='', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_parsing
+2025-11-05 02:58:30 [ERROR] paezlobato_crud_routes: Error al procesar la acción cargar_entradas: 1 validation error for EntradasDTO
+año
+  Input should be a valid integer, unable to parse string as an integer [type=int_parsing, input_value='', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_parsing
+2025-11-05 02:59:18 [ERROR] paezlobato_crud_routes: Error al procesar la acción cargar_entradas: 1 validation error for EntradasDTO
+año
+  Input should be a valid integer, unable to parse string as an integer [type=int_parsing, input_value='', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_parsing
+2025-11-05 02:59:57 [ERROR] paezlobato_crud_routes: Error al procesar la acción cargar_entradas: 1 validation error for EntradasDTO
+año
+  Input should be a valid integer, unable to parse string as an integer [type=int_parsing, input_value='', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_parsing
+2025-11-05 03:01:11 [ERROR] paezlobato_crud_routes: Error al procesar la acción cargar_entradas: 1 validation error for EntradasDTO
+año
+  Input should be a valid integer, unable to parse string as an integer [type=int_parsing, input_value='', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_parsing
+2025-11-05 03:02:08 [ERROR] paezlobato_crud_routes: Error al procesar la acción cargar_entradas: 1 validation error for EntradasDTO
+año
+  Input should be a valid integer, unable to parse string as an integer [type=int_parsing, input_value='', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_parsing

@@ -22,6 +22,13 @@ class GenericRepository:
         session.refresh(obj)
         return obj
 
+    def insert_all(self, session: Session, objs: List):
+        session.add_all(objs)
+        session.commit()
+        for obj in objs:
+            session.refresh(obj)
+        return objs
+
     def update(self, session: Session, obj):
         session.add(obj)
         session.commit()

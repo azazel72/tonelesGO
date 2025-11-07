@@ -1,0 +1,35 @@
+div.contenedor-tabla {
+    flex: 1 1 auto;
+    min-height: 0;
+}
+
+  /* Permitir saltos de línea en los títulos del header */
+.tabulator .tabulator-col .tabulator-col-title { white-space: normal; }
+
+/* Que el contenedor del header centre el contenido */
+.tabulator .tabulator-col .tabulator-col-content {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Nuestro bloque personalizado */
+.hdr { line-height: 1.1; text-align: center; }
+.hdr.multiline span:first-child { font-weight: 600; }
+
+/* Colores por tipo de columna (celdas) */
+.tabulator-cell.col-previsto        { background: rgba(255, 165, 0, 0.10); }
+.tabulator-cell.col-confirmado      { background: rgba(0, 200, 120, 0.06); }
+.tabulator-cell.col-pactados        { background: rgba(255, 165, 0, 0.10); }
+.tabulator-cell.col-descontar       { background: rgba(90, 90, 90, 0.06); }
+.tabulator-cell.col-total-previstos { background: rgba(255, 165, 0, 0.10); }
+.tabulator-cell.col-total-entregados{ background: rgba(0, 200, 120, 0.10); }
+
+/* Desajuste en Total previstos (no coincide con suma de meses) */
+.tabulator-cell.col-total-previstos.mismatch {
+  background: rgba(255, 0, 0, 0.18) !important;
+  font-weight: 600;
+}
+
+/* Pie de la tabla (texto auxiliar) */
+.pie-totales { padding: 6px 10px; font-size: 12px; color:#555; }

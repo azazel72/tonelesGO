@@ -6,11 +6,10 @@ from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
 from pydantic import ValidationError
 
-
 from servidor.colector import Colector
 from servidor.logica.acciones import obtener_acciones
-from servidor.rutas.request_message import RequestMessage
-from servidor.rutas.response_message import ResponseMessage
+from servidor.conexiones.request_message import RequestMessage
+from servidor.conexiones.response_message import ResponseMessage
 
 logger = logging.getLogger("paezlobato_crud_routes")
 
@@ -66,7 +65,10 @@ class CrudRoutes:
         @router.websocket("/ws")
         async def websocket_endpoint(ws: WebSocket):
             await ws.accept()
+
             clients.add(ws)
+            await ws.send_json(ResponseMessage.ok("login", Colector.colector.maestros.usuarios.get(1)).model_dump())
+
             try:
                 while True:
                     raw = await ws.receive_text()
@@ -81,7 +83,6 @@ class CrudRoutes:
 
             except WebSocketDisconnect:
                 clients.discard(ws)
-
 
         # =======================
         # Broadcast común
@@ -117,3 +118,8 @@ class CrudRoutes:
                 await ws.send_json(ResponseMessage.fail(msg.action, str(e)).model_dump())
         
         return router
+
+
+class ConexionWS:
+    def __init__(self, websocket: WebSocket):
+        self.websocket = websocket

@@ -1,8 +1,8 @@
 // ====== CREAR VENTANA UBICACIONES ======
-function openUbicacionesWin(el) {
+function openUbicacionesWin() {
   const KEY = "ubicaciones";
   const title = "Ubicaciones";
-  const tablaBD = "ubicaciones";
+  
   const columns = [
       { title:"ID", field:"id", width:70, hozAlign:"right", headerSort:false },
       { title:"Descripción", field:"descripcion", editor:"input", editable:false, filtrable:true  },
@@ -29,5 +29,5 @@ function openUbicacionesWin(el) {
       y: 90,
     }
   }
-  return crearWinBox(KEY, title, tablaBD, columns, options);
+  return crearVentana(KEY, title, columns, options);
 }

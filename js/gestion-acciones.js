@@ -13,4 +13,6 @@ var ACCIONES = {
     },
     "login": respuesta_login,
     "maestros": respuesta_maestros,
+    "cargar_entradas": mostrar_entradas,
+    "agregar_entradas_proveedores": mostrar_entradas,
 };

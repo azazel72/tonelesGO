@@ -2,7 +2,7 @@
 from servidor.colector import Colector
 from servidor.dominio.maestros.usuario_dto import UsuarioDTO
 from servidor.logica.helpers import BcryptHelper
-from servidor.rutas.request_message import RequestMessage
+from servidor.conexiones.request_message import RequestMessage
 
 def iniciar_sesion(ws, request:RequestMessage) -> UsuarioDTO | None:
     print(request)

@@ -7,7 +7,7 @@ class PlanCamionesDB(SQLModel, table=True):
 
     id: Optional[int] = Field(default=None, primary_key=True)
     año: int
-    proveedor_id: str
+    proveedor_id: int
 
     total_pactados: int = 0
     total_descontar: int = 0

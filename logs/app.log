@@ -3827,3 +3827,499 @@ AttributeError: 'UsuarioDB' object has no attribute 'rol'. Did you mean: 'role'?
 2025-11-04 04:26:09 [INFO] paezlobato_crud_routes: Acción recibida: maestros
 2025-11-04 04:27:47 [INFO] paezlobato_crud_routes: Acción recibida: login
 2025-11-04 04:27:47 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-04 17:34:38 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-04 17:34:38 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-04 17:34:38 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-04 17:34:53 [INFO] paezlobato_crud_routes: Acción recibida: login
+2025-11-04 17:34:54 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-04 17:37:29 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-04 17:37:29 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-04 17:37:29 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-04 17:37:29 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\TonelesGO\servidor\main.py", line 27, in lifespan
+    colector.obtener_datos_maestros()  # puede fallar
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\TonelesGO\servidor\colector.py", line 48, in obtener_datos_maestros
+    self.maestros.proveedores = {proveedor.id: ProveedorDTO.from_db(proveedor) for proveedor in proveedores}
+                                               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\TonelesGO\servidor\dominio\maestros\proveedor_dto.py", line 12, in from_db
+    nombre=proveedor_db.name,
+           ^^^^^^^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\main.py", line 1026, in __getattr__
+    raise AttributeError(f'{type(self).__name__!r} object has no attribute {item!r}')
+AttributeError: 'ProveedorDB' object has no attribute 'name'
+2025-11-04 17:37:43 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-04 17:37:43 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-04 17:37:43 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-04 17:39:21 [INFO] paezlobato_crud_routes: Acción recibida: login
+2025-11-04 17:39:21 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-04 17:51:12 [INFO] paezlobato_crud_routes: Acción recibida: login
+2025-11-04 17:51:12 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-04 17:51:43 [INFO] paezlobato_crud_routes: Acción recibida: login
+2025-11-04 17:51:43 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-04 17:53:44 [INFO] paezlobato_crud_routes: Acción recibida: login
+2025-11-04 17:53:44 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-04 17:54:48 [INFO] paezlobato_crud_routes: Acción recibida: login
+2025-11-04 17:54:48 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-04 18:00:49 [INFO] paezlobato_crud_routes: Acción recibida: login
+2025-11-04 18:00:49 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-04 18:02:11 [INFO] paezlobato_crud_routes: Acción recibida: login
+2025-11-04 18:02:11 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-04 18:03:07 [INFO] paezlobato_crud_routes: Acción recibida: login
+2025-11-04 18:03:07 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-04 18:06:24 [INFO] paezlobato_crud_routes: Acción recibida: login
+2025-11-04 18:06:24 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-04 18:07:32 [INFO] paezlobato_crud_routes: Acción recibida: login
+2025-11-04 18:07:32 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-04 18:09:10 [INFO] paezlobato_crud_routes: Acción recibida: login
+2025-11-04 18:09:10 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-04 18:10:05 [INFO] paezlobato_crud_routes: Acción recibida: login
+2025-11-04 18:10:05 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-04 18:11:43 [INFO] paezlobato_crud_routes: Acción recibida: login
+2025-11-04 18:11:43 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-05 01:08:08 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-05 01:08:08 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-05 01:08:08 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-05 01:18:52 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-05 01:18:52 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-05 01:18:52 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-05 01:23:19 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-05 01:23:19 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-05 01:23:19 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-05 01:24:06 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-05 01:24:06 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-05 01:24:06 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-05 01:24:27 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-05 01:24:27 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-05 01:24:27 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-05 01:24:33 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-05 01:24:33 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-05 01:24:33 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-05 01:46:30 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-05 01:46:30 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-05 01:46:30 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-05 01:48:21 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-05 01:48:21 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-05 01:48:21 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-05 01:51:20 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-05 01:51:20 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-05 01:51:20 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-05 01:57:54 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-05 01:57:54 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-05 01:57:54 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-05 01:59:06 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-05 01:59:06 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-05 01:59:06 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-05 01:59:22 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-05 01:59:22 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-05 01:59:22 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-05 02:07:45 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-05 02:07:45 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-05 02:07:45 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-05 02:09:11 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-05 02:09:11 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-05 02:09:11 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-05 02:13:38 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-05 02:13:38 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-05 02:13:38 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-05 02:13:46 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-05 02:13:46 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-05 02:13:46 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-05 02:14:24 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-05 02:14:24 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-05 02:14:24 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-05 02:14:36 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-05 02:14:36 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-05 02:14:36 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-05 02:14:43 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-05 02:14:43 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-05 02:14:43 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-05 02:15:01 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-05 02:15:01 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-05 02:15:01 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-05 02:15:09 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-05 02:15:09 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-05 02:15:09 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-05 02:15:18 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-05 02:15:18 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-05 02:15:18 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-05 02:15:28 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-05 02:15:28 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-05 02:15:28 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-05 02:15:47 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-05 02:15:47 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-05 02:15:47 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-05 02:16:18 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-05 02:16:18 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-05 02:16:18 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-05 02:16:18 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-05 02:16:21 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-05 02:30:11 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-05 02:32:51 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-05 02:35:13 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-05 02:45:47 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-05 02:46:10 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-05 02:46:51 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 02:46:55 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 02:47:33 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-05 02:47:33 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-05 02:47:33 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-05 02:47:33 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-05 02:47:37 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 02:47:47 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 02:48:36 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 02:48:40 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 02:48:49 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 02:48:50 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 02:48:59 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 02:49:00 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 02:49:01 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 02:49:02 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 02:49:07 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 02:49:08 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 02:49:09 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 02:49:10 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 02:49:11 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 02:49:11 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 02:49:20 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 02:49:21 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 02:49:21 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 02:49:28 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 02:49:35 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 02:49:39 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 02:49:40 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 02:49:44 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 02:49:46 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 02:49:46 [ERROR] paezlobato_crud_routes: Error al procesar la acción cargar_entradas: 1 validation error for EntradasDTO
+año
+  Input should be a valid integer, unable to parse string as an integer [type=int_parsing, input_value='', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_parsing
+2025-11-05 02:49:53 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 02:49:53 [ERROR] paezlobato_crud_routes: Error al procesar la acción cargar_entradas: 1 validation error for EntradasDTO
+año
+  Input should be a valid integer, unable to parse string as an integer [type=int_parsing, input_value='', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_parsing
+2025-11-05 02:56:15 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-05 02:57:53 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-05 02:57:56 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 02:57:56 [ERROR] paezlobato_crud_routes: Error al procesar la acción cargar_entradas: 1 validation error for EntradasDTO
+año
+  Input should be a valid integer, unable to parse string as an integer [type=int_parsing, input_value='', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_parsing
+2025-11-05 02:58:04 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 02:58:27 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-05 02:58:30 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 02:58:30 [ERROR] paezlobato_crud_routes: Error al procesar la acción cargar_entradas: 1 validation error for EntradasDTO
+año
+  Input should be a valid integer, unable to parse string as an integer [type=int_parsing, input_value='', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_parsing
+2025-11-05 02:58:33 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 02:59:11 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-05 02:59:18 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 02:59:18 [ERROR] paezlobato_crud_routes: Error al procesar la acción cargar_entradas: 1 validation error for EntradasDTO
+año
+  Input should be a valid integer, unable to parse string as an integer [type=int_parsing, input_value='', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_parsing
+2025-11-05 02:59:21 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 02:59:54 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-05 02:59:56 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 02:59:57 [ERROR] paezlobato_crud_routes: Error al procesar la acción cargar_entradas: 1 validation error for EntradasDTO
+año
+  Input should be a valid integer, unable to parse string as an integer [type=int_parsing, input_value='', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_parsing
+2025-11-05 02:59:59 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 03:01:05 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-05 03:01:11 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 03:01:11 [ERROR] paezlobato_crud_routes: Error al procesar la acción cargar_entradas: 1 validation error for EntradasDTO
+año
+  Input should be a valid integer, unable to parse string as an integer [type=int_parsing, input_value='', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_parsing
+2025-11-05 03:01:14 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 03:02:05 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-05 03:02:08 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 03:02:08 [ERROR] paezlobato_crud_routes: Error al procesar la acción cargar_entradas: 1 validation error for EntradasDTO
+año
+  Input should be a valid integer, unable to parse string as an integer [type=int_parsing, input_value='', input_type=str]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_parsing
+2025-11-05 03:02:10 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 03:08:01 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-05 03:08:37 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-05 03:08:42 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 03:08:43 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 03:09:05 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-05 03:09:20 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 03:11:41 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-05 03:11:50 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 03:11:51 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 03:12:45 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-05 03:13:49 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-05 03:14:02 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 03:14:05 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 03:14:07 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 03:18:42 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-05 03:18:46 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 03:18:49 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 03:18:50 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 03:18:51 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-05 03:20:05 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-05 03:20:18 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-05 03:20:23 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 00:36:12 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-06 00:36:12 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-06 00:36:12 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-06 00:36:22 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 00:36:32 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 00:37:31 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-06 00:37:31 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-06 00:37:31 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-06 00:37:31 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 00:37:37 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 00:43:52 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 00:43:59 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 00:45:05 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 00:45:09 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 00:46:15 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 00:47:42 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 00:47:47 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 00:48:20 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 00:48:24 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 00:48:26 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 00:48:27 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 00:48:28 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 00:49:10 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 00:55:46 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 00:56:23 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 00:56:37 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 00:56:40 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 00:56:48 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 00:57:36 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 01:21:53 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 01:22:12 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 01:22:35 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 01:23:20 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 01:23:41 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 01:23:58 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 01:35:29 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 01:35:34 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 01:36:54 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 01:36:59 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 01:37:18 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 01:37:37 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 01:37:50 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 01:37:50 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 01:38:09 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 01:40:29 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 01:42:09 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 01:42:13 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 01:44:27 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 01:44:31 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 01:52:00 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 01:52:04 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 02:10:00 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 02:10:21 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 02:10:24 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 02:10:27 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 02:11:49 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 02:12:10 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 02:15:02 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 02:16:35 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 02:17:50 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 02:18:40 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 02:19:15 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 02:19:32 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 02:19:50 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 02:23:14 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 02:23:25 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 02:23:44 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 02:24:33 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 02:24:43 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 02:24:59 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 02:25:07 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 02:27:22 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 02:27:43 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 02:27:48 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 02:28:00 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 02:28:11 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 02:28:32 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 02:28:51 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 02:29:06 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 02:36:15 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 02:36:22 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 02:38:54 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 02:39:32 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 02:39:41 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 02:39:45 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 02:39:52 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 02:39:55 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 02:39:58 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 02:39:59 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 02:40:00 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 02:51:52 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 02:51:59 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 02:59:58 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 03:00:04 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 03:08:03 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-06 03:08:03 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-06 03:08:03 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-06 03:08:03 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 03:08:16 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-06 03:08:16 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-06 03:08:16 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-06 03:08:16 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 03:11:09 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-06 03:11:09 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-06 03:11:09 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-06 03:11:09 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 03:11:24 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-06 03:11:24 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-06 03:11:24 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-06 03:11:24 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 03:22:47 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-06 03:22:47 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-06 03:22:47 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-06 03:22:47 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 03:23:05 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-06 03:23:05 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-06 03:23:06 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-06 03:23:06 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 03:29:15 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-06 03:29:15 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-06 03:29:15 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-06 03:29:16 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 03:29:55 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-06 03:29:55 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-06 03:29:55 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-06 03:29:55 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 03:32:16 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-06 03:32:16 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-06 03:32:16 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-06 03:32:16 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 03:32:39 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 03:32:43 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 03:32:50 [INFO] paezlobato_crud_routes: Acción recibida: agregar_entradas_proveedores
+2025-11-06 03:32:50 [INFO] paezlobato_colector: Proveedores faltantes para el año 2025: ['ASERRADERO DEL MOLINO', 'MADERAS SABUGO', 'MADERAS SABUGO CASTAÑO', 'MADERBAR CASTAÑO', 'MAITZER AMERICANA', 'MAITZER ESLOVAQUIA', 'MAITZER RUMANIA', 'QUERCUS IMPORT BULGARIA', 'QUERCUS PIRENAICA', 'SINDO']
+2025-11-06 03:32:50 [INFO] paezlobato_colector: Entradas de proveedores agregadas correctamente.
+2025-11-06 03:32:50 [INFO] paezlobato_crud_routes: Acción recibida: agregar_entradas_proveedores
+2025-11-06 03:32:50 [INFO] paezlobato_colector: Proveedores faltantes para el año 2025: []
+2025-11-06 03:32:50 [INFO] paezlobato_colector: Entradas de proveedores agregadas correctamente.
+2025-11-06 03:33:04 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 03:33:20 [INFO] paezlobato_crud_routes: Acción recibida: agregar_entradas_proveedores
+2025-11-06 03:33:20 [INFO] paezlobato_colector: Proveedores faltantes para el año 2025: []
+2025-11-06 03:33:20 [INFO] paezlobato_colector: Entradas de proveedores agregadas correctamente.
+2025-11-06 03:33:30 [INFO] paezlobato_crud_routes: Acción recibida: agregar_entradas_proveedores
+2025-11-06 03:33:30 [INFO] paezlobato_colector: Proveedores faltantes para el año 2025: []
+2025-11-06 03:33:30 [INFO] paezlobato_colector: Entradas de proveedores agregadas correctamente.
+2025-11-06 03:33:41 [INFO] paezlobato_crud_routes: Acción recibida: agregar_entradas_proveedores
+2025-11-06 03:33:41 [INFO] paezlobato_colector: Proveedores faltantes para el año 2025: []
+2025-11-06 03:33:41 [INFO] paezlobato_colector: Entradas de proveedores agregadas correctamente.
+2025-11-06 03:37:13 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 03:37:17 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 03:37:31 [INFO] paezlobato_crud_routes: Acción recibida: agregar_entradas_proveedores
+2025-11-06 03:37:31 [INFO] paezlobato_colector: Proveedores faltantes para el año 2026: ['ASERRADERO DEL MOLINO', 'MADERAS SABUGO', 'MADERAS SABUGO CASTAÑO', 'MADERBAR', 'MADERBAR CASTAÑO', 'MAITZER AMERICANA', 'MAITZER ESLOVAQUIA', 'MAITZER RUMANIA', 'QUERCUS IMPORT BULGARIA', 'QUERCUS PIRENAICA', 'SINDO']
+2025-11-06 03:37:31 [INFO] paezlobato_colector: Entradas de proveedores agregadas correctamente.
+2025-11-06 03:37:49 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 03:38:04 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 03:38:08 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 03:38:11 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 03:38:56 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 03:39:00 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 03:39:20 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 03:39:23 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 03:39:34 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 03:39:40 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 03:41:39 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 03:41:43 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 03:42:28 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 03:42:34 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 03:47:17 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 03:48:02 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 03:48:27 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 03:52:13 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 03:52:18 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 03:52:36 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 03:52:39 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 03:54:50 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 03:54:53 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 03:55:31 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 03:55:35 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 03:55:55 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 03:55:58 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 04:06:16 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 04:06:19 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 04:10:12 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 04:10:21 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 04:10:58 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 04:11:02 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 04:12:05 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 04:12:10 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 04:19:18 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 04:19:23 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 04:30:57 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 04:31:00 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 04:48:26 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 04:48:30 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 22:21:37 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-06 22:21:37 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-06 22:21:37 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-06 22:27:48 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 22:27:53 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 22:30:20 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 22:31:18 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 22:34:49 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 22:35:26 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-06 23:35:26 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 23:39:20 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 23:39:24 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-06 23:39:27 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 00:52:25 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 01:05:02 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 01:06:21 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 01:06:42 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 01:08:34 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 01:09:50 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 01:13:55 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 01:16:12 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 01:16:47 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 01:20:53 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-07 01:20:53 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-07 01:20:53 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-07 01:20:55 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 01:21:07 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 01:26:30 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 01:27:47 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 01:28:50 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 01:29:40 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 01:29:58 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 01:30:27 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 01:30:34 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 01:31:29 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 01:32:19 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 01:33:38 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 01:34:03 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 01:34:32 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 01:37:16 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 01:37:56 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 01:40:35 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 01:40:55 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 01:41:29 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 01:41:56 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 01:42:53 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 01:44:20 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 01:44:36 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 01:45:58 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 01:47:35 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 01:49:30 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 01:49:49 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-07 01:52:57 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 01:55:29 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 01:55:43 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 01:56:22 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 01:57:04 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 01:57:56 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 01:58:12 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 01:58:39 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 01:59:42 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 02:03:31 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 02:04:00 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-07 02:05:23 [INFO] paezlobato_crud_routes: Acción recibida: maestros

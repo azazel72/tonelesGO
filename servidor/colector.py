@@ -64,6 +64,25 @@ class Colector:
                 plan_facturacion=plan_facturacion[0] if plan_facturacion else None,
                 plan_materiales=plan_materiales
             )
+        
+    def agregar_entradas_proveedores(self, año: int) -> EntradasDTO:
+        with DB.crear_sesion() as session:
+            plan_camiones = self.repo_camiones.list_by_year(session, año)
+            proveedores = self.repo_proveedores.list_all(session)
+
+            plan_proveedores_ids = {pc.proveedor_id for pc in plan_camiones if pc.proveedor_id is not None}
+            proveedores_faltantes = [p for p in proveedores if p.id not in plan_proveedores_ids]
+
+            logger.info(f"Proveedores faltantes para el año {año}: {[p.nombre for p in proveedores_faltantes]}")
+            nuevas = [PlanCamionesDB(proveedor_id=p.id, año=año) for p in proveedores_faltantes]
+            self.repo_camiones.insert_all(session, nuevas)
+            try:
+                session.commit()
+            except Exception:
+                session.rollback()
+                raise
+            logger.info("Entradas de proveedores agregadas correctamente.")
+            return self.obtener_entradas(año)
 
     def limpiar_datos(self):
         #self.datos.clear()
