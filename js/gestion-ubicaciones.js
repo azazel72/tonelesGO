@@ -1,5 +1,16 @@
 // ====== CREAR VENTANA UBICACIONES ======
 function openUbicacionesWin() {
+  const wb = comprobarVentanaAbierta("ubicaciones");
+  if (wb) return wb;
+
+  const instalacionesDict = Object.values(DATOS?.maestros?.instalaciones ?? {}).map(
+    ({ id, nombre, ...resto }) => ({
+      ...resto, id, nombre,
+      value: id,
+      label: nombre,
+    })
+  );
+
   const configuracion = {
     KEY: "ubicaciones",
     winbox: {
@@ -14,31 +25,25 @@ function openUbicacionesWin() {
       options: {
         columns: [
           { title:"ID", field:"id", width:70, hozAlign:"right", headerSort:false },
-          { title:"Descripción", field:"descripcion", editor:"input", editable:false, filtrable:true  },
-          { title:"Instalación", field:"instalacion_id", editable:false, filtrable:true,
-            
+          { title:"Descripción", field:"descripcion", editor:"input", cssClass: "filtrable", },
+          {
+            title: "Instalación",
+            field: "instalacion_id",
             editor: "list",
             editorParams: {
-              values: [{"id":"1", "nombre":"Instalación A"},{"id":"2", "nombre":"Instalación B"}],//Object.values(DATOS.maestros.instalaciones || {}),
-              valueField: "id",
-              labelField: "nombre",
+              values: instalacionesDict,
+              clearable:true,
               autocomplete: true,
               allowEmpty: true,
+              listOnEmpty: true,
+              freetext: false,
+              itemFormatter:function(label, value, item, element){
+                return "<strong>" + label + " </strong><br/><div>" + item.tipo + "</div>";
+              },
             },
-            formatter: "lookup",
-            formatterParams: {
-              values: {"1": "Instalación A", "2": "Instalación B"}, // ejemplo estático
-              // dinámico desde datos maestros
-              
-              values: Object.values(DATOS.maestros.instalaciones || {}).reduce((acc, instalacion) => {
-                acc[instalacion.id] = instalacion.nombre;
-                return acc;
-              }, {}),
-              valueField: "id",
-              labelField: "nombre",
-            },
+            formatter: cell => DATOS?.maestros?.instalaciones[cell.getValue()]?.nombre ?? cell.getValue(),
           },
-          { title:"Orden", field:"orden", editor:"input", editable:false, filtrable:true  },
+          { title:"Orden", field:"orden", editor:"input", cssClass: "filtrable", },
           CeldaAcciones,
         ],
         data: Object.values(DATOS.maestros.ubicaciones || {}),

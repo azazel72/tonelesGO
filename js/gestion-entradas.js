@@ -1,48 +1,34 @@
 // ====== CREAR VENTANA ENTRADAS ======
 function openEntradasWin(datos = []) {
-  const KEY = "entradas";
+  const wb3 = comprobarVentanaAbierta("entradas");
+  if (wb3) return wb3;
 
-  if (REUSE_SINGLE && windowsRegistry.has(KEY)) {
-    const { wb, table } = windowsRegistry.get(KEY);
-    if (datos.length > 0) {
-      console.log(datos[0]);
-      table.replaceData(datos);
-    }
-    wb.show();
-    wb.focus();
-    return wb;
+  const configuracionEntradas = {
+    KEY: "entradas",
+    winbox: {
+      tipo: "entradas",
+      options: {
+        title: "Planificador de entradas",
+        x: "center",
+        y: "center",
+        width: "800px",
+        height: "520px",
+      }
+    },
+    tabulator: {
+      options: {
+        columns: crearColumnasEntradas(DATOS.maestros.proveedores),
+        data: Object.values(DATOS.maestros.estados || {}),
+      },
+    },
   }
 
-  const title = "Planificador de entradas";
-  
-  const columns = crearColumnasEntradas(DATOS.maestros.proveedores);
+  var wb2 = crearVentana(configuracion);
+  wb2.body.querySelector().querySelector("#u-cargar-entradas-input").value = new Date().getFullYear();
 
-  const options = {
-    winbox: {
-      x: "center",
-      y: "center",
-      width: "800px",
-      height: "520px",
-    }
-  };
 
-  // Contenedor del contenido
-  const mount = document.createElement("div");
-  mount.style.height = "100%";
-  mount.style.display = "flex";
-  mount.style.flexDirection = "column";
 
-  // Cabecera simple
-  const header = document.createElement("div");
-  header.className = "p-2 border-bottom d-flex gap-2 align-items-center";
-  header.innerHTML = `
-    <button class="btn btn-sm btn-outline-secondary"><span id="u-cargar-entradas">Consultar </span>
-    <input id='u-cargar-entradas-input' class='text-center' type='number' min='1970' max='2199'></input>
-    </button>
-    <div class="ms-auto d-flex gap-2">
-    <button id="u-add-providers" class="btn btn-sm btn-outline-success">Actualizar proveedores</button>
-    </div>
-  `;
+
   mount.appendChild(header);
   header.querySelector("#u-cargar-entradas-input").value = new Date().getFullYear();
 
@@ -195,7 +181,7 @@ function sumMeses(data, sufijo){ // sufijo: "previsto" | "confirmado"
 }
 
 // === construcción de columnas ===
-function crearColumnasEntradas(proveedores){
+function crearColumnasEntradas(proveedores) {
   // Grupo Identificación (sin ID visible)
   const identificacion = {
     title: "Identificación",
@@ -292,8 +278,6 @@ function crearColumnasEntradas(proveedores){
         cssClass:"col-confirmado", bottomCalc:"sum", bottomCalcParams:{precision:false} },
     ],
   }));
-
-
 
   return [
     identificacion,

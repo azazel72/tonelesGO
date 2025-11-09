@@ -37,6 +37,10 @@ window.onload = () => {
             await openSalidasWin();
         },
 
+        async "cerrar-maestros"() {
+            cerrarVentanasMaestros();
+        },
+
 
         async "login"() {
             enviarLogin();

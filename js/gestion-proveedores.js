@@ -1,20 +1,29 @@
 // ====== CREAR VENTANA PROVEEDORES ======
-function openProveedoresWin(el) {
-  const KEY = "proveedores";
-  const title = "Proveedores";
-  
-  const columns = [
-    { title:"ID", field:"id", width:70, hozAlign:"right", headerSort:false },
-    { title:"Nombre", field:"nombre", editor:"input", editable:false, filtrable:true },
-    CeldaAcciones,
-  ];
+function openProveedoresWin() {
+  const wb = comprobarVentanaAbierta("proveedores");
+  if (wb) return wb;
 
-  const options = {
+  const configuracion = {
+    KEY: "proveedores",
     winbox: {
-      x: 55,
-      y: 55,
-    }
+      tipo: "generico",
+      options: {
+        title: "Proveedores",
+        x: 55,
+        y: 55,
+      }
+    },
+    tabulator: {
+      options: {
+        columns: [
+          { title:"ID", field:"id", width:70, hozAlign:"right", headerSort:false },
+          { title:"Nombre", field:"nombre", editor:"input", editable:false, cssClass: "filtrable", },
+          CeldaAcciones,
+        ],
+        data: Object.values(DATOS.maestros.proveedores || {}),
+      },
+    },
   }
-  var datos = Object.values(DATOS.maestros.proveedores || {});
-  return crearVentana(KEY, title, columns, datos, options);
+
+  return crearVentana(configuracion);
 }

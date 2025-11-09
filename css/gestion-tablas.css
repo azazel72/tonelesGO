@@ -33,3 +33,12 @@ div.contenedor-tabla {
 
 /* Pie de la tabla (texto auxiliar) */
 .pie-totales { padding: 6px 10px; font-size: 12px; color:#555; }
+
+/* Estilos para edición con lista desplegable */
+.tabulator-edit-list .tabulator-edit-list-item.focused {
+  background:#83a8e2 !important;
+}
+
+.tabulator-cell button {
+  padding: 0 10px;
+}

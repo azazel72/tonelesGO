@@ -13,34 +13,14 @@ const windowsRegistry = new Map(); // key -> { wb, table }
 
 // ====== CREAR VENTANA GENERICA ======
 function crearVentana(configuracion, show=true) {
-  // Reusar
-  if (REUSE_SINGLE && windowsRegistry.has(configuracion.KEY)) {
-    const { wb, tabla } = windowsRegistry.get(configuracion.KEY);
-    wb.show();
-    wb.focus();
-    return wb;
-  }
-  
+ 
   // CREACION DE WINBOX
   const contenedor = crearElemento("div", { class: "contenedor-winbox" });
-  const cabecera = crearElemento("div", { class: "p-2 border-bottom d-flex gap-2 align-items-center" });
+  const cabecera = crearCabeceraVentana(configuracion);
   contenedor.appendChild(cabecera);
-  //Controles de cabecera
-  if (configuracion.winbox.tipo == "generico") {
-    const botonReload = crearBotonesGenericos("u-reload");
-    const botonAdd    = crearBotonesGenericos("u-add");
-    const botonFilter = crearBotonesGenericos("u-filter");
-    const botonEditar = crearBotonesGenericos("u-editar");
-    const contenedorDerecha = crearBotonesGenericos("contenedor-botones-derecha");
-    contenedorDerecha.appendChild(botonFilter);
-    contenedorDerecha.appendChild(botonEditar);
-    cabecera.appendChild(botonReload);
-    cabecera.appendChild(botonAdd);
-    cabecera.appendChild(contenedorDerecha);
-  }
 
   // Ventana
-  const wb = crearWinBox(contenedor, configuracion.winbox.options);
+  const wb = crearWinBox(configuracion.KEY, contenedor, configuracion.winbox.options);
   if (show) {
     wb.show();
     wb.focus();
@@ -51,34 +31,21 @@ function crearVentana(configuracion, show=true) {
 
   windowsRegistry.set(configuracion.KEY, { wb, table: tabla });
 
-  tabla.on("cellEdited", async (cell) => {
-    const row = cell.getRow().getData();
-    if (!row.id) return;
-    activo = wb.body.querySelector("#u-editar")?.getAttribute("aria-pressed") === "true";
-    console.log("activo", activo);
-    if (!activo) return;
-    const res = await fetch(`${BASE}?table=${configuracion.KEY}&id=${encodeURIComponent(row.id)}`, {
-      method: "PUT",
-      credentials: "same-origin",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(row),
-    });
-    if (!res.ok) { alert(await res.text()); tabla.replaceData(); return; }
-    try { cell.getRow().update(await res.json()); } catch {}
-  });
+  agregarEventosWinBox(wb, tabla, cabecera, configuracion);
+  agregarEventosTabla(wb, tabla, cabecera, configuracion);
 
-  cabecera.addEventListener("click", (e) => {
-    eventoClickCabecera(e, tabla);
-  });
-  
   return wb;
 }
 
-const CeldaAcciones = {
-  title:"Acciones", width:100, headerSort:false, hozAlign:"center",
-  formatter: getFormatter,
-  cellClick: getCellClick,
-};
+let CeldaAcciones;
+
+window.addEventListener("load", () => {
+  CeldaAcciones = {
+    title:"Acciones", width:100, headerSort:false, hozAlign:"center",
+    formatter: getFormatter,
+    cellClick: getCellClick,
+  };
+});
 
 function getFormatter(cell) {
   const d = cell.getRow().getData();
@@ -87,104 +54,10 @@ function getFormatter(cell) {
     : `<button class="btn btn-sm btn-outline-danger" data-action-row="borrar"><i class="bi bi-trash"></i></button>`;
 }
 
-async function getCellClick(e, cell) {
-  console.log("click en acciones");
-  const action = e.target.closest("button")?.getAttribute("data-action-row");
-  const tabla = cell.getTable();
-  const tablaBD = tabla.options.ajaxURL.match(/table=([^&]+)/)[1];
-  if (action === "crear") {
-    const row = cell.getRow();
-    const data = row.getData();
-    try {
-      const res = await fetch(`${BASE}?table=${tablaBD}`, {
-        method: "POST",
-        credentials:"same-origin",
-        headers: { "Content-Type":"application/json" },
-        body: JSON.stringify(data)
-      });
-      if (!res.ok) throw new Error(await res.text());
-      const wrap = await res.json();
-      const created = wrap.data ?? wrap;
 
-      row.update(created);
-      const newRow = await tabla.addRow(row.getData());
-      row.delete();
-
-      //await newRow.getElement().scrollIntoView({ behavior: "smooth", block: "center" });
-      await newRow.scrollTo("center", true);
-
-      tabla.alert("Registro creado con éxito");
-      setTimeout(()=>tabla.clearAlert(), 1200);
-    } catch (err) {
-      tabla.alert("Error: " + err.message);
-      setTimeout(()=>tabla.clearAlert(), 2000);
-    }
-  } else if (action === "borrar") {
-    const id = cell.getRow().getData().id;
-    if (!confirm(`¿Eliminar ID ${id}?`)) return;
-    try {
-      const res = await fetch(`${BASE}?table=${tablaBD}&id=${encodeURIComponent(id)}`, {
-        method:"DELETE",
-        credentials:"same-origin",
-      });
-      if (!res.ok) return alert(await res.text());
-      cell.getRow().delete();
-    } catch (err) {
-      alert("Error: " + err.message);
-      setTimeout(()=>tabla.clearAlert(), 2000);
-    }
-  }
-}
-
-async function eventoClickCabecera(e, tabla) {
-  const btn = e.target.closest("button");
-  if (!btn) return;
-  e.preventDefault();
-  btn.classList.add("disabled", "pe-none");
-  setTimeout(() => btn.classList.remove("disabled", "pe-none"), 500);
-  switch (btn.id) {
-    case "u-reload":
-      tabla.replaceData(tabla.datos);
-      break;
-    case "u-add":
-      const rowComp = await tabla.addRow({}, true);
-      tabla.getColumns().forEach(col => {
-        if (col.getDefinition()?.editable !== undefined) {
-            rowComp.getCell(col.getField())?.edit(true);
-        }
-      });
-      break;
-    case "u-filter":
-      activo = btn.getAttribute("aria-pressed") === "true";
-      tabla.getColumns().forEach(col => {
-        if (col.getDefinition()?.filtrable) {
-          if (activo) {
-            col.updateDefinition({
-              headerFilter: col.getDefinition()?.editor ?? "input",        // o "select" según columna or list
-            });
-          } else {
-            col.setHeaderFilterValue("");
-            col.updateDefinition({
-              headerFilter: false,
-            });
-          }
-        }
-      });
-      tabla.element.querySelector(".tabulator-header-filter input")?.focus();
-      break;
-    case "u-editar":
-      activo = btn.getAttribute("aria-pressed") === "true";
-      tabla.getColumns().forEach(col => {
-        if (col.getDefinition()?.editable !== undefined) {
-            col.updateDefinition({ editable: activo });
-        }
-      });
-      break;
-  }
-}
 
 // ====== WINBOX ======
-function crearWinBox(contenido, opciones={}) {
+function crearWinBox(KEY, contenido, opciones={}) {
   opciones.y = opciones.y ? (opciones.y + 56) : "center";
 
   const wb = new WinBox({
@@ -220,10 +93,12 @@ function crearTabla(KEY, contenedor, configuracion) {
     layout: "fitColumns",
     index: "id",
     persistenceID: `${KEY}-table`,
+    /*
     persistence:{
       sort:true,
       columns:true,
     },
+    */
     placeholder: "Sin datos",
     ...configuracion,
   });
@@ -285,11 +160,31 @@ function crearBotonesGenericos(tipo) {
       return crearElemento("div", {
         class: "ms-auto d-flex gap-2"
       });
+    case "u-cargar-entradas":
+      return crearElemento("button", {
+        id: "u-cargar-entradas",
+        class: "btn btn-sm btn-outline-secondary",
+        content: "Consultar"
+      });
+    case "u-add-providers":
+      return crearElemento("button", {
+        id: "u-add-providers",
+        class: "btn btn-sm btn-outline-success",
+        content: "Actualizar proveedores"
+      });
+    case "u-cargar-entradas-input":
+      return crearElemento("input", {
+        id: "u-cargar-entradas-input",
+        class: "form-control form-control-sm",
+        type: "number",
+        min: 1970,
+        max: 2199,
+        placeholder: "Año"
+      });
     default:
       return null;
   }
 }
-
 
 /**
  * Crea un elemento HTML genérico de forma sencilla.
@@ -322,4 +217,88 @@ function crearElemento(tag, opts = {}) {
   }
 
   return el;
+}
+
+function cerrarVentanasMaestros() {
+  const clavesMaestros = [
+    "usuarios",
+    "proveedores",
+    "clientes",
+    "instalaciones",
+    "ubicaciones",
+    "estados",
+    "materiales",
+    "entradas",
+    "salidas",
+  ];
+  for (const clave of clavesMaestros) {
+    const par = windowsRegistry.get(clave);
+    par?.wb?.hide();
+  }
+}
+
+function crearCabeceraVentana(configuracion) {
+  const cabecera = crearElemento("div", { class: "cabecera p-2 border-bottom d-flex gap-2 align-items-center" });
+
+  switch(configuracion.winbox.tipo) {
+    case "generico":
+      const botonReload = crearBotonesGenericos("u-reload");
+      const botonAdd    = crearBotonesGenericos("u-add");
+      const botonFilter = crearBotonesGenericos("u-filter");
+      const botonEditar = crearBotonesGenericos("u-editar");
+      const contenedorDerecha = crearBotonesGenericos("contenedor-botones-derecha");
+      contenedorDerecha.appendChild(botonFilter);
+      contenedorDerecha.appendChild(botonEditar);
+      cabecera.appendChild(botonReload);
+      cabecera.appendChild(botonAdd);
+      cabecera.appendChild(contenedorDerecha);
+      break;
+    case "entradas":
+      const botonCargar = crearBotonesGenericos("u-cargar-entradas");
+      const inputAño    = crearBotonesGenericos("u-cargar-entradas-input");
+      const botonAgregarProveedores = crearBotonesGenericos("u-add-providers");
+      const contenedorDerecha2 = crearBotonesGenericos("contenedor-botones-derecha");
+      contenedorDerecha2.appendChild(botonAgregarProveedores);
+      cabecera.appendChild(botonCargar);
+      cabecera.appendChild(inputAño);
+      cabecera.appendChild(contenedorDerecha2);
+      break;
+  }
+
+  return cabecera;
+}
+
+function agregarEventosWinBox(wb, tabla, cabecera, configuracion) {
+  cabecera.addEventListener("click", (e) => {
+    eventoClickCabecera(e, tabla, cabecera);
+  });
+}
+
+function agregarEventosTabla(wb, tabla, cabecera, configuracion) {
+  tabla.on("cellEdited", async (cell) => {
+    const row = cell.getRow().getData();
+    if (!row.id) return;
+    activo = wb.body.querySelector("#u-editar")?.getAttribute("aria-pressed") === "true";
+    console.log("activo", activo);
+    if (!activo) return;
+    const res = await fetch(`${BASE}?table=${configuracion.KEY}&id=${encodeURIComponent(row.id)}`, {
+      method: "PUT",
+      credentials: "same-origin",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(row),
+    });
+    if (!res.ok) { alert(await res.text()); tabla.replaceData(); return; }
+    try { cell.getRow().update(await res.json()); } catch {}
+  });
+}
+
+function comprobarVentanaAbierta(clave) {
+  if (REUSE_SINGLE && windowsRegistry.has(clave)) {
+    const par = windowsRegistry.get(clave);
+    par.wb.show();
+    par.wb.focus();
+    return par.wb;
+  } else {
+    return null;
+  }
 }
