@@ -755,3 +755,11 @@ año
 año
   Input should be a valid integer, unable to parse string as an integer [type=int_parsing, input_value='', input_type=str]
     For further information visit https://errors.pydantic.dev/2.12/v/int_parsing
+2025-11-11 23:04:25 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: 'GenericRepository' object has no attribute 'get_by_id'
+2025-11-11 23:14:01 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: 'GenericRepository' object has no attribute 'get_by_id'
+2025-11-11 23:14:26 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: 'GenericRepository' object has no attribute 'get_by_id'
+2025-11-11 23:16:26 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: 'Colector' object has no attribute 'modificar_maestro'
+2025-11-11 23:25:14 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: 'GenericRepository' object has no attribute 'get_by_id'
+2025-11-12 00:12:22 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: 'GenericRepository' object has no attribute 'get_by_id'
+2025-11-12 00:22:02 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: 'GenericRepository' object has no attribute 'get_by_id'
+2025-11-12 00:23:22 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: 'GenericRepository' object has no attribute 'get_by_id'

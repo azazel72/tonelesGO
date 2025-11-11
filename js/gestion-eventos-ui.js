@@ -57,8 +57,7 @@ async function eventoClickCabecera(e, tabla, cabecera) {
   setTimeout(() => btn.classList.remove("disabled", "pe-none"), 500);
   switch (btn.id) {
     case "u-reload":
-      //tabla.replaceData(tabla.datos);
-
+      tabla.redraw(true); 
       break;
     case "u-add":
       const rowComp = await tabla.addRow({}, true);

@@ -18,6 +18,7 @@ function openEntradasWin() {
     tabulator: {
       entradas: {
         options: {
+          height: "auto",
           columns: crearColumnasEntradas(DATOS.maestros.proveedores),
           data: DATOS.entradas.planificacion || [],
           columnDefaults: { editable:true, editor:"input", headerHozAlign:"center" },
@@ -26,6 +27,7 @@ function openEntradasWin() {
       },
       materiales: {
         options: {
+          height: "auto",
           columns: crearColumnasMateriales(),
           data: DATOS.entradas.plan_materiales || [],
         },
@@ -103,7 +105,7 @@ function crearColumnasEntradas(proveedores) {
     columns: [
       { title: "ID", field: "id", visible: false },                // oculto
       {
-        title: "Proveedor", field: "proveedor_id", width: 200,
+        title: "Proveedor", field: "proveedor_id", width: 250,
         editable: false, cssClass: "col-proveedor",
         formatter: (cell) => {
           const id = cell.getValue();
@@ -196,7 +198,7 @@ function crearColumnasEntradas(proveedores) {
     identificacion,
     totalesEntrada,
     ...gruposMeses,
-    CeldaAcciones,
+    EntradaAcciones,
   ];
 }
 
@@ -204,7 +206,7 @@ function crearColumnasMateriales() {
    // Grupo Identificación (sin ID visible)
   const columns = [
     { title: "ID", frozen: true, field: "id", visible: false },
-    { title: "Material", frozen: true, field: "tipo_material", width: 200,
+    { title: "Material", frozen: true, field: "tipo_material", width: 250,
       accessor: (value, data, type, params, column, row) =>{
         console.log(value, data, type, params, column, row);  
         return value >= params.legalAge;
@@ -244,7 +246,7 @@ function crearColumnasMateriales() {
     { title:"Octubre", field:"octubre", hozAlign:"right" },
     { title:"Noviembre", field:"noviembre", hozAlign:"right" },
     { title:"Diciembre", field:"diciembre", hozAlign:"right" },
-    CeldaAcciones,
+    EntradaAcciones,
   ];
 
   return columns;
@@ -264,8 +266,8 @@ function crearVentanaEntradas(configuracion, show=true) {
   }
 
   // Tabulator
-  const tablaEntradas = crearTabla(configuracion.KEY, contenedor, configuracion.tabulator.entradas.options);
-  const tablaMateriales = crearTabla(configuracion.KEY, contenedor, configuracion.tabulator.materiales.options);
+  const tablaEntradas = crearTabla("entradas", contenedor, configuracion.tabulator.entradas.options);
+  const tablaMateriales = crearTabla("materiales", contenedor, configuracion.tabulator.materiales.options);
 
   windowsRegistry.set(configuracion.KEY, { wb: wb, table: [tablaEntradas, tablaMateriales] });
   console.log(windowsRegistry);
@@ -304,7 +306,7 @@ function agregarEventosTablaEntradas(wb, tabla, cabecera, configuracion) {
     });
 
     // comunicar cambios al backend
-    send("modificar_entrada_planificacion", { id: d.id, campo: f, valor: d[f] });
+    send("modificar_entrada", { tabla: tabla.KEY, id: d.id, campo: f, valor: d[f], valores: d });
   });
 
   cabecera.querySelector("#u-cargar-entradas")?.addEventListener("click", () => {
@@ -339,4 +341,20 @@ function initialSync(topTable, botTable){
   const fijoTop = topTable.getColumn("producto");
   const fijoBot = botTable.getColumn("producto");
   if (fijoTop && fijoBot) fijoBot.setWidth(fijoTop.getWidth());
+}
+
+let EntradaAcciones;
+
+window.addEventListener("load", () => {
+  EntradaAcciones = {
+    title:"Acciones", width:100, headerSort:false, hozAlign:"center",
+    formatter: getFormatterEntradaAcciones,
+    cellClick: getCellClick,
+  };
+});
+
+function getFormatterEntradaAcciones(cell) {
+  const d = cell.getRow().getData();
+  return `<button class="btn btn-sm btn-outline-primary" data-action-row="crear"><i class="bi bi-file-earmark-arrow-up"></i></button>` +
+    `<button class="btn btn-sm btn-outline-danger" data-action-row="borrar"><i class="bi bi-trash"></i></button>`;
 }

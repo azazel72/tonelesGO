@@ -1,5 +1,7 @@
 import logging
 
+from servidor.conexiones.response_message import ResponseMessage
+
 from .modelos import ClienteDB, EstadoDB, InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB
 from .modelos import PlanCamionesDB, PlanFacturacionDB, PlanMaterialDB
 from .persistencia import GenericRepository, DB
@@ -87,3 +89,98 @@ class Colector:
     def limpiar_datos(self):
         #self.datos.clear()
         pass
+
+    def modificar_entrada(self, data):
+        tabla = data.get("tabla")
+        entrada_id = data.get("id")
+        campo = data.get("campo")
+        valor = data.get("valor")
+        objeto = None
+
+        with DB.crear_sesion() as session:
+            if tabla == "entradas":
+                repo = self.repo_camiones
+            else:
+                raise ValueError(f"Tabla '{tabla}' no reconocida.")
+            
+            objeto = repo.get(session, entrada_id)
+            if not objeto:
+                raise ValueError(f"Entrada con ID {entrada_id} no encontrada en la tabla '{tabla}'.")
+            
+            if not hasattr(objeto, campo):
+                raise ValueError(f"Campo '{campo}' no existe en la entrada de la tabla '{tabla}'.")
+            
+            setattr(objeto, campo, valor)
+            repo.update(session, objeto)
+
+            try:
+                session.commit()
+            except Exception:
+                session.rollback()
+                raise
+
+            #Actualizado en memoria
+            if tabla == "entradas":
+                self.maestros.camiones[entrada_id] = CamionDTO.from_db(objeto)
+
+            logger.info(f"Entrada ID {entrada_id} modificada: {campo} = {valor}")
+          
+            return ResponseMessage.ok("modificar_maestro", {"id": entrada_id, "campo": campo, "valor": valor}).model_dump()
+
+
+    def modificar_maestro(self, data):
+        tabla = data.get("tabla")
+        entrada_id = data.get("id")
+        campo = data.get("campo")
+        valor = data.get("valor")
+        objeto = None
+
+        with DB.crear_sesion() as session:
+            if tabla == "clientes":
+                repo = self.repo_clientes
+            elif tabla == "estados":
+                repo = self.repo_estados
+            elif tabla == "instalaciones":
+                repo = self.repo_instalaciones
+            elif tabla == "ubicaciones":
+                repo = self.repo_ubicaciones
+            elif tabla == "proveedores":
+                repo = self.repo_proveedores
+            elif tabla == "usuarios":
+                repo = self.repo_usuarios
+            else:
+                raise ValueError(f"Tabla '{tabla}' no reconocida.")
+            
+            objeto = repo.get(session, entrada_id)
+            if not objeto:
+                raise ValueError(f"Entrada con ID {entrada_id} no encontrada en la tabla '{tabla}'.")
+            
+            if not hasattr(objeto, campo):
+                raise ValueError(f"Campo '{campo}' no existe en la entrada de la tabla '{tabla}'.")
+            
+            setattr(objeto, campo, valor)
+            repo.update(session, objeto)
+
+            try:
+                session.commit()
+            except Exception:
+                session.rollback()
+                raise
+
+            #Actualizado en memoria
+            if tabla == "clientes":
+                self.maestros.clientes[entrada_id] = ClienteDTO.from_db(objeto)
+            elif tabla == "estados":
+                self.maestros.estados[entrada_id] = EstadoDTO.from_db(objeto)
+            elif tabla == "instalaciones":
+                self.maestros.instalaciones[entrada_id] = InstalacionDTO.from_db(objeto)
+            elif tabla == "ubicaciones":
+                self.maestros.ubicaciones[entrada_id] = UbicacionDTO.from_db(objeto)
+            elif tabla == "proveedores":
+                self.maestros.proveedores[entrada_id] = ProveedorDTO.from_db(objeto)
+            elif tabla == "usuarios":
+                self.maestros.usuarios[entrada_id] = UsuarioDTO.from_db(objeto)
+
+            logger.info(f"Entrada ID {entrada_id} modificada: {campo} = {valor}")
+          
+            return ResponseMessage.ok("modificar_maestro", {"id": entrada_id, "campo": campo, "valor": valor}).model_dump()

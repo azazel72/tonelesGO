@@ -4577,3 +4577,130 @@ año
 2025-11-11 02:25:10 [INFO] configurar_logs: 🟢 Logging configurado correctamente
 2025-11-11 02:25:10 [INFO] paezlobato_servidor: Aplicación iniciada
 2025-11-11 02:25:10 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-11 02:33:53 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-11 02:33:53 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-11 02:33:53 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-11 02:34:01 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-11 22:35:35 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-11 22:35:35 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-11 22:35:35 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-11 22:38:58 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-11 22:39:41 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-11 22:39:41 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-11 22:39:41 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-11 22:39:41 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-11 22:40:12 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-11 22:41:17 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada_planificacion
+2025-11-11 22:43:14 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-11 22:43:19 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-11 22:45:01 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada_planificacion
+2025-11-11 22:45:03 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada_planificacion
+2025-11-11 22:54:38 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-11 22:54:38 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-11 22:54:38 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-11 22:54:38 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-11 22:56:39 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada_planificacion
+2025-11-11 22:57:30 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada_planificacion
+2025-11-11 22:57:40 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada_planificacion
+2025-11-11 22:58:00 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-11 22:58:04 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-11 23:02:29 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-11 23:02:29 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-11 23:02:29 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-11 23:02:29 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-11 23:03:10 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-11 23:03:19 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-11 23:04:20 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-11 23:04:23 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-11 23:04:25 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-11 23:04:25 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: 'GenericRepository' object has no attribute 'get_by_id'
+2025-11-11 23:05:21 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-11 23:05:21 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-11 23:05:21 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-11 23:05:21 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-11 23:13:47 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-11 23:14:01 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-11 23:14:01 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: 'GenericRepository' object has no attribute 'get_by_id'
+2025-11-11 23:14:26 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-11 23:14:26 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: 'GenericRepository' object has no attribute 'get_by_id'
+2025-11-11 23:14:51 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-11 23:14:51 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-11 23:14:51 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-11 23:14:51 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-11 23:16:26 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-11 23:16:26 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: 'Colector' object has no attribute 'modificar_maestro'
+2025-11-11 23:18:06 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-11 23:18:06 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-11 23:18:06 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-11 23:18:06 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-11 23:23:10 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-11 23:23:10 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-11 23:23:10 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-11 23:23:10 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-11 23:24:42 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-11 23:24:42 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-11 23:24:42 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-11 23:24:42 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-11 23:24:46 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-11 23:25:14 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-11 23:25:14 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: 'GenericRepository' object has no attribute 'get_by_id'
+2025-11-11 23:26:13 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-11 23:26:13 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-11 23:26:13 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-11 23:26:13 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-11 23:26:24 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-11 23:26:24 [INFO] paezlobato_colector: Entrada ID 22 modificada: nombre = T1000
+2025-11-11 23:27:31 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-11 23:27:31 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-11 23:27:31 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-11 23:27:31 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-11 23:27:38 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-11 23:27:38 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-11 23:27:38 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-11 23:27:38 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-11 23:27:49 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-11 23:28:03 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-11 23:28:03 [INFO] paezlobato_colector: Entrada ID 22 modificada: nombre = T5000
+2025-11-11 23:28:49 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-11 23:30:34 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-11 23:30:34 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-11 23:30:34 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-11 23:30:34 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-11 23:31:22 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-11 23:31:22 [INFO] paezlobato_colector: Entrada ID 1 modificada: instalacion_id = 2
+2025-11-11 23:31:31 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-11 23:33:35 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-11 23:34:33 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-11 23:34:33 [INFO] paezlobato_colector: Entrada ID 1 modificada: orden = 10
+2025-11-11 23:34:39 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-11 23:34:39 [INFO] paezlobato_colector: Entrada ID 1 modificada: instalacion_id = 4
+2025-11-11 23:39:22 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-11 23:39:37 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-11 23:39:46 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-11 23:39:46 [INFO] paezlobato_colector: Entrada ID 1 modificada: orden = 10
+2025-11-11 23:40:05 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-11 23:40:05 [INFO] paezlobato_colector: Entrada ID 1 modificada: instalacion_id = 1
+2025-11-11 23:50:21 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-11 23:51:03 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-11 23:52:14 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-12 00:11:09 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-12 00:12:22 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-12 00:12:22 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: 'GenericRepository' object has no attribute 'get_by_id'
+2025-11-12 00:12:36 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-12 00:12:41 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-12 00:20:26 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-12 00:20:31 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-12 00:21:18 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-12 00:21:21 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-12 00:22:02 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-12 00:22:02 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: 'GenericRepository' object has no attribute 'get_by_id'
+2025-11-12 00:23:22 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-12 00:23:22 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: 'GenericRepository' object has no attribute 'get_by_id'
+2025-11-12 00:29:49 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-12 00:29:49 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-12 00:29:49 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-12 00:29:49 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-12 00:35:23 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-12 00:35:23 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-12 00:35:23 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-12 00:35:23 [INFO] paezlobato_crud_routes: Acción recibida: maestros

@@ -103,6 +103,8 @@ function crearTabla(KEY, contenedor, configuracion) {
     ...configuracion,
   });
 
+  tabla.KEY = KEY;
+
   return tabla;
 }
 
@@ -275,19 +277,23 @@ function agregarEventosWinBox(wb, tabla, cabecera, configuracion) {
 }
 
 function agregarEventosTabla(wb, tabla, cabecera, configuracion) {
+  tabla.on("cellEditing", (cell) => {
+    activo = wb.body.querySelector("#u-editar")?.getAttribute("aria-pressed") === "true";
+    if (!activo) {
+      cell.cancelEdit();
+    }
+  });
+
   tabla.on("cellEdited", async (cell) => {
+    //no guarda en un row nuevo, esto se hace desde el boton Crear
     const row = cell.getRow().getData();
     if (!row.id) return;
-    activo = wb.body.querySelector("#u-editar")?.getAttribute("aria-pressed") === "true";
-    console.log("activo", activo);
-    if (!activo) return;
 
     // comunicar cambios al backend
     const d = cell.getRow().getData();
     const f = cell.getField();
     const t = configuracion.KEY;
-    send("modificar_celda", { tabla: t, id: d.id, campo: f, valor: d[f] });
-    //try { cell.getRow().update(await res.json()); } catch {}
+    send("modificar_maestro", { tabla: t, id: d.id, campo: f, valor: d[f], valores: d });
   });
 }
 

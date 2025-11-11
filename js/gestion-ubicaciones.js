@@ -24,8 +24,8 @@ function openUbicacionesWin() {
     tabulator: {
       options: {
         columns: [
-          { title:"ID", field:"id", width:70, hozAlign:"right", headerSort:false },
-          { title:"Descripción", field:"descripcion", editor:"input", cssClass: "filtrable", },
+          { title:"ID", field:"id", width:70, hozAlign:"right", headerSort: false },
+          { title:"Descripción", field:"descripcion", editor:"input", editable: false, cssClass: "filtrable", },
           {
             title: "Instalación",
             field: "instalacion_id",
@@ -40,10 +40,12 @@ function openUbicacionesWin() {
               itemFormatter:function(label, value, item, element){
                 return "<strong>" + label + " </strong><br/><div>" + item.tipo + "</div>";
               },
+              editable: false,
+              cssClass: "filtrable",
             },
             formatter: cell => DATOS?.maestros?.instalaciones[cell.getValue()]?.nombre ?? cell.getValue(),
           },
-          { title:"Orden", field:"orden", editor:"input", cssClass: "filtrable", },
+          { title:"Orden", field:"orden", editor:"input", editable: false, cssClass: "filtrable", },
           CeldaAcciones,
         ],
         data: Object.values(DATOS.maestros.ubicaciones || {}),
