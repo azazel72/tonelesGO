@@ -4,7 +4,7 @@
 // - (Opcional) cambia el título con un contador/fecha para distinguir instancias
 
 // ====== CONFIG ======
-const BASE = "/tonelesgo/api/index.php";       // <-- ajusta la ruta real a tu index.php
+const BASE = "/paezlobato/api/index.php";       // <-- ajusta la ruta real a tu index.php
 const REUSE_SINGLE = true;                 // true = una ventana que se reusa
 const CLOSE_PRESERVES_STATE = true;        // true = cerrar SOLO oculta (conserva datos)
 // ====== REGISTRO DE VENTANAS ======
