@@ -92,8 +92,8 @@ function crearTabla(KEY, contenedor, configuracion) {
     width: "100%",
     layout: "fitColumns",
     index: "id",
-    persistenceID: `${KEY}-table`,
     /*
+    persistenceID: `${KEY}-table`,
     persistence:{
       sort:true,
       columns:true,
@@ -175,7 +175,7 @@ function crearBotonesGenericos(tipo) {
     case "u-cargar-entradas-input":
       return crearElemento("input", {
         id: "u-cargar-entradas-input",
-        class: "form-control form-control-sm",
+        class: "form-control-sm",
         type: "number",
         min: 1970,
         max: 2199,

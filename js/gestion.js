@@ -1,4 +1,8 @@
-const DATOS = {};
+const DATOS = {
+    maestros: {},
+    entradas: { planificacion: {} },
+    salidas: { planificacion: {} },
+};
 
 window.onload = () => {
     const actions = {

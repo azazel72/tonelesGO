@@ -22,12 +22,12 @@ div.contenedor-tabla {
 .tabulator-cell.col-confirmado      { background: rgba(0, 200, 120, 0.06); }
 .tabulator-cell.col-pactados        { background: rgba(255, 165, 0, 0.10); }
 .tabulator-cell.col-descontar       { background: rgba(90, 90, 90, 0.06); }
-.tabulator-cell.col-total-previstos { background: rgba(255, 165, 0, 0.10); }
+.tabulator-cell.col-total-previstos { /*background: rgba(255, 165, 0, 0.10) !important;*/ font-weight: bold; }
 .tabulator-cell.col-total-entregados{ background: rgba(0, 200, 120, 0.10); }
 
 /* Desajuste en Total previstos (no coincide con suma de meses) */
 .tabulator-cell.col-total-previstos.mismatch {
-  background: rgba(255, 0, 0, 0.18) !important;
+  background: rgb(251 206 206) !important;
   font-weight: 600;
 }
 

@@ -1,106 +1,71 @@
 <!doctype html>
 <html lang="es">
 <head>
-  <meta charset="utf-8" />
-  <title>Tabulator v6 - list sin blanco</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <!-- Asegúrate de que CSS y JS son de la MISMA versión -->
-  <link href="https://unpkg.com/tabulator-tables@6.2.0/dist/css/tabulator.min.css" rel="stylesheet">
-  <style>
-    body { font-family: system-ui, Arial, sans-serif; margin: 20px; }
-    #tabla { height: 360px; }
-    /* Por si tu CSS global pone el texto blanco: fuerza color legible en la lista */
-    .tabulator-edit-list .tabulator-list-item { color: #222; }
-
-.tabulator-edit-list .tabulator-edit-list-item.focused {
-  background:#83a8e2 !important;
-}
-
-  </style>
+<meta charset="utf-8" />
+<title>Totales por grupos de columnas</title>
+<link href="https://unpkg.com/tabulator-tables@6.3.0/dist/css/tabulator.min.css" rel="stylesheet">
+<style>
+  body { font-family: system-ui, Arial, sans-serif; margin: 20px; }
+  #tabla { height: 400px; }
+</style>
 </head>
 <body>
-  <h1>Editor "list" funcionando</h1>
-  <div id="tabla"></div>
+<h2>Totales agrupando cada dos columnas (estilo Excel)</h2>
+<div id="tabla"></div>
 
-  <script src="https://unpkg.com/tabulator-tables@6.2.0/dist/js/tabulator.min.js"></script>
-  <script>
-    const datos = [
-      { id: 1, nombre: "Ana",   estado: "OK",  rol: "admin" },
-      { id: 2, nombre: "Luis",  estado: "BAD", rol: "user"  },
-      { id: 3, nombre: "Marta", estado: "OK",  rol: "guest" },
-      { id: 4, nombre: "Paco",  estado: "NEW", rol: "user"  },
-    ];
+<script src="https://unpkg.com/tabulator-tables@6.3.0/dist/js/tabulator.min.js"></script>
+<script>
+  // Datos de ejemplo
+  const data = [
+    { id: 1, a1: 10, a2: 20, b1: 5,  b2: 7,  c1: 12, c2: 8 },
+    { id: 2, a1: 6,  a2: 9,  b1: 11, b2: 4,  c1: 10, c2: 15 },
+    { id: 3, a1: 8,  a2: 12, b1: 7,  b2: 9,  c1: 14, c2: 6 },
+  ];
 
-    // 1er list: array {label,value}
-    const estadosMap = { OK:"Operativo", BAD:"Con incidencias", NEW:"Nuevo" };
-    const estadosList = Object.entries(estadosMap).map(([value, label]) => ({ label, value }));
-    const transformados = datos.map(({ estado, ...resto }) => ({
-  ...resto,
-  value: estado,
-  label: estado,
-}));
+  // Función para sumar columnas del mismo grupo
+  const sumar = (field1, field2) => (cell) => {
+    const row = cell.getRow().getData();
+    const v1 = Number(row[field1]) || 0;
+    const v2 = Number(row[field2]) || 0;
+    return v1 + v2;
+  };
 
-    // 2º list: objeto simple {value: label} (evita blancos por estructura)
-    const rolesMap = { admin:"Administrador", user:"Usuario", guest:"Invitado" };
+  // Configuración de columnas con grupos de 2 + total
+  const columns = [
+    { title:"ID", field:"id", width:60, hozAlign:"center" },
 
-    const tabla = new Tabulator("#tabla", {
-      data: datos,
-      layout: "fitDataStretch",
-      columns: [
-        { title: "ID", field: "id", width: 70, hozAlign: "right" },
-        {
-          title: "Estado",
-          field: "estado",
-          editor: "list",
-          editorParams: {
-            values: transformados,      // [{label,value}]
-            // autocomplete: true,     // opcional
-            valuesLookup:"active", //get the values from the currently active rows in this column
-            //Value Lookup Configuration (use these with valuesLookup Option)
-            valuesLookupField:"estado",
-            clearable:true, 
-            itemFormatter:function(label, value, item, element){
-              console.log(element);
-                return "<strong>" + label + " </strong><br/><div>" + item.nombre+ "</div>";
-            },
-                    mask:"AAA-999", //apply input mask to text entry
-    freetext:true,
-          },
-          formatter: cell => estadosMap[cell.getValue()] ?? cell.getValue(),
-        },
-        {
-          title: "Rol",
-          field: "rol",
-          editor: "list",
-          editorParams: {
-            values: rolesMap,
-        autocomplete: true,
-        allowEmpty: true,
-        listOnEmpty: true,
-        freetext: true,
+    // Primer grupo
+    { title:"Grupo A", columns:[
+        { title:"A1", field:"a1", hozAlign:"right" },
+        { title:"A2", field:"a2", hozAlign:"right" },
+        { title:"Total A", field:"totalA", hozAlign:"right", bottomCalc:"sum",
+          formatter: sumar("a1","a2") }
+    ]},
 
-          },
-          formatter: cell => rolesMap[cell.getValue()] ?? cell.getValue(),
-        },        
-           {
-      title: "Location",
-      field: "locastion",
-      width: 130,
-      editor: "list",
-      editorParams: {
-        values: ["USA", "China", "South America"], //an array of values or value/label objects
-        autocomplete: true,
-        allowEmpty: true,
-        listOnEmpty: true,
-        freetext: true,
-      },
-    },
+    // Segundo grupo
+    { title:"Grupo B", columns:[
+        { title:"B1", field:"b1", hozAlign:"right" },
+        { title:"B2", field:"b2", hozAlign:"right" },
+        { title:"Total B", field:"totalB", hozAlign:"right", bottomCalc:"sum",
+          formatter: sumar("b1","b2") }
+    ]},
 
-        { title: "Nombre", field: "nombre", editor: "input" },
-      ],
-    });
+    // Tercer grupo
+    { title:"Grupo C", columns:[
+        { title:"C1", field:"c1", hozAlign:"right" },
+        { title:"C2", field:"c2", hozAlign:"right" },
+        { title:"Total C", field:"totalC", hozAlign:"right", bottomCalc:"sum",
+          formatter: sumar("c1","c2") }
+    ]},
+  ];
 
-    window.tabla = tabla;
-  </script>
+  // Instancia Tabulator
+  const table = new Tabulator("#tabla", {
+    data,
+    layout:"fitDataStretch",
+    columns,
+    bottomCalcFormatter:"money", // aplica formato de número a los totales inferiores
+  });
+</script>
 </body>
 </html>
