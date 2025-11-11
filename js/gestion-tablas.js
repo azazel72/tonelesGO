@@ -281,14 +281,13 @@ function agregarEventosTabla(wb, tabla, cabecera, configuracion) {
     activo = wb.body.querySelector("#u-editar")?.getAttribute("aria-pressed") === "true";
     console.log("activo", activo);
     if (!activo) return;
-    const res = await fetch(`${BASE}?table=${configuracion.KEY}&id=${encodeURIComponent(row.id)}`, {
-      method: "PUT",
-      credentials: "same-origin",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(row),
-    });
-    if (!res.ok) { alert(await res.text()); tabla.replaceData(); return; }
-    try { cell.getRow().update(await res.json()); } catch {}
+
+    // comunicar cambios al backend
+    const d = cell.getRow().getData();
+    const f = cell.getField();
+    const t = configuracion.KEY;
+    send("modificar_celda", { tabla: t, id: d.id, campo: f, valor: d[f] });
+    //try { cell.getRow().update(await res.json()); } catch {}
   });
 }
 

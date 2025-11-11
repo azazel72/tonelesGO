@@ -302,6 +302,9 @@ function agregarEventosTablaEntradas(wb, tabla, cabecera, configuracion) {
         pr.getElement().classList.toggle("mismatch", total_previstos !== sumaPrevMeses);
       }
     });
+
+    // comunicar cambios al backend
+    send("modificar_entrada_planificacion", { id: d.id, campo: f, valor: d[f] });
   });
 
   cabecera.querySelector("#u-cargar-entradas")?.addEventListener("click", () => {
