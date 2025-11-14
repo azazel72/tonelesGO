@@ -70,3 +70,22 @@ function send(action, data) {
   else alert("No conectado al servidor.");
 }
 
+async function wsRequest(action, data={}) {
+  return new Promise((resolve, reject) => {
+    const requestId = genId();
+    const msg = JSON.stringify({ action: action, data: data, request_id: requestId });
+    const ws = conn && conn.socket;
+    if (ws && ws.readyState === WebSocket.OPEN) {
+      pendingWsRequests.set(requestId, { resolve, reject });
+      ws.send(msg);
+      setTimeout(() => {
+        if (pendingWsRequests.has(requestId)) {
+          pendingWsRequests.delete(requestId);
+          reject(new Error("Timeout en la solicitud WebSocket"));
+        }
+      }, timeoutWsRequestMs);
+    } else {
+      reject(new Error("WebSocket no está conectado"));
+    }
+  });
+}

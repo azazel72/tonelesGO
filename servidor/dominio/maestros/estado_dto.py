@@ -3,7 +3,7 @@ from servidor.modelos import EstadoDB
 
 
 class EstadoDTO(BaseModel):
-    id: int
+    id: int | None
     descripcion: str
 
     def from_db(estado_db: EstadoDB) -> "EstadoDTO":

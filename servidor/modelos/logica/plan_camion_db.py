@@ -2,7 +2,7 @@
 from sqlmodel import SQLModel, Field
 from typing import Optional
 
-class PlanCamionesDB(SQLModel, table=True):
+class PlanCamionDB(SQLModel, table=True):
     __tablename__ = "plan_camiones"
 
     id: Optional[int] = Field(default=None, primary_key=True)

@@ -4,6 +4,7 @@ from .instalacion_dto import InstalacionDTO
 from .ubicacion_dto import UbicacionDTO
 from .proveedor_dto import ProveedorDTO
 from .usuario_dto import UsuarioDTO
+from .rol_dto import RolDTO
 
 __all__ = [
     "ClienteDTO",
@@ -12,4 +13,5 @@ __all__ = [
     "UbicacionDTO",
     "ProveedorDTO",
     "UsuarioDTO",
+    "RolDTO",
 ]

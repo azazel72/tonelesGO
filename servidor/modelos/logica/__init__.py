@@ -1,9 +1,9 @@
-from .plan_camniones_db import PlanCamionesDB
+from .plan_camion_db import PlanCamionDB
 from .plan_facturacion_db import PlanFacturacionDB
 from .plan_material_db import PlanMaterialDB
 
 __all__ = [
-    "PlanCamionesDB",
+    "PlanCamionDB",
     "PlanFacturacionDB",
     "PlanMaterialDB",
 ]

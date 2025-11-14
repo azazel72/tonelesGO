@@ -1,8 +1,8 @@
-from .logica import PlanCamionesDB, PlanFacturacionDB, PlanMaterialDB
-from .maestros import ClienteDB, EstadoDB, InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB
+from .logica import PlanCamionDB, PlanFacturacionDB, PlanMaterialDB
+from .maestros import ClienteDB, EstadoDB, InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB, RolDB
 
 __all__ = [
-    "PlanCamionesDB",
+    "PlanCamionDB",
     "PlanFacturacionDB",
     "PlanMaterialDB",
     "ClienteDB",
@@ -11,4 +11,5 @@ __all__ = [
     "UbicacionDB",
     "ProveedorDB",
     "UsuarioDB",
+    "RolDB",
 ]

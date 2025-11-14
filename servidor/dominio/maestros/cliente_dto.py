@@ -3,7 +3,7 @@ from servidor.modelos import ClienteDB
 
 
 class ClienteDTO(BaseModel):
-    id: int
+    id: int | None
     nombre: str
 
     def from_db(cliente_db: ClienteDB) -> "ClienteDTO":

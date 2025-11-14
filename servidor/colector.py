@@ -2,11 +2,11 @@ import logging
 
 from servidor.conexiones.response_message import ResponseMessage
 
-from .modelos import ClienteDB, EstadoDB, InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB
-from .modelos import PlanCamionesDB, PlanFacturacionDB, PlanMaterialDB
+from .modelos import ClienteDB, EstadoDB, InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB, RolDB
+from .modelos import PlanCamionDB, PlanFacturacionDB, PlanMaterialDB
 from .persistencia import GenericRepository, DB
-from .dominio import EntradasDTO, MaestrosDTO
-from .dominio import ClienteDTO, EstadoDTO, InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO
+from .dominio import EntradasDTO, MaestrosDTO, PlanMaterialDTO, PlanFacturacionDTO, PlanCamionDTO
+from .dominio import ClienteDTO, EstadoDTO, InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO, RolDTO
 
 logger = logging.getLogger("paezlobato_colector")
 
@@ -22,7 +22,7 @@ class Colector:
         self.maestros = MaestrosDTO()
 
         self.repo_facturacion = GenericRepository(PlanFacturacionDB)
-        self.repo_camiones = GenericRepository(PlanCamionesDB)
+        self.repo_camiones = GenericRepository(PlanCamionDB)
         self.repo_materiales = GenericRepository(PlanMaterialDB)
 
         self.repo_clientes = GenericRepository(ClienteDB)
@@ -32,6 +32,7 @@ class Colector:
         self.repo_proveedores = GenericRepository(ProveedorDB)
 
         self.repo_usuarios = GenericRepository(UsuarioDB)
+        self.repo_roles = GenericRepository(RolDB)
 
 
     def obtener_datos_maestros(self) -> dict:
@@ -42,6 +43,7 @@ class Colector:
             ubicaciones = self.repo_ubicaciones.list_all(session)
             proveedores = self.repo_proveedores.list_all(session)
             usuarios = self.repo_usuarios.list_all(session)
+            roles = self.repo_roles.list_all(session)
 
             self.maestros.clientes = {cliente.id: ClienteDTO.from_db(cliente) for cliente in clientes}
             self.maestros.estados = {estado.id: EstadoDTO.from_db(estado) for estado in estados}
@@ -49,23 +51,29 @@ class Colector:
             self.maestros.ubicaciones = {ubicacion.id: UbicacionDTO.from_db(ubicacion) for ubicacion in ubicaciones}
             self.maestros.proveedores = {proveedor.id: ProveedorDTO.from_db(proveedor) for proveedor in proveedores}
             self.maestros.usuarios = {usuario.id: UsuarioDTO.from_db(usuario) for usuario in usuarios}
+            self.maestros.roles = {rol.id: RolDTO.from_db(rol) for rol in roles}
 
             #print("Datos maestros cargados:", self.maestros)
             #print("Datos clientes cargados:", self.maestros.clientes)
 
 
-    def obtener_entradas(self, año: int) -> EntradasDTO:
+    def obtener_entradas(self, año: int, actualizar_local = True) -> EntradasDTO:
         with DB.crear_sesion() as session:
             plan_camiones = self.repo_camiones.list_by_year(session, año)
             plan_facturacion = self.repo_facturacion.list_by_year(session, año)
             plan_materiales = self.repo_materiales.list_by_year(session, año)
 
-            return EntradasDTO(
+            entradas_dto = EntradasDTO(
                 año=año,
-                plan_camiones=plan_camiones,
-                plan_facturacion=plan_facturacion[0] if plan_facturacion else None,
-                plan_materiales=plan_materiales
+                plan_camiones=[PlanCamionDTO.from_db(pc) for pc in plan_camiones],
+                plan_facturacion=PlanFacturacionDTO.from_db(plan_facturacion[0]) if plan_facturacion else None,
+                plan_materiales=[PlanMaterialDTO.from_db(pm) for pm in plan_materiales]
             )
+        
+            if actualizar_local:
+                self.entradas = entradas_dto
+
+            return entradas_dto
         
     def agregar_entradas_proveedores(self, año: int) -> EntradasDTO:
         with DB.crear_sesion() as session:
@@ -76,7 +84,7 @@ class Colector:
             proveedores_faltantes = [p for p in proveedores if p.id not in plan_proveedores_ids]
 
             logger.info(f"Proveedores faltantes para el año {año}: {[p.nombre for p in proveedores_faltantes]}")
-            nuevas = [PlanCamionesDB(proveedor_id=p.id, año=año) for p in proveedores_faltantes]
+            nuevas = [PlanCamionDB(proveedor_id=p.id, año=año) for p in proveedores_faltantes]
             self.repo_camiones.insert_all(session, nuevas)
             try:
                 session.commit()
@@ -86,10 +94,6 @@ class Colector:
             logger.info("Entradas de proveedores agregadas correctamente.")
             return self.obtener_entradas(año)
 
-    def limpiar_datos(self):
-        #self.datos.clear()
-        pass
-
     def modificar_entrada(self, data):
         tabla = data.get("tabla")
         entrada_id = data.get("id")
@@ -98,34 +102,17 @@ class Colector:
         objeto = None
 
         with DB.crear_sesion() as session:
-            if tabla == "entradas":
-                repo = self.repo_camiones
-            else:
-                raise ValueError(f"Tabla '{tabla}' no reconocida.")
-            
-            objeto = repo.get(session, entrada_id)
-            if not objeto:
-                raise ValueError(f"Entrada con ID {entrada_id} no encontrada en la tabla '{tabla}'.")
-            
-            if not hasattr(objeto, campo):
-                raise ValueError(f"Campo '{campo}' no existe en la entrada de la tabla '{tabla}'.")
-            
-            setattr(objeto, campo, valor)
-            repo.update(session, objeto)
+            repo, busqueda, objeto = self.obtener_repo(tabla)
 
-            try:
-                session.commit()
-            except Exception:
-                session.rollback()
-                raise
+            DTO = busqueda(entrada_id)
+            self.checkUpdate(DTO, tabla, entrada_id, campo)            
 
-            #Actualizado en memoria
-            if tabla == "entradas":
-                self.maestros.camiones[entrada_id] = CamionDTO.from_db(objeto)
+            setattr(DTO, campo, valor)
+            updated = DTO.to_db()
+            repo.update(session, updated)
 
             logger.info(f"Entrada ID {entrada_id} modificada: {campo} = {valor}")
-          
-            return ResponseMessage.ok("modificar_maestro", {"id": entrada_id, "campo": campo, "valor": valor}).model_dump()
+            return {"id": entrada_id, "campo": campo, "valor": valor}
 
 
     def modificar_maestro(self, data):
@@ -136,31 +123,27 @@ class Colector:
         objeto = None
 
         with DB.crear_sesion() as session:
-            if tabla == "clientes":
-                repo = self.repo_clientes
-            elif tabla == "estados":
-                repo = self.repo_estados
-            elif tabla == "instalaciones":
-                repo = self.repo_instalaciones
-            elif tabla == "ubicaciones":
-                repo = self.repo_ubicaciones
-            elif tabla == "proveedores":
-                repo = self.repo_proveedores
-            elif tabla == "usuarios":
-                repo = self.repo_usuarios
-            else:
-                raise ValueError(f"Tabla '{tabla}' no reconocida.")
+            repo, maestro, objeto = self.obtener_repo(tabla)
             
-            objeto = repo.get(session, entrada_id)
-            if not objeto:
-                raise ValueError(f"Entrada con ID {entrada_id} no encontrada en la tabla '{tabla}'.")
+            DTO = maestro.get(entrada_id)
+            self.checkUpdate(DTO, tabla, entrada_id, campo)
             
-            if not hasattr(objeto, campo):
-                raise ValueError(f"Campo '{campo}' no existe en la entrada de la tabla '{tabla}'.")
-            
-            setattr(objeto, campo, valor)
-            repo.update(session, objeto)
+            setattr(DTO, campo, valor)
+            updated = DTO.to_db()
+            repo.update(session, updated)
 
+            maestro[entrada_id] = DTO
+            logger.info(f"Entrada ID {entrada_id} modificada: {campo} = {valor}")
+            return  {"id": entrada_id, "campo": campo, "valor": valor}
+
+
+    def eliminar_maestro(self, data):
+        tabla = data.get("tabla")
+        entrada_id = data.get("id")
+
+        with DB.crear_sesion() as session:
+            repo, maestro, objeto = self.obtener_repo(tabla)
+            repo.delete(session, entrada_id)
             try:
                 session.commit()
             except Exception:
@@ -168,19 +151,84 @@ class Colector:
                 raise
 
             #Actualizado en memoria
-            if tabla == "clientes":
-                self.maestros.clientes[entrada_id] = ClienteDTO.from_db(objeto)
-            elif tabla == "estados":
-                self.maestros.estados[entrada_id] = EstadoDTO.from_db(objeto)
-            elif tabla == "instalaciones":
-                self.maestros.instalaciones[entrada_id] = InstalacionDTO.from_db(objeto)
-            elif tabla == "ubicaciones":
-                self.maestros.ubicaciones[entrada_id] = UbicacionDTO.from_db(objeto)
-            elif tabla == "proveedores":
-                self.maestros.proveedores[entrada_id] = ProveedorDTO.from_db(objeto)
-            elif tabla == "usuarios":
-                self.maestros.usuarios[entrada_id] = UsuarioDTO.from_db(objeto)
+            maestro.pop(entrada_id, None)
+            logger.info(f"Entrada ID {entrada_id} eliminada.")
+            return {"id": entrada_id }
 
-            logger.info(f"Entrada ID {entrada_id} modificada: {campo} = {valor}")
+
+
+    def insertar_maestro(self, data):
+        tabla = data.get("tabla")
+        objeto = None
+
+        with DB.crear_sesion() as session:
+            repo, maestro, objeto = self.obtener_repo(tabla)
+
+            objeto_DTO = objeto(id=0, **data)
+            objeto_DB = objeto_DTO.to_db()
+            objeto_DB.id = None  # Asegura que el ID sea None para la inserción
+            new = repo.insert(session, objeto_DB)
+            objeto_DTO = objeto.from_db(new)
+            maestro[new.id] = objeto_DTO
+
+            logger.info(f"Insertado ID {new.id} en la tabla {tabla}")
           
-            return ResponseMessage.ok("modificar_maestro", {"id": entrada_id, "campo": campo, "valor": valor}).model_dump()
+            return objeto_DTO
+        
+
+    def obtener_repo(self, tabla):
+        if tabla == "clientes":
+            repo = self.repo_clientes
+            maestro = self.maestros.clientes
+            objeto = ClienteDTO
+        elif tabla == "estados":
+            repo = self.repo_estados
+            maestro = self.maestros.estados
+            objeto = EstadoDTO
+        elif tabla == "instalaciones":
+            repo = self.repo_instalaciones
+            maestro = self.maestros.instalaciones
+            objeto = InstalacionDTO
+        elif tabla == "ubicaciones":
+            repo = self.repo_ubicaciones
+            maestro = self.maestros.ubicaciones
+            objeto = UbicacionDTO
+        elif tabla == "proveedores":
+            repo = self.repo_proveedores
+            maestro = self.maestros.proveedores
+            objeto = ProveedorDTO
+        elif tabla == "usuarios":
+            repo = self.repo_usuarios
+            maestro = self.maestros.usuarios
+            objeto = UsuarioDTO
+        elif tabla == "roles":
+            repo = self.repo_roles
+            maestro = self.maestros.roles
+            objeto = RolDTO
+        elif tabla == "entradas":
+            repo = self.repo_camiones
+            print(self.entradas.plan_camiones)
+            maestro = self.entradas.buscar_camion_por_id
+            objeto = PlanCamionDTO
+        elif tabla == "materiales":
+            repo = self.repo_materiales
+            maestro = self.entradas.buscar_material_por_id
+            objeto = PlanMaterialDTO
+        elif tabla == "facturacion":
+            repo = self.repo_facturacion
+            maestro = self.entradas.buscar_facturacion_por_id
+            objeto = PlanFacturacionDTO
+        else:
+            raise ValueError(f"Tabla '{tabla}' no reconocida.")
+
+        return repo, maestro, objeto
+    
+    def checkUpdate(self, objeto, tabla, entrada_id, campo):
+        if not objeto:
+            raise ValueError(f"Entrada con ID {entrada_id} no encontrada en la tabla '{tabla}'.")
+        if not hasattr(objeto, campo):
+            raise ValueError(f"Campo '{campo}' no existe en la entrada de la tabla '{tabla}'.")
+
+    def limpiar_datos(self):
+        #self.datos.clear()
+        pass

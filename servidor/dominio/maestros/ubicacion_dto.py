@@ -3,7 +3,7 @@ from servidor.modelos import UbicacionDB
 
 
 class UbicacionDTO(BaseModel):
-    id: int
+    id: int | None
     descripcion: str
     instalacion_id: int
     orden: int

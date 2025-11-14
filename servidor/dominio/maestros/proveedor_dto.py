@@ -3,7 +3,7 @@ from servidor.modelos import ProveedorDB
 
 
 class ProveedorDTO(BaseModel):
-    id: int
+    id: int | None
     nombre: str
 
     def from_db(proveedor_db: ProveedorDB) -> "ProveedorDTO":

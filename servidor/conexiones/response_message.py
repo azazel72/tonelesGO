@@ -9,11 +9,11 @@ class ResponseMessage(BaseModel, Generic[T]):
     action: str  # o usa un Enum/Literal si quieres restringir
     data: Optional[T] = None
     error: Optional[str] = None
+    request_id: Optional[str] = None
 
     @classmethod
-    def ok(cls, action: str, data: T) -> "ResponseMessage[T]":
-        return cls(action=action, data=data)
-
+    def ok(cls, action: str, data: T, request_id: Optional[str] = None) -> "ResponseMessage[T]":
+        return cls(action=action, data=data, request_id=request_id)
     @classmethod
-    def fail(cls, action: str, error: str) -> "ResponseMessage[Any]":
-        return cls(action=action, error=error)
+    def fail(cls, action: str, error: str, request_id: Optional[str] = None) -> "ResponseMessage[Any]":
+        return cls(action=action, error=error, request_id=request_id)

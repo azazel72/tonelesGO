@@ -3,7 +3,7 @@ from servidor.modelos import InstalacionDB
 
 
 class InstalacionDTO(BaseModel):
-    id: int
+    id: int | None
     nombre: str
     tipo: str
 

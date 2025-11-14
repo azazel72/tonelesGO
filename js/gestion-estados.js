@@ -15,9 +15,10 @@ function openEstadosWin() {
     },
     tabulator: {
       options: {
+        editable: false,
         columns: [
           { title:"ID", field:"id", width:70, hozAlign:"right", headerSort:false },
-          { title:"Descripción", field:"descripcion", editor:"input", editable:false, cssClass: "filtrable", },
+          { title:"Descripción", field:"descripcion", editor:"input", editable: tablaEditable, cssClass: "filtrable", },
           CeldaAcciones,
         ],
         data: Object.values(DATOS.maestros.estados || {}),

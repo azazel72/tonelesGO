@@ -763,3 +763,537 @@ año
 2025-11-12 00:12:22 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: 'GenericRepository' object has no attribute 'get_by_id'
 2025-11-12 00:22:02 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: 'GenericRepository' object has no attribute 'get_by_id'
 2025-11-12 00:23:22 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: 'GenericRepository' object has no attribute 'get_by_id'
+2025-11-12 23:53:13 [ERROR] paezlobato_crud_routes: Error al procesar la acción eliminar_maestro: Tabla '' no reconocida.
+2025-11-13 01:09:25 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_maestro: 'ResponseMessage[Any]' object has no attribute 'request_id'
+2025-11-13 01:12:45 [ERROR] paezlobato_crud_routes: Error al procesar la acción eliminar_maestro: 'ResponseMessage[Any]' object has no attribute 'request_id'
+2025-11-13 01:12:45 [ERROR] paezlobato_crud_routes: Error al procesar la acción eliminar_maestro: 'ResponseMessage[Any]' object has no attribute 'request_id'
+2025-11-13 01:14:33 [ERROR] paezlobato_crud_routes: Error al procesar la acción eliminar_maestro: too many values to unpack (expected 2)
+2025-11-13 01:14:33 [ERROR] paezlobato_crud_routes: Error al procesar la acción eliminar_maestro: too many values to unpack (expected 2)
+2025-11-13 01:16:16 [ERROR] paezlobato_crud_routes: Error al procesar la acción eliminar_maestro: too many values to unpack (expected 2)
+2025-11-13 01:16:16 [ERROR] paezlobato_crud_routes: Error al procesar la acción eliminar_maestro: too many values to unpack (expected 2)
+2025-11-13 01:17:06 [ERROR] paezlobato_crud_routes: Error al procesar la acción eliminar_maestro: cannot access local variable 'repo' where it is not associated with a value
+2025-11-13 01:17:06 [ERROR] paezlobato_crud_routes: Error al procesar la acción eliminar_maestro: cannot access local variable 'repo' where it is not associated with a value
+2025-11-13 01:17:32 [ERROR] paezlobato_crud_routes: Error al procesar la acción eliminar_maestro: too many values to unpack (expected 2)
+2025-11-13 01:17:32 [ERROR] paezlobato_crud_routes: Error al procesar la acción eliminar_maestro: too many values to unpack (expected 2)
+2025-11-13 02:00:53 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: (mysql.connector.errors.IntegrityError) 1062 (23000): Duplicate entry '19' for key 'PRIMARY'
+[SQL: INSERT INTO clientes (id, nombre) VALUES (%(id)s, %(nombre)s)]
+[parameters: {'id': 19, 'nombre': 't800'}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-11-13 02:04:35 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: Instance '<ClienteDB at 0x204158f3fc0>' is not persistent within this Session
+2025-11-13 02:05:03 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: (mysql.connector.errors.IntegrityError) 1062 (23000): Duplicate entry '19' for key 'PRIMARY'
+[SQL: INSERT INTO clientes (id, nombre) VALUES (%(id)s, %(nombre)s)]
+[parameters: {'id': 19, 'nombre': 't8'}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-11-13 02:07:25 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: (mysql.connector.errors.IntegrityError) 1062 (23000): Duplicate entry '17' for key 'PRIMARY'
+[SQL: INSERT INTO clientes (id, nombre) VALUES (%(id)s, %(nombre)s)]
+[parameters: {'id': 17, 'nombre': 't300'}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-11-13 02:08:41 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: Instance '<ClienteDB at 0x24480d6f110>' is not persistent within this Session
+2025-11-13 02:38:09 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_maestro: from_dict
+2025-11-13 02:41:52 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_maestro: 1 validation error for ClienteDTO
+id
+  Field required [type=missing, input_value={'tabla': 'clientes', 'nombre': 'Miguelon'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+2025-11-13 02:51:57 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_maestro: 1 validation error for ClienteDTO
+id
+  Field required [type=missing, input_value={'tabla': 'clientes', 'nombre': 'Miguelote'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+2025-11-13 02:54:32 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_maestro: 1 validation error for ClienteDTO
+id
+  Field required [type=missing, input_value={'tabla': 'clientes', 'nombre': 'Miguelon'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+2025-11-13 02:54:48 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_maestro: 1 validation error for ClienteDTO
+id
+  Field required [type=missing, input_value={'tabla': 'clientes', 'nombre': 'Miguelote'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+2025-11-13 02:55:06 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_maestro: 1 validation error for ClienteDTO
+id
+  Field required [type=missing, input_value={'tabla': 'clientes', 'nombre': 'test'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+2025-11-13 02:56:30 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_maestro: Could not refresh instance '<ClienteDB at 0x2044262ea80>'
+2025-11-13 02:57:51 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_maestro: (mysql.connector.errors.IntegrityError) 1062 (23000): Duplicate entry '5464654' for key 'name'
+[SQL: INSERT INTO clientes (nombre) VALUES (%(nombre)s)]
+[parameters: {'nombre': '5464654'}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-11-13 02:58:18 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_maestro: 'ClienteDTO' object has no attribute 'to_dict'
+2025-11-13 02:59:00 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_maestro: (mysql.connector.errors.IntegrityError) 1062 (23000): Duplicate entry '5464654' for key 'name'
+[SQL: INSERT INTO clientes (nombre) VALUES (%(nombre)s)]
+[parameters: {'nombre': '5464654'}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-11-13 02:59:05 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_maestro: (mysql.connector.errors.IntegrityError) 1062 (23000): Duplicate entry 'test' for key 'name'
+[SQL: INSERT INTO clientes (nombre) VALUES (%(nombre)s)]
+[parameters: {'nombre': 'test'}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-11-13 03:09:22 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_maestro: (mysql.connector.errors.IntegrityError) 1062 (23000): Duplicate entry 'Rafael' for key 'name'
+[SQL: INSERT INTO clientes (nombre) VALUES (%(nombre)s)]
+[parameters: {'nombre': 'Rafael'}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-11-13 03:10:01 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_maestro: servidor.dominio.maestros.cliente_dto.ClienteDTO() got multiple values for keyword argument 'id'
+2025-11-13 03:12:38 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_maestro: (mysql.connector.errors.IntegrityError) 1062 (23000): Duplicate entry 'Miguel' for key 'name'
+[SQL: INSERT INTO clientes (nombre) VALUES (%(nombre)s)]
+[parameters: {'nombre': 'Miguel'}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-11-13 03:14:15 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_maestro: (mysql.connector.errors.IntegrityError) 1062 (23000): Duplicate entry 'Pepe' for key 'name'
+[SQL: INSERT INTO clientes (nombre) VALUES (%(nombre)s)]
+[parameters: {'nombre': 'Pepe'}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-11-13 03:15:36 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_maestro: 1 validation error for ClienteDTO
+nombre
+  Field required [type=missing, input_value={'id': 0, 'tabla': 'clientes'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+2025-11-13 03:19:56 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 03:19:58 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 03:20:03 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 03:20:11 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 03:20:37 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 03:21:19 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 03:21:22 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 03:23:19 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 03:23:20 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 03:23:22 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 03:23:23 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 03:23:24 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 03:26:06 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 03:26:14 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 03:26:16 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 03:26:19 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 03:26:20 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 03:26:29 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 03:27:37 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 03:27:38 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 03:27:40 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 03:27:42 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 20:42:58 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 20:43:09 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 20:47:09 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_maestro: (mysql.connector.errors.IntegrityError) 1062 (23000): Duplicate entry 'nuevo cli' for key 'name'
+[SQL: INSERT INTO clientes (nombre) VALUES (%(nombre)s)]
+[parameters: {'nombre': 'nuevo cli'}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-11-13 21:00:10 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\mysql\connector\connection_cext.py", line 772, in cmd_query
+    self._cmysql.query(
+_mysql_connector.MySQLInterfaceError: Unknown column 'usuarios.username' in 'field list'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\default.py", line 951, in do_execute
+    cursor.execute(statement, parameters)
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\mysql\connector\cursor_cext.py", line 353, in execute
+    self._connection.cmd_query(
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\mysql\connector\opentelemetry\context_propagation.py", line 97, in wrapper
+    return method(cnx, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\mysql\connector\connection_cext.py", line 781, in cmd_query
+    raise get_mysql_exception(
+mysql.connector.errors.ProgrammingError: 1054 (42S22): Unknown column 'usuarios.username' in 'field list'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\paezlobato\servidor\main.py", line 29, in lifespan
+    colector.obtener_datos_maestros()  # puede fallar
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\colector.py", line 44, in obtener_datos_maestros
+    usuarios = self.repo_usuarios.list_all(session)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\persistencia\generic_repository.py", line 10, in list_all
+    return session.exec(statement).all()
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlmodel\orm\session.py", line 83, in exec
+    results = super().execute(
+              ^^^^^^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 2351, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 2249, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\context.py", line 306, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1419, in execute
+    return meth(
+           ^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\sql\elements.py", line 526, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1641, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 2355, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\default.py", line 951, in do_execute
+    cursor.execute(statement, parameters)
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\mysql\connector\cursor_cext.py", line 353, in execute
+    self._connection.cmd_query(
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\mysql\connector\opentelemetry\context_propagation.py", line 97, in wrapper
+    return method(cnx, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\mysql\connector\connection_cext.py", line 781, in cmd_query
+    raise get_mysql_exception(
+sqlalchemy.exc.ProgrammingError: (mysql.connector.errors.ProgrammingError) 1054 (42S22): Unknown column 'usuarios.username' in 'field list'
+[SQL: SELECT usuarios.id, usuarios.username, usuarios.fullname, usuarios.role, usuarios.password_hash 
+FROM usuarios]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-11-13 21:00:24 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\paezlobato\servidor\main.py", line 29, in lifespan
+    colector.obtener_datos_maestros()  # puede fallar
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\colector.py", line 51, in obtener_datos_maestros
+    self.maestros.usuarios = {usuario.id: UsuarioDTO.from_db(usuario) for usuario in usuarios}
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\dominio\maestros\usuario_dto.py", line 13, in from_db
+    return UsuarioDTO(
+           ^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\main.py", line 250, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for UsuarioDTO
+rol_id
+  Input should be a valid string [type=string_type, input_value=0, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/string_type
+2025-11-13 21:01:19 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\paezlobato\servidor\main.py", line 29, in lifespan
+    colector.obtener_datos_maestros()  # puede fallar
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\colector.py", line 51, in obtener_datos_maestros
+    self.maestros.usuarios = {usuario.id: UsuarioDTO.from_db(usuario) for usuario in usuarios}
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\dominio\maestros\usuario_dto.py", line 13, in from_db
+    return UsuarioDTO(
+           ^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\main.py", line 250, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for UsuarioDTO
+rol_id
+  Input should be a valid string [type=string_type, input_value=0, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/string_type
+2025-11-13 21:01:28 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\paezlobato\servidor\main.py", line 29, in lifespan
+    colector.obtener_datos_maestros()  # puede fallar
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\colector.py", line 51, in obtener_datos_maestros
+    self.maestros.usuarios = {usuario.id: UsuarioDTO.from_db(usuario) for usuario in usuarios}
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\dominio\maestros\usuario_dto.py", line 13, in from_db
+    return UsuarioDTO(
+           ^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\main.py", line 250, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for UsuarioDTO
+rol_id
+  Input should be a valid string [type=string_type, input_value=0, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/string_type
+2025-11-13 21:01:32 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\paezlobato\servidor\main.py", line 29, in lifespan
+    colector.obtener_datos_maestros()  # puede fallar
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\colector.py", line 51, in obtener_datos_maestros
+    self.maestros.usuarios = {usuario.id: UsuarioDTO.from_db(usuario) for usuario in usuarios}
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\dominio\maestros\usuario_dto.py", line 13, in from_db
+    return UsuarioDTO(
+           ^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\main.py", line 250, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for UsuarioDTO
+rol_id
+  Input should be a valid string [type=string_type, input_value=0, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/string_type
+2025-11-13 21:01:40 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\paezlobato\servidor\main.py", line 29, in lifespan
+    colector.obtener_datos_maestros()  # puede fallar
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\colector.py", line 51, in obtener_datos_maestros
+    self.maestros.usuarios = {usuario.id: UsuarioDTO.from_db(usuario) for usuario in usuarios}
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\dominio\maestros\usuario_dto.py", line 13, in from_db
+    return UsuarioDTO(
+           ^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\main.py", line 250, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for UsuarioDTO
+rol_id
+  Input should be a valid string [type=string_type, input_value=0, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/string_type
+2025-11-13 21:02:09 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\paezlobato\servidor\main.py", line 29, in lifespan
+    colector.obtener_datos_maestros()  # puede fallar
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\colector.py", line 51, in obtener_datos_maestros
+    self.maestros.usuarios = {usuario.id: UsuarioDTO.from_db(usuario) for usuario in usuarios}
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\dominio\maestros\usuario_dto.py", line 13, in from_db
+    return UsuarioDTO(
+           ^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\main.py", line 250, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for UsuarioDTO
+rol_id
+  Input should be a valid string [type=string_type, input_value=0, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/string_type
+2025-11-13 21:02:18 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\paezlobato\servidor\main.py", line 29, in lifespan
+    colector.obtener_datos_maestros()  # puede fallar
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\colector.py", line 51, in obtener_datos_maestros
+    self.maestros.usuarios = {usuario.id: UsuarioDTO.from_db(usuario) for usuario in usuarios}
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\dominio\maestros\usuario_dto.py", line 13, in from_db
+    return UsuarioDTO(
+           ^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\main.py", line 250, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for UsuarioDTO
+rol_id
+  Input should be a valid string [type=string_type, input_value=0, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/string_type
+2025-11-13 21:03:01 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\paezlobato\servidor\main.py", line 29, in lifespan
+    colector.obtener_datos_maestros()  # puede fallar
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\colector.py", line 51, in obtener_datos_maestros
+    self.maestros.usuarios = {usuario.id: UsuarioDTO.from_db(usuario) for usuario in usuarios}
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\dominio\maestros\usuario_dto.py", line 13, in from_db
+    return UsuarioDTO(
+           ^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\main.py", line 250, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for UsuarioDTO
+rol_id
+  Input should be a valid string [type=string_type, input_value=0, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/string_type
+2025-11-13 21:04:23 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\paezlobato\servidor\main.py", line 29, in lifespan
+    colector.obtener_datos_maestros()  # puede fallar
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\colector.py", line 51, in obtener_datos_maestros
+    self.maestros.usuarios = {usuario.id: UsuarioDTO.from_db(usuario) for usuario in usuarios}
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\dominio\maestros\usuario_dto.py", line 13, in from_db
+    return UsuarioDTO(
+           ^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\main.py", line 250, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for UsuarioDTO
+rol_id
+  Input should be a valid string [type=string_type, input_value=0, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/string_type
+2025-11-13 21:06:00 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\paezlobato\servidor\main.py", line 29, in lifespan
+    colector.obtener_datos_maestros()  # puede fallar
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\colector.py", line 51, in obtener_datos_maestros
+    self.maestros.usuarios = {usuario.id: UsuarioDTO.from_db(usuario) for usuario in usuarios}
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\dominio\maestros\usuario_dto.py", line 13, in from_db
+    return UsuarioDTO(
+           ^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\main.py", line 250, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for UsuarioDTO
+rol_id
+  Input should be a valid string [type=string_type, input_value=0, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/string_type
+2025-11-13 21:06:20 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\paezlobato\servidor\main.py", line 29, in lifespan
+    colector.obtener_datos_maestros()  # puede fallar
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\colector.py", line 51, in obtener_datos_maestros
+    self.maestros.usuarios = {usuario.id: UsuarioDTO.from_db(usuario) for usuario in usuarios}
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\dominio\maestros\usuario_dto.py", line 13, in from_db
+    return UsuarioDTO(
+           ^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\main.py", line 250, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for UsuarioDTO
+rol_id
+  Input should be a valid string [type=string_type, input_value=0, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/string_type
+2025-11-13 21:07:22 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\paezlobato\servidor\main.py", line 29, in lifespan
+    colector.obtener_datos_maestros()  # puede fallar
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\colector.py", line 51, in obtener_datos_maestros
+    self.maestros.usuarios = {usuario.id: UsuarioDTO.from_db(usuario) for usuario in usuarios}
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\dominio\maestros\usuario_dto.py", line 13, in from_db
+    return UsuarioDTO(
+           ^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\main.py", line 250, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for UsuarioDTO
+rol_id
+  Input should be a valid string [type=string_type, input_value=0, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/string_type
+2025-11-13 21:08:16 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\paezlobato\servidor\main.py", line 29, in lifespan
+    colector.obtener_datos_maestros()  # puede fallar
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\colector.py", line 51, in obtener_datos_maestros
+    self.maestros.usuarios = {usuario.id: UsuarioDTO.from_db(usuario) for usuario in usuarios}
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\dominio\maestros\usuario_dto.py", line 13, in from_db
+    return UsuarioDTO(
+           ^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\main.py", line 250, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for UsuarioDTO
+rol_id
+  Input should be a valid string [type=string_type, input_value=0, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/string_type
+2025-11-13 21:10:01 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\paezlobato\servidor\main.py", line 29, in lifespan
+    colector.obtener_datos_maestros()  # puede fallar
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\colector.py", line 52, in obtener_datos_maestros
+    self.maestros.usuarios = {usuario.id: UsuarioDTO.from_db(usuario) for usuario in usuarios}
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\dominio\maestros\usuario_dto.py", line 13, in from_db
+    return UsuarioDTO(
+           ^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\main.py", line 250, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for UsuarioDTO
+rol_id
+  Input should be a valid string [type=string_type, input_value=0, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/string_type
+2025-11-13 21:10:57 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\paezlobato\servidor\main.py", line 29, in lifespan
+    colector.obtener_datos_maestros()  # puede fallar
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\colector.py", line 53, in obtener_datos_maestros
+    self.maestros.usuarios = {usuario.id: UsuarioDTO.from_db(usuario) for usuario in usuarios}
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\dominio\maestros\usuario_dto.py", line 13, in from_db
+    return UsuarioDTO(
+           ^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\main.py", line 250, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for UsuarioDTO
+rol_id
+  Input should be a valid string [type=string_type, input_value=0, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/string_type
+2025-11-13 21:11:13 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\paezlobato\servidor\main.py", line 29, in lifespan
+    colector.obtener_datos_maestros()  # puede fallar
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\colector.py", line 53, in obtener_datos_maestros
+    self.maestros.usuarios = {usuario.id: UsuarioDTO.from_db(usuario) for usuario in usuarios}
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\dominio\maestros\usuario_dto.py", line 13, in from_db
+    return UsuarioDTO(
+           ^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\main.py", line 250, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for UsuarioDTO
+rol_id
+  Input should be a valid string [type=string_type, input_value=0, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/string_type
+2025-11-13 21:14:55 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 21:15:10 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 21:15:10 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 21:56:52 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: Tabla 'roles' no reconocida.
+2025-11-13 21:56:55 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: Tabla 'roles' no reconocida.
+2025-11-13 21:56:57 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: Tabla 'roles' no reconocida.
+2025-11-13 21:57:03 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: Tabla 'roles' no reconocida.
+2025-11-13 21:59:19 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: Tabla 'roles' no reconocida.
+2025-11-13 21:59:24 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: Tabla 'roles' no reconocida.
+2025-11-13 21:59:27 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: Tabla 'roles' no reconocida.
+2025-11-13 21:59:29 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: Tabla 'roles' no reconocida.
+2025-11-13 21:59:32 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: Tabla 'roles' no reconocida.
+2025-11-13 21:59:34 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: Tabla 'roles' no reconocida.
+2025-11-13 21:59:38 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: Tabla 'roles' no reconocida.
+2025-11-13 21:59:40 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: Tabla 'roles' no reconocida.
+2025-11-13 23:20:23 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: Tabla 'roles' no reconocida.
+2025-11-13 23:20:25 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: Tabla 'roles' no reconocida.
+2025-11-13 23:20:26 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: Tabla 'roles' no reconocida.
+2025-11-13 23:20:28 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: Tabla 'roles' no reconocida.
+2025-11-13 23:45:02 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 23:50:06 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 23:50:48 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 23:50:49 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 23:50:50 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 23:50:51 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 23:50:52 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 23:50:53 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 23:55:59 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 00:05:52 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 00:28:27 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 00:28:29 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 00:28:33 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 00:28:36 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 01:31:50 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 01:31:51 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 01:31:56 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 01:32:59 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 01:33:04 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 01:33:08 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 01:34:04 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 01:34:05 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 01:34:06 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 01:34:08 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 01:34:09 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 01:34:14 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 01:34:18 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 01:34:21 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 01:34:27 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 01:37:24 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 01:38:15 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 02:15:58 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: Colector.checkUpdate() takes 4 positional arguments but 5 were given
+2025-11-14 02:16:19 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: 'PlanCamionDB' object has no attribute 'to_db'
+2025-11-14 02:19:48 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: 'PlanCamionDB' object has no attribute 'to_db'
+2025-11-14 02:21:18 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: 'NoneType' object has no attribute 'get'
+2025-11-14 02:35:00 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: Entrada con ID 1 no encontrada en la tabla 'entradas'.
+2025-11-14 02:35:02 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: Entrada con ID 1 no encontrada en la tabla 'entradas'.
+2025-11-14 02:35:09 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: Entrada con ID 2 no encontrada en la tabla 'entradas'.
+2025-11-14 02:42:53 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: Entrada con ID 1 no encontrada en la tabla 'entradas'.
+2025-11-14 02:43:56 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: Entrada con ID 1 no encontrada en la tabla 'entradas'.
+2025-11-14 02:44:38 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: Entrada con ID 1 no encontrada en la tabla 'entradas'.
+2025-11-14 02:45:45 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: Entrada con ID 1 no encontrada en la tabla 'entradas'.
+2025-11-14 02:46:55 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: Entrada con ID 1 no encontrada en la tabla 'entradas'.
+2025-11-14 02:47:29 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: Entrada con ID 1 no encontrada en la tabla 'entradas'.

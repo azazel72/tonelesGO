@@ -1,50 +1,37 @@
 // ======= BOTONES DE LA COLUMNA DE ACCIONES EN TABLAS =======
 async function getCellClick(e, cell) {
+  e.preventDefault();
   console.log("click en acciones");
   const action = e.target.closest("button")?.getAttribute("data-action-row");
   const tabla = cell.getTable();
-  const tablaBD = tabla.options.ajaxURL.match(/table=([^&]+)/)[1];
-  if (action === "crear") {
-    const row = cell.getRow();
-    const data = row.getData();
-    try {
-      const res = await fetch(`${BASE}?table=${tablaBD}`, {
-        method: "POST",
-        credentials:"same-origin",
-        headers: { "Content-Type":"application/json" },
-        body: JSON.stringify(data)
-      });
-      if (!res.ok) throw new Error(await res.text());
-      const wrap = await res.json();
-      const created = wrap.data ?? wrap;
-
-      row.update(created);
-      const newRow = await tabla.addRow(row.getData());
-      row.delete();
-
-      //await newRow.getElement().scrollIntoView({ behavior: "smooth", block: "center" });
-      await newRow.scrollTo("center", true);
-
-      tabla.alert("Registro creado con éxito");
-      setTimeout(()=>tabla.clearAlert(), 1200);
-    } catch (err) {
-      tabla.alert("Error: " + err.message);
-      setTimeout(()=>tabla.clearAlert(), 2000);
-    }
-  } else if (action === "borrar") {
-    const id = cell.getRow().getData().id;
-    if (!confirm(`¿Eliminar ID ${id}?`)) return;
-    try {
-      const res = await fetch(`${BASE}?table=${tablaBD}&id=${encodeURIComponent(id)}`, {
-        method:"DELETE",
-        credentials:"same-origin",
-      });
-      if (!res.ok) return alert(await res.text());
-      cell.getRow().delete();
-    } catch (err) {
-      alert("Error: " + err.message);
-      setTimeout(()=>tabla.clearAlert(), 2000);
-    }
+  const row = cell.getRow();
+  switch (action) {
+    case "guardar":
+      const datos = row.getData();
+      respuesta = await wsRequest("insertar_maestro", { tabla: tabla.KEY, ...datos });
+      console.log(respuesta);
+      if (respuesta?.id) {
+        DATOS.maestros[tabla.KEY][respuesta.id] = respuesta;
+        row.update(respuesta);
+        row.reformat();
+        row.getElement().classList.remove('nuevo-registro');
+      } else {
+        row.delete();
+        alert("Error al guardar el registro.");
+      }
+      break;
+    case "borrar":
+      const id = row.getData().id;
+      if (id) {
+        if (!confirm(`¿Eliminar ID ${id}?`)) return;
+        respuesta = await wsRequest("eliminar_maestro", { tabla: tabla.KEY, id: id });
+        if (respuesta?.id == id) {
+          row.delete();
+        }
+      } else {
+        row.delete();
+      }
+      break;
   }
 }
 
@@ -60,12 +47,13 @@ async function eventoClickCabecera(e, tabla, cabecera) {
       tabla.redraw(true); 
       break;
     case "u-add":
+      if (tabla.element.querySelector('.nuevo-registro')) {
+        alert("Por favor, complete el registro nuevo antes de crear otro.");
+        return;
+      }
       const rowComp = await tabla.addRow({}, true);
-      tabla.getColumns().forEach(col => {
-        if (col.getDefinition()?.editable !== undefined) {
-            rowComp.getCell(col.getField())?.edit(true);
-        }
-      });
+      rowComp.scrollTo("center", true);
+      rowComp.getElement().classList.add('nuevo-registro');
       break;
     case "u-filter":
       activo = btn.getAttribute("aria-pressed") === "true";
@@ -73,9 +61,30 @@ async function eventoClickCabecera(e, tabla, cabecera) {
         console.log(col);
         if (col.getElement().classList.contains("filtrable")) {
           if (activo) {
-            col.updateDefinition({
-              headerFilter: col.getDefinition()?.editor ?? "input",        // o "select" según columna or list
-            });
+            switch (col.getDefinition()?.editor ?? "input") {
+              case "tickCross":
+                col.updateDefinition({
+                  headerFilter: "list",
+                  headerFilterParams: {
+                    values: {
+                      "": "Todos",   // <-- sin filtro
+                      "true": "Sí",
+                      "false": "No",
+                    },
+                  },
+                  headerFilterFunc: (headerValue, rowValue) => {
+                    if (headerValue === "" || headerValue == null) return true;
+                    const filterBool = headerValue === "true";
+                    return rowValue === filterBool;
+                  },
+                  headerFilterFuncParams: {},  
+                });
+                break;
+              default:
+                col.updateDefinition({
+                  headerFilter: "input", //col.getDefinition()?.editor ?? "input",        // o "select" según columna or list
+                });
+            }
           } else {
             col.setHeaderFilterValue("");
             col.updateDefinition({
@@ -87,12 +96,7 @@ async function eventoClickCabecera(e, tabla, cabecera) {
       tabla.element.querySelector(".tabulator-header-filter input")?.focus();
       break;
     case "u-editar":
-      activo = btn.getAttribute("aria-pressed") === "true";
-      tabla.getColumns().forEach(col => {
-        if (col.getDefinition()?.editable !== undefined) {
-            col.updateDefinition({ editable: activo });
-        }
-      });
+      tabla.options.editable = btn.getAttribute("aria-pressed") === "true";
       break;
   }
 }

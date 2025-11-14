@@ -18,15 +18,17 @@ function openEntradasWin() {
     tabulator: {
       entradas: {
         options: {
+          editable: true,
           height: "auto",
           columns: crearColumnasEntradas(DATOS.maestros.proveedores),
           data: DATOS.entradas.planificacion || [],
-          columnDefaults: { editable:true, editor:"input", headerHozAlign:"center" },
+          columnDefaults: { headerHozAlign:"center" },
           footerElement: "<div class='pie-totales'>Totales en el pie (suma por columna)</div>",
         },
       },
       materiales: {
         options: {
+          editable: true,
           height: "auto",
           columns: crearColumnasMateriales(),
           data: DATOS.entradas.plan_materiales || [],
@@ -97,7 +99,6 @@ function sumMeses(data, sufijo){ // sufijo: "previsto" | "confirmado"
 
 // === construcción de columnas ===
 function crearColumnasEntradas(proveedores) {
-  // Grupo Identificación (sin ID visible)
   const identificacion = {
     title: "Identificación",
     frozen:true,
@@ -106,7 +107,6 @@ function crearColumnasEntradas(proveedores) {
       { title: "ID", field: "id", visible: false },                // oculto
       {
         title: "Proveedor", field: "proveedor_id", width: 250,
-        editable: false, cssClass: "col-proveedor",
         formatter: (cell) => {
           const id = cell.getValue();
           const prov = proveedores?.[id];
@@ -129,21 +129,14 @@ function crearColumnasEntradas(proveedores) {
     frozen:true,
     headerSort: false,
     columns: [
-      { title: "Pa", field: "total_pactados", hozAlign: "right", cssClass:"col-pactados",
-        formatter: (cell) => {
-          const v = Number(cell.getValue()) || 0;
-          return v;
-        },
+      { title: "Pa", field: "total_pactados", cssClass:"col-pactados",
+        ...input_cero,
         bottomCalc:"sum", bottomCalcParams:{precision:false} },
-      { title: "De", field: "total_descontar", hozAlign: "right", cssClass:"col-descontar",
-        formatter: (cell) => {
-          const v = Number(cell.getValue()) || 0;
-          return v;
-        },        
+      { title: "De", field: "total_descontar", cssClass:"col-descontar",
+        ...input_cero,
         bottomCalc:"sum", bottomCalcParams:{precision:false} },
       {
         title:"Pr", field:"total_previstos", hozAlign:"right",
-        editable:false, cssClass:"col-total-previstos",
         // Mostramos el cálculo y coloreamos si no coincide con la suma por meses
         formatter: (cell) => {
           const row = cell.getRow();
@@ -163,7 +156,6 @@ function crearColumnasEntradas(proveedores) {
       },
       {
         title:"En", field:"total_entregados", hozAlign:"right",
-        editable:false, cssClass:"col-total-entregados",
         formatter: (cell) => {
           const d = cell.getRow().getData();
           return sumMeses(d, "confirmado");
@@ -179,17 +171,9 @@ function crearColumnasEntradas(proveedores) {
   const gruposMeses = MESES.map(([pre, titulo]) => ({
     title: titulo,
     columns: [
-      { title:"P", field:`${pre}_previsto`, hozAlign:"right",
-        formatter: (cell) => {
-          const v = Number(cell.getValue()) || 0;
-          return v;
-        },
+      { title:"P", field:`${pre}_previsto`, ...input_cero,
         cssClass:"col-previsto", bottomCalc:"sum", bottomCalcParams:{precision:false} },
-      { title:"C", field:`${pre}_confirmado`, hozAlign:"right",
-        formatter: (cell) => {
-          const v = Number(cell.getValue()) || 0;
-          return v;
-        },
+      { title:"C", field:`${pre}_confirmado`, ...input_cero,
         cssClass:"col-confirmado", bottomCalc:"sum", bottomCalcParams:{precision:false} },
     ],
   }));
@@ -203,54 +187,75 @@ function crearColumnasEntradas(proveedores) {
 }
 
 function crearColumnasMateriales() {
-   // Grupo Identificación (sin ID visible)
   const columns = [
     { title: "ID", frozen: true, field: "id", visible: false },
-    { title: "Material", frozen: true, field: "tipo_material", width: 250,
+    { title: "", frozen: true, field: "tipo_material", width: 250,
       accessor: (value, data, type, params, column, row) =>{
         console.log(value, data, type, params, column, row);  
-        return value >= params.legalAge;
+        return value;
       },
     },
     { title: "Año", frozen: true, field: "año", visible: false },
-    { title: "Pa", frozen: true, field: "total_pactados", hozAlign: "right", cssClass:"col-pactados",
-      formatter: (cell) => {
-        const v = Number(cell.getValue()) || 0;
-        return v;
-      },
+    { title: "Pa", frozen: true, field: "total_pactados", cssClass:"col-pactados",
+      ...input_cero,
     },
-    { title: "De", frozen: true, field: "total_descontar", hozAlign: "right", cssClass:"col-descontar",
-      formatter: (cell) => {
-        const v = Number(cell.getValue()) || 0;
-        return v;
-      },        
-    },
+    { title: "De", frozen: true, field: "total_descontar", cssClass:"col-descontar",
+      ...input_cero,
+    },        
     {
-      title:"Pr", frozen: true, field:"total_previstos", hozAlign:"right", cssClass:"col-total-previstos",
+      title:"Pr", frozen: true, field:"total_previstos", cssClass:"col-total-previstos",
+      hozAlign:"right", 
       formatter: (cell) => {
         return "TOTAL";
       },
     },
     {
-      title:"En", frozen: true, field:"total_entregados", hozAlign:"right", cssClass:"col-total-entregados",
+      title:"En", frozen: true, field:"total_entregados", cssClass:"col-total-entregados",
+      hozAlign:"right", 
+      editable: true,
+      editor:"input",
+      formatter: (cell) => {
+        const v = (Number(cell.getValue()) || 0) + " KG";
+        return v;
+      },
+      editorParams: {
+        selectContents: true,
+      },
     },        
-    { title:"Enero", field:"enero", hozAlign:"right" },
-    { title:"Febrero", field:"febrero", hozAlign:"right" },
-    { title:"Marzo", field:"marzo", hozAlign:"right" },
-    { title:"Abril", field:"abril", hozAlign:"right" },
-    { title:"Mayo", field:"mayo", hozAlign:"right" },
-    { title:"Junio", field:"junio", hozAlign:"right" },
-    { title:"Julio", field:"julio", hozAlign:"right" },
-    { title:"Agosto", field:"agosto", hozAlign:"right" },
-    { title:"Septiembre", field:"septiembre", hozAlign:"right" },
-    { title:"Octubre", field:"octubre", hozAlign:"right" },
-    { title:"Noviembre", field:"noviembre", hozAlign:"right" },
-    { title:"Diciembre", field:"diciembre", hozAlign:"right" },
+    { title:"Enero", field:"enero", ...parametros_meses },
+    { title:"Febrero", field:"febrero", ...parametros_meses },
+    { title:"Marzo", field:"marzo", ...parametros_meses },
+    { title:"Abril", field:"abril", ...parametros_meses },
+    { title:"Mayo", field:"mayo", ...parametros_meses },
+    { title:"Junio", field:"junio", ...parametros_meses },
+    { title:"Julio", field:"julio", ...parametros_meses },
+    { title:"Agosto", field:"agosto", ...parametros_meses },
+    { title:"Septiembre", field:"septiembre", ...parametros_meses },
+    { title:"Octubre", field:"octubre", ...parametros_meses },
+    { title:"Noviembre", field:"noviembre", ...parametros_meses },
+    { title:"Diciembre", field:"diciembre", ...parametros_meses },
     EntradaAcciones,
   ];
 
   return columns;
 }
+
+const parametros_meses = {
+  hozAlign:"right",
+  editable: true,
+  editor:"number",
+};
+
+const input_cero = {
+  hozAlign: "right",
+  editable: true,
+  editor:"input",
+  formatter: (cell) => {
+    const v = Number(cell.getValue()) || "#";
+    return v;
+  },
+};
+
 
 function crearVentanaEntradas(configuracion, show=true) {
    // CREACION DE WINBOX

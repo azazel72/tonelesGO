@@ -108,14 +108,15 @@ class CrudRoutes:
                 if handler:
                     result = handler(ws, msg)
                     if result is not None:
-                        await ws.send_json(ResponseMessage.ok(msg.action, result).model_dump())
+                        rm: Any = ResponseMessage.ok(msg.action, result, msg.request_id).model_dump()
+                        await ws.send_json(rm)
                     else:
-                        await ws.send_json(ResponseMessage.fail(msg.action, "no_result").model_dump())
+                        await ws.send_json(ResponseMessage.fail(msg.action, "no_result", msg.request_id).model_dump())
                 else:
-                    await ws.send_json(ResponseMessage.fail("unknown_action", msg.action).model_dump())
+                    await ws.send_json(ResponseMessage.fail("unknown_action", msg.action, msg.request_id).model_dump())
             except Exception as e:
                 logger.error("Error al procesar la acción %s: %s", msg.action, str(e))
-                await ws.send_json(ResponseMessage.fail(msg.action, str(e)).model_dump())
+                await ws.send_json(ResponseMessage.fail(msg.action, str(e), msg.request_id).model_dump())
         
         return router
 

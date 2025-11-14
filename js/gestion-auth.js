@@ -24,6 +24,7 @@ function clienteConectado() {
 
 function clienteDesconectado() {
     mostrarDesconectado();
+    if (overlay.hidden) mostrarLogin();
     console.log("Desconectado del servidor");
 }
 

@@ -10,6 +10,10 @@ window.onload = () => {
             await openUsuariosWin();
         },
 
+        async "ver-roles"() {
+            await openRolesWin();
+        },
+
         async "ver-proveedores"() {
             await openProveedoresWin();
         },

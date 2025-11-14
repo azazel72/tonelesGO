@@ -42,3 +42,7 @@ div.contenedor-tabla {
 .tabulator-cell button {
   padding: 0 10px;
 }
+
+.nuevo-registro {
+  background-color: #e0f7fa !important;
+}

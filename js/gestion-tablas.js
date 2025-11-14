@@ -50,7 +50,7 @@ window.addEventListener("load", () => {
 function getFormatter(cell) {
   const d = cell.getRow().getData();
   return d.id === undefined
-    ? `<button class="btn btn-sm btn-outline-primary" data-action-row="crear"><i class="bi bi-plus-lg"></i></button>`
+    ? `<button class="btn btn-sm btn-outline-primary" data-action-row="guardar"><i class="bi bi-plus-lg"></i></button>`
     : `<button class="btn btn-sm btn-outline-danger" data-action-row="borrar"><i class="bi bi-trash"></i></button>`;
 }
 
@@ -88,6 +88,7 @@ function crearTabla(KEY, contenedor, configuracion) {
     contenedor.appendChild(tablaHTML);
 
     const tabla = new Tabulator(tablaHTML, {
+    key: KEY,
     height: "100%",
     width: "100%",
     layout: "fitColumns",
@@ -224,6 +225,7 @@ function crearElemento(tag, opts = {}) {
 function cerrarVentanasMaestros() {
   const clavesMaestros = [
     "usuarios",
+    "roles",
     "proveedores",
     "clientes",
     "instalaciones",
@@ -277,13 +279,14 @@ function agregarEventosWinBox(wb, tabla, cabecera, configuracion) {
 }
 
 function agregarEventosTabla(wb, tabla, cabecera, configuracion) {
+/*
   tabla.on("cellEditing", (cell) => {
     activo = wb.body.querySelector("#u-editar")?.getAttribute("aria-pressed") === "true";
     if (!activo) {
       cell.cancelEdit();
     }
   });
-
+*/
   tabla.on("cellEdited", async (cell) => {
     //no guarda en un row nuevo, esto se hace desde el boton Crear
     const row = cell.getRow().getData();
@@ -293,7 +296,12 @@ function agregarEventosTabla(wb, tabla, cabecera, configuracion) {
     const d = cell.getRow().getData();
     const f = cell.getField();
     const t = configuracion.KEY;
-    send("modificar_maestro", { tabla: t, id: d.id, campo: f, valor: d[f], valores: d });
+    resultado = await wsRequest("modificar_maestro", { tabla: t, id: d.id, campo: f, valor: d[f], valores: d });
+    console.log(resultado);
+    cell.setValue(resultado["valor"]); // actualizar con valor confirmado por el servidor
+    if (resultado?.id != d.id) {
+      alert("Error al guardar los cambios en el servidor.");
+    }
   });
 }
 
@@ -306,4 +314,8 @@ function comprobarVentanaAbierta(clave) {
   } else {
     return null;
   }
+}
+
+function tablaEditable(cell) {
+  return cell.getTable().options.editable || cell.getRow().getData().id === undefined;
 }

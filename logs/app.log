@@ -4704,3 +4704,1274 @@ año
 2025-11-12 00:35:23 [INFO] paezlobato_servidor: Aplicación iniciada
 2025-11-12 00:35:23 [INFO] paezlobato_servidor: Rutas montadas correctamente
 2025-11-12 00:35:23 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-12 20:57:11 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-12 20:57:11 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-12 20:57:11 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-12 20:57:17 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-12 21:00:51 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-12 21:00:51 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-12 21:00:51 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-12 21:00:51 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-12 21:01:18 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-12 21:01:18 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-12 21:01:18 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-12 21:01:19 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-12 21:26:55 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-12 21:31:09 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-12 21:33:04 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-12 21:33:36 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-12 21:33:36 [INFO] paezlobato_colector: Entrada ID 1 modificada: orden = 10
+2025-11-12 21:47:24 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-12 21:48:18 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-12 21:49:12 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-12 21:49:20 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_maestro
+2025-11-12 22:30:53 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-12 22:32:10 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-12 22:32:56 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-12 22:37:34 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-12 22:38:43 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-12 22:39:26 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-12 22:40:41 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-12 22:43:07 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-12 22:44:10 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-12 22:45:00 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-12 22:46:15 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-12 22:46:34 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-12 22:47:25 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-12 22:48:50 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-12 22:50:07 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-12 22:51:44 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-12 22:51:51 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-12 22:51:51 [INFO] paezlobato_colector: Entrada ID 1 modificada: orden = 10
+2025-11-12 22:51:56 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-12 22:51:56 [INFO] paezlobato_colector: Entrada ID 1 modificada: role = 
+2025-11-12 22:51:57 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-12 22:51:57 [INFO] paezlobato_colector: Entrada ID 2 modificada: role = 
+2025-11-12 23:29:00 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-12 23:35:00 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-12 23:35:52 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-12 23:36:28 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-12 23:37:53 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_maestro
+2025-11-12 23:52:29 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-12 23:52:29 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-12 23:52:29 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-12 23:52:29 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-12 23:52:44 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-12 23:52:44 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-12 23:52:44 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-12 23:52:44 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-12 23:53:13 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_maestro
+2025-11-12 23:53:13 [ERROR] paezlobato_crud_routes: Error al procesar la acción eliminar_maestro: Tabla '' no reconocida.
+2025-11-12 23:56:24 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-12 23:56:34 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_maestro
+2025-11-12 23:56:34 [INFO] paezlobato_colector: Entrada ID 29 eliminada.
+2025-11-12 23:56:41 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_maestro
+2025-11-12 23:56:41 [INFO] paezlobato_colector: Entrada ID 29 eliminada.
+2025-11-12 23:56:52 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-12 23:57:13 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_maestro
+2025-11-12 23:57:13 [INFO] paezlobato_colector: Entrada ID 32 eliminada.
+2025-11-12 23:57:15 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-12 23:57:44 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_maestro
+2025-11-12 23:57:44 [INFO] paezlobato_colector: Entrada ID 31 eliminada.
+2025-11-13 00:03:00 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 00:05:36 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 00:06:17 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 00:26:22 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 00:27:05 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_maestro
+2025-11-13 00:27:05 [INFO] paezlobato_colector: Entrada ID 4 eliminada.
+2025-11-13 00:51:26 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 00:51:39 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 00:51:50 [INFO] paezlobato_crud_routes: Acción recibida: insertar_maestro
+2025-11-13 00:52:25 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 00:52:25 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 00:52:25 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 00:52:25 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 00:59:11 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 00:59:11 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 00:59:11 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 00:59:11 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 01:03:02 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 01:03:02 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 01:03:02 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 01:03:02 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 01:04:49 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 01:04:49 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 01:04:49 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 01:04:49 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 01:06:42 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 01:06:42 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 01:06:42 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 01:06:42 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 01:07:57 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 01:07:57 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 01:07:57 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 01:07:57 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 01:08:59 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 01:08:59 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 01:08:59 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 01:08:59 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 01:09:17 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 01:09:25 [INFO] paezlobato_crud_routes: Acción recibida: insertar_maestro
+2025-11-13 01:09:25 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_maestro: 'ResponseMessage[Any]' object has no attribute 'request_id'
+2025-11-13 01:12:39 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 01:12:45 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_maestro
+2025-11-13 01:12:45 [ERROR] paezlobato_crud_routes: Error al procesar la acción eliminar_maestro: 'ResponseMessage[Any]' object has no attribute 'request_id'
+2025-11-13 01:12:45 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_maestro
+2025-11-13 01:12:45 [ERROR] paezlobato_crud_routes: Error al procesar la acción eliminar_maestro: 'ResponseMessage[Any]' object has no attribute 'request_id'
+2025-11-13 01:14:23 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 01:14:23 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 01:14:23 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 01:14:23 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 01:14:32 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_maestro
+2025-11-13 01:14:33 [ERROR] paezlobato_crud_routes: Error al procesar la acción eliminar_maestro: too many values to unpack (expected 2)
+2025-11-13 01:14:33 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_maestro
+2025-11-13 01:14:33 [ERROR] paezlobato_crud_routes: Error al procesar la acción eliminar_maestro: too many values to unpack (expected 2)
+2025-11-13 01:15:29 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 01:15:29 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 01:15:29 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 01:15:29 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 01:16:10 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 01:16:10 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 01:16:10 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 01:16:10 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 01:16:16 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_maestro
+2025-11-13 01:16:16 [ERROR] paezlobato_crud_routes: Error al procesar la acción eliminar_maestro: too many values to unpack (expected 2)
+2025-11-13 01:16:16 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_maestro
+2025-11-13 01:16:16 [ERROR] paezlobato_crud_routes: Error al procesar la acción eliminar_maestro: too many values to unpack (expected 2)
+2025-11-13 01:17:00 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 01:17:00 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 01:17:00 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 01:17:00 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 01:17:06 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_maestro
+2025-11-13 01:17:06 [ERROR] paezlobato_crud_routes: Error al procesar la acción eliminar_maestro: cannot access local variable 'repo' where it is not associated with a value
+2025-11-13 01:17:06 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_maestro
+2025-11-13 01:17:06 [ERROR] paezlobato_crud_routes: Error al procesar la acción eliminar_maestro: cannot access local variable 'repo' where it is not associated with a value
+2025-11-13 01:17:28 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 01:17:28 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 01:17:28 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 01:17:28 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 01:17:32 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_maestro
+2025-11-13 01:17:32 [ERROR] paezlobato_crud_routes: Error al procesar la acción eliminar_maestro: too many values to unpack (expected 2)
+2025-11-13 01:17:32 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_maestro
+2025-11-13 01:17:32 [ERROR] paezlobato_crud_routes: Error al procesar la acción eliminar_maestro: too many values to unpack (expected 2)
+2025-11-13 01:18:03 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 01:18:03 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 01:18:03 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 01:18:03 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 01:18:07 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_maestro
+2025-11-13 01:18:07 [INFO] paezlobato_colector: Entrada ID 25 eliminada.
+2025-11-13 01:18:07 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_maestro
+2025-11-13 01:18:07 [INFO] paezlobato_colector: Entrada ID 25 eliminada.
+2025-11-13 01:18:45 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 01:18:45 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 01:18:45 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 01:18:45 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 01:19:27 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_maestro
+2025-11-13 01:19:27 [INFO] paezlobato_colector: Entrada ID 20 eliminada.
+2025-11-13 01:19:27 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_maestro
+2025-11-13 01:19:27 [INFO] paezlobato_colector: Entrada ID 20 eliminada.
+2025-11-13 01:20:08 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_maestro
+2025-11-13 01:20:08 [INFO] paezlobato_colector: Entrada ID 23 eliminada.
+2025-11-13 01:20:08 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_maestro
+2025-11-13 01:20:08 [INFO] paezlobato_colector: Entrada ID 23 eliminada.
+2025-11-13 01:23:47 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 01:23:47 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 01:23:48 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 01:23:48 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 01:24:17 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 01:24:17 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 01:24:17 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 01:24:17 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 01:26:56 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 01:26:56 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 01:26:56 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 01:26:56 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 01:27:45 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 01:27:45 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 01:27:45 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 01:27:45 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 01:28:04 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 01:28:04 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 01:28:04 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 01:28:04 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 01:28:26 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_maestro
+2025-11-13 01:28:26 [INFO] paezlobato_colector: Entrada ID 22 eliminada.
+2025-11-13 01:28:26 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_maestro
+2025-11-13 01:28:26 [INFO] paezlobato_colector: Entrada ID 22 eliminada.
+2025-11-13 01:29:36 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_maestro
+2025-11-13 01:29:36 [INFO] paezlobato_colector: Entrada ID 26 eliminada.
+2025-11-13 01:29:36 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_maestro
+2025-11-13 01:29:36 [INFO] paezlobato_colector: Entrada ID 26 eliminada.
+2025-11-13 01:33:43 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 01:33:43 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 01:33:43 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 01:33:43 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 01:33:48 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_maestro
+2025-11-13 01:33:48 [INFO] paezlobato_colector: Entrada ID 21 eliminada.
+2025-11-13 01:33:48 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_maestro
+2025-11-13 01:33:48 [INFO] paezlobato_colector: Entrada ID 21 eliminada.
+2025-11-13 01:34:07 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 01:34:07 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 01:34:07 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 01:34:07 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 01:34:13 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_maestro
+2025-11-13 01:34:13 [INFO] paezlobato_colector: Entrada ID 25 eliminada.
+2025-11-13 01:34:13 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_maestro
+2025-11-13 01:34:13 [INFO] paezlobato_colector: Entrada ID 25 eliminada.
+2025-11-13 01:35:59 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 01:35:59 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 01:35:59 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 01:35:59 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 01:36:04 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_maestro
+2025-11-13 01:36:04 [INFO] paezlobato_colector: Entrada ID 15 eliminada.
+2025-11-13 01:36:04 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_maestro
+2025-11-13 01:36:04 [INFO] paezlobato_colector: Entrada ID 15 eliminada.
+2025-11-13 01:38:12 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 01:38:32 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_maestro
+2025-11-13 01:38:32 [INFO] paezlobato_colector: Entrada ID 27 eliminada.
+2025-11-13 01:39:36 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 01:39:42 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_maestro
+2025-11-13 01:39:42 [INFO] paezlobato_colector: Entrada ID 18 eliminada.
+2025-11-13 01:40:06 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 01:40:13 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_maestro
+2025-11-13 01:40:13 [INFO] paezlobato_colector: Entrada ID 16 eliminada.
+2025-11-13 01:42:36 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 01:42:45 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_maestro
+2025-11-13 01:42:45 [INFO] paezlobato_colector: Entrada ID 30 eliminada.
+2025-11-13 01:43:18 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 01:56:06 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 01:56:06 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 01:56:06 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 01:56:06 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 01:56:37 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 01:56:37 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 01:56:37 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 01:56:37 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 01:57:04 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 01:57:04 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 01:57:04 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 01:57:04 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 02:00:43 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 02:00:53 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-13 02:00:53 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: (mysql.connector.errors.IntegrityError) 1062 (23000): Duplicate entry '19' for key 'PRIMARY'
+[SQL: INSERT INTO clientes (id, nombre) VALUES (%(id)s, %(nombre)s)]
+[parameters: {'id': 19, 'nombre': 't800'}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-11-13 02:04:28 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 02:04:28 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 02:04:28 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 02:04:28 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 02:04:35 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-13 02:04:35 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: Instance '<ClienteDB at 0x204158f3fc0>' is not persistent within this Session
+2025-11-13 02:04:58 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 02:04:58 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 02:04:58 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 02:04:58 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 02:05:03 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-13 02:05:03 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: (mysql.connector.errors.IntegrityError) 1062 (23000): Duplicate entry '19' for key 'PRIMARY'
+[SQL: INSERT INTO clientes (id, nombre) VALUES (%(id)s, %(nombre)s)]
+[parameters: {'id': 19, 'nombre': 't8'}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-11-13 02:07:25 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-13 02:07:25 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: (mysql.connector.errors.IntegrityError) 1062 (23000): Duplicate entry '17' for key 'PRIMARY'
+[SQL: INSERT INTO clientes (id, nombre) VALUES (%(id)s, %(nombre)s)]
+[parameters: {'id': 17, 'nombre': 't300'}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-11-13 02:08:38 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 02:08:38 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 02:08:38 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 02:08:38 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 02:08:41 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-13 02:08:41 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: Instance '<ClienteDB at 0x24480d6f110>' is not persistent within this Session
+2025-11-13 02:22:17 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 02:22:17 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 02:22:17 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 02:22:17 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 02:22:20 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-13 02:22:21 [INFO] paezlobato_colector: Entrada ID 19 modificada: nombre = t8000
+2025-11-13 02:22:56 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 02:22:56 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 02:22:56 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 02:22:56 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 02:23:35 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 02:23:35 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 02:23:35 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 02:23:35 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 02:25:30 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 02:25:30 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 02:25:30 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 02:25:30 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 02:25:38 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 02:25:38 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 02:25:38 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 02:25:38 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 02:26:06 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 02:26:14 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-13 02:26:14 [INFO] paezlobato_colector: Entrada ID 17 modificada: nombre = t300
+2025-11-13 02:27:21 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 02:27:29 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-13 02:27:29 [INFO] paezlobato_colector: Entrada ID 1 modificada: instalacion_id = 3
+2025-11-13 02:28:00 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 02:28:00 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 02:28:00 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 02:28:00 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 02:28:12 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 02:28:27 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-13 02:28:27 [INFO] paezlobato_colector: Entrada ID 28 modificada: nombre = t1700
+2025-11-13 02:31:59 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 02:31:59 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 02:31:59 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 02:31:59 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 02:32:08 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 02:32:08 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 02:32:08 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 02:32:08 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 02:32:14 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 02:32:28 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-13 02:32:28 [INFO] paezlobato_colector: Entrada ID 17 modificada: nombre = t3000
+2025-11-13 02:32:33 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 02:33:02 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_maestro
+2025-11-13 02:33:02 [INFO] paezlobato_colector: Entrada ID 9 eliminada.
+2025-11-13 02:35:39 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 02:35:39 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 02:35:39 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 02:35:39 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 02:37:01 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 02:37:01 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 02:37:01 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 02:37:01 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 02:37:55 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 02:37:55 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 02:37:55 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 02:37:55 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 02:38:09 [INFO] paezlobato_crud_routes: Acción recibida: insertar_maestro
+2025-11-13 02:38:09 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_maestro: from_dict
+2025-11-13 02:41:37 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 02:41:37 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 02:41:37 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 02:41:37 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 02:41:43 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 02:41:52 [INFO] paezlobato_crud_routes: Acción recibida: insertar_maestro
+2025-11-13 02:41:52 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_maestro: 1 validation error for ClienteDTO
+id
+  Field required [type=missing, input_value={'tabla': 'clientes', 'nombre': 'Miguelon'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+2025-11-13 02:51:57 [INFO] paezlobato_crud_routes: Acción recibida: insertar_maestro
+2025-11-13 02:51:57 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_maestro: 1 validation error for ClienteDTO
+id
+  Field required [type=missing, input_value={'tabla': 'clientes', 'nombre': 'Miguelote'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+2025-11-13 02:54:27 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 02:54:27 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 02:54:27 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 02:54:27 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 02:54:32 [INFO] paezlobato_crud_routes: Acción recibida: insertar_maestro
+2025-11-13 02:54:32 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_maestro: 1 validation error for ClienteDTO
+id
+  Field required [type=missing, input_value={'tabla': 'clientes', 'nombre': 'Miguelon'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+2025-11-13 02:54:48 [INFO] paezlobato_crud_routes: Acción recibida: insertar_maestro
+2025-11-13 02:54:48 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_maestro: 1 validation error for ClienteDTO
+id
+  Field required [type=missing, input_value={'tabla': 'clientes', 'nombre': 'Miguelote'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+2025-11-13 02:54:53 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 02:55:06 [INFO] paezlobato_crud_routes: Acción recibida: insertar_maestro
+2025-11-13 02:55:06 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_maestro: 1 validation error for ClienteDTO
+id
+  Field required [type=missing, input_value={'tabla': 'clientes', 'nombre': 'test'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+2025-11-13 02:56:19 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 02:56:19 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 02:56:19 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 02:56:19 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 02:56:30 [INFO] paezlobato_crud_routes: Acción recibida: insertar_maestro
+2025-11-13 02:56:30 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_maestro: Could not refresh instance '<ClienteDB at 0x2044262ea80>'
+2025-11-13 02:57:50 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 02:57:50 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 02:57:50 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 02:57:50 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 02:57:51 [INFO] paezlobato_crud_routes: Acción recibida: insertar_maestro
+2025-11-13 02:57:51 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_maestro: (mysql.connector.errors.IntegrityError) 1062 (23000): Duplicate entry '5464654' for key 'name'
+[SQL: INSERT INTO clientes (nombre) VALUES (%(nombre)s)]
+[parameters: {'nombre': '5464654'}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-11-13 02:58:18 [INFO] paezlobato_crud_routes: Acción recibida: insertar_maestro
+2025-11-13 02:58:18 [INFO] paezlobato_colector: Insertado ID 35 en la tabla clientes
+2025-11-13 02:58:18 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_maestro: 'ClienteDTO' object has no attribute 'to_dict'
+2025-11-13 02:58:55 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 02:58:55 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 02:58:55 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 02:58:55 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 02:59:00 [INFO] paezlobato_crud_routes: Acción recibida: insertar_maestro
+2025-11-13 02:59:00 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_maestro: (mysql.connector.errors.IntegrityError) 1062 (23000): Duplicate entry '5464654' for key 'name'
+[SQL: INSERT INTO clientes (nombre) VALUES (%(nombre)s)]
+[parameters: {'nombre': '5464654'}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-11-13 02:59:05 [INFO] paezlobato_crud_routes: Acción recibida: insertar_maestro
+2025-11-13 02:59:05 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_maestro: (mysql.connector.errors.IntegrityError) 1062 (23000): Duplicate entry 'test' for key 'name'
+[SQL: INSERT INTO clientes (nombre) VALUES (%(nombre)s)]
+[parameters: {'nombre': 'test'}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-11-13 03:00:14 [INFO] paezlobato_crud_routes: Acción recibida: insertar_maestro
+2025-11-13 03:00:15 [INFO] paezlobato_colector: Insertado ID 38 en la tabla clientes
+2025-11-13 03:02:26 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 03:02:36 [INFO] paezlobato_crud_routes: Acción recibida: insertar_maestro
+2025-11-13 03:02:36 [INFO] paezlobato_colector: Insertado ID 39 en la tabla clientes
+2025-11-13 03:08:58 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 03:09:09 [INFO] paezlobato_crud_routes: Acción recibida: insertar_maestro
+2025-11-13 03:09:09 [INFO] paezlobato_colector: Insertado ID 40 en la tabla clientes
+2025-11-13 03:09:22 [INFO] paezlobato_crud_routes: Acción recibida: insertar_maestro
+2025-11-13 03:09:22 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_maestro: (mysql.connector.errors.IntegrityError) 1062 (23000): Duplicate entry 'Rafael' for key 'name'
+[SQL: INSERT INTO clientes (nombre) VALUES (%(nombre)s)]
+[parameters: {'nombre': 'Rafael'}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-11-13 03:10:01 [INFO] paezlobato_crud_routes: Acción recibida: insertar_maestro
+2025-11-13 03:10:01 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_maestro: servidor.dominio.maestros.cliente_dto.ClienteDTO() got multiple values for keyword argument 'id'
+2025-11-13 03:10:13 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_maestro
+2025-11-13 03:10:13 [INFO] paezlobato_colector: Entrada ID 28 eliminada.
+2025-11-13 03:10:18 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_maestro
+2025-11-13 03:10:18 [INFO] paezlobato_colector: Entrada ID 33 eliminada.
+2025-11-13 03:12:10 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 03:12:19 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_maestro
+2025-11-13 03:12:19 [INFO] paezlobato_colector: Entrada ID 35 eliminada.
+2025-11-13 03:12:38 [INFO] paezlobato_crud_routes: Acción recibida: insertar_maestro
+2025-11-13 03:12:38 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_maestro: (mysql.connector.errors.IntegrityError) 1062 (23000): Duplicate entry 'Miguel' for key 'name'
+[SQL: INSERT INTO clientes (nombre) VALUES (%(nombre)s)]
+[parameters: {'nombre': 'Miguel'}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-11-13 03:14:07 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_maestro
+2025-11-13 03:14:07 [INFO] paezlobato_colector: Entrada ID 40 eliminada.
+2025-11-13 03:14:09 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_maestro
+2025-11-13 03:14:09 [INFO] paezlobato_colector: Entrada ID 38 eliminada.
+2025-11-13 03:14:15 [INFO] paezlobato_crud_routes: Acción recibida: insertar_maestro
+2025-11-13 03:14:15 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_maestro: (mysql.connector.errors.IntegrityError) 1062 (23000): Duplicate entry 'Pepe' for key 'name'
+[SQL: INSERT INTO clientes (nombre) VALUES (%(nombre)s)]
+[parameters: {'nombre': 'Pepe'}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-11-13 03:14:24 [INFO] paezlobato_crud_routes: Acción recibida: insertar_maestro
+2025-11-13 03:14:24 [INFO] paezlobato_colector: Insertado ID 44 en la tabla clientes
+2025-11-13 03:14:30 [INFO] paezlobato_crud_routes: Acción recibida: insertar_maestro
+2025-11-13 03:14:30 [INFO] paezlobato_colector: Insertado ID 45 en la tabla clientes
+2025-11-13 03:14:36 [INFO] paezlobato_crud_routes: Acción recibida: insertar_maestro
+2025-11-13 03:14:36 [INFO] paezlobato_colector: Insertado ID 46 en la tabla clientes
+2025-11-13 03:15:08 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 03:15:16 [INFO] paezlobato_crud_routes: Acción recibida: insertar_maestro
+2025-11-13 03:15:16 [INFO] paezlobato_colector: Insertado ID 47 en la tabla clientes
+2025-11-13 03:15:36 [INFO] paezlobato_crud_routes: Acción recibida: insertar_maestro
+2025-11-13 03:15:36 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_maestro: 1 validation error for ClienteDTO
+nombre
+  Field required [type=missing, input_value={'id': 0, 'tabla': 'clientes'}, input_type=dict]
+    For further information visit https://errors.pydantic.dev/2.12/v/missing
+2025-11-13 03:16:11 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-13 03:19:48 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 03:19:54 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-13 03:19:56 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-13 03:19:56 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 03:19:58 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-13 03:19:58 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 03:20:03 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-13 03:20:03 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 03:20:11 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-13 03:20:11 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 03:20:37 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-13 03:20:37 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 03:21:19 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-13 03:21:19 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 03:21:22 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-13 03:21:22 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 03:23:18 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-13 03:23:19 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 03:23:20 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-13 03:23:20 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 03:23:22 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-13 03:23:22 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 03:23:22 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-13 03:23:23 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 03:23:24 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-13 03:23:24 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 03:26:06 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-13 03:26:06 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 03:26:07 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 03:26:11 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-13 03:26:14 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-13 03:26:14 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 03:26:16 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-13 03:26:16 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 03:26:19 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-13 03:26:19 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 03:26:20 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-13 03:26:20 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 03:26:29 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-13 03:26:29 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 03:27:31 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 03:27:34 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-13 03:27:37 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-13 03:27:37 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 03:27:38 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-13 03:27:38 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 03:27:40 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-13 03:27:40 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 03:27:42 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-13 03:27:42 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 03:28:53 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 08:50:49 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 08:51:00 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 10:58:59 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 19:11:56 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 20:42:58 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-13 20:42:58 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 20:43:09 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-13 20:43:09 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 20:46:15 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 20:46:27 [INFO] paezlobato_crud_routes: Acción recibida: insertar_maestro
+2025-11-13 20:46:27 [INFO] paezlobato_colector: Insertado ID 48 en la tabla clientes
+2025-11-13 20:46:58 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 20:47:09 [INFO] paezlobato_crud_routes: Acción recibida: insertar_maestro
+2025-11-13 20:47:09 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_maestro: (mysql.connector.errors.IntegrityError) 1062 (23000): Duplicate entry 'nuevo cli' for key 'name'
+[SQL: INSERT INTO clientes (nombre) VALUES (%(nombre)s)]
+[parameters: {'nombre': 'nuevo cli'}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-11-13 20:47:19 [INFO] paezlobato_crud_routes: Acción recibida: insertar_maestro
+2025-11-13 20:47:19 [INFO] paezlobato_colector: Insertado ID 50 en la tabla clientes
+2025-11-13 20:49:56 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 21:00:10 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 21:00:10 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 21:00:10 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 21:00:10 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\mysql\connector\connection_cext.py", line 772, in cmd_query
+    self._cmysql.query(
+_mysql_connector.MySQLInterfaceError: Unknown column 'usuarios.username' in 'field list'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\default.py", line 951, in do_execute
+    cursor.execute(statement, parameters)
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\mysql\connector\cursor_cext.py", line 353, in execute
+    self._connection.cmd_query(
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\mysql\connector\opentelemetry\context_propagation.py", line 97, in wrapper
+    return method(cnx, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\mysql\connector\connection_cext.py", line 781, in cmd_query
+    raise get_mysql_exception(
+mysql.connector.errors.ProgrammingError: 1054 (42S22): Unknown column 'usuarios.username' in 'field list'
+
+The above exception was the direct cause of the following exception:
+
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\paezlobato\servidor\main.py", line 29, in lifespan
+    colector.obtener_datos_maestros()  # puede fallar
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\colector.py", line 44, in obtener_datos_maestros
+    usuarios = self.repo_usuarios.list_all(session)
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\persistencia\generic_repository.py", line 10, in list_all
+    return session.exec(statement).all()
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlmodel\orm\session.py", line 83, in exec
+    results = super().execute(
+              ^^^^^^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 2351, in execute
+    return self._execute_internal(
+           ^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\session.py", line 2249, in _execute_internal
+    result: Result[Any] = compile_state_cls.orm_execute_statement(
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\orm\context.py", line 306, in orm_execute_statement
+    result = conn.execute(
+             ^^^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1419, in execute
+    return meth(
+           ^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\sql\elements.py", line 526, in _execute_on_connection
+    return connection._execute_clauseelement(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1641, in _execute_clauseelement
+    ret = self._execute_context(
+          ^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1846, in _execute_context
+    return self._exec_single_context(
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1986, in _exec_single_context
+    self._handle_dbapi_exception(
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 2355, in _handle_dbapi_exception
+    raise sqlalchemy_exception.with_traceback(exc_info[2]) from e
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\base.py", line 1967, in _exec_single_context
+    self.dialect.do_execute(
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\sqlalchemy\engine\default.py", line 951, in do_execute
+    cursor.execute(statement, parameters)
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\mysql\connector\cursor_cext.py", line 353, in execute
+    self._connection.cmd_query(
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\mysql\connector\opentelemetry\context_propagation.py", line 97, in wrapper
+    return method(cnx, *args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\mysql\connector\connection_cext.py", line 781, in cmd_query
+    raise get_mysql_exception(
+sqlalchemy.exc.ProgrammingError: (mysql.connector.errors.ProgrammingError) 1054 (42S22): Unknown column 'usuarios.username' in 'field list'
+[SQL: SELECT usuarios.id, usuarios.username, usuarios.fullname, usuarios.role, usuarios.password_hash 
+FROM usuarios]
+(Background on this error at: https://sqlalche.me/e/20/f405)
+2025-11-13 21:00:24 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 21:00:24 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 21:00:24 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 21:00:24 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\paezlobato\servidor\main.py", line 29, in lifespan
+    colector.obtener_datos_maestros()  # puede fallar
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\colector.py", line 51, in obtener_datos_maestros
+    self.maestros.usuarios = {usuario.id: UsuarioDTO.from_db(usuario) for usuario in usuarios}
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\dominio\maestros\usuario_dto.py", line 13, in from_db
+    return UsuarioDTO(
+           ^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\main.py", line 250, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for UsuarioDTO
+rol_id
+  Input should be a valid string [type=string_type, input_value=0, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/string_type
+2025-11-13 21:01:19 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 21:01:19 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 21:01:19 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 21:01:19 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\paezlobato\servidor\main.py", line 29, in lifespan
+    colector.obtener_datos_maestros()  # puede fallar
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\colector.py", line 51, in obtener_datos_maestros
+    self.maestros.usuarios = {usuario.id: UsuarioDTO.from_db(usuario) for usuario in usuarios}
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\dominio\maestros\usuario_dto.py", line 13, in from_db
+    return UsuarioDTO(
+           ^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\main.py", line 250, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for UsuarioDTO
+rol_id
+  Input should be a valid string [type=string_type, input_value=0, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/string_type
+2025-11-13 21:01:28 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 21:01:28 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 21:01:28 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 21:01:28 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\paezlobato\servidor\main.py", line 29, in lifespan
+    colector.obtener_datos_maestros()  # puede fallar
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\colector.py", line 51, in obtener_datos_maestros
+    self.maestros.usuarios = {usuario.id: UsuarioDTO.from_db(usuario) for usuario in usuarios}
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\dominio\maestros\usuario_dto.py", line 13, in from_db
+    return UsuarioDTO(
+           ^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\main.py", line 250, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for UsuarioDTO
+rol_id
+  Input should be a valid string [type=string_type, input_value=0, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/string_type
+2025-11-13 21:01:31 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 21:01:31 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 21:01:31 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 21:01:32 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\paezlobato\servidor\main.py", line 29, in lifespan
+    colector.obtener_datos_maestros()  # puede fallar
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\colector.py", line 51, in obtener_datos_maestros
+    self.maestros.usuarios = {usuario.id: UsuarioDTO.from_db(usuario) for usuario in usuarios}
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\dominio\maestros\usuario_dto.py", line 13, in from_db
+    return UsuarioDTO(
+           ^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\main.py", line 250, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for UsuarioDTO
+rol_id
+  Input should be a valid string [type=string_type, input_value=0, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/string_type
+2025-11-13 21:01:40 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 21:01:40 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 21:01:40 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 21:01:40 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\paezlobato\servidor\main.py", line 29, in lifespan
+    colector.obtener_datos_maestros()  # puede fallar
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\colector.py", line 51, in obtener_datos_maestros
+    self.maestros.usuarios = {usuario.id: UsuarioDTO.from_db(usuario) for usuario in usuarios}
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\dominio\maestros\usuario_dto.py", line 13, in from_db
+    return UsuarioDTO(
+           ^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\main.py", line 250, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for UsuarioDTO
+rol_id
+  Input should be a valid string [type=string_type, input_value=0, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/string_type
+2025-11-13 21:02:09 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 21:02:09 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 21:02:09 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 21:02:09 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\paezlobato\servidor\main.py", line 29, in lifespan
+    colector.obtener_datos_maestros()  # puede fallar
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\colector.py", line 51, in obtener_datos_maestros
+    self.maestros.usuarios = {usuario.id: UsuarioDTO.from_db(usuario) for usuario in usuarios}
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\dominio\maestros\usuario_dto.py", line 13, in from_db
+    return UsuarioDTO(
+           ^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\main.py", line 250, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for UsuarioDTO
+rol_id
+  Input should be a valid string [type=string_type, input_value=0, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/string_type
+2025-11-13 21:02:18 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 21:02:18 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 21:02:18 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 21:02:18 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\paezlobato\servidor\main.py", line 29, in lifespan
+    colector.obtener_datos_maestros()  # puede fallar
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\colector.py", line 51, in obtener_datos_maestros
+    self.maestros.usuarios = {usuario.id: UsuarioDTO.from_db(usuario) for usuario in usuarios}
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\dominio\maestros\usuario_dto.py", line 13, in from_db
+    return UsuarioDTO(
+           ^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\main.py", line 250, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for UsuarioDTO
+rol_id
+  Input should be a valid string [type=string_type, input_value=0, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/string_type
+2025-11-13 21:03:01 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 21:03:01 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 21:03:01 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 21:03:01 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\paezlobato\servidor\main.py", line 29, in lifespan
+    colector.obtener_datos_maestros()  # puede fallar
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\colector.py", line 51, in obtener_datos_maestros
+    self.maestros.usuarios = {usuario.id: UsuarioDTO.from_db(usuario) for usuario in usuarios}
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\dominio\maestros\usuario_dto.py", line 13, in from_db
+    return UsuarioDTO(
+           ^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\main.py", line 250, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for UsuarioDTO
+rol_id
+  Input should be a valid string [type=string_type, input_value=0, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/string_type
+2025-11-13 21:04:23 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 21:04:23 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 21:04:23 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 21:04:23 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\paezlobato\servidor\main.py", line 29, in lifespan
+    colector.obtener_datos_maestros()  # puede fallar
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\colector.py", line 51, in obtener_datos_maestros
+    self.maestros.usuarios = {usuario.id: UsuarioDTO.from_db(usuario) for usuario in usuarios}
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\dominio\maestros\usuario_dto.py", line 13, in from_db
+    return UsuarioDTO(
+           ^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\main.py", line 250, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for UsuarioDTO
+rol_id
+  Input should be a valid string [type=string_type, input_value=0, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/string_type
+2025-11-13 21:06:00 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 21:06:00 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 21:06:00 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 21:06:00 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\paezlobato\servidor\main.py", line 29, in lifespan
+    colector.obtener_datos_maestros()  # puede fallar
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\colector.py", line 51, in obtener_datos_maestros
+    self.maestros.usuarios = {usuario.id: UsuarioDTO.from_db(usuario) for usuario in usuarios}
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\dominio\maestros\usuario_dto.py", line 13, in from_db
+    return UsuarioDTO(
+           ^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\main.py", line 250, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for UsuarioDTO
+rol_id
+  Input should be a valid string [type=string_type, input_value=0, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/string_type
+2025-11-13 21:06:20 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 21:06:20 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 21:06:20 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 21:06:20 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\paezlobato\servidor\main.py", line 29, in lifespan
+    colector.obtener_datos_maestros()  # puede fallar
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\colector.py", line 51, in obtener_datos_maestros
+    self.maestros.usuarios = {usuario.id: UsuarioDTO.from_db(usuario) for usuario in usuarios}
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\dominio\maestros\usuario_dto.py", line 13, in from_db
+    return UsuarioDTO(
+           ^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\main.py", line 250, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for UsuarioDTO
+rol_id
+  Input should be a valid string [type=string_type, input_value=0, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/string_type
+2025-11-13 21:07:22 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 21:07:22 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 21:07:22 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 21:07:22 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\paezlobato\servidor\main.py", line 29, in lifespan
+    colector.obtener_datos_maestros()  # puede fallar
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\colector.py", line 51, in obtener_datos_maestros
+    self.maestros.usuarios = {usuario.id: UsuarioDTO.from_db(usuario) for usuario in usuarios}
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\dominio\maestros\usuario_dto.py", line 13, in from_db
+    return UsuarioDTO(
+           ^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\main.py", line 250, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for UsuarioDTO
+rol_id
+  Input should be a valid string [type=string_type, input_value=0, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/string_type
+2025-11-13 21:08:16 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 21:08:16 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 21:08:16 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 21:08:16 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\paezlobato\servidor\main.py", line 29, in lifespan
+    colector.obtener_datos_maestros()  # puede fallar
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\colector.py", line 51, in obtener_datos_maestros
+    self.maestros.usuarios = {usuario.id: UsuarioDTO.from_db(usuario) for usuario in usuarios}
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\dominio\maestros\usuario_dto.py", line 13, in from_db
+    return UsuarioDTO(
+           ^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\main.py", line 250, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for UsuarioDTO
+rol_id
+  Input should be a valid string [type=string_type, input_value=0, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/string_type
+2025-11-13 21:10:01 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 21:10:01 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 21:10:01 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 21:10:01 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\paezlobato\servidor\main.py", line 29, in lifespan
+    colector.obtener_datos_maestros()  # puede fallar
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\colector.py", line 52, in obtener_datos_maestros
+    self.maestros.usuarios = {usuario.id: UsuarioDTO.from_db(usuario) for usuario in usuarios}
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\dominio\maestros\usuario_dto.py", line 13, in from_db
+    return UsuarioDTO(
+           ^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\main.py", line 250, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for UsuarioDTO
+rol_id
+  Input should be a valid string [type=string_type, input_value=0, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/string_type
+2025-11-13 21:10:57 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 21:10:57 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 21:10:57 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 21:10:57 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\paezlobato\servidor\main.py", line 29, in lifespan
+    colector.obtener_datos_maestros()  # puede fallar
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\colector.py", line 53, in obtener_datos_maestros
+    self.maestros.usuarios = {usuario.id: UsuarioDTO.from_db(usuario) for usuario in usuarios}
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\dominio\maestros\usuario_dto.py", line 13, in from_db
+    return UsuarioDTO(
+           ^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\main.py", line 250, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for UsuarioDTO
+rol_id
+  Input should be a valid string [type=string_type, input_value=0, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/string_type
+2025-11-13 21:11:13 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 21:11:13 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 21:11:13 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 21:11:13 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\paezlobato\servidor\main.py", line 29, in lifespan
+    colector.obtener_datos_maestros()  # puede fallar
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\colector.py", line 53, in obtener_datos_maestros
+    self.maestros.usuarios = {usuario.id: UsuarioDTO.from_db(usuario) for usuario in usuarios}
+                                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "C:\xampp\htdocs\paezlobato\servidor\dominio\maestros\usuario_dto.py", line 13, in from_db
+    return UsuarioDTO(
+           ^^^^^^^^^^^
+  File "C:\Users\RAFAEL\AppData\Local\Programs\Python\Python312\Lib\site-packages\pydantic\main.py", line 250, in __init__
+    validated_self = self.__pydantic_validator__.validate_python(data, self_instance=self)
+                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+pydantic_core._pydantic_core.ValidationError: 1 validation error for UsuarioDTO
+rol_id
+  Input should be a valid string [type=string_type, input_value=0, input_type=int]
+    For further information visit https://errors.pydantic.dev/2.12/v/string_type
+2025-11-13 21:11:45 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 21:11:45 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 21:11:45 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 21:11:45 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 21:11:58 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 21:14:49 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-13 21:14:54 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-13 21:14:55 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 21:15:10 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-13 21:15:10 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 21:15:10 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-13 21:15:10 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 21:46:36 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 21:46:44 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-13 21:46:44 [INFO] paezlobato_colector: Entrada ID 1 modificada: tipo = M
+2025-11-13 21:46:46 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-13 21:46:46 [INFO] paezlobato_colector: Entrada ID 2 modificada: tipo = B
+2025-11-13 21:46:47 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-13 21:46:47 [INFO] paezlobato_colector: Entrada ID 3 modificada: tipo = M
+2025-11-13 21:47:33 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 21:47:42 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-13 21:47:42 [INFO] paezlobato_colector: Entrada ID 1 modificada: tipo = B
+2025-11-13 21:47:53 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-13 21:47:53 [INFO] paezlobato_colector: Entrada ID 3 modificada: tipo = B
+2025-11-13 21:48:03 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-13 21:48:03 [INFO] paezlobato_colector: Entrada ID 2 modificada: tipo = M
+2025-11-13 21:56:03 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 21:56:40 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-13 21:56:40 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-13 21:56:40 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-13 21:56:41 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 21:56:44 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 21:56:52 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-13 21:56:52 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: Tabla 'roles' no reconocida.
+2025-11-13 21:56:55 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-13 21:56:55 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: Tabla 'roles' no reconocida.
+2025-11-13 21:56:57 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-13 21:56:57 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: Tabla 'roles' no reconocida.
+2025-11-13 21:57:03 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-13 21:57:03 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: Tabla 'roles' no reconocida.
+2025-11-13 21:59:05 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 21:59:19 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-13 21:59:19 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: Tabla 'roles' no reconocida.
+2025-11-13 21:59:24 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-13 21:59:24 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: Tabla 'roles' no reconocida.
+2025-11-13 21:59:27 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-13 21:59:27 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: Tabla 'roles' no reconocida.
+2025-11-13 21:59:29 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-13 21:59:29 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: Tabla 'roles' no reconocida.
+2025-11-13 21:59:32 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-13 21:59:32 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: Tabla 'roles' no reconocida.
+2025-11-13 21:59:34 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-13 21:59:34 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: Tabla 'roles' no reconocida.
+2025-11-13 21:59:38 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-13 21:59:38 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: Tabla 'roles' no reconocida.
+2025-11-13 21:59:40 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-13 21:59:40 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: Tabla 'roles' no reconocida.
+2025-11-13 22:07:23 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 22:07:59 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 22:13:08 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 22:15:12 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-13 23:16:27 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 23:17:33 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 23:20:17 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 23:20:23 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-13 23:20:23 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: Tabla 'roles' no reconocida.
+2025-11-13 23:20:25 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-13 23:20:25 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: Tabla 'roles' no reconocida.
+2025-11-13 23:20:26 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-13 23:20:26 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: Tabla 'roles' no reconocida.
+2025-11-13 23:20:28 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-13 23:20:28 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: Tabla 'roles' no reconocida.
+2025-11-13 23:23:17 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 23:23:51 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-13 23:26:34 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 23:26:49 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-13 23:26:49 [INFO] paezlobato_colector: Entrada ID 1 modificada: rol_id = 1
+2025-11-13 23:26:51 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-13 23:26:51 [INFO] paezlobato_colector: Entrada ID 2 modificada: rol_id = 2
+2025-11-13 23:26:54 [INFO] paezlobato_crud_routes: Acción recibida: modificar_maestro
+2025-11-13 23:26:54 [INFO] paezlobato_colector: Entrada ID 3 modificada: rol_id = 3
+2025-11-13 23:44:14 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 23:44:55 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-13 23:45:02 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-13 23:45:02 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 23:50:06 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-13 23:50:06 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 23:50:40 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 23:50:45 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-13 23:50:48 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-13 23:50:48 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 23:50:49 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-13 23:50:49 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 23:50:50 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-13 23:50:50 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 23:50:51 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-13 23:50:51 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 23:50:52 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-13 23:50:52 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 23:50:53 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-13 23:50:53 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 23:55:59 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-13 23:55:59 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-13 23:59:55 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-13 23:59:58 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-14 00:02:17 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-14 00:02:20 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-14 00:02:45 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-14 00:02:48 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-14 00:04:07 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-14 00:04:11 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-14 00:05:52 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-14 00:05:52 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 00:07:26 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-14 00:07:30 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-14 00:07:58 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-14 00:08:00 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-14 00:10:45 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-14 00:10:49 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-14 00:11:03 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-14 00:14:45 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-14 00:14:48 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-14 00:25:33 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-14 00:26:45 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-14 00:27:45 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-14 00:27:49 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-14 00:28:27 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-14 00:28:27 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 00:28:29 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-14 00:28:29 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 00:28:33 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-14 00:28:33 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 00:28:36 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-14 00:28:36 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 01:30:15 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-14 01:31:50 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-14 01:31:50 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 01:31:51 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-14 01:31:51 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 01:31:56 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-14 01:31:56 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 01:32:50 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-14 01:32:54 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-14 01:32:58 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-14 01:32:59 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 01:33:04 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-14 01:33:04 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 01:33:08 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-14 01:33:08 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 01:33:55 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-14 01:34:01 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-14 01:34:04 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-14 01:34:04 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 01:34:05 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-14 01:34:05 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 01:34:06 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-14 01:34:06 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 01:34:08 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-14 01:34:08 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 01:34:09 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-14 01:34:09 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 01:34:14 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-14 01:34:14 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 01:34:18 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-14 01:34:18 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 01:34:21 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-14 01:34:21 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 01:34:27 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-14 01:34:27 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 01:37:24 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-14 01:37:24 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 01:38:15 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-14 01:38:15 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: name 'CamionDTO' is not defined
+2025-11-14 01:42:39 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-14 01:42:39 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-14 01:42:39 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-14 01:42:39 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-14 01:42:55 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-14 01:42:55 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-14 01:42:55 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-14 01:42:55 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-14 01:43:07 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-14 01:43:07 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-14 01:43:07 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-14 01:43:07 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-14 01:43:34 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-14 01:43:34 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-14 01:43:34 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-14 01:43:34 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-14 01:44:06 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-14 01:44:06 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-14 01:44:06 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-14 01:44:06 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-14 02:00:06 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-14 02:00:06 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-14 02:00:06 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-14 02:00:06 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-14 02:01:12 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-14 02:01:12 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-14 02:01:12 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-14 02:01:12 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-14 02:01:50 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-14 02:01:50 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-14 02:01:50 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-14 02:01:50 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-14 02:05:27 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-14 02:05:27 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-14 02:05:27 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-14 02:05:27 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-14 02:06:14 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-14 02:06:14 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-14 02:06:14 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-14 02:06:14 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-14 02:07:32 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-14 02:07:32 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-14 02:07:32 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-14 02:07:32 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-14 02:12:15 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-14 02:12:15 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-14 02:12:15 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-14 02:12:15 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-14 02:14:01 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-14 02:14:01 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-14 02:14:01 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-14 02:14:01 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-14 02:15:52 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-14 02:15:52 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-14 02:15:52 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-14 02:15:52 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-14 02:15:58 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-14 02:15:58 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: Colector.checkUpdate() takes 4 positional arguments but 5 were given
+2025-11-14 02:16:15 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-14 02:16:15 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-14 02:16:15 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-14 02:16:15 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-14 02:16:19 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-14 02:16:19 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: 'PlanCamionDB' object has no attribute 'to_db'
+2025-11-14 02:19:19 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-14 02:19:19 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-14 02:19:19 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-14 02:19:19 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-14 02:19:48 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-14 02:19:48 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: 'PlanCamionDB' object has no attribute 'to_db'
+2025-11-14 02:21:13 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-14 02:21:13 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-14 02:21:13 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-14 02:21:13 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-14 02:21:18 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-14 02:21:18 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: 'NoneType' object has no attribute 'get'
+2025-11-14 02:32:30 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-14 02:32:30 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-14 02:32:30 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-14 02:32:30 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-14 02:32:55 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-14 02:32:55 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-14 02:32:55 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-14 02:32:55 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-14 02:34:55 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-14 02:34:55 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-14 02:34:55 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-14 02:34:55 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-14 02:35:00 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-14 02:35:00 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: Entrada con ID 1 no encontrada en la tabla 'entradas'.
+2025-11-14 02:35:02 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-14 02:35:02 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: Entrada con ID 1 no encontrada en la tabla 'entradas'.
+2025-11-14 02:35:09 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-14 02:35:09 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: Entrada con ID 2 no encontrada en la tabla 'entradas'.
+2025-11-14 02:42:28 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-14 02:42:28 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-14 02:42:28 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-14 02:42:28 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-14 02:42:53 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-14 02:42:53 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: Entrada con ID 1 no encontrada en la tabla 'entradas'.
+2025-11-14 02:43:48 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-14 02:43:48 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-14 02:43:48 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-14 02:43:48 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-14 02:43:56 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-14 02:43:56 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: Entrada con ID 1 no encontrada en la tabla 'entradas'.
+2025-11-14 02:44:34 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-14 02:44:34 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-14 02:44:34 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-14 02:44:34 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-14 02:44:38 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-14 02:44:38 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: Entrada con ID 1 no encontrada en la tabla 'entradas'.
+2025-11-14 02:45:13 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-14 02:45:13 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-14 02:45:13 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-14 02:45:13 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-14 02:45:41 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-14 02:45:41 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-14 02:45:41 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-14 02:45:41 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-14 02:45:45 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-14 02:45:45 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: Entrada con ID 1 no encontrada en la tabla 'entradas'.
+2025-11-14 02:46:00 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-14 02:46:03 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-14 02:46:55 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-14 02:46:55 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: Entrada con ID 1 no encontrada en la tabla 'entradas'.
+2025-11-14 02:47:25 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-14 02:47:25 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-14 02:47:25 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-14 02:47:25 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-14 02:47:29 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-14 02:47:29 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: Entrada con ID 1 no encontrada en la tabla 'entradas'.
+2025-11-14 02:50:23 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-14 02:50:23 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-14 02:50:23 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-14 02:50:23 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-14 02:50:28 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-14 02:50:34 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-14 02:50:34 [INFO] paezlobato_colector: Entrada ID 1 modificada: ene_previsto = 01
+2025-11-14 02:50:54 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-14 02:50:54 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-14 02:50:54 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-14 02:50:54 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-14 02:51:20 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-11-14 02:51:24 [INFO] paezlobato_crud_routes: Acción recibida: cargar_entradas
+2025-11-14 02:51:32 [INFO] paezlobato_crud_routes: Acción recibida: modificar_entrada
+2025-11-14 02:51:32 [INFO] paezlobato_colector: Entrada ID 4 modificada: feb_confirmado = 30
+2025-11-14 02:51:40 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-11-14 02:51:40 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-11-14 02:51:40 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-11-14 02:51:40 [INFO] paezlobato_crud_routes: Acción recibida: maestros

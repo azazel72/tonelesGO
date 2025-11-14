@@ -17,26 +17,41 @@ class GenericRepository:
         return session.get(self.model, id)
 
     def insert(self, session: Session, obj):
-        session.add(obj)
-        session.commit()
-        session.refresh(obj)
-        return obj
+        try:
+            session.add(obj)
+            session.commit()
+            session.refresh(obj)
+            return obj
+        except Exception:
+            session.rollback()
+            raise
 
     def insert_all(self, session: Session, objs: List):
-        session.add_all(objs)
-        session.commit()
-        for obj in objs:
-            session.refresh(obj)
-        return objs
+        try:
+            session.add_all(objs)
+            session.commit()
+            for obj in objs:
+                session.refresh(obj)
+            return objs
+        except Exception:
+            session.rollback()
+            raise
 
     def update(self, session: Session, obj):
-        session.add(obj)
-        session.commit()
-        session.refresh(obj)
-        return obj
+        try:
+            session.merge(obj)
+            session.commit()
+            return obj
+        except Exception:
+            session.rollback()
+            raise
 
     def delete(self, session: Session, id: int):
         obj = session.get(self.model, id)
         if obj:
-            session.delete(obj)
-            session.commit()
+            try:
+                session.delete(obj)
+                session.commit()
+            except Exception:
+                session.rollback()
+                raise

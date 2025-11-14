@@ -15,9 +15,10 @@ function openProveedoresWin() {
     },
     tabulator: {
       options: {
+        editable: false,
         columns: [
           { title:"ID", field:"id", width:70, hozAlign:"right", headerSort:false },
-          { title:"Nombre", field:"nombre", editor:"input", editable:false, cssClass: "filtrable", },
+          { title:"Nombre", field:"nombre", editor:"input", editable: tablaEditable, cssClass: "filtrable", },
           CeldaAcciones,
         ],
         data: Object.values(DATOS.maestros.proveedores || {}),

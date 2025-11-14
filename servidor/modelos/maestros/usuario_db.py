@@ -6,7 +6,7 @@ class UsuarioDB(SQLModel, table=True):
     __tablename__ = "usuarios"
 
     id: Optional[int] = Field(default=None, primary_key=True)
-    username: str
-    fullname: str
-    role: str
-    password_hash: str
+    alias: str
+    nombre: Optional[str] = None
+    rol_id: str
+    clave: str

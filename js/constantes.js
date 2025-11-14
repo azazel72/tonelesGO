@@ -7,3 +7,7 @@ const MESES = [
   ["may","Mayo"],["jun","Junio"],["jul","Julio"],["ago","Agosto"],
   ["sep","Septiembre"],["oct","Octubre"],["nov","Noviembre"],["dic","Diciembre"],
 ];
+
+const pendingWsRequests = new Map();
+const timeoutWsRequestMs = 10000;
+
