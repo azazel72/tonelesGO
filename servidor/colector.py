@@ -207,7 +207,6 @@ class Colector:
             objeto = RolDTO
         elif tabla == "entradas":
             repo = self.repo_camiones
-            print(self.entradas.plan_camiones)
             maestro = self.entradas.buscar_camion_por_id
             objeto = PlanCamionDTO
         elif tabla == "materiales":

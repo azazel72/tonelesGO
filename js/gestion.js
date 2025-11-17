@@ -49,6 +49,10 @@ window.onload = () => {
             cerrarVentanasMaestros();
         },
 
+        async "subir-archivo"() {
+            await openSubirArchivoWin();
+        },
+
 
         async "login"() {
             enviarLogin();
@@ -102,4 +106,13 @@ function respuesta_maestros(response) {
     } else {
         alert("Error al recibir maestros: " + response.error);
     }
+}
+
+
+
+function openSubirArchivoWin() {
+
+
+
+
 }

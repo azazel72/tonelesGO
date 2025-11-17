@@ -1,71 +1,216 @@
-<!doctype html>
-<html lang="es">
-<head>
-<meta charset="utf-8" />
-<title>Totales por grupos de columnas</title>
-<link href="https://unpkg.com/tabulator-tables@6.3.0/dist/css/tabulator.min.css" rel="stylesheet">
+<script src="./static/js/bootstrap.bundle.min.js"></script>
+  <!-- Tabulator -->
+  <link href="./static/css/tabulator.min.css" rel="stylesheet">
+  <script src="./static/js/tabulator.min.js"></script>
+
+  <!-- winbox-->
+  <link rel="stylesheet" href="./static/css/winbox.min.css">
+  <script defer src="./static/js/winbox.min.js"></script>
+
+<button id="open-upload">Subir archivos…</button>
+
 <style>
-  body { font-family: system-ui, Arial, sans-serif; margin: 20px; }
-  #tabla { height: 400px; }
+  .dropzone {
+    border: 2px dashed #999;
+    border-radius: 4px;
+    padding: 1rem;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #555;
+    cursor: pointer;
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .dropzone.dragover {
+    border-color: #007bff;
+    background: #f0f6ff;
+  }
+
+  .preview-area {
+    margin-top: 0.5rem;
+    border-top: 1px solid #ddd;
+    padding-top: 0.5rem;
+    max-height: 260px;
+    overflow: auto;
+  }
+
+  .preview-area iframe,
+  .preview-area embed,
+  .preview-area img {
+    width: 100%;
+    height: 220px;
+    border: none;
+    object-fit: contain;
+  }
 </style>
-</head>
-<body>
-<h2>Totales agrupando cada dos columnas (estilo Excel)</h2>
-<div id="tabla"></div>
 
-<script src="https://unpkg.com/tabulator-tables@6.3.0/dist/js/tabulator.min.js"></script>
 <script>
-  // Datos de ejemplo
-  const data = [
-    { id: 1, a1: 10, a2: 20, b1: 5,  b2: 7,  c1: 12, c2: 8 },
-    { id: 2, a1: 6,  a2: 9,  b1: 11, b2: 4,  c1: 10, c2: 15 },
-    { id: 3, a1: 8,  a2: 12, b1: 7,  b2: 9,  c1: 14, c2: 6 },
-  ];
+  document.getElementById('open-upload').addEventListener('click', () => {
+    const content = document.createElement('div');
+    content.innerHTML = `
+      <form id="upload-form" style="display:flex; flex-direction:column; gap:0.5rem; padding:0.5rem; height:100%;">
+        <label style="display:flex; flex-direction:column; font-size:0.9rem;">
+          ID BBDD:
+          <input type="number" name="bbdd_id" required style="padding:0.25rem;">
+        </label>
 
-  // Función para sumar columnas del mismo grupo
-  const sumar = (field1, field2) => (cell) => {
-    const row = cell.getRow().getData();
-    const v1 = Number(row[field1]) || 0;
-    const v2 = Number(row[field2]) || 0;
-    return v1 + v2;
-  };
+        <div class="dropzone">
+          Arrastra aquí tus archivos o haz clic para seleccionar
+        </div>
 
-  // Configuración de columnas con grupos de 2 + total
-  const columns = [
-    { title:"ID", field:"id", width:60, hozAlign:"center" },
+        <!-- input real (oculto) para usar también como respaldo -->
+        <input type="file" name="files[]" multiple style="display:none;">
 
-    // Primer grupo
-    { title:"Grupo A", columns:[
-        { title:"A1", field:"a1", hozAlign:"right" },
-        { title:"A2", field:"a2", hozAlign:"right" },
-        { title:"Total A", field:"totalA", hozAlign:"right", bottomCalc:"sum",
-          formatter: sumar("a1","a2") }
-    ]},
+        <button type="submit" style="padding:0.4rem; cursor:pointer;">Subir</button>
+        <div id="upload-status" style="font-size:0.8rem; color:#555;"></div>
 
-    // Segundo grupo
-    { title:"Grupo B", columns:[
-        { title:"B1", field:"b1", hozAlign:"right" },
-        { title:"B2", field:"b2", hozAlign:"right" },
-        { title:"Total B", field:"totalB", hozAlign:"right", bottomCalc:"sum",
-          formatter: sumar("b1","b2") }
-    ]},
+        <div class="preview-area">
+          <div style="font-size:0.8rem; margin-bottom:0.3rem; color:#555;">Vista previa (primer PDF/JPG seleccionado):</div>
+          <div class="preview-content" style="font-size:0.8rem; color:#999;">No hay archivo seleccionado.</div>
+        </div>
+      </form>
+    `;
 
-    // Tercer grupo
-    { title:"Grupo C", columns:[
-        { title:"C1", field:"c1", hozAlign:"right" },
-        { title:"C2", field:"c2", hozAlign:"right" },
-        { title:"Total C", field:"totalC", hozAlign:"right", bottomCalc:"sum",
-          formatter: sumar("c1","c2") }
-    ]},
-  ];
+    const win = new WinBox({
+      title: "Subir archivos",
+      width: "600px",
+      height: "500px",
+      x: "center",
+      y: "center",
+      mount: content,
+      class: ["modern", "no-full"],
+    });
 
-  // Instancia Tabulator
-  const table = new Tabulator("#tabla", {
-    data,
-    layout:"fitDataStretch",
-    columns,
-    bottomCalcFormatter:"money", // aplica formato de número a los totales inferiores
+    const form          = content.querySelector('#upload-form');
+    const dropzone      = content.querySelector('.dropzone');
+    const fileInput     = content.querySelector('input[type="file"]');
+    const status        = content.querySelector('#upload-status');
+    const previewArea   = content.querySelector('.preview-area .preview-content');
+
+    let currentFiles = []; // aquí guardamos lo que arrastren/seleccionen
+
+    // --- Vista previa local (sin pasar por backend)
+    function renderPreview(files) {
+      previewArea.innerHTML = '';
+
+      if (!files || files.length === 0) {
+        previewArea.textContent = "No hay archivo seleccionado.";
+        return;
+      }
+
+      const file = files[0];
+
+      const url = URL.createObjectURL(file);
+
+      if (file.type.startsWith('image/')) {
+        const img = document.createElement('img');
+        img.src = url;
+        previewArea.appendChild(img);
+      } else if (file.type === 'application/pdf') {
+        const iframe = document.createElement('iframe');
+        iframe.src = url;
+        previewArea.appendChild(iframe);
+      } else {
+        previewArea.textContent = `Archivo: ${file.name} (no se puede previsualizar aquí)`;
+        URL.revokeObjectURL(url);
+      }
+    }
+
+    // --- Click en la zona -> abre selector de archivos
+    dropzone.addEventListener('click', () => {
+      fileInput.click();
+    });
+
+    // --- Cambio en input file
+    fileInput.addEventListener('change', (e) => {
+      currentFiles = Array.from(e.target.files);
+      dropzone.textContent = currentFiles.length
+        ? `${currentFiles.length} archivo(s) seleccionado(s)`
+        : 'Arrastra aquí tus archivos o haz clic para seleccionar';
+      renderPreview(currentFiles);
+    });
+
+    // --- Drag & drop
+    dropzone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropzone.classList.add('dragover');
+    });
+
+    dropzone.addEventListener('dragleave', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('dragover');
+    });
+
+    dropzone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropzone.classList.remove('dragover');
+
+      const files = Array.from(e.dataTransfer.files || []);
+      if (!files.length) return;
+
+      currentFiles = files;
+      dropzone.textContent = `${currentFiles.length} archivo(s) arrastrado(s)`;
+      renderPreview(currentFiles);
+
+      // opcional: sincronizar también el input para mantener coherencia
+      const dt = new DataTransfer();
+      currentFiles.forEach(f => dt.items.add(f));
+      fileInput.files = dt.files;
+    });
+
+    // --- Envío al backend (ej: PHP upload.php)
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const id = form.bbdd_id.value.trim();
+      if (!id) {
+        status.textContent = "Introduce un ID de BBDD.";
+        status.style.color = "red";
+        return;
+      }
+
+      if (!currentFiles.length) {
+        status.textContent = "Selecciona al menos un archivo.";
+        status.style.color = "red";
+        return;
+      }
+
+      const formData = new FormData();
+      formData.append('bbdd_id', id);
+      currentFiles.forEach((file) => {
+        formData.append('files[]', file);
+      });
+
+      status.textContent = "Subiendo archivos…";
+      status.style.color = "#555";
+
+      try {
+        const resp = await fetch('upload.php', {
+          method: 'POST',
+          body: formData,
+        });
+
+        if (!resp.ok) {
+          throw new Error(`Error HTTP ${resp.status}`);
+        }
+
+        const data = await resp.json();
+        if (data.ok) {
+          status.textContent = "Subida correcta.";
+          status.style.color = "green";
+          // win.close(); // si quieres cerrar al terminar
+        } else {
+          status.textContent = "Error: " + (data.error || "desconocido");
+          status.style.color = "red";
+        }
+      } catch (err) {
+        console.error(err);
+        status.textContent = "Error en la subida: " + err.message;
+        status.style.color = "red";
+      }
+    });
   });
 </script>
-</body>
-</html>

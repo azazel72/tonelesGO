@@ -21,9 +21,8 @@ function openEntradasWin() {
           editable: true,
           height: "auto",
           columns: crearColumnasEntradas(DATOS.maestros.proveedores),
-          data: DATOS.entradas.planificacion || [],
+          data: DATOS.entradas.planificacion?.length || [],
           columnDefaults: { headerHozAlign:"center" },
-          footerElement: "<div class='pie-totales'>Totales en el pie (suma por columna)</div>",
         },
       },
       materiales: {
@@ -31,7 +30,10 @@ function openEntradasWin() {
           editable: true,
           height: "auto",
           columns: crearColumnasMateriales(),
-          data: DATOS.entradas.plan_materiales || [],
+          data: DATOS.entradas.desglose?.length || [],
+          columnDefaults: {
+            resizable: false,
+          },      
         },
       },
     },
@@ -47,25 +49,21 @@ function openEntradasWin() {
 
 // ====== MUESTRA LA VENTANA DE ENTRADAS ======
 function mostrar_entradas(response) {
-  console.log(response);
   DATOS.entradas.plan_camiones = response.data?.plan_camiones || [];
   DATOS.entradas.plan_facturacion = response.data?.plan_facturacion || {};
   DATOS.entradas.plan_materiales = response.data?.plan_materiales || [];
   DATOS.entradas.planificacion = Object.values(DATOS.entradas.plan_camiones || {});
   DATOS.entradas.desglose = [DATOS.entradas.plan_facturacion, ...DATOS.entradas.plan_materiales];
-  console.log(DATOS.entradas.planificacion);
-  console.log(DATOS.entradas.desglose);
-  DATOS.entradas.planificacion.push({})
 
-    if (response.data && windowsRegistry.has("entradas")) {
-      const { wb, table } = windowsRegistry.get("entradas");
-      console.log(table);
-      const tablaEntradas = table[0];
-      const tablaMateriales = table[1];
-      tablaEntradas.setData(DATOS.entradas.planificacion);
-      tablaMateriales.setData(DATOS.entradas.desglose);
-      openEntradasWin();
-    }
+  if (response.data && windowsRegistry.has("entradas")) {
+    const { wb, table } = windowsRegistry.get("entradas");
+    console.log(table);
+    const tablaEntradas = table[0];
+    const tablaMateriales = table[1];
+    tablaEntradas.setData(DATOS.entradas.planificacion);
+    tablaMateriales.setData(DATOS.entradas.desglose);
+    openEntradasWin();
+  }
 }
 
 // ====== ACCIONES BOTONES CABECERA ======
@@ -130,13 +128,13 @@ function crearColumnasEntradas(proveedores) {
     headerSort: false,
     columns: [
       { title: "Pa", field: "total_pactados", cssClass:"col-pactados",
-        ...input_cero,
+        width: 75, ...input_cero,
         bottomCalc:"sum", bottomCalcParams:{precision:false} },
       { title: "De", field: "total_descontar", cssClass:"col-descontar",
-        ...input_cero,
+        width: 75, ...input_cero,
         bottomCalc:"sum", bottomCalcParams:{precision:false} },
       {
-        title:"Pr", field:"total_previstos", hozAlign:"right",
+        title:"Pr", field:"total_previstos", width: 75, hozAlign:"right",
         // Mostramos el cálculo y coloreamos si no coincide con la suma por meses
         formatter: (cell) => {
           const row = cell.getRow();
@@ -155,7 +153,7 @@ function crearColumnasEntradas(proveedores) {
         },
       },
       {
-        title:"En", field:"total_entregados", hozAlign:"right",
+        title:"En", field:"total_entregados", width: 75, hozAlign:"right",
         formatter: (cell) => {
           const d = cell.getRow().getData();
           return sumMeses(d, "confirmado");
@@ -189,24 +187,33 @@ function crearColumnasEntradas(proveedores) {
 function crearColumnasMateriales() {
   const columns = [
     { title: "ID", frozen: true, field: "id", visible: false },
-    { title: "", frozen: true, field: "tipo_material", width: 250,
-      accessor: (value, data, type, params, column, row) =>{
-        console.log(value, data, type, params, column, row);  
-        return value;
+    { title: "", frozen: true, field: "tipo_material", width: 250, cssClass:"col-material",
+      formatter: (cell) => {
+        const row_title = cell.getRow().getData().tipo_material;
+        if (row_title) {
+          return cell.getValue();
+        } else {
+          return "A Facturar aprox.:";
+        }
       },
     },
     { title: "Año", frozen: true, field: "año", visible: false },
     { title: "Pa", frozen: true, field: "total_pactados", cssClass:"col-pactados",
-      ...input_cero,
+      width: 75, ...parametros_meses,
     },
     { title: "De", frozen: true, field: "total_descontar", cssClass:"col-descontar",
-      ...input_cero,
+      width: 75, ...parametros_meses,
     },        
     {
       title:"Pr", frozen: true, field:"total_previstos", cssClass:"col-total-previstos",
-      hozAlign:"right", 
+      width: 75, hozAlign:"right", 
       formatter: (cell) => {
-        return "TOTAL";
+        const row_title = cell.getRow().getData().tipo_material;
+        if (row_title) {
+          return "TOTAL";
+        } else {
+          return "";
+        }
       },
     },
     {
@@ -214,9 +221,15 @@ function crearColumnasMateriales() {
       hozAlign:"right", 
       editable: true,
       editor:"input",
+      width: 75, 
       formatter: (cell) => {
-        const v = (Number(cell.getValue()) || 0) + " KG";
-        return v;
+        const row_title = cell.getRow().getData().tipo_material;
+        if (row_title == "FLEJE" || !row_title) {
+          return cell.getValue();
+        } else {
+          const v = (Number(cell.getValue()) || 0) + " KG";
+          return v;
+        }
       },
       editorParams: {
         selectContents: true,
@@ -249,9 +262,9 @@ const parametros_meses = {
 const input_cero = {
   hozAlign: "right",
   editable: true,
-  editor:"input",
+  editor:"number",
   formatter: (cell) => {
-    const v = Number(cell.getValue()) || "#";
+    const v = Number(cell.getValue()) || "0";
     return v;
   },
 };
@@ -275,24 +288,17 @@ function crearVentanaEntradas(configuracion, show=true) {
   const tablaMateriales = crearTabla("materiales", contenedor, configuracion.tabulator.materiales.options);
 
   windowsRegistry.set(configuracion.KEY, { wb: wb, table: [tablaEntradas, tablaMateriales] });
-  console.log(windowsRegistry);
 
   agregarEventosWinBox(wb, tablaEntradas, cabecera, configuracion);
   agregarEventosTablaEntradas(wb, tablaEntradas, cabecera, configuracion);
   agregarEventosTablaMateriales(wb, tablaMateriales, cabecera, configuracion);
-/*
-  tablaEntradas.on("tableBuilt", () => initialSync(tablaEntradas, tablaMateriales));
-  tablaEntradas.on("columnResized", (column) => {
-    const field = column.getField();              // p.ej. "ene_exp" o "ene_ent"
-    const m = field && field.split("_")[0];       // "ene"
-    if (m) setBottomMonthWidth(m);
-  });
-*/
+  agregarSincronizacionTablas(tablaEntradas, tablaMateriales);
+
   return wb;
 }
 
 function agregarEventosTablaEntradas(wb, tabla, cabecera, configuracion) {
-  tabla.on("cellEdited", (cell) => {
+  tabla.on("cellEdited", async (cell) => {
     const f = cell.getField();
     if (!/_previsto$|_confirmado$|^total_(pactados|descontar)$/.test(f)) return;
 
@@ -311,7 +317,12 @@ function agregarEventosTablaEntradas(wb, tabla, cabecera, configuracion) {
     });
 
     // comunicar cambios al backend
-    send("modificar_entrada", { tabla: tabla.KEY, id: d.id, campo: f, valor: d[f], valores: d });
+    resultado = await wsRequest("modificar_entrada", { tabla: tabla.KEY, id: d.id, campo: f, valor: d[f], valores: d });
+    console.log(resultado);
+    cell.setValue(resultado["valor"]); // actualizar con valor confirmado por el servidor
+    if (resultado?.id != d.id) {
+      alert("Error al guardar los cambios en el servidor.");
+    }
   });
 
   cabecera.querySelector("#u-cargar-entradas")?.addEventListener("click", () => {
@@ -324,29 +335,20 @@ function agregarEventosTablaEntradas(wb, tabla, cabecera, configuracion) {
 }
 
 function agregarEventosTablaMateriales(wb, tablaMateriales, cabecera, configuracion) {
+  tablaMateriales.on("cellEdited", (cell) => {
+    const f = cell.getField();
+    const row = cell.getRow();
+    const d = row.getData();
 
+    if (d.tipo_material) {
+      send("modificar_material", { tablaMateriales: tablaMateriales.KEY, id: d.id, campo: f, valor: d[f], valores: d });
+    } else {
+      send("modificar_facturacion", { tablaMateriales: tablaMateriales.KEY, id: d.id, campo: f, valor: d[f], valores: d });
+    }
 
+  });
 }
 
-// helper: suma anchos de las dos subcolumnas de un mes
-function setBottomMonthWidth(topTable, botTable, shortMonth, longMonth){
-  const exp = topTable.getColumn(`${shortMonth}_previsto`);
-  const ent = topTable.getColumn(`${shortMonth}_confirmado`);
-  if (!exp || !ent) return;
-  const w = exp.getWidth() + ent.getWidth();
-  const col = botTable.getColumn(longMonth);
-  col && col.setWidth(w);
-}
-
-// sincroniza todas al construir
-function initialSync(topTable, botTable){
-  [["ene","enero"],["feb","febrero"],["mar","marzo"],["abr","abril"],["may","mayo"],["jun","junio"],["jul","julio"],["ago","agosto"],["sep","septiembre"],["oct","octubre"],["nov","noviembre"],["dic","diciembre"]]
-    .forEach(([shortMonth, longMonth]) => setBottomMonthWidth(topTable, botTable, shortMonth, longMonth));
-  // columnas fijas iguales en ambas
-  const fijoTop = topTable.getColumn("producto");
-  const fijoBot = botTable.getColumn("producto");
-  if (fijoTop && fijoBot) fijoBot.setWidth(fijoTop.getWidth());
-}
 
 let EntradaAcciones;
 
@@ -362,4 +364,73 @@ function getFormatterEntradaAcciones(cell) {
   const d = cell.getRow().getData();
   return `<button class="btn btn-sm btn-outline-primary" data-action-row="crear"><i class="bi bi-file-earmark-arrow-up"></i></button>` +
     `<button class="btn btn-sm btn-outline-danger" data-action-row="borrar"><i class="bi bi-trash"></i></button>`;
+}
+
+
+
+/////////////////// SINCRONIZACIÓN COLUMNAS ///////////////////
+function agregarSincronizacionTablas(masterTable, slaveTable) {
+
+  masterTable.on("tableBuilt", (...a) => {
+
+    masterTable.on("columnResized", (column) => {
+      syncGroupWidthsByTitle(masterTable, slaveTable, column);
+    });
+
+    masterTable.on("renderComplete", () => {
+      syncGroupWidthsByTitle(masterTable, slaveTable);
+    });
+
+    let lock = false;
+
+    masterTable.on("scrollHorizontal", function(left){
+      if (lock) return;
+      lock = true;
+      const slaveHolder  = slaveTable.element?.querySelector(".tabulator-tableholder");
+      slaveHolder.scrollLeft = left;
+      lock = false;
+    });
+    slaveTable.on("scrollHorizontal", function(left){
+      if (lock) return;
+      lock = true;
+      const masterHolder = masterTable.element?.querySelector(".tabulator-tableholder");
+      masterHolder.scrollLeft = left;
+      lock = false;
+    });
+  });
+}
+
+const ColumnasTablasEntradas = {"Identificación": "tipo_material", "Totales": {"total_pactados": "total_pactados", "total_descontar": "total_descontar", "total_previstos": "total_previstos", "total_entregados": "total_entregados"},
+"Enero":"enero","Febrero":"febrero","Marzo":"marzo","Abril":"abril","Mayo":"mayo","Junio":"junio","Julio":"julio","Agosto":"agosto","Septiembre":"septiembre","Octubre":"octubre","Noviembre":"noviembre","Diciembre":"diciembre",
+"Acciones": "Acciones"};
+
+function syncGroupWidthsByTitle(masterTable, slaveTable, column=null) {
+  const columnas = masterTable.getColumnLayout();
+  let col_cambiada = column ? column.getParentColumn().getDefinition().title : null;
+  columnas.forEach(col => {
+    if (column && col.title !== col_cambiada) return;
+    let destino = ColumnasTablasEntradas[col.title];
+    try {
+      if (destino) {
+        if (typeof(destino) === "object" && column) {
+          col_cambiada = column.getField();
+          destino = destino[col_cambiada];
+          const slaveCol = slaveTable.getColumn(destino);
+          if (slaveCol) {
+            const width = column.getWidth();
+            slaveCol.updateDefinition({ width: width });
+          }
+        } else {
+          const slaveCol = slaveTable.getColumn(destino);
+          if (slaveCol) {
+            const totalWidth = col.columns.reduce((acc, subCol) => acc + (subCol.visible ? Number(subCol.width) : 0), 0);
+            slaveCol.updateDefinition({ width: totalWidth });
+          }
+        }
+      }
+    } catch (e) {
+      console.error("Error sincronizando columna:", destino, e);    
+    }
+  });
+  //slaveTable.redraw(true);
 }
