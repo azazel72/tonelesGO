@@ -34,6 +34,10 @@ window.onload = () => {
             await openEstadosWin();
         },
 
+        async "ver-puestos-trabajo"() {
+            await openPuestosTrabajoWin();
+        },
+
         async "ver-materiales"() {
             await openMaterialesWin();
         },
@@ -41,8 +45,8 @@ window.onload = () => {
         async "ver-entradas"() {
             await openEntradasWin();
         },
-        async "ver-salidas"() {
-            await openSalidasWin();
+        async "ver-cuadrantes"() {
+            await openCuadrantesWin();
         },
 
         async "cerrar-maestros"() {

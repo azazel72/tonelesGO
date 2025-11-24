@@ -12,7 +12,15 @@ class GenericRepository:
     def list_by_year(self, session: Session, año: int) -> List:
         statement = select(self.model).where(self.model.año == año)
         return session.exec(statement).all()
-
+    
+    def list_by_start_date(self, session: Session, fecha: str) -> List:
+        statement = select(self.model).where(self.model.fecha_inicio == fecha)
+        return session.exec(statement).first()
+    
+    def list_by_cuadrante_id(self, session: Session, cuadrante_id: int) -> List:
+        statement = select(self.model).where(self.model.cuadrante_id == cuadrante_id)
+        return session.exec(statement).all()
+    
     def get(self, session: Session, id: int):
         return session.get(self.model, id)
 

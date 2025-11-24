@@ -1,5 +1,5 @@
-from .logica import EntradasDTO, MaestrosDTO, PlanCamionDTO, PlanFacturacionDTO, PlanMaterialDTO
-from .maestros import ClienteDTO, EstadoDTO, InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO, RolDTO
+from .logica import EntradasDTO, MaestrosDTO, PlanCamionDTO, PlanFacturacionDTO, PlanMaterialDTO, CuadranteDTO, CuadranteDetalleDTO
+from .maestros import ClienteDTO, EstadoDTO, InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO, RolDTO, PuestoTrabajoDTO
     
 __all__ = [
     "EntradasDTO",
@@ -14,4 +14,7 @@ __all__ = [
     "PlanCamionDTO",
     "PlanFacturacionDTO",
     "PlanMaterialDTO",
+    "PuestoTrabajoDTO",
+    "CuadranteDTO",
+    "CuadranteDetalleDTO",
 ]

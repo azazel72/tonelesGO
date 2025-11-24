@@ -5,6 +5,7 @@ from .ubicacion_db import UbicacionDB
 from .proveedor_db import ProveedorDB
 from .usuario_db import UsuarioDB
 from .rol_db import RolDB
+from .puesto_trabajo_db import PuestoTrabajoDB
 
 __all__ = [
     "ClienteDB",
@@ -14,4 +15,5 @@ __all__ = [
     "ProveedorDB",
     "UsuarioDB",
     "RolDB",
+    "PuestoTrabajoDB"
 ]

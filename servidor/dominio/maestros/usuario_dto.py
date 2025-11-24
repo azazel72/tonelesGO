@@ -7,6 +7,7 @@ class UsuarioDTO(BaseModel):
     alias: str
     nombre: str
     rol_id: int | None
+    empleado: bool | None = Field(default=False)
     clave: str = Field(exclude=True)
 
     def from_db(usuario_db: UsuarioDB) -> "UsuarioDTO":
@@ -15,6 +16,7 @@ class UsuarioDTO(BaseModel):
             alias=usuario_db.alias,
             nombre=usuario_db.nombre,
             rol_id=usuario_db.rol_id,
+            empleado=usuario_db.empleado,
             clave=usuario_db.clave
         )
     
@@ -24,6 +26,7 @@ class UsuarioDTO(BaseModel):
             alias=self.alias,
             nombre=self.nombre,
             rol_id=self.rol_id,
+            empleado=self.empleado,
             clave=self.clave
         )
         

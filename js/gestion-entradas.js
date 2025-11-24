@@ -21,7 +21,7 @@ function openEntradasWin() {
           editable: true,
           height: "auto",
           columns: crearColumnasEntradas(DATOS.maestros.proveedores),
-          data: DATOS.entradas.planificacion?.length || [],
+          data: DATOS.entradas.planificacion?.length ? DATOS.entradas.planificacion : [],
           columnDefaults: { headerHozAlign:"center" },
         },
       },
@@ -30,7 +30,7 @@ function openEntradasWin() {
           editable: true,
           height: "auto",
           columns: crearColumnasMateriales(),
-          data: DATOS.entradas.desglose?.length || [],
+          data: DATOS.entradas.desglose?.length ? DATOS.entradas.desglose : [],
           columnDefaults: {
             resizable: false,
           },      

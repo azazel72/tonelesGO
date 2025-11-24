@@ -14,4 +14,6 @@ def obtener_acciones() -> Dict[str, any]:
         "modificar_entrada": lambda ws, req: Colector.colector.modificar_entrada(req.data),
         "eliminar_maestro": lambda ws, req: Colector.colector.eliminar_maestro(req.data),
         "insertar_maestro": lambda ws, req: Colector.colector.insertar_maestro(req.data),
+        "cargar_cuadrantes": lambda ws, req: Colector.colector.obtener_cuadrante(req.data.get("fecha")),
+        "actualizar_cuadrantes": lambda ws, req: Colector.colector.actualizar_cuadrante(req.data.get("fecha")),
     }

@@ -1297,3 +1297,22 @@ rol_id
 2025-11-14 02:45:45 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: Entrada con ID 1 no encontrada en la tabla 'entradas'.
 2025-11-14 02:46:55 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: Entrada con ID 1 no encontrada en la tabla 'entradas'.
 2025-11-14 02:47:29 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_entrada: Entrada con ID 1 no encontrada en la tabla 'entradas'.
+2025-11-23 18:55:03 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: Tabla 'puestos-trabajo' no reconocida.
+2025-11-23 19:07:23 [ERROR] paezlobato_crud_routes: Error al procesar la acción modificar_maestro: Tabla 'puestos-trabajo' no reconocida.
+2025-11-24 01:01:23 [ERROR] paezlobato_crud_routes: Error al procesar la acción cargar_cuadrantes: cannot access local variable 'detalles' where it is not associated with a value
+2025-11-24 01:17:22 [ERROR] paezlobato_crud_routes: Error al procesar la acción cargar_cuadrantes: Object of type date is not JSON serializable
+2025-11-24 01:23:41 [ERROR] paezlobato_crud_routes: Error al procesar la acción cargar_cuadrantes: 'str' object has no attribute 'get'
+2025-11-24 01:23:45 [ERROR] paezlobato_crud_routes: Error al procesar la acción cargar_cuadrantes: 'str' object has no attribute 'get'
+2025-11-24 01:27:01 [ERROR] paezlobato_crud_routes: Error al procesar la acción cargar_cuadrantes: Object of type date is not JSON serializable
+2025-11-24 01:27:24 [ERROR] paezlobato_crud_routes: Error al procesar la acción cargar_cuadrantes: Object of type date is not JSON serializable
+2025-11-24 01:33:41 [ERROR] paezlobato_crud_routes: Error al procesar la acción cargar_cuadrantes: 2 validation errors for CuadranteDTO
+fecha_inicio
+  Input should be a valid string [type=string_type, input_value=datetime.date(2025, 11, 20), input_type=date]
+    For further information visit https://errors.pydantic.dev/2.12/v/string_type
+fecha_fin
+  Input should be a valid string [type=string_type, input_value=datetime.date(2025, 11, 26), input_type=date]
+    For further information visit https://errors.pydantic.dev/2.12/v/string_type
+2025-11-24 01:37:48 [ERROR] paezlobato_crud_routes: Error al procesar la acción cargar_cuadrantes: (mysql.connector.errors.IntegrityError) 1048 (23000): Column 'fecha_fin' cannot be null
+[SQL: INSERT INTO cuadrantes (fecha_inicio, fecha_fin, titulo, observaciones) VALUES (%(fecha_inicio)s, %(fecha_fin)s, %(titulo)s, %(observaciones)s)]
+[parameters: {'fecha_inicio': '2025-11-20', 'fecha_fin': None, 'titulo': '', 'observaciones': ''}]
+(Background on this error at: https://sqlalche.me/e/20/gkpj)

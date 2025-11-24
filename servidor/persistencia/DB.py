@@ -12,7 +12,8 @@ class DB:
             user=user,
             password=password,
             database=database,
-            charset="utf8mb4"
+            charset="utf8mb4",
+            port=constantes.PUERTO_BD
         )
 
         return conn

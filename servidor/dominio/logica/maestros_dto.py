@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from servidor.dominio.maestros.cliente_dto import ClienteDTO
 from servidor.dominio.maestros.estado_dto import EstadoDTO
 from servidor.dominio.maestros.instalacion_dto import InstalacionDTO
+from servidor.dominio.maestros.puesto_trabajo_dto import PuestoTrabajoDTO
 from servidor.dominio.maestros.ubicacion_dto import UbicacionDTO
 from servidor.dominio.maestros.proveedor_dto import ProveedorDTO
 from servidor.dominio.maestros.usuario_dto import UsuarioDTO
@@ -18,6 +19,7 @@ class MaestrosDTO(BaseModel):
     proveedores: Optional[Dict[int, ProveedorDTO]] = {}
     usuarios: Optional[Dict[int, "UsuarioDTO"]] = {}
     roles: Optional[Dict[int, "RolDTO"]] = {}
+    puestos_trabajo: Optional[Dict[int, "PuestoTrabajoDTO"]] = {}
 
     def buscar_usuario_por_username(self, username: str) -> UsuarioDTO | None:
         for usuario in (self.usuarios.values() if self.usuarios else []):

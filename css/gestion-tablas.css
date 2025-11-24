@@ -46,3 +46,29 @@ div.contenedor-tabla {
 .nuevo-registro {
   background-color: #e0f7fa !important;
 }
+
+
+
+
+#tablaCuadrante .tabulator .tabulator-cell.celda-cuadrante {
+    /*white-space: normal;      /* permitir varias líneas */
+    /*overflow: visible;        /* no ocultar contenido */
+    /*text-overflow: clip;      /* sin "..." */
+    /*display: flex;            /* las píldoras en línea, pero */
+    /*flex-wrap: wrap;          /* que se vayan abajo cuando no quepan */
+    /*align-items: flex-start; /* */
+}
+
+/* Tus celdas de cuadrante: sin ellipsis, con salto de línea y altura auto */
+#tablaCuadrante .celda-cuadrante {
+    min-height: 32px;
+    padding: 2px;
+}
+
+/* Cuando es objetivo de drop */
+#tablaCuadrante .celda-cuadrante.drop-target {
+    outline: 2px dashed #0d6efd;              /* borde azul tipo Bootstrap */
+    outline-offset: -2px;
+    background-color: rgba(13, 110, 253, .08); /* azul muy suave de fondo */
+}
+

@@ -50,13 +50,16 @@
               <li><a class="dropdown-item" href="#" data-action="ver-estados">
                 <i class="bi bi-arrow-clockwise me-1"></i> Ver estados
               </a></li>
+              <li><a class="dropdown-item" href="#" data-action="ver-puestos-trabajo">
+                <i class="bi bi-diagram-3 me-1"></i> Ver puestos de trabajo
+              </a></li>
 
               <li><hr class="dropdown-divider"></li>
               <li><a class="dropdown-item" href="#" data-action="ver-usuarios">
                 <i class="bi bi-people me-1"></i> Ver usuarios
               </a></li>
               <li><a class="dropdown-item" href="#" data-action="ver-roles">
-                <i class="bi bi-person me-1"></i> Ver roles
+                <i class="bi bi-person-gear me-1"></i> Ver roles
               </a></li>
 
 
@@ -78,20 +81,11 @@
               </a></li>
 
               <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item text-danger" href="#" data-action="subir-archivo">
-                <i class="bi bi-trash me-1"></i> Subir archivo
+              <li><a class="dropdown-item" href="#" data-action="ver-cuadrantes">
+                <i class="bi bi-trash me-1"></i> Ver Cuadrantes
               </a></li>
 
-              <li><a class="dropdown-item" href="#" data-action="nuevo">
-                <i class="bi bi-plus-circle me-1"></i> Nuevo registro
-              </a></li>
-              <li><a class="dropdown-item" href="#" data-action="refrescar">
-                <i class="bi bi-arrow-clockwise me-1"></i> Refrescar
-              </a></li>
-              <li><hr class="dropdown-divider"></li>
-              <li><a class="dropdown-item text-danger" href="#" data-action="eliminar-seleccion">
-                <i class="bi bi-trash me-1"></i> Eliminar selección
-              </a></li>
+
             </ul>
           </li>
 
@@ -147,7 +141,9 @@
 
   <!-- Centro -->
   <main id="content" class="container-fluid py-2">
-    <div id="escritorio"></div>
+    <div id="escritorio">
+
+    </div>
   </main>
 
   <!-- Pie fijo -->
@@ -157,25 +153,47 @@
 
 
 
-<div id="login-overlay"class="overlay">
-  <div class="login-box ws--connecting" id="login-box">
-    <div class="ws-status">
-      <span class="ws-dot"></span><span id="ws-text">Conectando…</span>
+    <div id="login-overlay"class="overlay">
+      <div class="login-box ws--connecting" id="login-box">
+        <div class="ws-status">
+          <span class="ws-dot"></span><span id="ws-text">Conectando…</span>
+        </div>
+
+        <h2>Iniciar sesión</h2>
+        <div id="login-form" autocomplete="off">
+          <label for="user">Usuario</label>
+          <input id="user" name="user" type="text" disabled required>
+
+          <label for="pass">Clave</label>
+          <input id="pass" name="pass" type="password" disabled required>
+
+          <button type="button" id="login-button" class="btn btn-primary" data-action="login" disabled>Enviar</button>
     </div>
 
-    <h2>Iniciar sesión</h2>
-    <div id="login-form" autocomplete="off">
-      <label for="user">Usuario</label>
-      <input id="user" name="user" type="text" disabled required>
 
-      <label for="pass">Clave</label>
-      <input id="pass" name="pass" type="password" disabled required>
-
-      <button type="button" id="login-button" class="btn btn-primary" data-action="login" disabled>Enviar</button>
-</div>
   </div>
 </div>
 
+<template id="plantilla_cuadrantes">
+  <div class="cabecera p-2 border-bottom d-flex gap-2 align-items-center">
+    <button id="u-cargar-cuadrantes" class="btn btn-sm btn-outline-secondary">Consultar</button>
+    <input id="u-cargar-cuadrantes-input" class="form-control-sm" type="date" step="7"/>
+    <div class="ms-auto d-flex gap-2">
+      <button id="u-actualizar-cuadrantes" class="btn btn-sm btn-outline-success" disabled>Actualizar</button>
+    </div>
+  </div>
+
+  <div id="contenedor-cuadrante">
+    <div class="row p-2">
+      <div class="col-3">
+        <div id="listaUsuarios"></div>
+      </div>
+      <div class="col-9">
+          <div id="tablaCuadrante"></div>
+      </div>
+    </div>
+  </div>
+</template>
 
   
 
@@ -197,10 +215,12 @@
   <script src="./js/gestion-roles.js"></script>
   <script src="./js/gestion-proveedores.js"></script>
   <script src="./js/gestion-clientes.js"></script>
+  <script src="./js/gestion-puestos-trabajo.js"></script>
   <script src="./js/gestion-instalaciones.js"></script>
   <script src="./js/gestion-ubicaciones.js?v=1"></script>
   <script src="./js/gestion-estados.js"></script>
   <script src="./js/gestion-entradas.js?v=1.0001"></script>
+  <script src="./js/gestion-cuadrantes.js"></script>
   <script src="./js/gestion-eventos-ws.js"></script>
   <script src="./js/gestion-eventos-ui.js"></script>
 

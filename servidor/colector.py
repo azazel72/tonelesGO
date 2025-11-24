@@ -1,12 +1,11 @@
+from datetime import date, timedelta
 import logging
 
-from servidor.conexiones.response_message import ResponseMessage
-
-from .modelos import ClienteDB, EstadoDB, InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB, RolDB
-from .modelos import PlanCamionDB, PlanFacturacionDB, PlanMaterialDB
+from .modelos import ClienteDB, EstadoDB, InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB, RolDB, PuestoTrabajoDB
+from .modelos import PlanCamionDB, PlanFacturacionDB, PlanMaterialDB, CuadranteDB, CuadranteDetalleDB
 from .persistencia import GenericRepository, DB
-from .dominio import EntradasDTO, MaestrosDTO, PlanMaterialDTO, PlanFacturacionDTO, PlanCamionDTO
-from .dominio import ClienteDTO, EstadoDTO, InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO, RolDTO
+from .dominio import EntradasDTO, MaestrosDTO, PlanMaterialDTO, PlanFacturacionDTO, PlanCamionDTO, CuadranteDTO, CuadranteDetalleDTO
+from .dominio import ClienteDTO, EstadoDTO, InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO, RolDTO, PuestoTrabajoDTO
 
 logger = logging.getLogger("paezlobato_colector")
 
@@ -30,11 +29,15 @@ class Colector:
         self.repo_instalaciones = GenericRepository(InstalacionDB)
         self.repo_ubicaciones = GenericRepository(UbicacionDB)
         self.repo_proveedores = GenericRepository(ProveedorDB)
+        self.repo_puestos_trabajo = GenericRepository(PuestoTrabajoDB)
 
         self.repo_usuarios = GenericRepository(UsuarioDB)
         self.repo_roles = GenericRepository(RolDB)
 
+        self.repo_cuadrantes = GenericRepository(CuadranteDB)
+        self.repo_cuadrante_detalles = GenericRepository(CuadranteDetalleDB)
 
+#region Métodos Maestros
     def obtener_datos_maestros(self) -> dict:
         with DB.crear_sesion() as session:
             clientes = self.repo_clientes.list_all(session)
@@ -44,6 +47,7 @@ class Colector:
             proveedores = self.repo_proveedores.list_all(session)
             usuarios = self.repo_usuarios.list_all(session)
             roles = self.repo_roles.list_all(session)
+            puestos_trabajo = self.repo_puestos_trabajo.list_all(session)
 
             self.maestros.clientes = {cliente.id: ClienteDTO.from_db(cliente) for cliente in clientes}
             self.maestros.estados = {estado.id: EstadoDTO.from_db(estado) for estado in estados}
@@ -52,67 +56,10 @@ class Colector:
             self.maestros.proveedores = {proveedor.id: ProveedorDTO.from_db(proveedor) for proveedor in proveedores}
             self.maestros.usuarios = {usuario.id: UsuarioDTO.from_db(usuario) for usuario in usuarios}
             self.maestros.roles = {rol.id: RolDTO.from_db(rol) for rol in roles}
+            self.maestros.puestos_trabajo = {puesto.id: PuestoTrabajoDTO.from_db(puesto) for puesto in puestos_trabajo}
 
             #print("Datos maestros cargados:", self.maestros)
             #print("Datos clientes cargados:", self.maestros.clientes)
-
-
-    def obtener_entradas(self, año: int, actualizar_local = True) -> EntradasDTO:
-        with DB.crear_sesion() as session:
-            plan_camiones = self.repo_camiones.list_by_year(session, año)
-            plan_facturacion = self.repo_facturacion.list_by_year(session, año)
-            plan_materiales = self.repo_materiales.list_by_year(session, año)
-
-            entradas_dto = EntradasDTO(
-                año=año,
-                plan_camiones=[PlanCamionDTO.from_db(pc) for pc in plan_camiones],
-                plan_facturacion=PlanFacturacionDTO.from_db(plan_facturacion[0]) if plan_facturacion else None,
-                plan_materiales=[PlanMaterialDTO.from_db(pm) for pm in plan_materiales]
-            )
-        
-            if actualizar_local:
-                self.entradas = entradas_dto
-
-            return entradas_dto
-        
-    def agregar_entradas_proveedores(self, año: int) -> EntradasDTO:
-        with DB.crear_sesion() as session:
-            plan_camiones = self.repo_camiones.list_by_year(session, año)
-            proveedores = self.repo_proveedores.list_all(session)
-
-            plan_proveedores_ids = {pc.proveedor_id for pc in plan_camiones if pc.proveedor_id is not None}
-            proveedores_faltantes = [p for p in proveedores if p.id not in plan_proveedores_ids]
-
-            logger.info(f"Proveedores faltantes para el año {año}: {[p.nombre for p in proveedores_faltantes]}")
-            nuevas = [PlanCamionDB(proveedor_id=p.id, año=año) for p in proveedores_faltantes]
-            self.repo_camiones.insert_all(session, nuevas)
-            try:
-                session.commit()
-            except Exception:
-                session.rollback()
-                raise
-            logger.info("Entradas de proveedores agregadas correctamente.")
-            return self.obtener_entradas(año)
-
-    def modificar_entrada(self, data):
-        tabla = data.get("tabla")
-        entrada_id = data.get("id")
-        campo = data.get("campo")
-        valor = data.get("valor")
-        objeto = None
-
-        with DB.crear_sesion() as session:
-            repo, busqueda, objeto = self.obtener_repo(tabla)
-
-            DTO = busqueda(entrada_id)
-            self.checkUpdate(DTO, tabla, entrada_id, campo)            
-
-            setattr(DTO, campo, valor)
-            updated = DTO.to_db()
-            repo.update(session, updated)
-
-            logger.info(f"Entrada ID {entrada_id} modificada: {campo} = {valor}")
-            return {"id": entrada_id, "campo": campo, "valor": valor}
 
 
     def modificar_maestro(self, data):
@@ -174,8 +121,138 @@ class Colector:
             logger.info(f"Insertado ID {new.id} en la tabla {tabla}")
           
             return objeto_DTO
+#endregion
+
+#region Métodos Entradas
+    def obtener_entradas(self, año: int, actualizar_local = True) -> EntradasDTO:
+        with DB.crear_sesion() as session:
+            plan_camiones = self.repo_camiones.list_by_year(session, año)
+            plan_facturacion = self.repo_facturacion.list_by_year(session, año)
+            plan_materiales = self.repo_materiales.list_by_year(session, año)
+
+            entradas_dto = EntradasDTO(
+                año=año,
+                plan_camiones=[PlanCamionDTO.from_db(pc) for pc in plan_camiones],
+                plan_facturacion=PlanFacturacionDTO.from_db(plan_facturacion[0]) if plan_facturacion else None,
+                plan_materiales=[PlanMaterialDTO.from_db(pm) for pm in plan_materiales]
+            )
+        
+            if actualizar_local:
+                self.entradas = entradas_dto
+
+            return entradas_dto
+        
+    def agregar_entradas_proveedores(self, año: int) -> EntradasDTO:
+        with DB.crear_sesion() as session:
+            plan_camiones = self.repo_camiones.list_by_year(session, año)
+            proveedores = self.repo_proveedores.list_all(session)
+
+            plan_proveedores_ids = {pc.proveedor_id for pc in plan_camiones if pc.proveedor_id is not None}
+            proveedores_faltantes = [p for p in proveedores if p.id not in plan_proveedores_ids]
+
+            logger.info(f"Proveedores faltantes para el año {año}: {[p.nombre for p in proveedores_faltantes]}")
+            nuevas = [PlanCamionDB(proveedor_id=p.id, año=año) for p in proveedores_faltantes]
+            self.repo_camiones.insert_all(session, nuevas)
+            try:
+                session.commit()
+            except Exception:
+                session.rollback()
+                raise
+            logger.info("Entradas de proveedores agregadas correctamente.")
+            return self.obtener_entradas(año)
+
+    def modificar_entrada(self, data):
+        tabla = data.get("tabla")
+        entrada_id = data.get("id")
+        campo = data.get("campo")
+        valor = data.get("valor")
+        objeto = None
+
+        with DB.crear_sesion() as session:
+            repo, busqueda, objeto = self.obtener_repo(tabla)
+
+            DTO = busqueda(entrada_id)
+            self.checkUpdate(DTO, tabla, entrada_id, campo)            
+
+            setattr(DTO, campo, valor)
+            updated = DTO.to_db()
+            repo.update(session, updated)
+
+            logger.info(f"Entrada ID {entrada_id} modificada: {campo} = {valor}")
+            return {"id": entrada_id, "campo": campo, "valor": valor}
+#endregion
+
+#region Métodos Cuadrantes
+    def obtener_cuadrante(self, fecha: str, actualizar_local = True) -> CuadranteDTO:
+        with DB.crear_sesion() as session:
+            cuadrante = self.repo_cuadrantes.list_by_start_date(session, fecha)
+            if cuadrante is None:
+                cuadrante = self.insertar_cuadrante(date.fromisoformat(fecha))
+
+            detalles = self.repo_cuadrante_detalles.list_by_cuadrante_id(session, cuadrante.id)
+            
+            cuadrante_dto = CuadranteDTO.from_db(cuadrante)
+            cuadrante_dto.detalles = [CuadranteDetalleDTO.from_db(det) for det in detalles]
+        
+            if actualizar_local:
+                self.cuadrante = cuadrante_dto
+
+            return cuadrante_dto
+        
+    def actualizar_cuadrante(self, fecha: int) -> CuadranteDTO:
+        with DB.crear_sesion() as session:
+            plan_camiones = self.repo_camiones.list_by_year(session, fecha)
+            proveedores = self.repo_proveedores.list_all(session)
+
+            plan_proveedores_ids = {pc.proveedor_id for pc in plan_camiones if pc.proveedor_id is not None}
+            proveedores_faltantes = [p for p in proveedores if p.id not in plan_proveedores_ids]
+
+            logger.info(f"Proveedores faltantes para el año {fecha}: {[p.nombre for p in proveedores_faltantes]}")
+            nuevas = [PlanCamionDB(proveedor_id=p.id, año=fecha) for p in proveedores_faltantes]
+            self.repo_camiones.insert_all(session, nuevas)
+            try:
+                session.commit()
+            except Exception:
+                session.rollback()
+                raise
+            logger.info("Entradas de proveedores agregadas correctamente.")
+            return self.obtener_cuadrante(fecha)
+
+    def modificar_cuadrante(self, data):
+        tabla = data.get("tabla")
+        entrada_id = data.get("id")
+        campo = data.get("campo")
+        valor = data.get("valor")
+        objeto = None
+
+        with DB.crear_sesion() as session:
+            repo, busqueda, objeto = self.obtener_repo(tabla)
+
+            DTO = busqueda(entrada_id)
+            self.checkUpdate(DTO, tabla, entrada_id, campo)            
+
+            setattr(DTO, campo, valor)
+            updated = DTO.to_db()
+            repo.update(session, updated)
+
+            logger.info(f"Entrada ID {entrada_id} modificada: {campo} = {valor}")
+            return {"id": entrada_id, "campo": campo, "valor": valor}
         
 
+    def insertar_cuadrante(self, fecha: date) -> CuadranteDB:
+        with DB.crear_sesion() as session:
+            DTO = CuadranteDTO(
+                id=None,
+                fecha_inicio=fecha,
+                fecha_fin=fecha + timedelta(days=6),
+                titulo="",
+                observaciones="",
+                detalles=[],
+            )
+            return self.repo_cuadrantes.insert(session, DTO.to_db())
+#endregion
+
+#region Métodos Auxiliares
     def obtener_repo(self, tabla):
         if tabla == "clientes":
             repo = self.repo_clientes
@@ -189,6 +266,10 @@ class Colector:
             repo = self.repo_instalaciones
             maestro = self.maestros.instalaciones
             objeto = InstalacionDTO
+        elif tabla == "puestos_trabajo":
+            repo = self.repo_puestos_trabajo
+            maestro = self.maestros.puestos_trabajo
+            objeto = PuestoTrabajoDTO
         elif tabla == "ubicaciones":
             repo = self.repo_ubicaciones
             maestro = self.maestros.ubicaciones
@@ -231,3 +312,4 @@ class Colector:
     def limpiar_datos(self):
         #self.datos.clear()
         pass
+#endregion

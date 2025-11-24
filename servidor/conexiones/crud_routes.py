@@ -106,10 +106,12 @@ class CrudRoutes:
             try:
                 handler = ACCIONES.get(msg.action)
                 if handler:
+                    print(msg.data)
                     result = handler(ws, msg)
                     if result is not None:
                         rm: Any = ResponseMessage.ok(msg.action, result, msg.request_id).model_dump()
-                        await ws.send_json(rm)
+                        safe_data = jsonable_encoder(rm)
+                        await ws.send_json(safe_data)
                     else:
                         await ws.send_json(ResponseMessage.fail(msg.action, "no_result", msg.request_id).model_dump())
                 else:

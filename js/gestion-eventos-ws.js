@@ -24,5 +24,7 @@ var ACCIONES = {
     "maestros": respuesta_maestros,
     "cargar_entradas": mostrar_entradas,
     "agregar_entradas_proveedores": mostrar_entradas,
+    "cargar_cuadrantes": mostrar_cuadrantes,
+    "actualizar_cuadrante": mostrar_cuadrantes,
 };
 

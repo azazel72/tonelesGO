@@ -244,28 +244,41 @@ function cerrarVentanasMaestros() {
 function crearCabeceraVentana(configuracion) {
   const cabecera = crearElemento("div", { class: "cabecera p-2 border-bottom d-flex gap-2 align-items-center" });
 
-  switch(configuracion.winbox.tipo) {
+  switch(configuracion.winbox?.tipo) {
     case "generico":
-      const botonReload = crearBotonesGenericos("u-reload");
+      const botonRecargarGenericos = crearBotonesGenericos("u-reload");
       const botonAdd    = crearBotonesGenericos("u-add");
       const botonFilter = crearBotonesGenericos("u-filter");
       const botonEditar = crearBotonesGenericos("u-editar");
       const contenedorDerecha = crearBotonesGenericos("contenedor-botones-derecha");
       contenedorDerecha.appendChild(botonFilter);
       contenedorDerecha.appendChild(botonEditar);
-      cabecera.appendChild(botonReload);
+      cabecera.appendChild(botonRecargarGenericos);
       cabecera.appendChild(botonAdd);
       cabecera.appendChild(contenedorDerecha);
       break;
     case "entradas":
-      const botonCargar = crearBotonesGenericos("u-cargar-entradas");
-      const inputAño    = crearBotonesGenericos("u-cargar-entradas-input");
-      const botonAgregarProveedores = crearBotonesGenericos("u-add-providers");
-      const contenedorDerecha2 = crearBotonesGenericos("contenedor-botones-derecha");
-      contenedorDerecha2.appendChild(botonAgregarProveedores);
-      cabecera.appendChild(botonCargar);
-      cabecera.appendChild(inputAño);
-      cabecera.appendChild(contenedorDerecha2);
+      const botonCargarEntradas = crearBotonesGenericos("u-cargar-entradas");
+      const inputAñoEntradas    = crearBotonesGenericos("u-cargar-entradas-input");
+      const botonAgregarProveedoresEntradas = crearBotonesGenericos("u-add-providers");
+      const contenedorDerechaEntradas = crearBotonesGenericos("contenedor-botones-derecha");
+      contenedorDerechaEntradas.appendChild(botonAgregarProveedoresEntradas);
+      cabecera.appendChild(botonCargarEntradas);
+      cabecera.appendChild(inputAñoEntradas);
+      cabecera.appendChild(contenedorDerechaEntradas);
+      break;
+    case "cuadrantes":
+      const botonCargarCuadrantes = crearBotonesGenericos("u-cargar-cuadrantes");
+      const inputAñoCuadrantes    = crearBotonesGenericos("u-cargar-cuadrantes-input");
+      const botonAgregarProveedoresCuadrantes = crearBotonesGenericos("u-add-providers");
+      const contenedorDerechaCuadrantes = crearBotonesGenericos("contenedor-botones-derecha");
+      contenedorDerechaCuadrantes.appendChild(botonAgregarProveedoresCuadrantes);
+      cabecera.appendChild(botonCargarCuadrantes);
+      cabecera.appendChild(inputAñoCuadrantes);
+      cabecera.appendChild(contenedorDerechaCuadrantes);
+      break;
+    default:
+      // sin botones
       break;
   }
 
