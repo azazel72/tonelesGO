@@ -12,17 +12,17 @@ class CuadranteDetalleDB(SQLModel, table=True):
 
     cuadrante_id: int = Field(
         index=True,
-        foreign_key="cuadrante.id",
+        foreign_key="cuadrantes.id",
     )
 
     puesto_id: int = Field(
         index=True,
-        foreign_key="puesto_trabajo.id",
+        foreign_key="puestos_trabajo.id",
     )
 
     usuario_id: int = Field(
         index=True,
-        foreign_key="usuario.id",
+        foreign_key="usuarios.id",
     )
 
     orden_en_puesto: int = Field(default=1, ge=0)

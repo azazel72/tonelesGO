@@ -21,56 +21,8 @@ function openCuadrantesWin() {
     tabulator: {
       height: "auto",
       layout: "fitColumns",
-      columns: crearColumnasCuadrantes(DATOS.cuadrantes).map(col => ({
-        ...col,
-        formatter: (cell) => {
-          const el = cell.getElement();   // elemento real de la celda Tabulator
-
-          el.classList.add("celda-cuadrante");
-
-          el.addEventListener("dragenter", (e) => {
-            e.preventDefault();                      // muy importante
-            el.classList.add("drop-target");
-          });
-
-          el.addEventListener("dragover", (e) => {
-            e.preventDefault();                      // sin esto no hay drop
-            e.dataTransfer.dropEffect = "copy";
-            // por si acaso, mantener la clase:
-            el.classList.add("drop-target");
-          });
-
-          el.addEventListener("dragleave", (e) => {
-            // cuando el ratón sale de la celda, quitamos el estilo
-            el.classList.remove("drop-target");
-          });
-
-          el.addEventListener("drop", (e) => {
-            e.preventDefault();
-            el.classList.remove("drop-target");
-
-            const id = e.dataTransfer.getData("usuario_id");
-            const nombre = e.dataTransfer.getData("usuario_nombre");
-            if (!id) return;
-
-            const pill = document.createElement("span");
-            pill.className = "badge rounded-pill m-1";
-            pill.textContent = nombre;
-
-            const bg = getPillColorByIndex(Number(id));       // tu función
-            const fg = getContrastTextColor(bg);              // tu función
-            pill.style.backgroundColor = bg;
-            pill.style.color = fg;
-
-            el.appendChild(pill);
-
-            guardarAsignacion(id, cell.getRow().getData().id, cell.getField());
-          });
-
-          return "";
-        },
-      })),
-      data: Object.values(DATOS.maestros?.puestos_trabajo ?? {}),
+      columns: crearColumnasCuadrantes(DATOS.cuadrante),
+      data: crearDatosCuadrantes(DATOS.cuadrante),
     },
   }
 
@@ -81,52 +33,224 @@ function openCuadrantesWin() {
   return wb;
 }
 
-function guardarAsignacion(usuarioId, puestoId, fecha) {
-    fetch("/api/cuadrante-detalle", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-            usuario_id: usuarioId,
-            puesto_id: puestoId,
-            fecha: fecha
-        })
-    });
-}
-
-
 // ====== MUESTRA LA VENTANA DE CUADRANTES ======
 function mostrar_cuadrantes(response) {
-  DATOS.cuadrantes = response.data ?? [];
+  DATOS.cuadrante = response.data ?? [];
   
   if (response.data && windowsRegistry.has("cuadrantes")) {
     const { wb, table } = windowsRegistry.get("cuadrantes");
 
-
-    
-    console.log(table);
-
-    //tablaEntradas.setData(DATOS.cuadrantes.planificacion);
+    table.setColumns(crearColumnasCuadrantes(DATOS.cuadrante));
+    table.setData(crearDatosCuadrantes(DATOS.cuadrante));
     
     openCuadrantesWin();
   }
 }
 
-// ====== FIN CREAR VENTANA ENTRADAS ======
+// ====== FIN CREAR VENTANA CUADRANTES ======
 
 // --- UTILIDADES ---
 
 // === construcción de columnas ===
-function crearColumnasCuadrantes(cuadrantes) {
+function crearColumnasCuadrantes(cuadrante) {
+  const jue = sumarDiasYYYYMMDD(cuadrante?.fecha_inicio, 0);
+  const vie = sumarDiasYYYYMMDD(cuadrante?.fecha_inicio, 1);
+  const lun = sumarDiasYYYYMMDD(cuadrante?.fecha_inicio, 4);
+  const mar = sumarDiasYYYYMMDD(cuadrante?.fecha_inicio, 5);
+  const mie = sumarDiasYYYYMMDD(cuadrante?.fecha_inicio, 6);
+
   const columnas = [
     { title: "ID", field: "id", visible: false },
     { title: "Puesto", field: "nombre", width: 150, frozen: true },
-    { title: "Jue", field: "nombre" },
-    { title: "Vie", field: "nombre" },
-    { title: "Lun", field: "nombre" },
-    { title: "Mar", field: "nombre" },
-    { title: "Mié", field: "nombre" },
+    { title: "Jue", field: jue, formatter: formatterColumnasCuadrante, variableHeight: true, cssClass: "celda-cuadrante"},
+    { title: "Vie", field: vie, formatter: formatterColumnasCuadrante, variableHeight: true, cssClass: "celda-cuadrante"},
+    { title: "Lun", field: lun, formatter: formatterColumnasCuadrante, variableHeight: true, cssClass: "celda-cuadrante"},
+    { title: "Mar", field: mar, formatter: formatterColumnasCuadrante, variableHeight: true, cssClass: "celda-cuadrante"},
+    { title: "Mié", field: mie, formatter: formatterColumnasCuadrante, variableHeight: true, cssClass: "celda-cuadrante"},
   ];
   return columnas;
+}
+
+function formatterColumnasCuadrante(cell, formatterParams, onRendered) {
+  
+  onRendered(function() {
+    const el = cell.getElement();
+    const value = cell.getValue() || [];
+
+    el.innerHTML = "";
+
+    // Pintar cada pill
+    value.forEach((detalle, index) => {
+      debugger;
+      const pill = crearElemento("div",
+        {
+          id: detalle.id,
+          class: "usuario-pill badge m-1 p-2",
+          draggable: "true",
+          "data-user-id": detalle.user_id,
+          content: buscar_usuario_por_id(detalle.user_id)?.nombre ?? "Usuario no encontrado",
+          style: getPillColorByIndex(detalle.user_id),
+        }
+      );
+
+      // info para el drag
+      pill.dataset.id = detalle.id;
+      pill.dataset.userId = detalle.user_id;
+      pill.dataset.nombre = buscar_usuario_por_id(detalle.user_id)?.nombre ?? "Usuario no encontrado";
+      pill.dataset.rowId = cell.getRow().getData().id;
+      pill.dataset.field = cell.getField();
+      pill.dataset.index = index;
+
+      console.log(pill.dataset.userId, pill.dataset.nombre, pill.dataset.rowId, pill.dataset.field)
+
+      pill.addEventListener("dragstart", (e) => {
+        console.log(pill.dataset.userId, pill.dataset.nombre, pill.dataset.rowId, pill.dataset.field)
+        e.dataTransfer.effectAllowed = "move";
+        e.dataTransfer.setData("tipo", "pill-cuadrante");
+        e.dataTransfer.setData("userId", pill.dataset.userId);
+        e.dataTransfer.setData("nombre", pill.dataset.nombre);
+        e.dataTransfer.setData("rowId", pill.dataset.rowId);
+        e.dataTransfer.setData("field", pill.dataset.field);
+        console.log(pill.dataset.userId, pill.dataset.nombre, pill.dataset.rowId, pill.dataset.field);
+      });
+
+      el.appendChild(pill);
+    });
+
+    // Bind de eventos de drop en la celda (una sola vez por elemento DOM)
+    if (!el.dataset.dndBound) {
+      el.dataset.dndBound = "1";
+
+      el.addEventListener("dragenter", (e) => {
+        e.preventDefault();
+        el.classList.add("drop-target");
+      });
+
+      el.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = "move";
+        el.classList.add("drop-target");
+      });
+
+      el.addEventListener("dragleave", () => {
+        el.classList.remove("drop-target");
+      });
+
+      el.addEventListener("drop", (e) => {
+        e.preventDefault();
+        el.classList.remove("drop-target");
+        manejarDropEnCelda(e, cell);
+      });
+    }
+  });
+ 
+  return "";
+}
+
+function manejarDropEnCelda(e, cellDestino) {
+  const id = e.dataTransfer.getData("id");
+  const userId = e.dataTransfer.getData("userId");
+  if (!userId) return;
+  const tipo = e.dataTransfer.getData("tipo");
+  const nombre = e.dataTransfer.getData("nombre");
+  const rowIdOrigen = e.dataTransfer.getData("rowId");
+  const fieldOrigen = e.dataTransfer.getData("field");
+
+  const tabla = cellDestino.getRow().getTable();
+  const fieldDestino = cellDestino.getField();
+  const rowDestino = cellDestino.getRow();
+  const dataRowDestino = rowDestino.getData();
+
+  if (rowIdOrigen == rowDestino.getData().id && fieldOrigen == fieldDestino) {
+    console.log("Mismo origen y destino, no hacer nada");
+    return;
+  }
+
+  const arrDestino = Array.isArray(dataRowDestino[fieldDestino]) ? dataRowDestino[fieldDestino] : [];
+
+  let accion = "actualizar";
+
+  //if (tipo === "pill-cuadrante") {
+  if (rowIdOrigen && fieldOrigen) {
+    const rowOrigen = tabla.getRow(rowIdOrigen);
+    const dataOrigen = rowOrigen.getData();
+    const arrOrigen = Array.isArray(dataOrigen[fieldOrigen]) ? dataOrigen[fieldOrigen] : [];
+
+    // quitar del origen
+    const nuevaOrigen = arrOrigen.filter(p => String(p.id) !== String(userId));
+    rowOrigen.update({ [fieldOrigen]: nuevaOrigen });
+  } else {
+    accion = "insertar";
+  }
+
+  let detalle = null;
+
+  // evitar duplicados en destino
+  const yaExiste = arrDestino.some(p => String(p.id) === String(userId));
+  if (!yaExiste) {
+    switch (accion) {
+      case "actualizar":
+        detalle = actualizarDetalleCuadrante({
+          id: id,
+          cuadrante_id: DATOS.cuadrante.id,
+          puesto_id: dataRowDestino.id,
+          fecha: fieldDestino,
+          usuario_id: Number(userId),
+        });
+        break;
+      case "insertar":
+        detalle = insertarDetalleCuadrante({
+          cuadrante_id: DATOS.cuadrante.id,
+          puesto_id: dataRowDestino.id,
+          fecha: fieldDestino,
+          usuario_id: Number(userId),
+        });
+        break;
+    }
+    if (!detalle) {
+      console.error("Error al procesar el detalle del cuadrante");
+      return;
+    }
+    const nuevaDestino = arrDestino.concat(detalle);
+    rowDestino.update({ [fieldDestino]: nuevaDestino });
+    //faltaria actualizar el cuadrante en DATOS.cuadrante.detalles
+  }
+  //cellDestino.checkHeight();
+  //rowDestino.normalizeHeight(); 
+}
+
+
+function crearDatosCuadrantes(cuadrante) {
+  if (!cuadrante?.fecha_inicio) return [];
+
+  const jue = sumarDiasYYYYMMDD(cuadrante?.fecha_inicio, 0);
+  const vie = sumarDiasYYYYMMDD(cuadrante?.fecha_inicio, 1);
+  const lun = sumarDiasYYYYMMDD(cuadrante?.fecha_inicio, 4);
+  const mar = sumarDiasYYYYMMDD(cuadrante?.fecha_inicio, 5);
+  const mie = sumarDiasYYYYMMDD(cuadrante?.fecha_inicio, 6);
+  console.log("XXX", cuadrante);
+  console.log(jue);
+  const datos = Object.values(DATOS.maestros.puestos_trabajo).map(puesto => ({
+    id: puesto.id,
+    nombre: puesto.nombre,
+    [jue]: cuadrante.detalles.filter(d => d.puesto_id === puesto.id && d.fecha === jue).map(d => {
+      return DATOS.maestros.usuarios[d.usuario_id];
+    }),
+    [vie]: cuadrante.detalles.filter(d => d.puesto_id === puesto.id && d.fecha === vie).map(d => {
+      return DATOS.maestros.usuarios[d.usuario_id];
+    }),
+    [lun]: cuadrante.detalles.filter(d => d.puesto_id === puesto.id && d.fecha === lun).map(d => {
+      return DATOS.maestros.usuarios[d.usuario_id];
+    }),
+    [mar]: cuadrante.detalles.filter(d => d.puesto_id === puesto.id && d.fecha === mar).map(d => {
+      return DATOS.maestros.usuarios[d.usuario_id];
+    }),
+    [mie]: cuadrante.detalles.filter(d => d.puesto_id === puesto.id && d.fecha === mie).map(d => {
+      return DATOS.maestros.usuarios[d.usuario_id];
+    }),
+  }));
+  console.log(datos);
+  return datos;
 }
 
 function crearVentanaCuadrantes(configuracion, show=true) {
@@ -155,27 +279,22 @@ function crearVentanaCuadrantes(configuracion, show=true) {
 
   agregarEventosCuadrantes(wb, configuracion, contenedor);
 
-  /*
-  tabla.element.addEventListener("dragover", e => { 
-    console.log(e.target);
-    e.preventDefault(); 
-  
-  });
-  tabla.element.addEventListener("drop", e => { console.log(e.target) });
-*/
-
   return wb;
 }
 
 function completarEmpleadosCuadrantes(key, listaUsuarios, usuarios, configuracion) {
   listaUsuarios.innerHTML = "";
-  Object.values(usuarios).forEach(element => {
+
+  Object.values(usuarios).sort((a, b) =>
+    a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' })
+  ).forEach(element => {
     if (element.empleado) {
       const pill = crearElemento("div",
         { value: element.id,
           class: "usuario-pill badge m-1 p-2",
           draggable: "true",
           "data-user-id": element.id,
+          "data-nombre": element.nombre,
           content: element.nombre,
           style: getPillColorByIndex(element.id),
         }
@@ -186,47 +305,39 @@ function completarEmpleadosCuadrantes(key, listaUsuarios, usuarios, configuracio
   listaUsuarios.addEventListener("dragstart", (e) => {
     const pill = e.target.closest(".usuario-pill");
     if (pill) {
-      e.dataTransfer.setData("usuario_id", pill.getAttribute("data-user-id"));
-      //e.dataTransfer.setData("usuario_id", pill.dataset.userId); // alternativa
-      e.dataTransfer.setData("usuario_nombre", pill.textContent.trim());
+      e.dataTransfer.setData("userId", pill.dataset.userId);
+      e.dataTransfer.setData("tipo", "pill-listado");
+      e.dataTransfer.setData("nombre", pill.dataset.nombre);
     }
   });
+  listaUsuarios.addEventListener("dragover", (e) => {
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "move";
+  });
+  listaUsuarios.addEventListener("drop", (e) => {
+    e.preventDefault();
+    console.log("Buscar el origen y eliminarlo de la tabla");
+
+    const tipo = e.dataTransfer.getData("tipo");
+    const userId = e.dataTransfer.getData("userId");
+    const rowIdOrigen = e.dataTransfer.getData("rowId");
+    const fieldOrigen = e.dataTransfer.getData("field");
+
+    if (tipo !== "pill-cuadrante" || !rowIdOrigen || !fieldOrigen || !userId) return;
+
+    const tabla = windowsRegistry.get(key).table;
+    const rowOrigen = tabla.getRow(rowIdOrigen);
+    const dataOrigen = rowOrigen.getData();
+    const arrOrigen = Array.isArray(dataOrigen[fieldOrigen]) ? dataOrigen[fieldOrigen] : [];
+
+    // quitar del cuadrante
+    const nuevaOrigen = arrOrigen.filter(p => String(p.id) !== String(userId));
+    rowOrigen.update({ [fieldOrigen]: nuevaOrigen });
+  });
+
 }
 
 function agregarEventosCuadrantes(wb, configuracion, contenedor) {
-
-
-
-
-/*
-  tabla.on("cellEdited", async (cell) => {
-    const f = cell.getField();
-    if (!/_previsto$|_confirmado$|^total_(pactados|descontar)$/.test(f)) return;
-
-    const row = cell.getRow();
-    const d = row.getData();
-    const total_previstos  = (Number(d.total_pactados)||0) - (Number(d.total_descontar)||0);
-    const total_entregados = MESES.reduce((a,[pre]) => a + (Number(d[`${pre}_confirmado`])||0), 0);
-
-    row.update({ total_previstos, total_entregados }).then(() => {
-      // marca mismatch en "Pr"
-      const pr = row.getCell("total_previstos");
-      if (pr) {
-        const sumaPrevMeses = MESES.reduce((a,[pre]) => a + (Number(d[`${pre}_previsto`])||0), 0);
-        pr.getElement().classList.toggle("mismatch", total_previstos !== sumaPrevMeses);
-      }
-    });
-
-    // comunicar cambios al backend
-    resultado = await wsRequest("modificar_entrada", { tabla: tabla.KEY, id: d.id, campo: f, valor: d[f], valores: d });
-    console.log(resultado);
-    cell.setValue(resultado["valor"]); // actualizar con valor confirmado por el servidor
-    if (resultado?.id != d.id) {
-      alert("Error al guardar los cambios en el servidor.");
-    }
-  });
-*/
-
   const input_fecha_cuadrantes = contenedor.querySelector('#u-cargar-cuadrantes-input');
 
   contenedor.querySelector("#u-cargar-cuadrantes")?.addEventListener("click", async () => {
@@ -238,60 +349,40 @@ function agregarEventosCuadrantes(wb, configuracion, contenedor) {
     send("cargar_cuadrantes", { fecha: input_fecha_cuadrantes.value });
    
   });
-  contenedor.querySelector("#u-actualizar-cuadrantes").addEventListener("click", async () => {
-    if (!input_fecha_cuadrantes.checkValidity()) {
-      alert("Fecha inválida");
-      input_fecha_cuadrantes.focus();
-      return;
-    }
-    send("actualizar_cuadrantes", { fecha: input_fecha_cuadrantes.value });
+
+  contenedor.querySelector("#u-color_empleados-input").addEventListener("change", async () => {
+    document.querySelector("#contenedor-cuadrante").classList.toggle("mismo-color");
   });
-  
+
+  contenedor.querySelector("#u-ancho_empleados-input").addEventListener("change", async () => {
+    document.querySelector("#contenedor-cuadrante").classList.toggle("mismo-ancho");
+  });
+
   input_fecha_cuadrantes.value = obtenerAnteriorDiaSemana().toISOString().split("T")[0];
 }
 
-function obtenerAnteriorDiaSemana(dia_objetivo = 4, fecha = new Date()) {
-    const d = new Date(fecha);
-    const dia = d.getDay(); // 0=Dom, 1=Lun, 2=Mar, 3=Mié, 4=Jue, 5=Vie, 6=Sáb
 
-    // Si es miércoles → lo devolvemos tal cual
-    if (dia === dia_objetivo) return d;
 
-    // Si es otro día, retroceder los días necesarios
-    const diferencia = (dia - dia_objetivo + 7) % 7; 
-    d.setDate(d.getDate() - diferencia);
-
-    return d;
+async function actualizarDetalleCuadrante(detalles) {
+  let respuesta = await wsRequest("actualizar_detalle_cuadrante", detalles);
+  console.log(respuesta);
+  return respuesta;
 }
 
-const PILL_COLORS = [
-  "#e57373", "#f06292", "#ba68c8", "#9575cd", "#7986cb",
-  "#64b5f6", "#4fc3f7", "#4dd0e1", "#4db6ac", "#81c784",
-  "#aed581", "#dce775", "#fff176", "#ffd54f", "#ffb74d",
-  "#ff8a65", "#d32f2f", "#c2185b", "#7b1fa2", "#512da8",
-  "#303f9f", "#1976d2", "#0288d1", "#0097a7", "#00796b",
-  "#388e3c", "#689f38", "#afb42b", "#fbc02d", "#ffa000",
-  "#f57c00", "#e64a19", "#5d4037", "#455a64", "#8d6e63",
-  "#90a4ae", "#c0ca33", "#00acc1", "#00897b"
-];
-function getPillColorByIndex(i) {
-  const color_fondo = PILL_COLORS[i % PILL_COLORS.length];
-  const color_texto = getContrastTextColor(color_fondo);
-  //return { background: color_fondo, color: color_texto };
-  return `background: ${color_fondo}; color: ${color_texto};`;
+async function insertarDetalleCuadrante(detalles) {
+  let respuesta = await wsRequest("insertar_detalle_cuadrante", detalles);
+  console.log(respuesta);
+  return respuesta;
 }
 
-function getContrastTextColor(hexColor) {
-  // hexColor tipo "#rrggbb"
-  const hex = hexColor.replace("#", "");
+async function eliminarDetalleCuadrante(detalles) {
+  let respuesta = await wsRequest("eliminar_detalle_cuadrante",  detalles);
+  console.log(respuesta);
+  return respuesta;
+}
 
-  const r = parseInt(hex.substring(0, 2), 16);
-  const g = parseInt(hex.substring(2, 4), 16);
-  const b = parseInt(hex.substring(4, 6), 16);
 
-  // YIQ: percepción humana de brillo
-  const yiq = (r * 299 + g * 587 + b * 114) / 1000;
-
-  // si es claro → texto negro, si es oscuro → texto blanco
-  return yiq >= 128 ? "#000000" : "#ffffff";
+function respuesta_cuadrantes(msg) {
+  console.log("Respuesta cuadrantes:", msg);
+  // Aquí podríamos actualizar DATOS.cuadrante.detalles si es necesario
 }

@@ -1,11 +1,14 @@
 from datetime import date, timedelta
 import logging
+from typing import List
+
+from servidor.herramientas.utilidades import obtener_anterior_dia_semana
 
 from .modelos import ClienteDB, EstadoDB, InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB, RolDB, PuestoTrabajoDB
 from .modelos import PlanCamionDB, PlanFacturacionDB, PlanMaterialDB, CuadranteDB, CuadranteDetalleDB
 from .persistencia import GenericRepository, DB
 from .dominio import EntradasDTO, MaestrosDTO, PlanMaterialDTO, PlanFacturacionDTO, PlanCamionDTO, CuadranteDTO, CuadranteDetalleDTO
-from .dominio import ClienteDTO, EstadoDTO, InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO, RolDTO, PuestoTrabajoDTO
+from .dominio import ClienteDTO, EstadoDTO, InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO, RolDTO, PuestoTrabajoDTO, CuadrantesDTO
 
 logger = logging.getLogger("paezlobato_colector")
 
@@ -14,11 +17,13 @@ class Colector:
     colector: "Colector" = None
     entradas: "EntradasDTO" = None
     maestros: "MaestrosDTO" = None
+    cuadrantes: "CuadrantesDTO" = None
 
     def __init__(self):
         Colector.colector = self
         self.entradas = EntradasDTO()
         self.maestros = MaestrosDTO()
+        self.cuadrantes = CuadrantesDTO()
 
         self.repo_facturacion = GenericRepository(PlanFacturacionDB)
         self.repo_camiones = GenericRepository(PlanCamionDB)
@@ -183,14 +188,20 @@ class Colector:
 #endregion
 
 #region Métodos Cuadrantes
-    def obtener_cuadrante(self, fecha: str, actualizar_local = True) -> CuadranteDTO:
+    def obtener_cuadrante_actual(self) -> dict:
+        if not self.cuadrantes.cuadrante_actual:
+            fecha_inicial = obtener_anterior_dia_semana().isoformat()
+            actual = self.obtener_cuadrante(fecha_inicial)
+            self.cuadrantes.cuadrante_actual = actual    
+
+    def obtener_cuadrante(self, fecha: str, actualizar_local = False) -> CuadranteDTO:
         with DB.crear_sesion() as session:
             cuadrante = self.repo_cuadrantes.list_by_start_date(session, fecha)
             if cuadrante is None:
                 cuadrante = self.insertar_cuadrante(date.fromisoformat(fecha))
 
             detalles = self.repo_cuadrante_detalles.list_by_cuadrante_id(session, cuadrante.id)
-            
+
             cuadrante_dto = CuadranteDTO.from_db(cuadrante)
             cuadrante_dto.detalles = [CuadranteDetalleDTO.from_db(det) for det in detalles]
         
@@ -199,46 +210,6 @@ class Colector:
 
             return cuadrante_dto
         
-    def actualizar_cuadrante(self, fecha: int) -> CuadranteDTO:
-        with DB.crear_sesion() as session:
-            plan_camiones = self.repo_camiones.list_by_year(session, fecha)
-            proveedores = self.repo_proveedores.list_all(session)
-
-            plan_proveedores_ids = {pc.proveedor_id for pc in plan_camiones if pc.proveedor_id is not None}
-            proveedores_faltantes = [p for p in proveedores if p.id not in plan_proveedores_ids]
-
-            logger.info(f"Proveedores faltantes para el año {fecha}: {[p.nombre for p in proveedores_faltantes]}")
-            nuevas = [PlanCamionDB(proveedor_id=p.id, año=fecha) for p in proveedores_faltantes]
-            self.repo_camiones.insert_all(session, nuevas)
-            try:
-                session.commit()
-            except Exception:
-                session.rollback()
-                raise
-            logger.info("Entradas de proveedores agregadas correctamente.")
-            return self.obtener_cuadrante(fecha)
-
-    def modificar_cuadrante(self, data):
-        tabla = data.get("tabla")
-        entrada_id = data.get("id")
-        campo = data.get("campo")
-        valor = data.get("valor")
-        objeto = None
-
-        with DB.crear_sesion() as session:
-            repo, busqueda, objeto = self.obtener_repo(tabla)
-
-            DTO = busqueda(entrada_id)
-            self.checkUpdate(DTO, tabla, entrada_id, campo)            
-
-            setattr(DTO, campo, valor)
-            updated = DTO.to_db()
-            repo.update(session, updated)
-
-            logger.info(f"Entrada ID {entrada_id} modificada: {campo} = {valor}")
-            return {"id": entrada_id, "campo": campo, "valor": valor}
-        
-
     def insertar_cuadrante(self, fecha: date) -> CuadranteDB:
         with DB.crear_sesion() as session:
             DTO = CuadranteDTO(
@@ -250,6 +221,52 @@ class Colector:
                 detalles=[],
             )
             return self.repo_cuadrantes.insert(session, DTO.to_db())
+
+    def insertar_detalle_cuadrante(self, data) -> CuadranteDetalleDTO:
+        cuadrante_id = data.get("cuadrante_id")
+        fecha = data.get("fecha")
+        puesto_id = data.get("puesto_id")
+        usuario_id = data.get("usuario_id")
+        with DB.crear_sesion() as session:
+            DTO = CuadranteDetalleDTO(
+                id=None,
+                cuadrante_id=cuadrante_id,
+                puesto_id=puesto_id,
+                fecha=date.fromisoformat(fecha),
+                usuario_id=usuario_id,
+            )
+            return CuadranteDetalleDTO.from_db(self.repo_cuadrante_detalles.insert(session, DTO.to_db()))
+
+    def actualizar_detalle_cuadrante(self, data) -> CuadranteDetalleDTO:
+        entrada_id = data.get("id")
+        cuadrante_id = data.get("cuadrante_id")
+        fecha = data.get("fecha")
+        puesto_id = data.get("puesto_id")
+        usuario_id = data.get("usuario_id")
+
+        with DB.crear_sesion() as session:
+            DTO = CuadranteDetalleDTO(
+                id=entrada_id,
+                cuadrante_id=cuadrante_id,
+                puesto_id=puesto_id,
+                fecha=date.fromisoformat(fecha),
+                usuario_id=usuario_id,
+            )
+            updated = CuadranteDetalleDTO.to_db(DTO)
+            return CuadranteDetalleDTO.from_db(self.repo_cuadrante_detalles.update(session, updated))
+
+    def eliminar_detalle_cuadrante(self, data):
+        id = data.get("id")
+
+        with DB.crear_sesion() as session:
+            self.repo_cuadrante_detalles.delete(session, id)
+            try:
+                session.commit()
+            except Exception:
+                session.rollback()
+                raise
+            logger.info(f"Detalle de cuadrante ID {id} eliminado.")
+            return {"id": id }
 #endregion
 
 #region Métodos Auxiliares
@@ -298,6 +315,14 @@ class Colector:
             repo = self.repo_facturacion
             maestro = self.entradas.buscar_facturacion_por_id
             objeto = PlanFacturacionDTO
+        elif tabla == "cuadrantes":
+            repo = self.repo_cuadrantes
+            maestro = None
+            objeto = CuadranteDTO
+        elif tabla == "cuadrante_detalles":
+            repo = self.repo_cuadrante_detalles
+            maestro = None
+            objeto = CuadranteDetalleDTO
         else:
             raise ValueError(f"Tabla '{tabla}' no reconocida.")
 

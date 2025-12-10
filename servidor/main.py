@@ -27,6 +27,7 @@ async def lifespan(app: FastAPI):
     try:
         colector = Colector()
         colector.obtener_datos_maestros()  # puede fallar
+        colector.obtener_cuadrante_actual()
         yield
     except Exception:
         logger.exception("Fallo al inicializar datos maestros")

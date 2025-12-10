@@ -267,16 +267,6 @@ function crearCabeceraVentana(configuracion) {
       cabecera.appendChild(inputAñoEntradas);
       cabecera.appendChild(contenedorDerechaEntradas);
       break;
-    case "cuadrantes":
-      const botonCargarCuadrantes = crearBotonesGenericos("u-cargar-cuadrantes");
-      const inputAñoCuadrantes    = crearBotonesGenericos("u-cargar-cuadrantes-input");
-      const botonAgregarProveedoresCuadrantes = crearBotonesGenericos("u-add-providers");
-      const contenedorDerechaCuadrantes = crearBotonesGenericos("contenedor-botones-derecha");
-      contenedorDerechaCuadrantes.appendChild(botonAgregarProveedoresCuadrantes);
-      cabecera.appendChild(botonCargarCuadrantes);
-      cabecera.appendChild(inputAñoCuadrantes);
-      cabecera.appendChild(contenedorDerechaCuadrantes);
-      break;
     default:
       // sin botones
       break;

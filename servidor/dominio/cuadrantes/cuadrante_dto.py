@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from typing import List, Optional
 from datetime import date
 
-from servidor.dominio.logica.cuadrante_detalle_dto import CuadranteDetalleDTO
+from servidor.dominio.cuadrantes.cuadrante_detalle_dto import CuadranteDetalleDTO
 from servidor.modelos.logica.cuadrante_db import CuadranteDB
 
 class CuadranteDTO(BaseModel):

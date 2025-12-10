@@ -26,5 +26,8 @@ var ACCIONES = {
     "agregar_entradas_proveedores": mostrar_entradas,
     "cargar_cuadrantes": mostrar_cuadrantes,
     "actualizar_cuadrante": mostrar_cuadrantes,
+    "insertar_detalle_cuadrante": respuesta_cuadrantes,
+    "actualizar_detalle_cuadrante": respuesta_cuadrantes,
+    "eliminar_detalle_cuadrante": respuesta_cuadrantes,
 };
 

@@ -1316,3 +1316,347 @@ fecha_fin
 [SQL: INSERT INTO cuadrantes (fecha_inicio, fecha_fin, titulo, observaciones) VALUES (%(fecha_inicio)s, %(fecha_fin)s, %(titulo)s, %(observaciones)s)]
 [parameters: {'fecha_inicio': '2025-11-20', 'fecha_fin': None, 'titulo': '', 'observaciones': ''}]
 (Background on this error at: https://sqlalche.me/e/20/gkpj)
+2025-12-07 21:31:28 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\paezlobato\servidor\main.py", line 30, in lifespan
+    colector.obtener_cuadrante_actual()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Colector' object has no attribute 'obtener_cuadrante_actual'. Did you mean: 'obtener_cuadrante'?
+2025-12-07 21:48:35 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\paezlobato\servidor\main.py", line 30, in lifespan
+    colector.obtener_cuadrante_actual()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Colector' object has no attribute 'obtener_cuadrante_actual'. Did you mean: 'obtener_cuadrante'?
+2025-12-07 21:48:48 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\paezlobato\servidor\main.py", line 30, in lifespan
+    colector.obtener_cuadrante_actual()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Colector' object has no attribute 'obtener_cuadrante_actual'. Did you mean: 'obtener_cuadrante'?
+2025-12-07 21:48:59 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\paezlobato\servidor\main.py", line 30, in lifespan
+    colector.obtener_cuadrante_actual()
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'Colector' object has no attribute 'obtener_cuadrante_actual'. Did you mean: 'obtener_cuadrante'?
+2025-12-07 21:49:15 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\paezlobato\servidor\main.py", line 30, in lifespan
+    colector.obtener_cuadrante_actual()
+  File "C:\xampp\htdocs\paezlobato\servidor\colector.py", line 195, in obtener_cuadrante_actual
+    self.maestros.clientes = {cliente.id: ClienteDTO.from_db(cliente) for cliente in clientes}
+                                                                                     ^^^^^^^^
+NameError: name 'clientes' is not defined. Did you mean: 'ClienteDB'?
+2025-12-07 21:51:04 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\paezlobato\servidor\main.py", line 30, in lifespan
+    colector.obtener_cuadrante_actual()
+  File "C:\xampp\htdocs\paezlobato\servidor\colector.py", line 196, in obtener_cuadrante_actual
+    self.cuadrantes.cuadrante_actual = {cliente.id: ClienteDTO.from_db(cliente) for cliente in clientes}
+                                                                                               ^^^^^^^^
+NameError: name 'clientes' is not defined. Did you mean: 'ClienteDB'?
+2025-12-07 21:56:50 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\paezlobato\servidor\main.py", line 30, in lifespan
+    colector.obtener_cuadrante_actual()
+  File "C:\xampp\htdocs\paezlobato\servidor\colector.py", line 196, in obtener_cuadrante_actual
+    self.cuadrantes.cuadrante_actual = {cliente.id: ClienteDTO.from_db(cliente) for cliente in clientes}
+                                                                                               ^^^^^^^^
+NameError: name 'clientes' is not defined. Did you mean: 'ClienteDB'?
+2025-12-07 22:27:50 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\paezlobato\servidor\main.py", line 30, in lifespan
+    colector.obtener_cuadrante_actual()
+  File "C:\xampp\htdocs\paezlobato\servidor\colector.py", line 198, in obtener_cuadrante_actual
+    self.cuadrantes.cuadrante_actual.detalles = [CuadranteDetalleDTO.from_db(det) for det in cuadrante_detalles] if self.cuadrantes.cuadrante_actual else []
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'detalles'
+2025-12-07 22:28:51 [ERROR] paezlobato_servidor: Fallo al inicializar datos maestros
+Traceback (most recent call last):
+  File "C:\xampp\htdocs\paezlobato\servidor\main.py", line 30, in lifespan
+    colector.obtener_cuadrante_actual()
+  File "C:\xampp\htdocs\paezlobato\servidor\colector.py", line 198, in obtener_cuadrante_actual
+    self.cuadrantes.cuadrante_actual.detalles = [CuadranteDetalleDTO.from_db(det) for det in cuadrante_detalles] if cuadrante_detalles else []
+    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AttributeError: 'NoneType' object has no attribute 'detalles'
+2025-12-10 04:25:14 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 3 validation errors for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+puesto_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+usuario_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-10 04:25:16 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 3 validation errors for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+puesto_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+usuario_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-10 04:25:18 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 3 validation errors for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+puesto_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+usuario_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-10 04:25:20 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 3 validation errors for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+puesto_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+usuario_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-10 04:25:43 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 3 validation errors for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+puesto_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+usuario_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-10 04:25:45 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 3 validation errors for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+puesto_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+usuario_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-10 04:25:51 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 3 validation errors for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+puesto_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+usuario_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-10 04:25:53 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 3 validation errors for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+puesto_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+usuario_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-10 04:25:55 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 3 validation errors for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+puesto_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+usuario_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-10 04:25:57 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 3 validation errors for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+puesto_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+usuario_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-10 04:25:59 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 3 validation errors for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+puesto_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+usuario_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-10 04:26:01 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 3 validation errors for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+puesto_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+usuario_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-10 04:26:03 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 3 validation errors for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+puesto_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+usuario_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-10 04:26:06 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 3 validation errors for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+puesto_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+usuario_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-10 04:26:08 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 3 validation errors for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+puesto_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+usuario_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-10 04:26:14 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 3 validation errors for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+puesto_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+usuario_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-10 04:26:16 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 3 validation errors for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+puesto_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+usuario_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-10 04:26:17 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 3 validation errors for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+puesto_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+usuario_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-10 04:26:19 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 3 validation errors for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+puesto_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+usuario_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-10 04:26:21 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 3 validation errors for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+puesto_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+usuario_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-10 04:26:23 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 3 validation errors for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+puesto_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+usuario_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-10 04:26:25 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 3 validation errors for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+puesto_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+usuario_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-10 04:26:28 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 3 validation errors for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+puesto_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+usuario_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-10 04:26:29 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 3 validation errors for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+puesto_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+usuario_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-10 04:26:32 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 3 validation errors for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+puesto_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+usuario_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-10 04:26:34 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 3 validation errors for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+puesto_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+usuario_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-10 04:26:37 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 3 validation errors for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+puesto_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+usuario_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-10 04:30:24 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: fromisoformat: argument must be str
+2025-12-10 04:30:27 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: fromisoformat: argument must be str
+2025-12-10 04:30:28 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: fromisoformat: argument must be str
+2025-12-10 04:31:44 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: fromisoformat: argument must be str
+2025-12-10 04:32:00 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: fromisoformat: argument must be str
+2025-12-10 04:32:13 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: fromisoformat: argument must be str
+2025-12-10 04:33:30 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 'ResponseMessage[Any]' object has no attribute 'get'
+2025-12-10 04:34:41 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: Foreign key associated with column 'cuadrante_detalles.cuadrante_id' could not find table 'cuadrante' with which to generate a foreign key to target column 'id'
+2025-12-10 04:39:37 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: CuadranteDetalleDTO.from_db() takes 1 positional argument but 2 were given
+2025-12-10 04:40:03 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: CuadranteDetalleDTO.from_db() takes 1 positional argument but 2 were given

@@ -13,7 +13,7 @@ class GenericRepository:
         statement = select(self.model).where(self.model.año == año)
         return session.exec(statement).all()
     
-    def list_by_start_date(self, session: Session, fecha: str) -> List:
+    def list_by_start_date(self, session: Session, fecha: str):
         statement = select(self.model).where(self.model.fecha_inicio == fecha)
         return session.exec(statement).first()
     

@@ -106,7 +106,7 @@ class CrudRoutes:
             try:
                 handler = ACCIONES.get(msg.action)
                 if handler:
-                    print(msg.data)
+                    print("datos recibidos", msg.data)
                     result = handler(ws, msg)
                     if result is not None:
                         rm: Any = ResponseMessage.ok(msg.action, result, msg.request_id).model_dump()
