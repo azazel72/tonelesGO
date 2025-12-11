@@ -28,6 +28,14 @@ function obtenerAnteriorDiaSemana(dia_objetivo = 4, fecha = new Date()) {
 
   return d;
 }
+
+function titulo_con_fecha(titulo, fecha) {
+  if (!fecha) return titulo;
+  const d = new Date(fecha + "T00:00:00");
+  return titulo + " (" + String(d.getDate()).padStart(2, "0") + "/"
+       + String(d.getMonth() + 1).padStart(2, "0") + "/"
+       + d.getFullYear() + ")";
+}
 //#endregion
 
 //#region colores

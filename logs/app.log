@@ -7383,3 +7383,393 @@ usuario_id
 2025-12-10 09:44:38 [INFO] paezlobato_crud_routes: Acción recibida: maestros
 2025-12-10 09:44:42 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
 2025-12-10 09:44:43 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 00:27:39 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-12-11 00:27:39 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-12-11 00:27:39 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-12-11 00:27:43 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 00:30:59 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 00:31:24 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 00:31:29 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 00:31:40 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 00:35:52 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 00:56:26 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 00:58:00 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 00:58:03 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 01:08:03 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 01:10:02 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 01:10:05 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 01:22:07 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 01:22:10 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 01:24:23 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 01:24:28 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 01:24:52 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 02:29:59 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 02:46:13 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 02:46:19 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 02:46:23 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 02:47:36 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 02:47:41 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 03:21:59 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 03:22:14 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 03:23:27 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 03:23:30 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 03:23:32 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 03:23:32 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 1 validation error for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-11 03:24:05 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 03:24:09 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 03:24:10 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 03:24:10 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 1 validation error for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-11 03:24:12 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 03:24:12 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 1 validation error for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-11 03:24:20 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 03:27:17 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 03:27:19 [INFO] paezlobato_crud_routes: Acción recibida: actualizar_detalle_cuadrante
+2025-12-11 03:27:22 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 03:27:25 [INFO] paezlobato_crud_routes: Acción recibida: actualizar_detalle_cuadrante
+2025-12-11 03:27:29 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 03:28:43 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 03:28:46 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 03:28:49 [INFO] paezlobato_crud_routes: Acción recibida: actualizar_detalle_cuadrante
+2025-12-11 03:28:53 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 03:28:58 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 03:29:04 [INFO] paezlobato_crud_routes: Acción recibida: actualizar_detalle_cuadrante
+2025-12-11 03:29:07 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 03:29:34 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 03:29:37 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 03:30:08 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 03:30:12 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 03:30:15 [INFO] paezlobato_crud_routes: Acción recibida: actualizar_detalle_cuadrante
+2025-12-11 03:30:21 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 03:30:59 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 03:31:05 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 03:31:08 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 03:31:16 [INFO] paezlobato_crud_routes: Acción recibida: actualizar_detalle_cuadrante
+2025-12-11 03:31:18 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 03:31:20 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 03:31:20 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 03:31:22 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 03:31:26 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 03:31:30 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 03:31:41 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 03:31:41 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 1 validation error for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-11 03:31:44 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 03:31:49 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 03:31:52 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 03:31:54 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 03:31:54 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 1 validation error for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-11 03:31:55 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 03:31:55 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 1 validation error for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-11 03:31:56 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 03:31:59 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 03:32:02 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 03:32:08 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 03:32:08 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 1 validation error for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-11 04:04:48 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 04:04:51 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 04:04:55 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 04:04:55 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 1 validation error for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-11 04:04:59 [INFO] paezlobato_crud_routes: Acción recibida: actualizar_detalle_cuadrante
+2025-12-11 04:05:02 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 04:05:04 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 04:05:08 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 04:05:25 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 04:05:25 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 1 validation error for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-11 04:05:30 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 04:05:33 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 04:05:37 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 04:05:41 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 04:05:41 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 1 validation error for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-11 04:09:36 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 04:09:44 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 04:10:09 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 04:10:09 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 1 validation error for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-11 04:11:21 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 04:11:25 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 04:11:35 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 04:11:35 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 1 validation error for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-11 04:13:47 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 04:13:52 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 04:13:54 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 04:13:54 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 1 validation error for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-11 04:13:57 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 04:13:57 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 1 validation error for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-11 04:14:00 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 04:14:00 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 1 validation error for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-11 04:14:02 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 04:14:02 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 1 validation error for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-11 04:14:06 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 04:14:06 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 1 validation error for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-11 04:14:10 [INFO] paezlobato_crud_routes: Acción recibida: actualizar_detalle_cuadrante
+2025-12-11 04:14:12 [INFO] paezlobato_crud_routes: Acción recibida: actualizar_detalle_cuadrante
+2025-12-11 04:14:13 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 04:14:16 [INFO] paezlobato_crud_routes: Acción recibida: actualizar_detalle_cuadrante
+2025-12-11 04:14:18 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 04:14:21 [INFO] paezlobato_crud_routes: Acción recibida: actualizar_detalle_cuadrante
+2025-12-11 04:14:23 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 04:14:44 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 04:14:44 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 1 validation error for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-11 04:15:17 [INFO] paezlobato_crud_routes: Acción recibida: actualizar_detalle_cuadrante
+2025-12-11 04:15:18 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 04:15:28 [INFO] paezlobato_crud_routes: Acción recibida: actualizar_detalle_cuadrante
+2025-12-11 04:15:32 [INFO] paezlobato_crud_routes: Acción recibida: actualizar_detalle_cuadrante
+2025-12-11 04:15:36 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 04:18:54 [INFO] paezlobato_crud_routes: Acción recibida: actualizar_detalle_cuadrante
+2025-12-11 04:19:17 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 04:19:20 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 04:19:25 [INFO] paezlobato_crud_routes: Acción recibida: actualizar_detalle_cuadrante
+2025-12-11 04:19:47 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 04:19:52 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 04:19:56 [INFO] paezlobato_crud_routes: Acción recibida: actualizar_detalle_cuadrante
+2025-12-11 04:20:38 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 04:20:41 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 04:20:48 [INFO] paezlobato_crud_routes: Acción recibida: actualizar_detalle_cuadrante
+2025-12-11 04:24:35 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 04:24:38 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 04:24:41 [INFO] paezlobato_crud_routes: Acción recibida: actualizar_detalle_cuadrante
+2025-12-11 04:25:15 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 04:25:21 [INFO] paezlobato_crud_routes: Acción recibida: actualizar_detalle_cuadrante
+2025-12-11 04:31:29 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 04:31:32 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 04:31:35 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 04:31:35 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 1 validation error for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-11 04:31:41 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 04:31:41 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 1 validation error for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-11 04:34:39 [INFO] paezlobato_crud_routes: Acción recibida: actualizar_detalle_cuadrante
+2025-12-11 04:35:13 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 04:35:16 [INFO] paezlobato_crud_routes: Acción recibida: actualizar_detalle_cuadrante
+2025-12-11 04:43:38 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 04:43:41 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 04:43:57 [INFO] paezlobato_crud_routes: Acción recibida: actualizar_detalle_cuadrante
+2025-12-11 04:46:55 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 04:46:59 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 04:47:06 [INFO] paezlobato_crud_routes: Acción recibida: actualizar_detalle_cuadrante
+2025-12-11 04:48:06 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 04:48:58 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 04:49:01 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 04:49:07 [INFO] paezlobato_crud_routes: Acción recibida: actualizar_detalle_cuadrante
+2025-12-11 04:52:18 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 04:52:22 [INFO] paezlobato_crud_routes: Acción recibida: actualizar_detalle_cuadrante
+2025-12-11 04:53:15 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 04:53:21 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 04:53:29 [INFO] paezlobato_crud_routes: Acción recibida: actualizar_detalle_cuadrante
+2025-12-11 04:55:09 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 04:56:09 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 04:56:18 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 04:56:18 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 1 validation error for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-11 04:56:35 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 04:56:35 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 1 validation error for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-11 04:56:48 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 04:56:49 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 04:57:00 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 04:57:17 [INFO] paezlobato_crud_routes: Acción recibida: actualizar_detalle_cuadrante
+2025-12-11 04:57:22 [INFO] paezlobato_crud_routes: Acción recibida: actualizar_detalle_cuadrante
+2025-12-11 04:57:24 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 04:57:30 [INFO] paezlobato_crud_routes: Acción recibida: actualizar_detalle_cuadrante
+2025-12-11 04:58:23 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 04:58:25 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 04:59:10 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 04:59:13 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 04:59:20 [INFO] paezlobato_crud_routes: Acción recibida: actualizar_detalle_cuadrante
+2025-12-11 05:01:07 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 05:01:13 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 05:01:18 [INFO] paezlobato_crud_routes: Acción recibida: actualizar_detalle_cuadrante
+2025-12-11 05:02:59 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 05:02:59 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 1 validation error for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-11 05:04:34 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 05:04:37 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 05:04:40 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 05:04:40 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 1 validation error for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-11 05:05:33 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 05:05:33 [ERROR] paezlobato_crud_routes: Error al procesar la acción insertar_detalle_cuadrante: 1 validation error for CuadranteDetalleDTO
+cuadrante_id
+  Input should be a valid integer [type=int_type, input_value=None, input_type=NoneType]
+    For further information visit https://errors.pydantic.dev/2.12/v/int_type
+2025-12-11 05:07:46 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 05:07:50 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 05:07:51 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 05:07:55 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 05:08:01 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 05:08:03 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 05:08:06 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 05:08:08 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 05:08:31 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 05:08:49 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 05:10:19 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 05:10:23 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 05:11:41 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 05:11:44 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 05:11:46 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 05:13:53 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 05:13:57 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 05:13:58 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 05:14:00 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 05:14:03 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 05:14:05 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 05:14:08 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 05:14:10 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 05:14:15 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 05:14:17 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 05:14:20 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 05:14:27 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 05:14:32 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 05:14:35 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 05:14:37 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 05:14:39 [INFO] paezlobato_crud_routes: Acción recibida: actualizar_detalle_cuadrante
+2025-12-11 05:14:44 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 05:14:47 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 05:14:48 [INFO] paezlobato_crud_routes: Acción recibida: actualizar_detalle_cuadrante
+2025-12-11 05:14:49 [INFO] paezlobato_crud_routes: Acción recibida: actualizar_detalle_cuadrante
+2025-12-11 05:14:50 [INFO] paezlobato_crud_routes: Acción recibida: actualizar_detalle_cuadrante
+2025-12-11 05:14:52 [INFO] paezlobato_crud_routes: Acción recibida: actualizar_detalle_cuadrante
+2025-12-11 05:14:53 [INFO] paezlobato_crud_routes: Acción recibida: actualizar_detalle_cuadrante
+2025-12-11 05:14:54 [INFO] paezlobato_crud_routes: Acción recibida: actualizar_detalle_cuadrante
+2025-12-11 05:15:10 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 05:15:13 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 05:15:16 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 05:16:13 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 05:16:17 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 05:18:15 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 05:19:20 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 05:19:56 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 05:20:01 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 05:20:08 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 05:20:11 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 05:20:15 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 05:20:18 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 05:20:30 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 05:20:35 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 05:20:45 [INFO] paezlobato_crud_routes: Acción recibida: actualizar_detalle_cuadrante
+2025-12-11 05:21:02 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 05:25:06 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 05:25:51 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 05:25:53 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 05:25:55 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 05:28:30 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 05:28:35 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 05:28:42 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_detalle_cuadrante
+2025-12-11 05:28:42 [INFO] paezlobato_colector: Detalle de cuadrante ID None eliminado.
+2025-12-11 05:28:54 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_detalle_cuadrante
+2025-12-11 05:28:54 [INFO] paezlobato_colector: Detalle de cuadrante ID None eliminado.
+2025-12-11 05:28:58 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 05:30:16 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 05:30:20 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 05:30:21 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 05:30:23 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 05:30:25 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 05:30:27 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 05:30:31 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_detalle_cuadrante
+2025-12-11 05:30:31 [INFO] paezlobato_colector: Detalle de cuadrante ID 47 eliminado.
+2025-12-11 05:30:35 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_detalle_cuadrante
+2025-12-11 05:30:35 [INFO] paezlobato_colector: Detalle de cuadrante ID 49 eliminado.
+2025-12-11 05:30:37 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_detalle_cuadrante
+2025-12-11 05:30:37 [INFO] paezlobato_colector: Detalle de cuadrante ID 41 eliminado.
+2025-12-11 05:30:40 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_detalle_cuadrante
+2025-12-11 05:30:40 [INFO] paezlobato_colector: Detalle de cuadrante ID 41 eliminado.
+2025-12-11 05:30:42 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_detalle_cuadrante
+2025-12-11 05:30:43 [INFO] paezlobato_colector: Detalle de cuadrante ID 72 eliminado.
+2025-12-11 05:30:46 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_detalle_cuadrante
+2025-12-11 05:30:46 [INFO] paezlobato_colector: Detalle de cuadrante ID 51 eliminado.
+2025-12-11 05:30:48 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 05:31:27 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 05:31:34 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 05:31:35 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 05:31:39 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_detalle_cuadrante
+2025-12-11 05:31:39 [INFO] paezlobato_colector: Detalle de cuadrante ID 57 eliminado.
+2025-12-11 05:32:22 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 05:32:25 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 05:32:26 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 05:32:28 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_detalle_cuadrante
+2025-12-11 05:32:28 [INFO] paezlobato_colector: Detalle de cuadrante ID 63 eliminado.
+2025-12-11 05:32:35 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_detalle_cuadrante
+2025-12-11 05:32:35 [INFO] paezlobato_colector: Detalle de cuadrante ID 60 eliminado.
+2025-12-11 05:33:19 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 05:33:23 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 05:33:26 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 05:33:31 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_detalle_cuadrante
+2025-12-11 05:33:31 [INFO] paezlobato_colector: Detalle de cuadrante ID 59 eliminado.
+2025-12-11 05:33:35 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_detalle_cuadrante
+2025-12-11 05:33:35 [INFO] paezlobato_colector: Detalle de cuadrante ID 64 eliminado.
+2025-12-11 05:33:36 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_detalle_cuadrante
+2025-12-11 05:33:36 [INFO] paezlobato_colector: Detalle de cuadrante ID 76 eliminado.
+2025-12-11 05:33:38 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-11 05:34:01 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 05:34:03 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_detalle_cuadrante
+2025-12-11 05:34:03 [INFO] paezlobato_colector: Detalle de cuadrante ID 79 eliminado.
+2025-12-11 05:34:06 [INFO] paezlobato_crud_routes: Acción recibida: insertar_detalle_cuadrante
+2025-12-11 05:34:07 [INFO] paezlobato_crud_routes: Acción recibida: eliminar_detalle_cuadrante
+2025-12-11 05:34:07 [INFO] paezlobato_colector: Detalle de cuadrante ID 80 eliminado.
+2025-12-11 05:35:04 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 05:35:26 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-11 05:35:30 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
