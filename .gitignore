@@ -2,6 +2,8 @@
 /logs/*
 **/logs/
 *.log
+./logs
+./logs/*
 
 **/__pycache__/
 **/*.pyc

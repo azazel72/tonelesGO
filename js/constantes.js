@@ -1,6 +1,6 @@
 const wsScheme = location.protocol === "https:" ? "wss" : "ws";
 const puertoWs = 5000;
-const wsUrl = `${wsScheme}://${location.host}:${puertoWs}/ws`;
+const wsUrl = `${wsScheme}://${location.hostname}:${puertoWs}/ws`;
 
 const MESES = [
   ["ene","Enero"],["feb","Febrero"],["mar","Marzo"],["abr","Abril"],
