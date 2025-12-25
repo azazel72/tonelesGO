@@ -207,7 +207,51 @@
   </div>
 
   <div id="contenedor-cuadrante">
-    <div class="row p-2">
+    <div class="row py-2 px-0 m-0">
+      <div class="col-3">
+        <div id="listaUsuarios"></div>
+      </div>
+      <div class="col-9">
+          <div id="tablaCuadrante"></div>
+      </div>
+    </div>
+  </div>
+</template>
+
+<template id="plantilla_cuadrantes">
+  <div class="cabecera p-2 border-bottom d-flex gap-2 align-items-center">
+    <button id="u-cargar-cuadrantes" class="btn btn-sm btn-outline-primary">Consultar</button>
+    <input id="u-cargar-cuadrantes-input" class="form-control-sm" type="date" step="7"/>
+
+    <div class="form-check form-switch ms-2">
+      <input
+        class="form-check-input"
+        type="checkbox"
+        id="u-color_empleados-input"
+      />
+      <label class="form-check-label small" for="u-color_empleados-input">
+        Mismo color
+      </label>
+    </div>
+
+    <div class="form-check form-switch ms-2">
+      <input
+        class="form-check-input"
+        type="checkbox"
+        id="u-ancho_empleados-input"
+      />
+      <label class="form-check-label small" for="u-ancho_empleados-input">
+        Mismo ancho
+      </label>
+    </div>
+
+    <div class="ms-auto d-flex gap-2">
+      <button id="u-actualizar-cuadrantes" class="btn btn-sm btn-outline-success" disabled>Actualizar</button>
+    </div>
+  </div>
+
+  <div id="contenedor-cuadrante">
+    <div class="row py-2 px-0 m-0">
       <div class="col-3">
         <div id="listaUsuarios"></div>
       </div>

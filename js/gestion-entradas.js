@@ -247,7 +247,7 @@ function crearColumnasMateriales() {
     { title:"Octubre", field:"octubre", ...parametros_meses },
     { title:"Noviembre", field:"noviembre", ...parametros_meses },
     { title:"Diciembre", field:"diciembre", ...parametros_meses },
-    EntradaAcciones,
+    { title:"Acciones", width:100, headerSort:false, hozAlign:"center"},
   ];
 
   return columns;
@@ -362,7 +362,7 @@ window.addEventListener("load", () => {
 
 function getFormatterEntradaAcciones(cell) {
   const d = cell.getRow().getData();
-  return `<button class="btn btn-sm btn-outline-primary" data-action-row="crear"><i class="bi bi-file-earmark-arrow-up"></i></button>` +
+  return `<button class="btn btn-sm btn-outline-primary" data-action-row="entradas"><i class="bi bi-file-earmark-arrow-up"></i></button>` +
     `<button class="btn btn-sm btn-outline-danger" data-action-row="borrar"><i class="bi bi-trash"></i></button>`;
 }
 

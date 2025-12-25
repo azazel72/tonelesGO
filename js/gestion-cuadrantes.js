@@ -222,7 +222,7 @@ function crearDatosCuadrantes(cuadrante) {
       return {...d, empleado: DATOS.maestros.usuarios[d.usuario_id]};
     }),
   }));
-  console.log(datos);
+  DATOS.cuadrante_dinamico = datos;
   return datos;
 }
 
