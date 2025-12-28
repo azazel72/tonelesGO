@@ -42,6 +42,26 @@ window.onload = () => {
             await openMaterialesWin();
         },
 
+        async "ver-duelas"() {
+            await openDuelasWin();
+        },
+
+        async "ver-pedidos"() {
+            await openPedidosWin();
+        },
+
+        async "ver-lineas-pedido"() {
+            await openLineasPedidoWin();
+        },
+
+        async "ver-palets"() {
+            await openPaletsWin();
+        },
+
+        async "ver-productos"() {
+            await openProductosWin();
+        },
+
         async "ver-entradas"() {
             await openEntradasWin();
         },

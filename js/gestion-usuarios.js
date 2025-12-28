@@ -25,7 +25,7 @@ function openUsuariosWin() {
       options: {
         editable: false,
         columns: [
-          { title:"ID", field:"id", width:70, hozAlign:"right", headerSort:false },
+          { title:"ID", field:"id", width:70, hozAlign:"right"},
           { title:"Alias", field:"alias", editor:"input", editable: tablaEditable, cssClass: "filtrable", },
           { title:"Nombre", field:"nombre", editor:"input", editable: tablaEditable, cssClass: "filtrable", },
           { title: "Rol",

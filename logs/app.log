@@ -727,3 +727,38 @@ sqlalchemy.exc.OperationalError: (mysql.connector.errors.OperationalError) 2013 
 2025-12-12 01:54:07 [INFO] paezlobato_crud_routes: Acción recibida: maestros
 2025-12-12 01:58:47 [INFO] paezlobato_crud_routes: Acción recibida: maestros
 2025-12-12 01:58:57 [INFO] paezlobato_crud_routes: Acción recibida: cargar_cuadrantes
+2025-12-25 21:37:41 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-12-25 21:37:41 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-12-25 21:37:41 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-12-25 21:37:41 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-26 00:35:00 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-26 00:35:56 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-12-26 00:35:56 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-12-26 00:35:56 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-12-26 00:35:56 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-26 00:37:47 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-12-26 00:37:47 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-12-26 00:37:47 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-12-26 00:37:47 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-28 14:34:43 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-12-28 14:34:43 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-12-28 14:34:43 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-12-28 14:34:48 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-28 14:34:53 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-28 15:05:00 [INFO] configurar_logs: 🟢 Logging configurado correctamente
+2025-12-28 15:05:00 [INFO] paezlobato_servidor: Aplicación iniciada
+2025-12-28 15:05:00 [INFO] paezlobato_servidor: Rutas montadas correctamente
+2025-12-28 15:05:04 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-28 17:57:56 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-28 17:58:25 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-28 17:59:31 [INFO] paezlobato_crud_routes: Acción recibida: insertar_maestro
+2025-12-28 17:59:31 [INFO] paezlobato_colector: Insertado ID 1 en la tabla materiales
+2025-12-28 17:59:44 [INFO] paezlobato_crud_routes: Acción recibida: insertar_maestro
+2025-12-28 17:59:44 [INFO] paezlobato_colector: Insertado ID 2 en la tabla materiales
+2025-12-28 18:00:31 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-28 18:05:25 [INFO] paezlobato_crud_routes: Acción recibida: insertar_maestro
+2025-12-28 18:05:25 [INFO] paezlobato_colector: Insertado ID 1 en la tabla duelas
+2025-12-28 18:05:43 [INFO] paezlobato_crud_routes: Acción recibida: insertar_maestro
+2025-12-28 18:05:43 [INFO] paezlobato_colector: Insertado ID 2 en la tabla duelas
+2025-12-28 18:19:18 [INFO] paezlobato_crud_routes: Acción recibida: maestros
+2025-12-28 18:19:27 [INFO] paezlobato_crud_routes: Acción recibida: maestros

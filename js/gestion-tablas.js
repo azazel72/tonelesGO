@@ -232,6 +232,11 @@ function cerrarVentanasMaestros() {
     "ubicaciones",
     "estados",
     "materiales",
+    "duelas",
+    "pedidos",
+    "lineas_pedido",
+    "palets",
+    "productos",
     "entradas",
     "salidas",
   ];

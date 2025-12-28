@@ -1,3 +1,4 @@
+
 from .cliente_dto import ClienteDTO
 from .estado_dto import EstadoDTO
 from .instalacion_dto import InstalacionDTO
@@ -6,6 +7,12 @@ from .proveedor_dto import ProveedorDTO
 from .usuario_dto import UsuarioDTO
 from .rol_dto import RolDTO
 from .puesto_trabajo_dto import PuestoTrabajoDTO
+from .material_dto import MaterialDTO
+from .duela_dto import DuelaDTO
+from .pedido_dto import PedidoDTO
+from .linea_pedido_dto import LineaPedidoDTO
+from .palet_dto import PaletDTO
+from .producto_dto import ProductoDTO
 
 __all__ = [
     "ClienteDTO",
@@ -16,4 +23,10 @@ __all__ = [
     "UsuarioDTO",
     "RolDTO",
     "PuestoTrabajoDTO",
+    "MaterialDTO",
+    "DuelaDTO",
+    "PedidoDTO",
+    "LineaPedidoDTO",
+    "PaletDTO",
+    "ProductoDTO",
 ]

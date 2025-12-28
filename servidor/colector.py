@@ -4,11 +4,11 @@ from typing import List
 
 from servidor.herramientas.utilidades import obtener_anterior_dia_semana
 
-from .modelos import ClienteDB, EstadoDB, InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB, RolDB, PuestoTrabajoDB
+from .modelos import ClienteDB, EstadoDB, InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB, RolDB, PuestoTrabajoDB, MaterialDB, DuelaDB, PedidoDB, LineaPedidoDB, PaletDB, ProductoDB
 from .modelos import PlanCamionDB, PlanFacturacionDB, PlanMaterialDB, CuadranteDB, CuadranteDetalleDB
 from .persistencia import GenericRepository, DB
 from .dominio import EntradasDTO, MaestrosDTO, PlanMaterialDTO, PlanFacturacionDTO, PlanCamionDTO, CuadranteDTO, CuadranteDetalleDTO
-from .dominio import ClienteDTO, EstadoDTO, InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO, RolDTO, PuestoTrabajoDTO, CuadrantesDTO
+from .dominio import ClienteDTO, EstadoDTO, InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO, RolDTO, PuestoTrabajoDTO, MaterialDTO, DuelaDTO, PedidoDTO, LineaPedidoDTO, PaletDTO, ProductoDTO, CuadrantesDTO
 
 logger = logging.getLogger("paezlobato_colector")
 
@@ -18,6 +18,7 @@ class Colector:
     entradas: "EntradasDTO" = None
     maestros: "MaestrosDTO" = None
     cuadrantes: "CuadrantesDTO" = None
+
 
     def __init__(self):
         Colector.colector = self
@@ -36,13 +37,23 @@ class Colector:
         self.repo_proveedores = GenericRepository(ProveedorDB)
         self.repo_puestos_trabajo = GenericRepository(PuestoTrabajoDB)
 
+        self.repo_materiales_maestro = GenericRepository(MaterialDB)
+        self.repo_duelas = GenericRepository(DuelaDB)
+        self.repo_pedidos = GenericRepository(PedidoDB)
+        self.repo_lineas_pedido = GenericRepository(LineaPedidoDB)
+        self.repo_palets = GenericRepository(PaletDB)
+        self.repo_productos = GenericRepository(ProductoDB)
+
         self.repo_usuarios = GenericRepository(UsuarioDB)
         self.repo_roles = GenericRepository(RolDB)
 
         self.repo_cuadrantes = GenericRepository(CuadranteDB)
         self.repo_cuadrante_detalles = GenericRepository(CuadranteDetalleDB)
 
-#region Métodos Maestros
+
+    #region Métodos Maestros
+
+
     def obtener_datos_maestros(self) -> dict:
         with DB.crear_sesion() as session:
             clientes = self.repo_clientes.list_all(session)
@@ -53,6 +64,12 @@ class Colector:
             usuarios = self.repo_usuarios.list_all(session)
             roles = self.repo_roles.list_all(session)
             puestos_trabajo = self.repo_puestos_trabajo.list_all(session)
+            materiales = self.repo_materiales_maestro.list_all(session)
+            duelas = self.repo_duelas.list_all(session)
+            pedidos = self.repo_pedidos.list_all(session)
+            lineas_pedido = self.repo_lineas_pedido.list_all(session)
+            palets = self.repo_palets.list_all(session)
+            productos = self.repo_productos.list_all(session)
 
             self.maestros.clientes = {cliente.id: ClienteDTO.from_db(cliente) for cliente in clientes}
             self.maestros.estados = {estado.id: EstadoDTO.from_db(estado) for estado in estados}
@@ -62,6 +79,12 @@ class Colector:
             self.maestros.usuarios = {usuario.id: UsuarioDTO.from_db(usuario) for usuario in usuarios}
             self.maestros.roles = {rol.id: RolDTO.from_db(rol) for rol in roles}
             self.maestros.puestos_trabajo = {puesto.id: PuestoTrabajoDTO.from_db(puesto) for puesto in puestos_trabajo}
+            self.maestros.materiales = {material.id: MaterialDTO.from_db(material) for material in materiales}
+            self.maestros.duelas = {duela.id: DuelaDTO.from_db(duela) for duela in duelas}
+            self.maestros.pedidos = {pedido.id: PedidoDTO.from_db(pedido) for pedido in pedidos}
+            self.maestros.lineas_pedido = {linea.id: LineaPedidoDTO.from_db(linea) for linea in lineas_pedido}
+            self.maestros.palets = {palet.id: PaletDTO.from_db(palet) for palet in palets}
+            self.maestros.productos = {producto.id: ProductoDTO.from_db(producto) for producto in productos}
 
             #print("Datos maestros cargados:", self.maestros)
             #print("Datos clientes cargados:", self.maestros.clientes)
@@ -126,9 +149,9 @@ class Colector:
             logger.info(f"Insertado ID {new.id} en la tabla {tabla}")
           
             return objeto_DTO
-#endregion
+    #endregion
 
-#region Métodos Entradas
+    #region Métodos Entradas
     def obtener_entradas(self, año: int, actualizar_local = True) -> EntradasDTO:
         with DB.crear_sesion() as session:
             plan_camiones = self.repo_camiones.list_by_year(session, año)
@@ -185,9 +208,9 @@ class Colector:
 
             logger.info(f"Entrada ID {entrada_id} modificada: {campo} = {valor}")
             return {"id": entrada_id, "campo": campo, "valor": valor}
-#endregion
+    #endregion
 
-#region Métodos Cuadrantes
+    #region Métodos Cuadrantes
     def obtener_cuadrante_actual(self) -> dict:
         if not self.cuadrantes.cuadrante_actual:
             fecha_inicial = obtener_anterior_dia_semana().isoformat()
@@ -267,9 +290,9 @@ class Colector:
                 raise
             logger.info(f"Detalle de cuadrante ID {id} eliminado.")
             return {"id": id }
-#endregion
+    #endregion
 
-#region Métodos Auxiliares
+    #region Métodos Auxiliares
     def obtener_repo(self, tabla):
         if tabla == "clientes":
             repo = self.repo_clientes
@@ -308,6 +331,30 @@ class Colector:
             maestro = self.entradas.buscar_camion_por_id
             objeto = PlanCamionDTO
         elif tabla == "materiales":
+            repo = self.repo_materiales_maestro
+            maestro = self.maestros.materiales
+            objeto = MaterialDTO
+        elif tabla == "duelas":
+            repo = self.repo_duelas
+            maestro = self.maestros.duelas
+            objeto = DuelaDTO
+        elif tabla == "pedidos":
+            repo = self.repo_pedidos
+            maestro = self.maestros.pedidos
+            objeto = PedidoDTO
+        elif tabla == "lineas_pedido":
+            repo = self.repo_lineas_pedido
+            maestro = self.maestros.lineas_pedido
+            objeto = LineaPedidoDTO
+        elif tabla == "palets":
+            repo = self.repo_palets
+            maestro = self.maestros.palets
+            objeto = PaletDTO
+        elif tabla == "productos":
+            repo = self.repo_productos
+            maestro = self.maestros.productos
+            objeto = ProductoDTO
+        elif tabla == "plan_materiales":
             repo = self.repo_materiales
             maestro = self.entradas.buscar_material_por_id
             objeto = PlanMaterialDTO
@@ -337,4 +384,4 @@ class Colector:
     def limpiar_datos(self):
         #self.datos.clear()
         pass
-#endregion
+    #endregion
