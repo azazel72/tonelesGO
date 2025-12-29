@@ -6,7 +6,7 @@ from servidor.modelos import PaletDB
 class PaletDTO(BaseModel):
     id: int | None
     codigo: str
-    linea_pedido_id: int
+    linea_entrada_id: int
     ubicacion_id: int
     procesado: bool = False
 
@@ -14,7 +14,7 @@ class PaletDTO(BaseModel):
         return PaletDTO(
             id=palet_db.id,
             codigo=palet_db.codigo,
-            linea_pedido_id=palet_db.linea_pedido_id,
+            linea_entrada_id=palet_db.linea_entrada_id,
             ubicacion_id=palet_db.ubicacion_id,
             procesado=palet_db.procesado,
         )
@@ -23,7 +23,7 @@ class PaletDTO(BaseModel):
         return PaletDB(
             id=self.id,
             codigo=self.codigo,
-            linea_pedido_id=self.linea_pedido_id,
+            linea_entrada_id=self.linea_entrada_id,
             ubicacion_id=self.ubicacion_id,
             procesado=self.procesado,
         )

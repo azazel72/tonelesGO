@@ -1,14 +1,14 @@
-// ====== CREAR VENTANA CONFIGURACION ENTRADAS ======
-function openConfiguracionEntradasWin() {
-  let wb = comprobarVentanaAbierta("configuracion_entradas");
+// ====== CREAR VENTANA PLANIFICACION ENTRADAS ======
+function openPlanificacionEntradasWin() {
+  let wb = comprobarVentanaAbierta("planificacion_entradas");
   if (wb) return wb;
 
   const configuracionEntradas = {
-    KEY: "configuracion_entradas",
+    KEY: "planificacion_entradas",
     winbox: {
-      tipo: "configuracion_entradas",
+      tipo: "planificacion_entradas",
       options: {
-        title: "Configuracion de entradas",
+        title: "Planificacion de entradas",
         x: 0,
         y: 56,
         width: "100%",
@@ -16,12 +16,12 @@ function openConfiguracionEntradasWin() {
       }
     },
     tabulator: {
-      configuracion_entradas: {
+      planificacion_entradas: {
         options: {
           editable: true,
           height: "auto",
-          columns: crearColumnasConfiguracionEntradas(DATOS.maestros.proveedores),
-          data: DATOS.configuracion_entradas.planificacion?.length ? DATOS.configuracion_entradas.planificacion : [],
+          columns: crearColumnasPlanificacionEntradas(DATOS.maestros.proveedores),
+          data: DATOS.planificacion_entradas.planificacion?.length ? DATOS.planificacion_entradas.planificacion : [],
           columnDefaults: { headerHozAlign:"center" },
         },
       },
@@ -30,7 +30,7 @@ function openConfiguracionEntradasWin() {
           editable: true,
           height: "auto",
           columns: crearColumnasMateriales(),
-          data: DATOS.configuracion_entradas.desglose?.length ? DATOS.configuracion_entradas.desglose : [],
+          data: DATOS.planificacion_entradas.desglose?.length ? DATOS.planificacion_entradas.desglose : [],
           columnDefaults: {
             resizable: false,
           },      
@@ -39,7 +39,7 @@ function openConfiguracionEntradasWin() {
     },
   }
 
-  wb = crearVentanaConfiguracionEntradas(configuracionEntradas);
+  wb = crearVentanaPlanificacionEntradas(configuracionEntradas);
 
   wb.maximize();
   
@@ -47,43 +47,43 @@ function openConfiguracionEntradasWin() {
 }
 
 
-// ====== MUESTRA LA VENTANA DE CONFIGURACION ENTRADAS ======
-function mostrar_configuracion_entradas(response) {
-  DATOS.configuracion_entradas.plan_camiones = response.data?.plan_camiones || [];
-  DATOS.configuracion_entradas.plan_facturacion = response.data?.plan_facturacion || {};
-  DATOS.configuracion_entradas.plan_materiales = response.data?.plan_materiales || [];
-  DATOS.configuracion_entradas.planificacion = Object.values(DATOS.configuracion_entradas.plan_camiones || {});
-  DATOS.configuracion_entradas.desglose = [DATOS.configuracion_entradas.plan_facturacion, ...DATOS.configuracion_entradas.plan_materiales];
+// ====== MUESTRA LA VENTANA DE PLANIFICACION ENTRADAS ======
+function mostrar_planificacion_entradas(response) {
+  DATOS.planificacion_entradas.plan_camiones = response.data?.plan_camiones || [];
+  DATOS.planificacion_entradas.plan_facturacion = response.data?.plan_facturacion || {};
+  DATOS.planificacion_entradas.plan_materiales = response.data?.plan_materiales || [];
+  DATOS.planificacion_entradas.planificacion = Object.values(DATOS.planificacion_entradas.plan_camiones || {});
+  DATOS.planificacion_entradas.desglose = [DATOS.planificacion_entradas.plan_facturacion, ...DATOS.planificacion_entradas.plan_materiales];
 
-  if (response.data && windowsRegistry.has("configuracion_entradas")) {
-    const { wb, table } = windowsRegistry.get("configuracion_entradas");
+  if (response.data && windowsRegistry.has("planificacion_entradas")) {
+    const { wb, table } = windowsRegistry.get("planificacion_entradas");
     console.log(table);
-    const tablaConfiguracionEntradas = table[0];
+    const tablaPlanificacionEntradas = table[0];
     const tablaMateriales = table[1];
-    tablaConfiguracionEntradas.setData(DATOS.configuracion_entradas.planificacion);
-    tablaMateriales.setData(DATOS.configuracion_entradas.desglose);
-    openConfiguracionEntradasWin();
+    tablaPlanificacionEntradas.setData(DATOS.planificacion_entradas.planificacion);
+    tablaMateriales.setData(DATOS.planificacion_entradas.desglose);
+    openPlanificacionEntradasWin();
   }
 }
 
 // ====== ACCIONES BOTONES CABECERA ======
-function cargar_configuracion_entradas(wb, tabla) {
-  var input = document.getElementById('u-cargar-configuracion-entradas-input');
+function cargar_planificacion_entradas(wb, tabla) {
+  var input = document.getElementById('u-cargar-planificacion-entradas-input');
   if (!input.checkValidity()) {
     alert("Año inválido");
     input.focus();
     return;
   }
-  send("cargar_configuracion_entradas", { año: input.value });
+  send("cargar_planificacion_entradas", { año: input.value });
 }
-function agregar_configuracion_entradas(wb, tabla) {
-  var input = document.getElementById('u-cargar-configuracion-entradas-input');
+function agregar_planificacion_entradas(wb, tabla) {
+  var input = document.getElementById('u-cargar-planificacion-entradas-input');
   if (!input.checkValidity()) {
     alert("Año inválido");
     input.focus();
     return;
   }
-  send("agregar_configuracion_entradas", { año: input.value });
+  send("agregar_planificacion_entradas", { año: input.value });
 }
 
 
@@ -96,7 +96,7 @@ function sumMeses(data, sufijo){ // sufijo: "previsto" | "confirmado"
 }
 
 // === construcción de columnas ===
-function crearColumnasConfiguracionEntradas(proveedores) {
+function crearColumnasPlanificacionEntradas(proveedores) {
   const identificacion = {
     title: "Identificación",
     frozen:true,
@@ -122,7 +122,7 @@ function crearColumnasConfiguracionEntradas(proveedores) {
   };
 
   // Grupo Totales (de entrada)
-  const totalesConfiguracionEntradas = {
+  const totalesPlanificacionEntradas = {
     title: "Totales",
     frozen:true,
     headerSort: false,
@@ -178,9 +178,9 @@ function crearColumnasConfiguracionEntradas(proveedores) {
 
   return [
     identificacion,
-    totalesConfiguracionEntradas,
+    totalesPlanificacionEntradas,
     ...gruposMeses,
-    ConfiguracionEntradasAcciones,
+    PlanificacionEntradasAcciones,
   ];
 }
 
@@ -270,7 +270,7 @@ const input_cero = {
 };
 
 
-function crearVentanaConfiguracionEntradas(configuracion, show=true) {
+function crearVentanaPlanificacionEntradas(configuracion, show=true) {
    // CREACION DE WINBOX
   const contenedor = crearElemento("div", { class: "contenedor-winbox" });
   const cabecera = crearCabeceraVentana(configuracion);
@@ -284,20 +284,20 @@ function crearVentanaConfiguracionEntradas(configuracion, show=true) {
   }
 
   // Tabulator
-  const tablaConfiguracionEntradas = crearTabla("configuracion_entradas", contenedor, configuracion.tabulator.configuracion_entradas.options);
+  const tablaPlanificacionEntradas = crearTabla("planificacion_entradas", contenedor, configuracion.tabulator.planificacion_entradas.options);
   const tablaMateriales = crearTabla("materiales", contenedor, configuracion.tabulator.materiales.options);
 
-  windowsRegistry.set(configuracion.KEY, { wb: wb, table: [tablaConfiguracionEntradas, tablaMateriales] });
+  windowsRegistry.set(configuracion.KEY, { wb: wb, table: [tablaPlanificacionEntradas, tablaMateriales] });
 
-  agregarEventosWinBox(wb, tablaConfiguracionEntradas, cabecera, configuracion);
-  agregarEventosTablaConfiguracionEntradas(wb, tablaConfiguracionEntradas, cabecera, configuracion);
+  agregarEventosWinBox(wb, tablaPlanificacionEntradas, cabecera, configuracion);
+  agregarEventosTablaPlanificacionEntradas(wb, tablaPlanificacionEntradas, cabecera, configuracion);
   agregarEventosTablaMateriales(wb, tablaMateriales, cabecera, configuracion);
-  agregarSincronizacionTablas(tablaConfiguracionEntradas, tablaMateriales);
+  agregarSincronizacionTablas(tablaPlanificacionEntradas, tablaMateriales);
 
   return wb;
 }
 
-function agregarEventosTablaConfiguracionEntradas(wb, tabla, cabecera, configuracion) {
+function agregarEventosTablaPlanificacionEntradas(wb, tabla, cabecera, configuracion) {
   tabla.on("cellEdited", async (cell) => {
     const f = cell.getField();
     if (!/_previsto$|_confirmado$|^total_(pactados|descontar)$/.test(f)) return;
@@ -325,13 +325,13 @@ function agregarEventosTablaConfiguracionEntradas(wb, tabla, cabecera, configura
     }
   });
 
-  cabecera.querySelector("#u-cargar-configuracion-entradas")?.addEventListener("click", () => {
-    cargar_configuracion_entradas(wb, tabla);
+  cabecera.querySelector("#u-cargar-planificacion-entradas")?.addEventListener("click", () => {
+    cargar_planificacion_entradas(wb, tabla);
   });
   cabecera.querySelector("#u-add-providers").addEventListener("click", async () => {
-    agregar_configuracion_entradas(wb, tabla);
+    agregar_planificacion_entradas(wb, tabla);
   });
-  cabecera.querySelector("#u-cargar-configuracion-entradas-input").value = new Date().getFullYear();
+  cabecera.querySelector("#u-cargar-planificacion-entradas-input").value = new Date().getFullYear();
 }
 
 function agregarEventosTablaMateriales(wb, tablaMateriales, cabecera, configuracion) {
@@ -350,19 +350,19 @@ function agregarEventosTablaMateriales(wb, tablaMateriales, cabecera, configurac
 }
 
 
-let ConfiguracionEntradasAcciones;
+let PlanificacionEntradasAcciones;
 
 window.addEventListener("load", () => {
-  ConfiguracionEntradasAcciones = {
+  PlanificacionEntradasAcciones = {
     title:"Acciones", width:100, headerSort:false, hozAlign:"center",
-    formatter: getFormatterConfiguracionEntradasAcciones,
+    formatter: getFormatterPlanificacionEntradasAcciones,
     cellClick: getCellClick,
   };
 });
 
-function getFormatterConfiguracionEntradasAcciones(cell) {
+function getFormatterPlanificacionEntradasAcciones(cell) {
   const d = cell.getRow().getData();
-  return `<button class="btn btn-sm btn-outline-primary" data-action-row="configuracion_entradas"><i class="bi bi-file-earmark-arrow-up"></i></button>` +
+  return `<button class="btn btn-sm btn-outline-primary" data-action-row="planificacion_entradas"><i class="bi bi-file-earmark-arrow-up"></i></button>` +
     `<button class="btn btn-sm btn-outline-danger" data-action-row="borrar"><i class="bi bi-trash"></i></button>`;
 }
 
@@ -400,7 +400,7 @@ function agregarSincronizacionTablas(masterTable, slaveTable) {
   });
 }
 
-const ColumnasTablasConfiguracionEntradas = {"Identificación": "tipo_material", "Totales": {"total_pactados": "total_pactados", "total_descontar": "total_descontar", "total_previstos": "total_previstos", "total_entregados": "total_entregados"},
+const ColumnasTablasPlanificacionEntradas = {"Identificación": "tipo_material", "Totales": {"total_pactados": "total_pactados", "total_descontar": "total_descontar", "total_previstos": "total_previstos", "total_entregados": "total_entregados"},
 "Enero":"enero","Febrero":"febrero","Marzo":"marzo","Abril":"abril","Mayo":"mayo","Junio":"junio","Julio":"julio","Agosto":"agosto","Septiembre":"septiembre","Octubre":"octubre","Noviembre":"noviembre","Diciembre":"diciembre",
 "Acciones": "Acciones"};
 
@@ -409,7 +409,7 @@ function syncGroupWidthsByTitle(masterTable, slaveTable, column=null) {
   let col_cambiada = column ? column.getParentColumn().getDefinition().title : null;
   columnas.forEach(col => {
     if (column && col.title !== col_cambiada) return;
-    let destino = ColumnasTablasConfiguracionEntradas[col.title];
+    let destino = ColumnasTablasPlanificacionEntradas[col.title];
     try {
       if (destino) {
         if (typeof(destino) === "object" && column) {

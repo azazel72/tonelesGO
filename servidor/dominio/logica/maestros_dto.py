@@ -12,8 +12,8 @@ from servidor.dominio.maestros.usuario_dto import UsuarioDTO
 from servidor.dominio.maestros.rol_dto import RolDTO
 from servidor.dominio.maestros.material_dto import MaterialDTO
 from servidor.dominio.maestros.duela_dto import DuelaDTO
-from servidor.dominio.maestros.pedido_dto import PedidoDTO
-from servidor.dominio.maestros.linea_pedido_dto import LineaPedidoDTO
+from servidor.dominio.maestros.entrada_dto import EntradaDTO
+from servidor.dominio.maestros.linea_entrada_dto import LineaEntradaDTO
 from servidor.dominio.maestros.palet_dto import PaletDTO
 from servidor.dominio.maestros.producto_dto import ProductoDTO
 
@@ -29,8 +29,8 @@ class MaestrosDTO(BaseModel):
     puestos_trabajo: Optional[Dict[int, "PuestoTrabajoDTO"]] = {}
     materiales: Optional[Dict[int, "MaterialDTO"]] = {}
     duelas: Optional[Dict[int, "DuelaDTO"]] = {}
-    pedidos: Optional[Dict[int, "PedidoDTO"]] = {}
-    lineas_pedido: Optional[Dict[int, "LineaPedidoDTO"]] = {}
+    entradas: Optional[Dict[int, "EntradaDTO"]] = {}
+    lineas_entrada: Optional[Dict[int, "LineaEntradaDTO"]] = {}
     palets: Optional[Dict[int, "PaletDTO"]] = {}
     productos: Optional[Dict[int, "ProductoDTO"]] = {}
 

@@ -9,8 +9,8 @@ from .rol_db import RolDB
 from .puesto_trabajo_db import PuestoTrabajoDB
 from .material_db import MaterialDB
 from .duela_db import DuelaDB
-from .pedido_db import PedidoDB
-from .linea_pedido_db import LineaPedidoDB
+from .entrada_db import EntradaDB
+from .linea_entrada_db import LineaEntradaDB
 from .palet_db import PaletDB
 from .producto_db import ProductoDB
 
@@ -25,8 +25,8 @@ __all__ = [
     "PuestoTrabajoDB",
     "MaterialDB",
     "DuelaDB",
-    "PedidoDB",
-    "LineaPedidoDB",
+    "EntradaDB",
+    "LineaEntradaDB",
     "PaletDB",
     "ProductoDB",
 ]

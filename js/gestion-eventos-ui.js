@@ -32,11 +32,11 @@ async function getCellClick(e, cell) {
         row.delete();
       }
       break;
-    case "configuracion_entradas":
+    case "planificacion_entradas":
       {
         const id_evento = row.getData().id;
-        console.log("Abrir gestión de configuracion de entradas para evento ID", id_evento);
-        //abrir_gestion_configuracion_entradas(id_evento);
+        console.log("Abrir gestión de planificacion de entradas para evento ID", id_evento);
+        //abrir_gestion_planificacion_entradas(id_evento);
       }
       break;
   }

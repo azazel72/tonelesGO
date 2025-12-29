@@ -4,7 +4,7 @@ function openPaletsWin() {
   const wb = comprobarVentanaAbierta("palets");
   if (wb) return wb;
 
-  const lineasDict = Object.values(DATOS?.maestros?.lineas_pedido ?? {}).map(
+  const lineasDict = Object.values(DATOS?.maestros?.lineas_entrada ?? {}).map(
     ({ id, ...resto }) => ({
       ...resto, id,
       value: id,
@@ -45,8 +45,8 @@ function openPaletsWin() {
           { title:"ID", field:"id", width:70, hozAlign:"right"},
           { title:"Codigo", field:"codigo", editor:"input", editable: tablaEditable, cssClass: "filtrable" },
           {
-            title: "Linea pedido",
-            field: "linea_pedido_id",
+            title: "Linea entrada",
+            field: "linea_entrada_id",
             editor: "list",
             editorParams: {
               values: lineasDict,
@@ -58,7 +58,7 @@ function openPaletsWin() {
             },
             editable: tablaEditable,
             cssClass: "filtrable",
-            formatter: cell => DATOS?.maestros?.lineas_pedido?.[cell.getValue()]?.id ?? cell.getValue(),
+            formatter: cell => DATOS?.maestros?.lineas_entrada?.[cell.getValue()]?.id ?? cell.getValue(),
           },
           {
             title: "Ubicacion",

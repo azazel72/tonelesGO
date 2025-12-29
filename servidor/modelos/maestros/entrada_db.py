@@ -4,8 +4,8 @@ from sqlmodel import SQLModel, Field
 from typing import Optional
 
 
-class PedidoDB(SQLModel, table=True):
-    __tablename__ = "pedidos"
+class EntradaDB(SQLModel, table=True):
+    __tablename__ = "entradas"
 
     id: Optional[int] = Field(default=None, primary_key=True)
     numero: str

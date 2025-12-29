@@ -3,11 +3,11 @@ from sqlmodel import SQLModel, Field
 from typing import Optional
 
 
-class LineaPedidoDB(SQLModel, table=True):
-    __tablename__ = "lineas_pedido"
+class LineaEntradaDB(SQLModel, table=True):
+    __tablename__ = "lineas_entrada"
 
     id: Optional[int] = Field(default=None, primary_key=True)
-    pedido_id: int
+    entrada_id: int
     duela_id: int
     bultos: int = 0
     kilos: float = 0

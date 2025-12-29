@@ -514,10 +514,10 @@ CREATE TABLE `duelas` (
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `pedidos`
+-- Estructura de tabla para la tabla `entradas`
 --
 
-CREATE TABLE `pedidos` (
+CREATE TABLE `entradas` (
   `id` int(11) NOT NULL,
   `numero` varchar(50) NOT NULL,
   `proveedor_id` int(11) NOT NULL,
@@ -536,12 +536,12 @@ CREATE TABLE `pedidos` (
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `lineas_pedido`
+-- Estructura de tabla para la tabla `lineas_entrada`
 --
 
-CREATE TABLE `lineas_pedido` (
+CREATE TABLE `lineas_entrada` (
   `id` int(11) NOT NULL,
-  `pedido_id` int(11) NOT NULL,
+  `entrada_id` int(11) NOT NULL,
   `duela_id` int(11) NOT NULL,
   `bultos` int(11) NOT NULL DEFAULT 0,
   `kilos` decimal(10,2) NOT NULL DEFAULT 0.00,
@@ -558,7 +558,7 @@ CREATE TABLE `lineas_pedido` (
 CREATE TABLE `palets` (
   `id` int(11) NOT NULL,
   `codigo` varchar(60) NOT NULL,
-  `linea_pedido_id` int(11) NOT NULL,
+  `linea_entrada_id` int(11) NOT NULL,
   `ubicacion_id` int(11) NOT NULL,
   `procesado` tinyint(1) NOT NULL DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
@@ -606,26 +606,26 @@ ALTER TABLE `duelas`
   ADD KEY `fk_duelas_materiales` (`material_id`);
 
 --
--- Indices de la tabla `pedidos`
+-- Indices de la tabla `entradas`
 --
-ALTER TABLE `pedidos`
+ALTER TABLE `entradas`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_pedidos_proveedores` (`proveedor_id`);
+  ADD KEY `fk_entradas_proveedores` (`proveedor_id`);
 
 --
--- Indices de la tabla `lineas_pedido`
+-- Indices de la tabla `lineas_entrada`
 --
-ALTER TABLE `lineas_pedido`
+ALTER TABLE `lineas_entrada`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_lineas_pedido_pedidos` (`pedido_id`),
-  ADD KEY `fk_lineas_pedido_duelas` (`duela_id`);
+  ADD KEY `fk_lineas_entrada_entradas` (`entrada_id`),
+  ADD KEY `fk_lineas_entrada_duelas` (`duela_id`);
 
 --
 -- Indices de la tabla `palets`
 --
 ALTER TABLE `palets`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `fk_palets_lineas` (`linea_pedido_id`),
+  ADD KEY `fk_palets_lineas` (`linea_entrada_id`),
   ADD KEY `fk_palets_ubicaciones` (`ubicacion_id`);
 
 --
@@ -645,10 +645,10 @@ ALTER TABLE `materiales`
 ALTER TABLE `duelas`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
-ALTER TABLE `pedidos`
+ALTER TABLE `entradas`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
-ALTER TABLE `lineas_pedido`
+ALTER TABLE `lineas_entrada`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE `palets`
@@ -663,15 +663,15 @@ ALTER TABLE `productos`
 ALTER TABLE `duelas`
   ADD CONSTRAINT `fk_duelas_materiales` FOREIGN KEY (`material_id`) REFERENCES `materiales` (`id`) ON UPDATE CASCADE;
 
-ALTER TABLE `pedidos`
-  ADD CONSTRAINT `fk_pedidos_proveedores` FOREIGN KEY (`proveedor_id`) REFERENCES `proveedores` (`id`) ON UPDATE CASCADE;
+ALTER TABLE `entradas`
+  ADD CONSTRAINT `fk_entradas_proveedores` FOREIGN KEY (`proveedor_id`) REFERENCES `proveedores` (`id`) ON UPDATE CASCADE;
 
-ALTER TABLE `lineas_pedido`
-  ADD CONSTRAINT `fk_lineas_pedido_pedidos` FOREIGN KEY (`pedido_id`) REFERENCES `pedidos` (`id`) ON UPDATE CASCADE,
-  ADD CONSTRAINT `fk_lineas_pedido_duelas` FOREIGN KEY (`duela_id`) REFERENCES `duelas` (`id`) ON UPDATE CASCADE;
+ALTER TABLE `lineas_entrada`
+  ADD CONSTRAINT `fk_lineas_entrada_entradas` FOREIGN KEY (`entrada_id`) REFERENCES `entradas` (`id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_lineas_entrada_duelas` FOREIGN KEY (`duela_id`) REFERENCES `duelas` (`id`) ON UPDATE CASCADE;
 
 ALTER TABLE `palets`
-  ADD CONSTRAINT `fk_palets_lineas` FOREIGN KEY (`linea_pedido_id`) REFERENCES `lineas_pedido` (`id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_palets_lineas` FOREIGN KEY (`linea_entrada_id`) REFERENCES `lineas_entrada` (`id`) ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_palets_ubicaciones` FOREIGN KEY (`ubicacion_id`) REFERENCES `ubicaciones` (`id`) ON UPDATE CASCADE;
 
 COMMIT;

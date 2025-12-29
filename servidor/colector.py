@@ -4,25 +4,25 @@ from typing import List
 
 from servidor.herramientas.utilidades import obtener_anterior_dia_semana
 
-from .modelos import ClienteDB, EstadoDB, InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB, RolDB, PuestoTrabajoDB, MaterialDB, DuelaDB, PedidoDB, LineaPedidoDB, PaletDB, ProductoDB
+from .modelos import ClienteDB, EstadoDB, InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB, RolDB, PuestoTrabajoDB, MaterialDB, DuelaDB, EntradaDB, LineaEntradaDB, PaletDB, ProductoDB
 from .modelos import PlanCamionDB, PlanFacturacionDB, PlanMaterialDB, CuadranteDB, CuadranteDetalleDB
 from .persistencia import GenericRepository, DB
-from .dominio import ConfiguracionEntradasDTO, MaestrosDTO, PlanMaterialDTO, PlanFacturacionDTO, PlanCamionDTO, CuadranteDTO, CuadranteDetalleDTO
-from .dominio import ClienteDTO, EstadoDTO, InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO, RolDTO, PuestoTrabajoDTO, MaterialDTO, DuelaDTO, PedidoDTO, LineaPedidoDTO, PaletDTO, ProductoDTO, CuadrantesDTO
+from .dominio import PlanificacionEntradasDTO, MaestrosDTO, PlanMaterialDTO, PlanFacturacionDTO, PlanCamionDTO, CuadranteDTO, CuadranteDetalleDTO
+from .dominio import ClienteDTO, EstadoDTO, InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO, RolDTO, PuestoTrabajoDTO, MaterialDTO, DuelaDTO, EntradaDTO, LineaEntradaDTO, PaletDTO, ProductoDTO, CuadrantesDTO
 
 logger = logging.getLogger("paezlobato_colector")
 
 class Colector:
 
     colector: "Colector" = None
-    configuracion_entradas: "ConfiguracionEntradasDTO" = None
+    planificacion_entradas: "PlanificacionEntradasDTO" = None
     maestros: "MaestrosDTO" = None
     cuadrantes: "CuadrantesDTO" = None
 
 
     def __init__(self):
         Colector.colector = self
-        self.configuracion_entradas = ConfiguracionEntradasDTO()
+        self.planificacion_entradas = PlanificacionEntradasDTO()
         self.maestros = MaestrosDTO()
         self.cuadrantes = CuadrantesDTO()
 
@@ -39,8 +39,8 @@ class Colector:
 
         self.repo_materiales_maestro = GenericRepository(MaterialDB)
         self.repo_duelas = GenericRepository(DuelaDB)
-        self.repo_pedidos = GenericRepository(PedidoDB)
-        self.repo_lineas_pedido = GenericRepository(LineaPedidoDB)
+        self.repo_entradas = GenericRepository(EntradaDB)
+        self.repo_lineas_entrada = GenericRepository(LineaEntradaDB)
         self.repo_palets = GenericRepository(PaletDB)
         self.repo_productos = GenericRepository(ProductoDB)
 
@@ -66,8 +66,8 @@ class Colector:
             puestos_trabajo = self.repo_puestos_trabajo.list_all(session)
             materiales = self.repo_materiales_maestro.list_all(session)
             duelas = self.repo_duelas.list_all(session)
-            pedidos = self.repo_pedidos.list_all(session)
-            lineas_pedido = self.repo_lineas_pedido.list_all(session)
+            entradas = self.repo_entradas.list_all(session)
+            lineas_entrada = self.repo_lineas_entrada.list_all(session)
             palets = self.repo_palets.list_all(session)
             productos = self.repo_productos.list_all(session)
 
@@ -81,8 +81,8 @@ class Colector:
             self.maestros.puestos_trabajo = {puesto.id: PuestoTrabajoDTO.from_db(puesto) for puesto in puestos_trabajo}
             self.maestros.materiales = {material.id: MaterialDTO.from_db(material) for material in materiales}
             self.maestros.duelas = {duela.id: DuelaDTO.from_db(duela) for duela in duelas}
-            self.maestros.pedidos = {pedido.id: PedidoDTO.from_db(pedido) for pedido in pedidos}
-            self.maestros.lineas_pedido = {linea.id: LineaPedidoDTO.from_db(linea) for linea in lineas_pedido}
+            self.maestros.entradas = {entrada.id: EntradaDTO.from_db(entrada) for entrada in entradas}
+            self.maestros.lineas_entrada = {linea.id: LineaEntradaDTO.from_db(linea) for linea in lineas_entrada}
             self.maestros.palets = {palet.id: PaletDTO.from_db(palet) for palet in palets}
             self.maestros.productos = {producto.id: ProductoDTO.from_db(producto) for producto in productos}
 
@@ -152,13 +152,13 @@ class Colector:
     #endregion
 
     #region Métodos Entradas
-    def obtener_configuracion_entradas(self, año: int, actualizar_local = True) -> ConfiguracionEntradasDTO:
+    def obtener_planificacion_entradas(self, año: int, actualizar_local = True) -> PlanificacionEntradasDTO:
         with DB.crear_sesion() as session:
             plan_camiones = self.repo_camiones.list_by_year(session, año)
             plan_facturacion = self.repo_facturacion.list_by_year(session, año)
             plan_materiales = self.repo_materiales.list_by_year(session, año)
 
-            configuracion_entradas_dto = ConfiguracionEntradasDTO(
+            planificacion_entradas_dto = PlanificacionEntradasDTO(
                 año=año,
                 plan_camiones=[PlanCamionDTO.from_db(pc) for pc in plan_camiones],
                 plan_facturacion=PlanFacturacionDTO.from_db(plan_facturacion[0]) if plan_facturacion else None,
@@ -166,11 +166,11 @@ class Colector:
             )
         
             if actualizar_local:
-                self.configuracion_entradas = configuracion_entradas_dto
+                self.planificacion_entradas = planificacion_entradas_dto
 
-            return configuracion_entradas_dto
+            return planificacion_entradas_dto
         
-    def agregar_configuracion_entradas(self, año: int) -> ConfiguracionEntradasDTO:
+    def agregar_planificacion_entradas(self, año: int) -> PlanificacionEntradasDTO:
         with DB.crear_sesion() as session:
             plan_camiones = self.repo_camiones.list_by_year(session, año)
             proveedores = self.repo_proveedores.list_all(session)
@@ -187,7 +187,7 @@ class Colector:
                 session.rollback()
                 raise
             logger.info("Entradas de proveedores agregadas correctamente.")
-            return self.obtener_configuracion_entradas(año)
+            return self.obtener_planificacion_entradas(año)
 
     def modificar_entrada(self, data):
         tabla = data.get("tabla")
@@ -326,9 +326,9 @@ class Colector:
             repo = self.repo_roles
             maestro = self.maestros.roles
             objeto = RolDTO
-        elif tabla == "configuracion_entradas":
+        elif tabla == "planificacion_entradas":
             repo = self.repo_camiones
-            maestro = self.configuracion_entradas.buscar_camion_por_id
+            maestro = self.planificacion_entradas.buscar_camion_por_id
             objeto = PlanCamionDTO
         elif tabla == "materiales":
             repo = self.repo_materiales_maestro
@@ -338,14 +338,14 @@ class Colector:
             repo = self.repo_duelas
             maestro = self.maestros.duelas
             objeto = DuelaDTO
-        elif tabla == "pedidos":
-            repo = self.repo_pedidos
-            maestro = self.maestros.pedidos
-            objeto = PedidoDTO
-        elif tabla == "lineas_pedido":
-            repo = self.repo_lineas_pedido
-            maestro = self.maestros.lineas_pedido
-            objeto = LineaPedidoDTO
+        elif tabla == "entradas":
+            repo = self.repo_entradas
+            maestro = self.maestros.entradas
+            objeto = EntradaDTO
+        elif tabla == "lineas_entrada":
+            repo = self.repo_lineas_entrada
+            maestro = self.maestros.lineas_entrada
+            objeto = LineaEntradaDTO
         elif tabla == "palets":
             repo = self.repo_palets
             maestro = self.maestros.palets
@@ -356,11 +356,11 @@ class Colector:
             objeto = ProductoDTO
         elif tabla == "plan_materiales":
             repo = self.repo_materiales
-            maestro = self.configuracion_entradas.buscar_material_por_id
+            maestro = self.planificacion_entradas.buscar_material_por_id
             objeto = PlanMaterialDTO
         elif tabla == "facturacion":
             repo = self.repo_facturacion
-            maestro = self.configuracion_entradas.buscar_facturacion_por_id
+            maestro = self.planificacion_entradas.buscar_facturacion_por_id
             objeto = PlanFacturacionDTO
         elif tabla == "cuadrantes":
             repo = self.repo_cuadrantes

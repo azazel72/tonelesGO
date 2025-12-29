@@ -9,8 +9,8 @@ from .rol_dto import RolDTO
 from .puesto_trabajo_dto import PuestoTrabajoDTO
 from .material_dto import MaterialDTO
 from .duela_dto import DuelaDTO
-from .pedido_dto import PedidoDTO
-from .linea_pedido_dto import LineaPedidoDTO
+from .entrada_dto import EntradaDTO
+from .linea_entrada_dto import LineaEntradaDTO
 from .palet_dto import PaletDTO
 from .producto_dto import ProductoDTO
 
@@ -25,8 +25,8 @@ __all__ = [
     "PuestoTrabajoDTO",
     "MaterialDTO",
     "DuelaDTO",
-    "PedidoDTO",
-    "LineaPedidoDTO",
+    "EntradaDTO",
+    "LineaEntradaDTO",
     "PaletDTO",
     "ProductoDTO",
 ]

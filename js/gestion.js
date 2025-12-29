@@ -1,6 +1,6 @@
 const DATOS = {
     maestros: {},
-    configuracion_entradas: { planificacion: {} },
+    planificacion_entradas: { planificacion: {} },
     salidas: { planificacion: {} },
 };
 
@@ -46,12 +46,12 @@ window.onload = () => {
             await openDuelasWin();
         },
 
-        async "ver-pedidos"() {
-            await openPedidosWin();
+        async "ver-entradas"() {
+            await openEntradasWin();
         },
 
-        async "ver-lineas-pedido"() {
-            await openLineasPedidoWin();
+        async "ver-lineas-entrada"() {
+            await openLineasEntradaWin();
         },
 
         async "ver-palets"() {
@@ -62,8 +62,8 @@ window.onload = () => {
             await openProductosWin();
         },
 
-        async "ver-configuracion-entradas"() {
-            await openConfiguracionEntradasWin();
+        async "ver-planificacion-entradas"() {
+            await openPlanificacionEntradasWin();
         },
         async "ver-cuadrantes"() {
             await openCuadrantesWin();
@@ -106,11 +106,11 @@ window.onload = () => {
         puestos_trabajo: openPuestosTrabajoWin,
         materiales: openMaterialesWin,
         duelas: openDuelasWin,
-        pedidos: openPedidosWin,
-        lineas_pedido: openLineasPedidoWin,
+        entradas: openEntradasWin,
+        lineas_entrada: openLineasEntradaWin,
         palets: openPaletsWin,
         productos: openProductosWin,
-        configuracion_entradas: openConfiguracionEntradasWin,
+        planificacion_entradas: openPlanificacionEntradasWin,
         cuadrantes: openCuadrantesWin,
     };
 

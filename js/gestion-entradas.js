@@ -1,7 +1,7 @@
 
-// ====== CREAR VENTANA PEDIDOS ======
-function openPedidosWin() {
-  const wb = comprobarVentanaAbierta("pedidos");
+// ====== CREAR VENTANA ENTRADAS ======
+function openEntradasWin() {
+  const wb = comprobarVentanaAbierta("entradas");
   if (wb) return wb;
 
   const proveedoresDict = Object.values(DATOS?.maestros?.proveedores ?? {}).map(
@@ -21,11 +21,11 @@ function openPedidosWin() {
   };
 
   const configuracion = {
-    KEY: "pedidos",
+    KEY: "entradas",
     winbox: {
       tipo: "generico",
       options: {
-        title: "Pedidos",
+        title: "Entradas",
         x: 60,
         y: 160,
       }
@@ -66,7 +66,7 @@ function openPedidosWin() {
           { title:"Anulado", field:"anulado", ...parametros_check },
           CeldaAcciones,
         ],
-        data: Object.values(DATOS.maestros.pedidos || {}),
+        data: Object.values(DATOS.maestros.entradas || {}),
       },
     },
   };

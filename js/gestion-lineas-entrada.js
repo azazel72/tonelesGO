@@ -1,10 +1,10 @@
 
-// ====== CREAR VENTANA LINEAS DE PEDIDO ======
-function openLineasPedidoWin() {
-  const wb = comprobarVentanaAbierta("lineas_pedido");
+// ====== CREAR VENTANA LINEAS DE ENTRADA ======
+function openLineasEntradaWin() {
+  const wb = comprobarVentanaAbierta("lineas_entrada");
   if (wb) return wb;
 
-  const pedidosDict = Object.values(DATOS?.maestros?.pedidos ?? {}).map(
+  const entradasDict = Object.values(DATOS?.maestros?.entradas ?? {}).map(
     ({ id, numero, ...resto }) => ({
       ...resto, id, numero,
       value: id,
@@ -29,11 +29,11 @@ function openLineasPedidoWin() {
   };
 
   const configuracion = {
-    KEY: "lineas_pedido",
+    KEY: "lineas_entrada",
     winbox: {
       tipo: "generico",
       options: {
-        title: "Lineas de pedido",
+        title: "Lineas de entrada",
         x: 90,
         y: 180,
       }
@@ -44,11 +44,11 @@ function openLineasPedidoWin() {
         columns: [
           { title:"ID", field:"id", width:70, hozAlign:"right"},
           {
-            title: "Pedido",
-            field: "pedido_id",
+            title: "Entrada",
+            field: "entrada_id",
             editor: "list",
             editorParams: {
-              values: pedidosDict,
+              values: entradasDict,
               clearable: true,
               autocomplete: true,
               allowEmpty: true,
@@ -57,7 +57,7 @@ function openLineasPedidoWin() {
             },
             editable: tablaEditable,
             cssClass: "filtrable",
-            formatter: cell => DATOS?.maestros?.pedidos?.[cell.getValue()]?.numero ?? cell.getValue(),
+            formatter: cell => DATOS?.maestros?.entradas?.[cell.getValue()]?.numero ?? cell.getValue(),
           },
           {
             title: "Duela",
@@ -81,7 +81,7 @@ function openLineasPedidoWin() {
           { title:"Verificado", field:"verificado", ...parametros_check },
           CeldaAcciones,
         ],
-        data: Object.values(DATOS.maestros.lineas_pedido || {}),
+        data: Object.values(DATOS.maestros.lineas_entrada || {}),
       },
     },
   };

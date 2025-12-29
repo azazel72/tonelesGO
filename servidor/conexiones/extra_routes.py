@@ -2,7 +2,7 @@
 from typing import Dict, List
 from fastapi import APIRouter
 from servidor.colector import Colector
-from servidor.dominio.logica.configuracion_entradas_dto import ConfiguracionEntradasDTO
+from servidor.dominio.logica.planificacion_entradas_dto import PlanificacionEntradasDTO
 from servidor.dominio.logica.maestros_dto import MaestrosDTO
 from servidor.dominio.maestros.cliente_dto import ClienteDTO
 
@@ -17,9 +17,9 @@ class ExtraRoutes:
             colector = Colector.colector
             return colector.maestros
 
-        @router.get("/configuracion-entradas", response_model=str)
-        async def get_configuracion_entradas():
-            return str(Colector.colector.configuracion_entradas)
+        @router.get("/planificacion-entradas", response_model=str)
+        async def get_planificacion_entradas():
+            return str(Colector.colector.planificacion_entradas)
 
 
         return router

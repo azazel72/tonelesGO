@@ -1,21 +1,21 @@
 
 from pydantic import BaseModel
-from servidor.modelos import LineaPedidoDB
+from servidor.modelos import LineaEntradaDB
 
 
-class LineaPedidoDTO(BaseModel):
+class LineaEntradaDTO(BaseModel):
     id: int | None
-    pedido_id: int
+    entrada_id: int
     duela_id: int
     bultos: int = 0
     kilos: float = 0
     bultos_entregados: int = 0
     verificado: bool = False
 
-    def from_db(linea_db: LineaPedidoDB) -> "LineaPedidoDTO":
-        return LineaPedidoDTO(
+    def from_db(linea_db: LineaEntradaDB) -> "LineaEntradaDTO":
+        return LineaEntradaDTO(
             id=linea_db.id,
-            pedido_id=linea_db.pedido_id,
+            entrada_id=linea_db.entrada_id,
             duela_id=linea_db.duela_id,
             bultos=linea_db.bultos,
             kilos=linea_db.kilos,
@@ -23,10 +23,10 @@ class LineaPedidoDTO(BaseModel):
             verificado=linea_db.verificado,
         )
 
-    def to_db(self) -> LineaPedidoDB:
-        return LineaPedidoDB(
+    def to_db(self) -> LineaEntradaDB:
+        return LineaEntradaDB(
             id=self.id,
-            pedido_id=self.pedido_id,
+            entrada_id=self.entrada_id,
             duela_id=self.duela_id,
             bultos=self.bultos,
             kilos=self.kilos,
