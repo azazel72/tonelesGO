@@ -7,7 +7,7 @@ from servidor.herramientas.utilidades import obtener_anterior_dia_semana
 from .modelos import ClienteDB, EstadoDB, InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB, RolDB, PuestoTrabajoDB, MaterialDB, DuelaDB, PedidoDB, LineaPedidoDB, PaletDB, ProductoDB
 from .modelos import PlanCamionDB, PlanFacturacionDB, PlanMaterialDB, CuadranteDB, CuadranteDetalleDB
 from .persistencia import GenericRepository, DB
-from .dominio import EntradasDTO, MaestrosDTO, PlanMaterialDTO, PlanFacturacionDTO, PlanCamionDTO, CuadranteDTO, CuadranteDetalleDTO
+from .dominio import ConfiguracionEntradasDTO, MaestrosDTO, PlanMaterialDTO, PlanFacturacionDTO, PlanCamionDTO, CuadranteDTO, CuadranteDetalleDTO
 from .dominio import ClienteDTO, EstadoDTO, InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO, RolDTO, PuestoTrabajoDTO, MaterialDTO, DuelaDTO, PedidoDTO, LineaPedidoDTO, PaletDTO, ProductoDTO, CuadrantesDTO
 
 logger = logging.getLogger("paezlobato_colector")
@@ -15,14 +15,14 @@ logger = logging.getLogger("paezlobato_colector")
 class Colector:
 
     colector: "Colector" = None
-    entradas: "EntradasDTO" = None
+    configuracion_entradas: "ConfiguracionEntradasDTO" = None
     maestros: "MaestrosDTO" = None
     cuadrantes: "CuadrantesDTO" = None
 
 
     def __init__(self):
         Colector.colector = self
-        self.entradas = EntradasDTO()
+        self.configuracion_entradas = ConfiguracionEntradasDTO()
         self.maestros = MaestrosDTO()
         self.cuadrantes = CuadrantesDTO()
 
@@ -152,13 +152,13 @@ class Colector:
     #endregion
 
     #region Métodos Entradas
-    def obtener_entradas(self, año: int, actualizar_local = True) -> EntradasDTO:
+    def obtener_configuracion_entradas(self, año: int, actualizar_local = True) -> ConfiguracionEntradasDTO:
         with DB.crear_sesion() as session:
             plan_camiones = self.repo_camiones.list_by_year(session, año)
             plan_facturacion = self.repo_facturacion.list_by_year(session, año)
             plan_materiales = self.repo_materiales.list_by_year(session, año)
 
-            entradas_dto = EntradasDTO(
+            configuracion_entradas_dto = ConfiguracionEntradasDTO(
                 año=año,
                 plan_camiones=[PlanCamionDTO.from_db(pc) for pc in plan_camiones],
                 plan_facturacion=PlanFacturacionDTO.from_db(plan_facturacion[0]) if plan_facturacion else None,
@@ -166,11 +166,11 @@ class Colector:
             )
         
             if actualizar_local:
-                self.entradas = entradas_dto
+                self.configuracion_entradas = configuracion_entradas_dto
 
-            return entradas_dto
+            return configuracion_entradas_dto
         
-    def agregar_entradas_proveedores(self, año: int) -> EntradasDTO:
+    def agregar_configuracion_entradas(self, año: int) -> ConfiguracionEntradasDTO:
         with DB.crear_sesion() as session:
             plan_camiones = self.repo_camiones.list_by_year(session, año)
             proveedores = self.repo_proveedores.list_all(session)
@@ -187,7 +187,7 @@ class Colector:
                 session.rollback()
                 raise
             logger.info("Entradas de proveedores agregadas correctamente.")
-            return self.obtener_entradas(año)
+            return self.obtener_configuracion_entradas(año)
 
     def modificar_entrada(self, data):
         tabla = data.get("tabla")
@@ -326,9 +326,9 @@ class Colector:
             repo = self.repo_roles
             maestro = self.maestros.roles
             objeto = RolDTO
-        elif tabla == "entradas":
+        elif tabla == "configuracion_entradas":
             repo = self.repo_camiones
-            maestro = self.entradas.buscar_camion_por_id
+            maestro = self.configuracion_entradas.buscar_camion_por_id
             objeto = PlanCamionDTO
         elif tabla == "materiales":
             repo = self.repo_materiales_maestro
@@ -356,11 +356,11 @@ class Colector:
             objeto = ProductoDTO
         elif tabla == "plan_materiales":
             repo = self.repo_materiales
-            maestro = self.entradas.buscar_material_por_id
+            maestro = self.configuracion_entradas.buscar_material_por_id
             objeto = PlanMaterialDTO
         elif tabla == "facturacion":
             repo = self.repo_facturacion
-            maestro = self.entradas.buscar_facturacion_por_id
+            maestro = self.configuracion_entradas.buscar_facturacion_por_id
             objeto = PlanFacturacionDTO
         elif tabla == "cuadrantes":
             repo = self.repo_cuadrantes

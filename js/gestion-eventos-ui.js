@@ -32,11 +32,11 @@ async function getCellClick(e, cell) {
         row.delete();
       }
       break;
-    case "entradas":
+    case "configuracion_entradas":
       {
         const id_evento = row.getData().id;
-        console.log("Abrir gestión de entradas para evento ID", id_evento);
-        //abrir_gestion_entradas(id_evento);
+        console.log("Abrir gestión de configuracion de entradas para evento ID", id_evento);
+        //abrir_gestion_configuracion_entradas(id_evento);
       }
       break;
   }
@@ -51,7 +51,16 @@ async function eventoClickCabecera(e, tabla, cabecera) {
   setTimeout(() => btn.classList.remove("disabled", "pe-none"), 500);
   switch (btn.id) {
     case "u-reload":
-      tabla.redraw(true); 
+      {
+        const key = tabla.KEY;
+        const par = windowsRegistry.get(key);
+        if (par?.wb) {
+          par.wb.hide();
+          windowsRegistry.delete(key);
+        }
+        window.__reloadKey = key;
+        send("maestros", {});
+      }
       break;
     case "u-add":
       if (tabla.element.querySelector('.nuevo-registro')) {
@@ -88,9 +97,22 @@ async function eventoClickCabecera(e, tabla, cabecera) {
                 });
                 break;
               default:
-                col.updateDefinition({
-                  headerFilter: "input", //col.getDefinition()?.editor ?? "input",        // o "select" según columna or list
-                });
+                {
+                  const def = col.getDefinition();
+                  if (def?.editor === "list") {
+                    col.updateDefinition({
+                      headerFilter: "list",
+                      headerFilterParams: {
+                        values: def?.editorParams?.values ?? {},
+                        clearable: true,
+                      },
+                    });
+                  } else {
+                    col.updateDefinition({
+                      headerFilter: "input",
+                    });
+                  }
+                }
             }
           } else {
             col.setHeaderFilterValue("");

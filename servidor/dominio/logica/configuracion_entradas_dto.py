@@ -5,7 +5,7 @@ from servidor.dominio.logica.plan_camion_dto import PlanCamionDTO
 from servidor.dominio.logica.plan_facturacion_dto import PlanFacturacionDTO
 from servidor.dominio.logica.plan_material_dto import PlanMaterialDTO
 
-class EntradasDTO(BaseModel):
+class ConfiguracionEntradasDTO(BaseModel):
     año: Optional[int] = 0
     plan_camiones: Optional[List[PlanCamionDTO]] = None
     plan_facturacion: Optional[PlanFacturacionDTO] = None

@@ -1,6 +1,6 @@
 const DATOS = {
     maestros: {},
-    entradas: { planificacion: {} },
+    configuracion_entradas: { planificacion: {} },
     salidas: { planificacion: {} },
 };
 
@@ -62,8 +62,8 @@ window.onload = () => {
             await openProductosWin();
         },
 
-        async "ver-entradas"() {
-            await openEntradasWin();
+        async "ver-configuracion-entradas"() {
+            await openConfiguracionEntradasWin();
         },
         async "ver-cuadrantes"() {
             await openCuadrantesWin();
@@ -92,6 +92,26 @@ window.onload = () => {
             const value = el.dataset.filterValue;
             console.log(field, op, value);
         },
+    };
+
+    // Mantener actualizado cuando se agreguen nuevas ventanas/maestros.
+    window.WINDOW_OPENERS = {
+        usuarios: openUsuariosWin,
+        roles: openRolesWin,
+        proveedores: openProveedoresWin,
+        clientes: openClientesWin,
+        instalaciones: openInstalacionesWin,
+        ubicaciones: openUbicacionesWin,
+        estados: openEstadosWin,
+        puestos_trabajo: openPuestosTrabajoWin,
+        materiales: openMaterialesWin,
+        duelas: openDuelasWin,
+        pedidos: openPedidosWin,
+        lineas_pedido: openLineasPedidoWin,
+        palets: openPaletsWin,
+        productos: openProductosWin,
+        configuracion_entradas: openConfiguracionEntradasWin,
+        cuadrantes: openCuadrantesWin,
     };
 
     // Delegación de eventos (un solo listener para toda la página)
@@ -127,6 +147,11 @@ function respuesta_maestros(response) {
     if (response.data) {
         DATOS.maestros = response.data;
         console.log("Maestros recibidos:", DATOS.maestros);
+        if (window.__reloadKey) {
+            const key = window.__reloadKey;
+            window.__reloadKey = null;
+            window.WINDOW_OPENERS?.[key]?.();
+        }
     } else {
         alert("Error al recibir maestros: " + response.error);
     }

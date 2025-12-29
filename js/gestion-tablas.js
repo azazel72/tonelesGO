@@ -163,9 +163,9 @@ function crearBotonesGenericos(tipo) {
       return crearElemento("div", {
         class: "ms-auto d-flex gap-2"
       });
-    case "u-cargar-entradas":
+    case "u-cargar-configuracion-entradas":
       return crearElemento("button", {
-        id: "u-cargar-entradas",
+        id: "u-cargar-configuracion-entradas",
         class: "btn btn-sm btn-outline-secondary",
         content: "Consultar"
       });
@@ -175,9 +175,9 @@ function crearBotonesGenericos(tipo) {
         class: "btn btn-sm btn-outline-success",
         content: "Actualizar proveedores"
       });
-    case "u-cargar-entradas-input":
+    case "u-cargar-configuracion-entradas-input":
       return crearElemento("input", {
-        id: "u-cargar-entradas-input",
+        id: "u-cargar-configuracion-entradas-input",
         class: "form-control-sm",
         type: "number",
         min: 1970,
@@ -229,6 +229,7 @@ function cerrarVentanasMaestros() {
     "proveedores",
     "clientes",
     "instalaciones",
+    "puestos_trabajo",
     "ubicaciones",
     "estados",
     "materiales",
@@ -237,7 +238,7 @@ function cerrarVentanasMaestros() {
     "lineas_pedido",
     "palets",
     "productos",
-    "entradas",
+    "configuracion_entradas",
     "salidas",
   ];
   for (const clave of clavesMaestros) {
@@ -262,13 +263,13 @@ function crearCabeceraVentana(configuracion) {
       cabecera.appendChild(botonAdd);
       cabecera.appendChild(contenedorDerecha);
       break;
-    case "entradas":
-      const botonCargarEntradas = crearBotonesGenericos("u-cargar-entradas");
-      const inputAñoEntradas    = crearBotonesGenericos("u-cargar-entradas-input");
+    case "configuracion_entradas":
+      const botonCargarConfiguracionEntradas = crearBotonesGenericos("u-cargar-configuracion-entradas");
+      const inputAñoEntradas    = crearBotonesGenericos("u-cargar-configuracion-entradas-input");
       const botonAgregarProveedoresEntradas = crearBotonesGenericos("u-add-providers");
       const contenedorDerechaEntradas = crearBotonesGenericos("contenedor-botones-derecha");
       contenedorDerechaEntradas.appendChild(botonAgregarProveedoresEntradas);
-      cabecera.appendChild(botonCargarEntradas);
+      cabecera.appendChild(botonCargarConfiguracionEntradas);
       cabecera.appendChild(inputAñoEntradas);
       cabecera.appendChild(contenedorDerechaEntradas);
       break;

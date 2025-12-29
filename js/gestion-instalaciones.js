@@ -28,8 +28,11 @@ function openInstalacionesWin() {
               clearable: true,
               autocomplete: true,
               allowEmpty: true,
+              listOnEmpty: true,
+              freetext: false,
             },
             editable: tablaEditable,
+            cssClass: "filtrable",
             formatter: cell => cell.getValue() == "M" ? "Maderas" : cell.getValue() == "B" ? "Botas" : cell.getValue(),
           },
 
