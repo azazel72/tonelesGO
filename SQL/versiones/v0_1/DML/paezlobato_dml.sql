@@ -17,6 +17,8 @@ SET time_zone = "+00:00";
 /*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
 /*!40101 SET NAMES utf8mb4 */;
 
+SET FOREIGN_KEY_CHECKS = 0;
+
 --
 -- Base de datos: `paezlobato`
 --
@@ -59,6 +61,100 @@ INSERT INTO `cuadrantes` (`id`, `fecha_inicio`, `fecha_fin`, `titulo`, `observac
 (6, '2025-12-18', '2025-12-24', '', '', '2025-12-07 23:55:16', NULL, NULL, NULL, 0, NULL, NULL),
 (7, '2025-12-25', '2025-12-31', '', '', '2025-12-08 01:13:51', NULL, NULL, NULL, 0, NULL, NULL),
 (8, '2026-02-19', '2026-02-25', '', '', '2025-12-10 04:29:17', NULL, NULL, NULL, 0, NULL, NULL);
+
+INSERT INTO `proveedores` (`id`, `nombre`) VALUES
+(6, 'ASERRADERO DEL MOLINO'),
+(7, 'MADERAS SABUGO'),
+(8, 'MADERAS SABUGO CASTAÑO'),
+(1, 'MADERBAR'),
+(2, 'MADERBAR CASTAÑO'),
+(5, 'MAITZER AMERICANA'),
+(3, 'MAITZER ESLOVAQUIA'),
+(4, 'MAITZER RUMANIA'),
+(10, 'QUERCUS IMPORT BULGARIA'),
+(9, 'QUERCUS PIRENAICA'),
+(11, 'SINDO');
+
+--
+-- Volcado de datos para la tabla `roles`
+--
+
+INSERT INTO `roles` (`id`, `nombre`, `planificacion`, `recepcion`, `ubicacion`, `fabricacion`, `expedicion`, `trazabilidad`, `administrador`) VALUES
+(1, 'admin', 1, 1, 1, 1, 1, 1, 1),
+(2, 'gestor', 1, 1, 1, 1, 1, 1, 0),
+(3, 'operario', 0, 1, 1, 1, 1, 0, 0);
+
+--
+-- Volcado de datos para la tabla `puestos_trabajo`
+-- (mover antes de cuadrante_detalles para satisfacer FK)
+--
+
+INSERT INTO `puestos_trabajo` (`id`, `nombre`, `es_maquinaria`, `activo`, `created_at`, `created_by`, `updated_at`, `updated_by`, `deleted`, `deleted_at`, `deleted_by`) VALUES
+(1, 'LABRAR', 0, 1, '2025-11-23 16:56:45', NULL, NULL, NULL, 0, NULL, NULL),
+(2, 'COR. FLEJE', 0, 1, '2025-11-23 16:56:45', NULL, '2025-11-23 19:09:48', NULL, 0, NULL, NULL),
+(3, 'JUNTAR', 0, 1, '2025-11-23 16:56:45', NULL, NULL, NULL, 0, NULL, NULL),
+(4, 'LEVANTAR', 0, 1, '2025-11-23 16:56:45', NULL, NULL, NULL, 0, NULL, NULL),
+(5, 'BATIDERO MAÑANA', 1, 1, '2025-11-23 16:56:45', NULL, NULL, NULL, 0, NULL, NULL),
+(6, 'BATIDERO TARDE', 1, 1, '2025-11-23 16:56:45', NULL, NULL, NULL, 0, NULL, NULL),
+(7, 'HERRAR', 0, 1, '2025-11-23 16:56:45', NULL, NULL, NULL, 0, NULL, NULL),
+(8, 'ARRUÑAR', 0, 1, '2025-11-23 16:56:45', NULL, NULL, NULL, 0, NULL, NULL),
+(9, 'COR. FONDO', 1, 1, '2025-11-23 16:56:45', NULL, NULL, NULL, 0, NULL, NULL),
+(10, 'JUNTAR PZS.', 0, 1, '2025-11-23 16:56:45', NULL, NULL, NULL, 0, NULL, NULL),
+(11, 'ARRUMAR', 0, 1, '2025-11-23 16:56:45', NULL, NULL, NULL, 0, NULL, NULL),
+(12, 'ENGABILLAR', 0, 1, '2025-11-23 16:56:45', NULL, NULL, NULL, 0, NULL, NULL),
+(13, 'PULIMENTAR', 1, 1, '2025-11-23 16:56:45', NULL, NULL, NULL, 0, NULL, NULL),
+(14, 'BANDEAR', 0, 1, '2025-11-23 16:56:45', NULL, NULL, NULL, 0, NULL, NULL),
+(15, 'LIQUIDO', 0, 1, '2025-11-23 16:56:45', NULL, NULL, NULL, 0, NULL, NULL),
+(16, 'LÁSER', 1, 1, '2025-11-23 16:56:45', NULL, NULL, NULL, 0, NULL, NULL),
+(17, 'FONDAR', 0, 1, '2025-11-23 16:56:45', NULL, NULL, NULL, 0, NULL, NULL),
+(18, 'COMODIN', 0, 1, '2025-11-23 16:56:45', NULL, NULL, NULL, 0, NULL, NULL),
+(19, 'TALLER VIEJO', 0, 1, '2025-11-23 16:56:45', NULL, NULL, NULL, 0, NULL, NULL);
+
+--
+-- Volcado de datos para la tabla `usuarios`
+-- (mover antes de cuadrante_detalles para satisfacer FK)
+--
+
+INSERT INTO `usuarios` (`id`, `alias`, `nombre`, `clave`, `empleado`, `rol_id`, `created_at`, `updated_at`, `deleted_at`, `is_deleted`, `created_by`, `updated_by`, `deleted_by`) VALUES
+(1, 'admin', 'Admin', '$2y$10$lyhm35pbQHiZEDpSHlwCQOkBUy8RQwv/2Mn7KSQodnU7cSMJ6QxMS', 0, 1, '2025-10-25 13:43:49', '2025-11-23 17:05:32', '2025-10-25 23:36:52', 0, 'system', 'system', NULL),
+(2, 'rafa', 'Rafael', '$2b$10$nVJMSjwq0c8lKcIqj15LG.K0o7D3Cu/Ttc3JCiCocXIfcXr1koW2W', 0, 2, '2025-10-25 13:43:49', '2025-11-23 17:05:35', NULL, 0, 'system', 'system', NULL),
+(3, 'pepe', 'Pepe Sanchez', '$2b$12$e5Hd/HX6dIUk9GqUdWGB0eb3.8YCE2hBjInKdFYWVzv412aoJmE52', 0, 3, '2025-10-25 13:43:49', '2025-11-23 17:05:38', NULL, 0, 'system', 'system', NULL),
+(42, 'pedrito', 'PEDRITO', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
+(43, 'calvente', 'CALVENTE', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
+(44, 'j.carlos', 'J.CARLOS', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
+(45, 'perez', 'PEREZ', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
+(46, 'jose luis', 'JOSE LUIS', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
+(47, 'giraldo', 'GIRALDO', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
+(48, 'adrian', 'ADRIAN', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
+(49, 'manuel', 'MANUEL', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
+(50, 'jony', 'JONY', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
+(51, 'jesus', 'JESUS', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
+(52, 'rujano', 'RUJANO', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
+(53, 'clavijo', 'CLAVIJO', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
+(54, 'lauren', 'LAUREN', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
+(55, 'fran', 'FRAN', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
+(56, 'parra', 'PARRA', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
+(57, 'juan jose', 'JUAN JOSE', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
+(58, 'martin', 'MARTIN', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
+(59, 'melero', 'MELERO', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
+(60, 'nono', 'NONO', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
+(61, 'jose fco', 'JOSE FCO', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
+(62, 'muñoz', 'MUÑOZ', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
+(63, 'corral', 'CORRAL', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
+(64, 'diaz', 'DIAZ', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
+(65, 'j.alberto', 'J.ALBERTO', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
+(66, 'torres', 'TORRES', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
+(67, 'angel', 'ANGEL', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
+(68, 'luis', 'LUIS', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
+(69, 'mancilla', 'MANCILLA', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
+(70, 'juanito', 'JUANITO', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
+(71, 'j.antonio', 'J.ANTONIO', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
+(72, 'adri', 'ADRI', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
+(73, 'paco', 'PACO', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
+(74, 'miguelon', 'MIGUELON', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
+(75, 'julio', 'JULIO', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
+(76, 'jose', 'JOSE', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
+(77, 'jose mari', 'JOSE MARI', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL);
 
 --
 -- Volcado de datos para la tabla `cuadrante_detalles`
@@ -172,52 +268,7 @@ INSERT INTO `plan_material` (`id`, `año`, `tipo_material`, `total_pactados`, `t
 -- Volcado de datos para la tabla `proveedores`
 --
 
-INSERT INTO `proveedores` (`id`, `nombre`) VALUES
-(6, 'ASERRADERO DEL MOLINO'),
-(7, 'MADERAS SABUGO'),
-(8, 'MADERAS SABUGO CASTAÑO'),
-(1, 'MADERBAR'),
-(2, 'MADERBAR CASTAÑO'),
-(5, 'MAITZER AMERICANA'),
-(3, 'MAITZER ESLOVAQUIA'),
-(4, 'MAITZER RUMANIA'),
-(10, 'QUERCUS IMPORT BULGARIA'),
-(9, 'QUERCUS PIRENAICA'),
-(11, 'SINDO');
 
---
--- Volcado de datos para la tabla `puestos_trabajo`
---
-
-INSERT INTO `puestos_trabajo` (`id`, `nombre`, `es_maquinaria`, `activo`, `created_at`, `created_by`, `updated_at`, `updated_by`, `deleted`, `deleted_at`, `deleted_by`) VALUES
-(1, 'LABRAR', 0, 1, '2025-11-23 16:56:45', NULL, NULL, NULL, 0, NULL, NULL),
-(2, 'COR. FLEJE', 0, 1, '2025-11-23 16:56:45', NULL, '2025-11-23 19:09:48', NULL, 0, NULL, NULL),
-(3, 'JUNTAR', 0, 1, '2025-11-23 16:56:45', NULL, NULL, NULL, 0, NULL, NULL),
-(4, 'LEVANTAR', 0, 1, '2025-11-23 16:56:45', NULL, NULL, NULL, 0, NULL, NULL),
-(5, 'BATIDERO MAÑANA', 1, 1, '2025-11-23 16:56:45', NULL, NULL, NULL, 0, NULL, NULL),
-(6, 'BATIDERO TARDE', 1, 1, '2025-11-23 16:56:45', NULL, NULL, NULL, 0, NULL, NULL),
-(7, 'HERRAR', 0, 1, '2025-11-23 16:56:45', NULL, NULL, NULL, 0, NULL, NULL),
-(8, 'ARRUÑAR', 0, 1, '2025-11-23 16:56:45', NULL, NULL, NULL, 0, NULL, NULL),
-(9, 'COR. FONDO', 1, 1, '2025-11-23 16:56:45', NULL, NULL, NULL, 0, NULL, NULL),
-(10, 'JUNTAR PZS.', 0, 1, '2025-11-23 16:56:45', NULL, NULL, NULL, 0, NULL, NULL),
-(11, 'ARRUMAR', 0, 1, '2025-11-23 16:56:45', NULL, NULL, NULL, 0, NULL, NULL),
-(12, 'ENGABILLAR', 0, 1, '2025-11-23 16:56:45', NULL, NULL, NULL, 0, NULL, NULL),
-(13, 'PULIMENTAR', 1, 1, '2025-11-23 16:56:45', NULL, NULL, NULL, 0, NULL, NULL),
-(14, 'BANDEAR', 0, 1, '2025-11-23 16:56:45', NULL, NULL, NULL, 0, NULL, NULL),
-(15, 'LIQUIDO', 0, 1, '2025-11-23 16:56:45', NULL, NULL, NULL, 0, NULL, NULL),
-(16, 'LÁSER', 1, 1, '2025-11-23 16:56:45', NULL, NULL, NULL, 0, NULL, NULL),
-(17, 'FONDAR', 0, 1, '2025-11-23 16:56:45', NULL, NULL, NULL, 0, NULL, NULL),
-(18, 'COMODIN', 0, 1, '2025-11-23 16:56:45', NULL, NULL, NULL, 0, NULL, NULL),
-(19, 'TALLER VIEJO', 0, 1, '2025-11-23 16:56:45', NULL, NULL, NULL, 0, NULL, NULL);
-
---
--- Volcado de datos para la tabla `roles`
---
-
-INSERT INTO `roles` (`id`, `nombre`, `planificacion`, `recepcion`, `ubicacion`, `fabricacion`, `expedicion`, `trazabilidad`, `administrador`) VALUES
-(1, 'admin', 1, 1, 1, 1, 1, 1, 1),
-(2, 'gestor', 1, 1, 1, 1, 1, 1, 0),
-(3, 'operario', 0, 1, 1, 1, 1, 0, 0);
 
 --
 -- Volcado de datos para la tabla `ubicaciones`
@@ -226,47 +277,4 @@ INSERT INTO `roles` (`id`, `nombre`, `planificacion`, `recepcion`, `ubicacion`, 
 INSERT INTO `ubicaciones` (`id`, `descripcion`, `instalacion_id`, `orden`) VALUES
 (1, 'A11', 3, 10);
 
---
--- Volcado de datos para la tabla `usuarios`
---
-
-INSERT INTO `usuarios` (`id`, `alias`, `nombre`, `clave`, `empleado`, `rol_id`, `created_at`, `updated_at`, `deleted_at`, `is_deleted`, `created_by`, `updated_by`, `deleted_by`) VALUES
-(1, 'admin', 'Admin', '$2y$10$lyhm35pbQHiZEDpSHlwCQOkBUy8RQwv/2Mn7KSQodnU7cSMJ6QxMS', 0, 1, '2025-10-25 13:43:49', '2025-11-23 17:05:32', '2025-10-25 23:36:52', 0, 'system', 'system', NULL),
-(2, 'rafa', 'Rafael', '$2b$10$nVJMSjwq0c8lKcIqj15LG.K0o7D3Cu/Ttc3JCiCocXIfcXr1koW2W', 0, 2, '2025-10-25 13:43:49', '2025-11-23 17:05:35', NULL, 0, 'system', 'system', NULL),
-(3, 'pepe', 'Pepe Sanchez', '$2b$12$e5Hd/HX6dIUk9GqUdWGB0eb3.8YCE2hBjInKdFYWVzv412aoJmE52', 0, 3, '2025-10-25 13:43:49', '2025-11-23 17:05:38', NULL, 0, 'system', 'system', NULL),
-(42, 'pedrito', 'PEDRITO', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
-(43, 'calvente', 'CALVENTE', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
-(44, 'j.carlos', 'J.CARLOS', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
-(45, 'perez', 'PEREZ', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
-(46, 'jose luis', 'JOSE LUIS', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
-(47, 'giraldo', 'GIRALDO', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
-(48, 'adrian', 'ADRIAN', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
-(49, 'manuel', 'MANUEL', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
-(50, 'jony', 'JONY', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
-(51, 'jesus', 'JESUS', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
-(52, 'rujano', 'RUJANO', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
-(53, 'clavijo', 'CLAVIJO', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
-(54, 'lauren', 'LAUREN', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
-(55, 'fran', 'FRAN', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
-(56, 'parra', 'PARRA', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
-(57, 'juan jose', 'JUAN JOSE', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
-(58, 'martin', 'MARTIN', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
-(59, 'melero', 'MELERO', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
-(60, 'nono', 'NONO', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
-(61, 'jose fco', 'JOSE FCO', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
-(62, 'muñoz', 'MUÑOZ', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
-(63, 'corral', 'CORRAL', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
-(64, 'diaz', 'DIAZ', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
-(65, 'j.alberto', 'J.ALBERTO', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
-(66, 'torres', 'TORRES', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
-(67, 'angel', 'ANGEL', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
-(68, 'luis', 'LUIS', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
-(69, 'mancilla', 'MANCILLA', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
-(70, 'juanito', 'JUANITO', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
-(71, 'j.antonio', 'J.ANTONIO', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
-(72, 'adri', 'ADRI', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
-(73, 'paco', 'PACO', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
-(74, 'miguelon', 'MIGUELON', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
-(75, 'julio', 'JULIO', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
-(76, 'jose', 'JOSE', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL),
-(77, 'jose mari', 'JOSE MARI', '', 1, NULL, '2025-11-23 16:31:44', '2025-11-23 17:05:23', NULL, 0, 'system', 'system', NULL);
+SET FOREIGN_KEY_CHECKS = 1;

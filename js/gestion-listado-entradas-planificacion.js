@@ -79,46 +79,6 @@ function openListadoEntradasPlanificacionWin(contexto = {}) {
   leftHeader.appendChild(botonFiltroEntradas);
   leftHeader.appendChild(botonEditarEntradas);
 
-  const tabs = crearElemento("div", { class: "listado-entradas-planificacion-tabs" });
-  const tabLineas = crearElemento("button", {
-    class: "listado-entradas-planificacion-tab is-active",
-    content: "Lineas",
-  });
-  const tabArchivos = crearElemento("button", {
-    class: "listado-entradas-planificacion-tab",
-    content: "Archivos",
-  });
-  tabs.appendChild(tabLineas);
-  tabs.appendChild(tabArchivos);
-  right.appendChild(tabs);
-
-  const panelLineas = crearElemento("div", { class: "listado-entradas-planificacion-panel is-active" });
-  const panelArchivos = crearElemento("div", { class: "listado-entradas-planificacion-panel" });
-  right.appendChild(panelLineas);
-  right.appendChild(panelArchivos);
-
-  const lineasHeader = crearElemento("div", { class: "listado-entradas-planificacion-header listado-entradas-planificacion-header-right" });
-  const botonNuevaLinea = crearElemento("button", {
-    class: "btn btn-sm btn-outline-success",
-    content: "<i class=\"bi bi-plus-lg me-1\"></i> Nueva linea"
-  });
-  const botonFiltroLineas = crearElemento("button", {
-    class: "btn btn-sm btn-outline-secondary",
-    content: "<i class=\"bi bi-funnel\"></i> Filtros",
-    "data-bs-toggle": "button",
-    "aria-pressed": "false",
-  });
-  const botonEditarLineas = crearElemento("button", {
-    class: "btn btn-sm btn-outline-info",
-    content: "<i class=\"bi bi-lock\"></i><i class=\"bi bi-unlock\"></i> Editar",
-    "data-bs-toggle": "button",
-    "aria-pressed": "false",
-  });
-  lineasHeader.appendChild(botonNuevaLinea);
-  lineasHeader.appendChild(botonFiltroLineas);
-  lineasHeader.appendChild(botonEditarLineas);
-  panelLineas.appendChild(lineasHeader);
-
   const archivosHeader = crearElemento("div", { class: "listado-entradas-planificacion-header listado-entradas-planificacion-header-right" });
   const selectArchivos = crearElemento("select", {
     id: "u-archivos-planificacion-selector",
@@ -141,12 +101,38 @@ function openListadoEntradasPlanificacionWin(contexto = {}) {
   archivosHeader.appendChild(botonSubir);
   archivosHeader.appendChild(botonVer);
   archivosHeader.appendChild(botonEliminarArchivo);
-  panelArchivos.appendChild(archivosHeader);
+  right.appendChild(archivosHeader);
+
+  const archivosSelectRow = crearElemento("div", { class: "listado-entradas-planificacion-select-row" });
+  archivosSelectRow.appendChild(selectArchivos);
+  right.appendChild(archivosSelectRow);
+
+  const lineasHeader = crearElemento("div", { class: "listado-entradas-planificacion-header listado-entradas-planificacion-header-right" });
+  const botonNuevaLinea = crearElemento("button", {
+    class: "btn btn-sm btn-outline-success",
+    content: "<i class=\"bi bi-plus-lg me-1\"></i> Nueva linea"
+  });
+  const botonFiltroLineas = crearElemento("button", {
+    class: "btn btn-sm btn-outline-secondary",
+    content: "<i class=\"bi bi-funnel\"></i> Filtros",
+    "data-bs-toggle": "button",
+    "aria-pressed": "false",
+  });
+  const botonEditarLineas = crearElemento("button", {
+    class: "btn btn-sm btn-outline-info",
+    content: "<i class=\"bi bi-lock\"></i><i class=\"bi bi-unlock\"></i> Editar",
+    "data-bs-toggle": "button",
+    "aria-pressed": "false",
+  });
+  lineasHeader.appendChild(botonNuevaLinea);
+  lineasHeader.appendChild(botonFiltroLineas);
+  lineasHeader.appendChild(botonEditarLineas);
+  right.appendChild(lineasHeader);
 
   const leftTable = crearElemento("div", { class: "listado-entradas-planificacion-table" });
   const rightTable = crearElemento("div", { class: "listado-entradas-planificacion-table" });
   left.appendChild(leftTable);
-  panelLineas.appendChild(rightTable);
+  right.appendChild(rightTable);
 
   const win = crearWinBox("listado_entradas_planificacion", contenedor, {
     title: "Listado de entradas",
@@ -587,17 +573,6 @@ function openListadoEntradasPlanificacionWin(contexto = {}) {
       alert("Error al eliminar archivo: " + err.message);
     }
   });
-
-  function activarPanel(panel) {
-    const isLineas = panel === "lineas";
-    tabLineas.classList.toggle("is-active", isLineas);
-    tabArchivos.classList.toggle("is-active", !isLineas);
-    panelLineas.classList.toggle("is-active", isLineas);
-    panelArchivos.classList.toggle("is-active", !isLineas);
-  }
-
-  tabLineas.addEventListener("click", () => activarPanel("lineas"));
-  tabArchivos.addEventListener("click", () => activarPanel("archivos"));
 
   filtrarEntradas();
 
