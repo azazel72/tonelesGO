@@ -13,3 +13,4 @@ class ArchivoSubidoDB(SQLModel, table=True):
     extension: str
     entidad: str
     entidad_id: int
+    is_deleted: bool = False

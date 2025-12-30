@@ -57,7 +57,6 @@ function mostrar_planificacion_entradas(response) {
 
   if (response.data && windowsRegistry.has("planificacion_entradas")) {
     const { wb, table } = windowsRegistry.get("planificacion_entradas");
-    console.log(table);
     const tablaPlanificacionEntradas = table[0];
     const tablaMateriales = table[1];
     tablaPlanificacionEntradas.setData(DATOS.planificacion_entradas.planificacion);

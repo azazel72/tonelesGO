@@ -1,15 +1,10 @@
-/logs
-/logs/*
+# Logs
 **/logs/
 *.log
-./logs
-./logs/*
 
+# Archivos (carpeta concreta)
 archivos/
-archivos/*
 
-**/__pycache__/
-**/*.pyc
-**/*.pyo
-.pyc
+# Python
 __pycache__/
+*.py[cod]

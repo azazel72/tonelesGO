@@ -34,9 +34,13 @@ async function getCellClick(e, cell) {
       break;
     case "planificacion_entradas":
       {
-        const id_evento = row.getData().id;
-        console.log("Abrir gestión de planificacion de entradas para evento ID", id_evento);
-        //abrir_gestion_planificacion_entradas(id_evento);
+        const data = row.getData();
+        console.log("Abrir gestion de planificacion de entradas para evento ID", data?.id);
+        openListadoEntradasPlanificacionWin({
+          anno: data?.["año"] ?? data?.ano,
+          proveedor_id: data?.proveedor_id,
+          forceReload: true,
+        });
       }
       break;
   }
@@ -129,3 +133,8 @@ async function eventoClickCabecera(e, tabla, cabecera) {
       break;
   }
 }
+
+
+
+
+

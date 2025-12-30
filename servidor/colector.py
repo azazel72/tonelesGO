@@ -7,6 +7,8 @@ from servidor.herramientas.utilidades import obtener_anterior_dia_semana
 from .modelos import ClienteDB, EstadoDB, InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB, RolDB, PuestoTrabajoDB, MaterialDB, DuelaDB, EntradaDB, LineaEntradaDB, PaletDB, ProductoDB, ArchivoSubidoDB
 from .modelos import PlanCamionDB, PlanFacturacionDB, PlanMaterialDB, CuadranteDB, CuadranteDetalleDB
 from .persistencia import GenericRepository, DB
+from sqlmodel import select
+from sqlalchemy import extract
 from .dominio import PlanificacionEntradasDTO, MaestrosDTO, PlanMaterialDTO, PlanFacturacionDTO, PlanCamionDTO, CuadranteDTO, CuadranteDetalleDTO
 from .dominio import ClienteDTO, EstadoDTO, InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO, RolDTO, PuestoTrabajoDTO, MaterialDTO, DuelaDTO, EntradaDTO, LineaEntradaDTO, PaletDTO, ProductoDTO, ArchivoSubidoDTO, CuadrantesDTO
 
@@ -211,6 +213,34 @@ class Colector:
 
             logger.info(f"Entrada ID {entrada_id} modificada: {campo} = {valor}")
             return {"id": entrada_id, "campo": campo, "valor": valor}
+    #endregion
+
+    #region Mètodos Listados Entradas
+    def listar_entradas_planificacion(self, año: int, proveedor_id: int | None):
+        with DB.crear_sesion() as session:
+            statement = select(EntradaDB)
+            if proveedor_id:
+                statement = statement.where(EntradaDB.proveedor_id == proveedor_id)
+            if año:
+                statement = statement.where(extract("year", EntradaDB.fecha) == año)
+            entradas = session.exec(statement).all()
+            return [EntradaDTO.from_db(entrada) for entrada in entradas]
+
+    def listar_lineas_entrada(self, entrada_id: int):
+        with DB.crear_sesion() as session:
+            statement = select(LineaEntradaDB).where(LineaEntradaDB.entrada_id == entrada_id)
+            lineas = session.exec(statement).all()
+            return [LineaEntradaDTO.from_db(linea) for linea in lineas]
+
+    def listar_archivos_entidad(self, entidad: str, entidad_id: int):
+        with DB.crear_sesion() as session:
+            statement = select(ArchivoSubidoDB).where(
+                ArchivoSubidoDB.entidad == entidad,
+                ArchivoSubidoDB.entidad_id == entidad_id,
+                ArchivoSubidoDB.is_deleted == False,
+            )
+            archivos = session.exec(statement).all()
+            return [ArchivoSubidoDTO.from_db(archivo) for archivo in archivos]
     #endregion
 
     #region Métodos Cuadrantes

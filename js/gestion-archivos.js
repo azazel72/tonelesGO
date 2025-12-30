@@ -61,10 +61,12 @@ function openSubirArchivoWin(options = {}) {
     form.entidad.value = entidad;
     form.entidad_id.value = entidadId === null || entidadId === undefined ? "" : String(entidadId);
     const mensajeEl = content.querySelector(".upload-mensaje");
-    if (mensaje) {
-        mensajeEl.textContent = mensaje;
-    } else {
-        mensajeEl.classList.add("d-none");
+    if (mensajeEl) {
+        if (mensaje) {
+            mensajeEl.textContent = mensaje;
+        } else {
+            mensajeEl.classList.add("d-none");
+        }
     }
 
     const allowedMimes = new Set(["application/pdf", "image/jpeg"]);
