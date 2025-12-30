@@ -4,11 +4,11 @@ from typing import List
 
 from servidor.herramientas.utilidades import obtener_anterior_dia_semana
 
-from .modelos import ClienteDB, EstadoDB, InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB, RolDB, PuestoTrabajoDB, MaterialDB, DuelaDB, EntradaDB, LineaEntradaDB, PaletDB, ProductoDB
+from .modelos import ClienteDB, EstadoDB, InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB, RolDB, PuestoTrabajoDB, MaterialDB, DuelaDB, EntradaDB, LineaEntradaDB, PaletDB, ProductoDB, ArchivoSubidoDB
 from .modelos import PlanCamionDB, PlanFacturacionDB, PlanMaterialDB, CuadranteDB, CuadranteDetalleDB
 from .persistencia import GenericRepository, DB
 from .dominio import PlanificacionEntradasDTO, MaestrosDTO, PlanMaterialDTO, PlanFacturacionDTO, PlanCamionDTO, CuadranteDTO, CuadranteDetalleDTO
-from .dominio import ClienteDTO, EstadoDTO, InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO, RolDTO, PuestoTrabajoDTO, MaterialDTO, DuelaDTO, EntradaDTO, LineaEntradaDTO, PaletDTO, ProductoDTO, CuadrantesDTO
+from .dominio import ClienteDTO, EstadoDTO, InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO, RolDTO, PuestoTrabajoDTO, MaterialDTO, DuelaDTO, EntradaDTO, LineaEntradaDTO, PaletDTO, ProductoDTO, ArchivoSubidoDTO, CuadrantesDTO
 
 logger = logging.getLogger("paezlobato_colector")
 
@@ -43,6 +43,7 @@ class Colector:
         self.repo_lineas_entrada = GenericRepository(LineaEntradaDB)
         self.repo_palets = GenericRepository(PaletDB)
         self.repo_productos = GenericRepository(ProductoDB)
+        self.repo_archivos_subidos = GenericRepository(ArchivoSubidoDB)
 
         self.repo_usuarios = GenericRepository(UsuarioDB)
         self.repo_roles = GenericRepository(RolDB)
@@ -70,6 +71,7 @@ class Colector:
             lineas_entrada = self.repo_lineas_entrada.list_all(session)
             palets = self.repo_palets.list_all(session)
             productos = self.repo_productos.list_all(session)
+            archivos_subidos = self.repo_archivos_subidos.list_all(session)
 
             self.maestros.clientes = {cliente.id: ClienteDTO.from_db(cliente) for cliente in clientes}
             self.maestros.estados = {estado.id: EstadoDTO.from_db(estado) for estado in estados}
@@ -85,6 +87,7 @@ class Colector:
             self.maestros.lineas_entrada = {linea.id: LineaEntradaDTO.from_db(linea) for linea in lineas_entrada}
             self.maestros.palets = {palet.id: PaletDTO.from_db(palet) for palet in palets}
             self.maestros.productos = {producto.id: ProductoDTO.from_db(producto) for producto in productos}
+            self.maestros.archivos_subidos = {archivo.id: ArchivoSubidoDTO.from_db(archivo) for archivo in archivos_subidos}
 
             #print("Datos maestros cargados:", self.maestros)
             #print("Datos clientes cargados:", self.maestros.clientes)
@@ -354,6 +357,10 @@ class Colector:
             repo = self.repo_productos
             maestro = self.maestros.productos
             objeto = ProductoDTO
+        elif tabla == "archivos_subidos":
+            repo = self.repo_archivos_subidos
+            maestro = self.maestros.archivos_subidos
+            objeto = ArchivoSubidoDTO
         elif tabla == "plan_materiales":
             repo = self.repo_materiales
             maestro = self.planificacion_entradas.buscar_material_por_id

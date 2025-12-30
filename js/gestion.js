@@ -62,6 +62,10 @@ window.onload = () => {
             await openProductosWin();
         },
 
+        async "ver-archivos-subidos"() {
+            await openArchivosSubidosWin();
+        },
+
         async "ver-planificacion-entradas"() {
             await openPlanificacionEntradasWin();
         },
@@ -110,6 +114,7 @@ window.onload = () => {
         lineas_entrada: openLineasEntradaWin,
         palets: openPaletsWin,
         productos: openProductosWin,
+        archivos_subidos: openArchivosSubidosWin,
         planificacion_entradas: openPlanificacionEntradasWin,
         cuadrantes: openCuadrantesWin,
     };
@@ -157,11 +162,3 @@ function respuesta_maestros(response) {
     }
 }
 
-
-
-function openSubirArchivoWin() {
-
-
-
-
-}

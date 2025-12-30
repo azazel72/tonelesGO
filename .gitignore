@@ -5,6 +5,9 @@
 ./logs
 ./logs/*
 
+archivos/
+archivos/*
+
 **/__pycache__/
 **/*.pyc
 **/*.pyo

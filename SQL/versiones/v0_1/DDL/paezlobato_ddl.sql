@@ -591,6 +591,29 @@ CREATE TABLE `productos` (
   `deleted_by` varchar(100) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `archivos_subidos`
+--
+
+CREATE TABLE `archivos_subidos` (
+  `id` int(11) NOT NULL,
+  `titulo` varchar(150) NOT NULL,
+  `nombre_original` varchar(255) NOT NULL,
+  `nombre_archivo` varchar(255) NOT NULL,
+  `extension` varchar(10) NOT NULL,
+  `entidad` varchar(80) NOT NULL,
+  `entidad_id` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `is_deleted` tinyint(1) NOT NULL DEFAULT 0,
+  `created_by` varchar(100) NOT NULL DEFAULT 'system',
+  `updated_by` varchar(100) NOT NULL DEFAULT 'system',
+  `deleted_by` varchar(100) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
 --
 -- Indices de la tabla `materiales`
 --
@@ -637,6 +660,13 @@ ALTER TABLE `productos`
   ADD KEY `idx_productos_produccion` (`produccion_id`);
 
 --
+-- Indices de la tabla `archivos_subidos`
+--
+ALTER TABLE `archivos_subidos`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `idx_archivos_subidos_entidad` (`entidad`,`entidad_id`);
+
+--
 -- AUTO_INCREMENT de las tablas volcadas
 --
 ALTER TABLE `materiales`
@@ -655,6 +685,9 @@ ALTER TABLE `palets`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 ALTER TABLE `productos`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `archivos_subidos`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
 --

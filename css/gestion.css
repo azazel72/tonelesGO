@@ -108,6 +108,78 @@ button#btn-logout:hover span * {
     color: black;
 }
 
+.upload-winbox {
+    height: 100%;
+}
+
+.upload-layout {
+    display: flex;
+    gap: 12px;
+    padding: 8px;
+    height: 100%;
+}
+
+.upload-panel {
+    flex: 0 0 30%;
+    min-width: 0;
+}
+
+.upload-panel-preview {
+    flex: 0 0 70%;
+    min-width: 0;
+}
+
+.upload-dropzone {
+    border: 2px dashed #999;
+    border-radius: 4px;
+    padding: 12px;
+    text-align: center;
+    font-size: 0.9rem;
+    color: #555;
+    cursor: pointer;
+    min-height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.upload-dropzone.is-dragover {
+    border-color: #0d6efd;
+    background: #eef5ff;
+}
+
+.upload-preview-area {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+}
+
+.upload-preview-content {
+    flex: 1;
+    border: 1px solid #e2e2e2;
+    border-radius: 4px;
+    padding: 6px;
+    background: #fafafa;
+    overflow: hidden;
+    width: 100%;
+}
+
+.upload-preview-area iframe,
+.upload-preview-area embed,
+.upload-preview-area img {
+    display: block;
+    width: 100%;
+    max-width: 100%;
+    height: 100%;
+    border: none;
+    object-fit: contain;
+}
+
+.upload-submit {
+    min-width: 160px;
+}
+
 
   /* Indicador de estado WebSocket */
   .ws-status {

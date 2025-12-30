@@ -402,7 +402,7 @@ function agregarSincronizacionTablas(masterTable, slaveTable) {
 
 const ColumnasTablasPlanificacionEntradas = {"Identificación": "tipo_material", "Totales": {"total_pactados": "total_pactados", "total_descontar": "total_descontar", "total_previstos": "total_previstos", "total_entregados": "total_entregados"},
 "Enero":"enero","Febrero":"febrero","Marzo":"marzo","Abril":"abril","Mayo":"mayo","Junio":"junio","Julio":"julio","Agosto":"agosto","Septiembre":"septiembre","Octubre":"octubre","Noviembre":"noviembre","Diciembre":"diciembre",
-"Acciones": "Acciones"};
+"Acciones": ""};
 
 function syncGroupWidthsByTitle(masterTable, slaveTable, column=null) {
   const columnas = masterTable.getColumnLayout();
@@ -413,12 +413,12 @@ function syncGroupWidthsByTitle(masterTable, slaveTable, column=null) {
     try {
       if (destino) {
         if (typeof(destino) === "object" && column) {
-          col_cambiada = column.getField();
-          destino = destino[col_cambiada];
-          const slaveCol = slaveTable.getColumn(destino);
-          if (slaveCol) {
-            const width = column.getWidth();
-            slaveCol.updateDefinition({ width: width });
+            col_cambiada = column.getField();
+            destino = destino[col_cambiada];
+            const slaveCol = slaveTable.getColumn(destino);
+            if (slaveCol) {
+              const width = column.getWidth();
+              slaveCol.updateDefinition({ width: width });
           }
         } else {
           const slaveCol = slaveTable.getColumn(destino);

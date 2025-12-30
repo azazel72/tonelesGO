@@ -16,6 +16,7 @@ from servidor.dominio.maestros.entrada_dto import EntradaDTO
 from servidor.dominio.maestros.linea_entrada_dto import LineaEntradaDTO
 from servidor.dominio.maestros.palet_dto import PaletDTO
 from servidor.dominio.maestros.producto_dto import ProductoDTO
+from servidor.dominio.maestros.archivo_subido_dto import ArchivoSubidoDTO
 
 
 class MaestrosDTO(BaseModel):
@@ -33,6 +34,7 @@ class MaestrosDTO(BaseModel):
     lineas_entrada: Optional[Dict[int, "LineaEntradaDTO"]] = {}
     palets: Optional[Dict[int, "PaletDTO"]] = {}
     productos: Optional[Dict[int, "ProductoDTO"]] = {}
+    archivos_subidos: Optional[Dict[int, "ArchivoSubidoDTO"]] = {}
 
     def buscar_usuario_por_username(self, username: str) -> UsuarioDTO | None:
         for usuario in (self.usuarios.values() if self.usuarios else []):
