@@ -16,18 +16,18 @@ document.addEventListener("DOMContentLoaded", function () {
         event.preventDefault();
         const miga = event.target.closest("li:not(.active)");
         if (!miga || !miga.hasAttribute("mostrar")) return; // Verifica que se haya hecho clic en una miga válida
-        // Muestra la sección correspondiente al atributo 'mostrar' 
+        // Muestra la sección correspondiente al atributo 'mostrar'
         mostrarSeccion(miga.getAttribute("mostrar"));
     });
 
     prepararEventosRecepcion();
-
     prepararEventosFabricacion();
-
     prepararEventosExpedicion();
 
     // Muestra la sección de tareas al cargar la página
     mostrarSeccion("vista_tareas");
+
+    conexionInicial();
 });
 
 function mostrarSeccion(id) {
@@ -40,6 +40,9 @@ function mostrarSeccion(id) {
         });
         // Muestra la sección correspondiente
         seccionActiva.classList.add("pagina-activa");
+        if (id === "vista_recepcion") {
+            cargarEntradasRecepcion();
+        }
         // Actualiza las migas de pan
         actualizarMigasPan(id);
     }
@@ -95,3 +98,28 @@ function crearMigaPan(nombre, mostrarSeccion, activo = false) {
     }
     return nuevaMiga;
 }
+
+function routeMessage(data) {
+    //console.log("Mensaje recibido:", data);
+    try {
+        const msg = typeof data === 'string' ? JSON.parse(data) : data;
+        if (msg.request_id) {
+        const pending = pendingWsRequests.get(msg.request_id);
+        if (pending) {
+            pendingWsRequests.delete(msg.request_id);
+            pending.resolve(msg.data);
+            return;
+        }
+        }
+        (ACCIONES[msg.action] || ACCIONES.default)?.(msg);
+    } catch (e) {
+        console.error('WS JSON inválido:', e, data);
+    }
+}
+
+var ACCIONES = {
+    "default": (msg) => {
+        console.warn("Acción no manejada:", msg);
+    },
+    "login": console.log,
+};

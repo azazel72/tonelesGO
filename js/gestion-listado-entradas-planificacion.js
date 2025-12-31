@@ -163,11 +163,33 @@ function openListadoEntradasPlanificacionWin(contexto = {}) {
     return valor === true || valor === 1 || valor === "1";
   }
 
+  function esCheckEditable(cell) {
+    const def = cell.getColumn().getDefinition();
+    const tablaEditableActual = Boolean(cell.getTable()?.options?.editable);
+    if (typeof def.editable === "function") {
+      return Boolean(def.editable(cell));
+    }
+    if (def.editable !== undefined) {
+      return Boolean(def.editable);
+    }
+    return tablaEditableActual;
+  }
+
+  function toggleCheckCell(cell) {
+    if (!esCheckEditable(cell)) return;
+    const nuevo = esVerdadero(cell.getValue()) ? 0 : 1;
+    cell.setValue(nuevo);
+  }
+
   const parametrosCheck = {
     hozAlign: "center",
     formatter: "tickCross",
-    editor: "tickCross",
-    editorParams: {},
+    esCheck: true,
+    editor: false,
+    cellClick: (e, cell) => {
+      e.preventDefault();
+      toggleCheckCell(cell);
+    },
   };
 
   const tablaEntradas = new Tabulator(leftTable, {
@@ -179,7 +201,26 @@ function openListadoEntradasPlanificacionWin(contexto = {}) {
     columns: [
       { title: "ID", field: "id", width: 70, hozAlign: "right", cssClass: "filtrable" },
       { title: "Numero", field: "numero", width: 130, editor: "input", editable: tablaEditable, cssClass: "filtrable" },
-      { title: "Fecha", field: "fecha", width: 120, editor: "input", editable: tablaEditable, cssClass: "filtrable" },
+      {
+        title: "Fecha",
+        field: "fecha",
+        width: 120,
+        editor: "input",
+        editable: tablaEditable,
+        cssClass: "filtrable",
+        formatter: (cell) => {
+          const v = cell.getValue();
+          if (!v) return "";
+          // Muestra en formato DD-MM-YYYY, manteniendo entrada base YYYY-MM-DD para el editor
+          const d = new Date(v);
+          if (Number.isNaN(d.getTime())) return v;
+          const yyyy = d.getFullYear();
+          const mm = String(d.getMonth() + 1).padStart(2, "0");
+          const dd = String(d.getDate()).padStart(2, "0");
+          return `${dd}-${mm}-${yyyy}`;
+        },
+        editorParams: { elementAttributes: { type: "date" } },
+      },
       {
         title: "Proveedor",
         field: "proveedor_id",
@@ -413,7 +454,9 @@ function openListadoEntradasPlanificacionWin(contexto = {}) {
     tabla.getColumns().forEach((col) => {
       if (!col.getElement().classList.contains("filtrable")) return;
       if (activo) {
-        switch (col.getDefinition()?.editor ?? "input") {
+        const def = col.getDefinition();
+        const tipoEditor = def?.editor ?? (def?.esCheck ? "tickCross" : "input");
+        switch (tipoEditor) {
           case "tickCross":
             col.updateDefinition({
               headerFilter: "list",

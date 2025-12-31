@@ -178,28 +178,24 @@
     Edita celdas para guardar, usa “Añadir” o el icono de papelera para borrar.
   </footer>
 
+  <div id="login-overlay"class="overlay">
+    <div class="login-box ws--connecting" id="login-box">
+      <div class="ws-status">
+        <span class="ws-dot"></span><span id="ws-text">Conectando…</span>
+      </div>
 
+      <h2>Iniciar sesión</h2>
+      <div id="login-form" autocomplete="off">
+        <label for="user">Usuario</label>
+        <input id="user" name="user" type="text" disabled required>
 
-    <div id="login-overlay"class="overlay">
-      <div class="login-box ws--connecting" id="login-box">
-        <div class="ws-status">
-          <span class="ws-dot"></span><span id="ws-text">Conectando…</span>
-        </div>
+        <label for="pass">Clave</label>
+        <input id="pass" name="pass" type="password" disabled required>
 
-        <h2>Iniciar sesión</h2>
-        <div id="login-form" autocomplete="off">
-          <label for="user">Usuario</label>
-          <input id="user" name="user" type="text" disabled required>
-
-          <label for="pass">Clave</label>
-          <input id="pass" name="pass" type="password" disabled required>
-
-          <button type="button" id="login-button" class="btn btn-primary" data-action="login" disabled>Enviar</button>
+        <button type="button" id="login-button" class="btn btn-primary" data-action="login" disabled>Enviar</button>
+      </div>
     </div>
-
-
   </div>
-</div>
 
 <template id="plantilla_cuadrantes">
   <div class="cabecera p-2 border-bottom d-flex gap-2 align-items-center">

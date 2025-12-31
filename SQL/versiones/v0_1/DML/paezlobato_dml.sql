@@ -265,6 +265,28 @@ INSERT INTO `plan_material` (`id`, `año`, `tipo_material`, `total_pactados`, `t
 (3, '2025', 'PUNTAFITAS', 0, 0, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00, 0.00);
 
 --
+-- Volcado de datos para la tabla `materiales`
+--
+
+INSERT INTO `materiales` (`id`, `descripcion`) VALUES
+(1, 'Hileras de Duela de Roble Frances 1300x1200x35mm'),
+(2, 'Hileras de Duela de Roble Frances 1150x1200x35mm'),
+(3, 'Hileras de Duela de Roble Frances 1000x1200x3,5mm'),
+(4, 'Hileras de Duela de Roble Frances 950x1200x3,5mm'),
+(5, 'Hileras de Duela de Roble Frances 700x1200x35mm');
+
+--
+-- Volcado de datos para la tabla `duelas`
+--
+
+INSERT INTO `duelas` (`id`, `descripcion`, `material_id`) VALUES
+(1, 'Hileras de Duela de Roble Frances 1300x1200x35mm', 1),
+(2, 'Hileras de Duela de Roble Frances 1150x1200x35mm', 2),
+(3, 'Hileras de Duela de Roble Frances 1000x1200x3,5mm', 3),
+(4, 'Hileras de Duela de Roble Frances 950x1200x3,5mm', 4),
+(5, 'Hileras de Duela de Roble Frances 700x1200x35mm', 5);
+
+--
 -- Volcado de datos para la tabla `proveedores`
 --
 
@@ -278,3 +300,4 @@ INSERT INTO `ubicaciones` (`id`, `descripcion`, `instalacion_id`, `orden`) VALUE
 (1, 'A11', 3, 10);
 
 SET FOREIGN_KEY_CHECKS = 1;
+COMMIT;
