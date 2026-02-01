@@ -26,7 +26,12 @@ function crearVentana(configuracion, show=true) {
   }
 
   // Tabulator
-  const tabla = crearTabla(configuracion.KEY, contenedor, configuracion.tabulator.options);
+  const tabla = crearTabla(
+    configuracion.KEY,
+    contenedor,
+    configuracion.tabulator.options,
+    configuracion.data_key
+  );
 
   windowsRegistry.set(configuracion.KEY, { wb, table: tabla });
 
@@ -82,7 +87,7 @@ function crearWinBox(KEY, contenido, opciones={}) {
 }
 
 // ====== CREACION DE TABULATOR ======
-function crearTabla(KEY, contenedor, configuracion) {
+function crearTabla(KEY, contenedor, configuracion, dataKey = "maestros") {
     const tablaHTML = crearElemento("div", { class: "contenedor-tabla" });
     contenedor.appendChild(tablaHTML);
 
@@ -104,6 +109,7 @@ function crearTabla(KEY, contenedor, configuracion) {
   });
 
   tabla.KEY = KEY;
+  tabla.DATA_STORE = dataKey || "maestros";
 
   return tabla;
 }

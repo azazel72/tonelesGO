@@ -558,8 +558,8 @@ CREATE TABLE `lineas_entrada` (
 CREATE TABLE `palets` (
   `id` int(11) NOT NULL,
   `codigo` varchar(60) NOT NULL,
-  `linea_entrada_id` int(11) NOT NULL,
-  `ubicacion_id` int(11) NOT NULL,
+  `linea_entrada_id` int(11) DEFAULT NULL,
+  `ubicacion_id` int(11) DEFAULT NULL,
   `procesado` tinyint(1) NOT NULL DEFAULT 0,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
@@ -605,6 +605,150 @@ CREATE TABLE `archivos_subidos` (
   `extension` varchar(10) NOT NULL,
   `entidad` varchar(80) NOT NULL,
   `entidad_id` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `is_deleted` tinyint(1) NOT NULL DEFAULT 0,
+  `created_by` varchar(100) NOT NULL DEFAULT 'system',
+  `updated_by` varchar(100) NOT NULL DEFAULT 'system',
+  `deleted_by` varchar(100) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `ordenes_fabricacion`
+--
+
+CREATE TABLE `ordenes_fabricacion` (
+  `id` int(11) NOT NULL,
+  `numero` varchar(50) NOT NULL,
+  `fecha` date DEFAULT NULL,
+  `cliente_id` int(11) DEFAULT NULL,
+  `estado` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `is_deleted` tinyint(1) NOT NULL DEFAULT 0,
+  `created_by` varchar(100) NOT NULL DEFAULT 'system',
+  `updated_by` varchar(100) NOT NULL DEFAULT 'system',
+  `deleted_by` varchar(100) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `tipos_producto`
+--
+
+CREATE TABLE `tipos_producto` (
+  `id` int(11) NOT NULL,
+  `codigo` varchar(60) NOT NULL,
+  `descripcion` varchar(150) NOT NULL,
+  `id_material` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `is_deleted` tinyint(1) NOT NULL DEFAULT 0,
+  `created_by` varchar(100) NOT NULL DEFAULT 'system',
+  `updated_by` varchar(100) NOT NULL DEFAULT 'system',
+  `deleted_by` varchar(100) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `lineas_fabricacion`
+--
+
+CREATE TABLE `lineas_fabricacion` (
+  `id` int(11) NOT NULL,
+  `orden_id` int(11) NOT NULL,
+  `tipo_producto_id` int(11) NOT NULL,
+  `cantidad` int(11) NOT NULL DEFAULT 0,
+  `cantidad_fabricada` int(11) NOT NULL DEFAULT 0,
+  `estado` int(11) DEFAULT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `is_deleted` tinyint(1) NOT NULL DEFAULT 0,
+  `created_by` varchar(100) NOT NULL DEFAULT 'system',
+  `updated_by` varchar(100) NOT NULL DEFAULT 'system',
+  `deleted_by` varchar(100) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `trazabilidad_procesado`
+--
+
+CREATE TABLE `trazabilidad_procesado` (
+  `id` int(11) NOT NULL,
+  `palet_origen_id` int(11) NOT NULL,
+  `palet_destino_id` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `is_deleted` tinyint(1) NOT NULL DEFAULT 0,
+  `created_by` varchar(100) NOT NULL DEFAULT 'system',
+  `updated_by` varchar(100) NOT NULL DEFAULT 'system',
+  `deleted_by` varchar(100) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `trazabilidad_fabricacion`
+--
+
+CREATE TABLE `trazabilidad_fabricacion` (
+  `id` int(11) NOT NULL,
+  `linea_fabricacion_id` int(11) NOT NULL,
+  `palet_id` int(11) NOT NULL,
+  `cantidad_fabricada` int(11) NOT NULL DEFAULT 0,
+  `estado` smallint NOT NULL DEFAULT 0,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `is_deleted` tinyint(1) NOT NULL DEFAULT 0,
+  `created_by` varchar(100) NOT NULL DEFAULT 'system',
+  `updated_by` varchar(100) NOT NULL DEFAULT 'system',
+  `deleted_by` varchar(100) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `trazabilidad_producto`
+--
+
+CREATE TABLE `trazabilidad_producto` (
+  `id` int(11) NOT NULL,
+  `trazabilidad_fabricacion_id` int(11) NOT NULL,
+  `producto_id` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
+  `deleted_at` timestamp NULL DEFAULT NULL,
+  `is_deleted` tinyint(1) NOT NULL DEFAULT 0,
+  `created_by` varchar(100) NOT NULL DEFAULT 'system',
+  `updated_by` varchar(100) NOT NULL DEFAULT 'system',
+  `deleted_by` varchar(100) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
+-- Estructura de tabla para la tabla `botas`
+--
+
+CREATE TABLE `botas` (
+  `id` int(11) NOT NULL,
+  `codigo` varchar(60) NOT NULL,
+  `vaso_producto_id` int(11) NOT NULL,
+  `fondo_producto_id` int(11) NOT NULL,
+  `tapa_producto_id` int(11) NOT NULL,
+  `estado` int(11) DEFAULT NULL,
   `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
   `updated_at` timestamp NOT NULL DEFAULT current_timestamp() ON UPDATE current_timestamp(),
   `deleted_at` timestamp NULL DEFAULT NULL,
@@ -667,6 +811,67 @@ ALTER TABLE `archivos_subidos`
   ADD KEY `idx_archivos_subidos_entidad` (`entidad`,`entidad_id`);
 
 --
+-- Indices de la tabla `ordenes_fabricacion`
+--
+ALTER TABLE `ordenes_fabricacion`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_ordenes_fabricacion_clientes` (`cliente_id`),
+  ADD KEY `fk_ordenes_fabricacion_estados` (`estado`);
+
+--
+-- Indices de la tabla `tipos_producto`
+--
+ALTER TABLE `tipos_producto`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `codigo` (`codigo`),
+  ADD KEY `fk_tipos_producto_materiales` (`id_material`);
+
+--
+-- Indices de la tabla `lineas_fabricacion`
+--
+ALTER TABLE `lineas_fabricacion`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_lineas_fabricacion_ordenes` (`orden_id`),
+  ADD KEY `fk_lineas_fabricacion_tipos` (`tipo_producto_id`),
+  ADD KEY `fk_lineas_fabricacion_estados` (`estado`);
+
+--
+-- Indices de la tabla `trazabilidad_procesado`
+--
+ALTER TABLE `trazabilidad_procesado`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_trazabilidad_procesado_origen` (`palet_origen_id`),
+  ADD KEY `fk_trazabilidad_procesado_destino` (`palet_destino_id`);
+
+--
+-- Indices de la tabla `trazabilidad_fabricacion`
+--
+ALTER TABLE `trazabilidad_fabricacion`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_trazabilidad_fabricacion_linea` (`linea_fabricacion_id`),
+  ADD KEY `fk_trazabilidad_fabricacion_palet` (`palet_id`),
+  ADD UNIQUE KEY `uk_trazabilidad_fabricacion_linea_palet` (`linea_fabricacion_id`,`palet_id`);
+
+--
+-- Indices de la tabla `trazabilidad_producto`
+--
+ALTER TABLE `trazabilidad_producto`
+  ADD PRIMARY KEY (`id`),
+  ADD KEY `fk_trazabilidad_producto_fabricacion` (`trazabilidad_fabricacion_id`),
+  ADD KEY `fk_trazabilidad_producto_producto` (`producto_id`);
+
+--
+-- Indices de la tabla `botas`
+--
+ALTER TABLE `botas`
+  ADD PRIMARY KEY (`id`),
+  ADD UNIQUE KEY `codigo` (`codigo`),
+  ADD KEY `fk_botas_vaso` (`vaso_producto_id`),
+  ADD KEY `fk_botas_fondo` (`fondo_producto_id`),
+  ADD KEY `fk_botas_tapa` (`tapa_producto_id`),
+  ADD KEY `fk_botas_estados` (`estado`);
+
+--
 -- AUTO_INCREMENT de las tablas volcadas
 --
 ALTER TABLE `materiales`
@@ -690,6 +895,27 @@ ALTER TABLE `productos`
 ALTER TABLE `archivos_subidos`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
 
+ALTER TABLE `ordenes_fabricacion`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `tipos_producto`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `lineas_fabricacion`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `trazabilidad_procesado`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `trazabilidad_fabricacion`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `trazabilidad_producto`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
+ALTER TABLE `botas`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT;
+
 --
 -- Restricciones para tablas volcadas
 --
@@ -706,6 +932,49 @@ ALTER TABLE `lineas_entrada`
 ALTER TABLE `palets`
   ADD CONSTRAINT `fk_palets_lineas` FOREIGN KEY (`linea_entrada_id`) REFERENCES `lineas_entrada` (`id`) ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_palets_ubicaciones` FOREIGN KEY (`ubicacion_id`) REFERENCES `ubicaciones` (`id`) ON UPDATE CASCADE;
+
+--
+-- Ajuste para permitir NULL en palets (si la tabla ya existe)
+--
+ALTER TABLE `palets`
+  MODIFY `linea_entrada_id` int(11) NULL,
+  MODIFY `ubicacion_id` int(11) NULL;
+
+--
+-- Ajuste estado en trazabilidad_fabricacion (si la tabla ya existe)
+--
+ALTER TABLE `trazabilidad_fabricacion`
+  MODIFY `estado` smallint NOT NULL DEFAULT 0;
+
+ALTER TABLE `ordenes_fabricacion`
+  ADD CONSTRAINT `fk_ordenes_fabricacion_clientes` FOREIGN KEY (`cliente_id`) REFERENCES `clientes` (`id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_ordenes_fabricacion_estados` FOREIGN KEY (`estado`) REFERENCES `estados` (`id`) ON UPDATE CASCADE;
+
+ALTER TABLE `tipos_producto`
+  ADD CONSTRAINT `fk_tipos_producto_materiales` FOREIGN KEY (`id_material`) REFERENCES `materiales` (`id`) ON UPDATE CASCADE;
+
+ALTER TABLE `lineas_fabricacion`
+  ADD CONSTRAINT `fk_lineas_fabricacion_ordenes` FOREIGN KEY (`orden_id`) REFERENCES `ordenes_fabricacion` (`id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_lineas_fabricacion_tipos` FOREIGN KEY (`tipo_producto_id`) REFERENCES `tipos_producto` (`id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_lineas_fabricacion_estados` FOREIGN KEY (`estado`) REFERENCES `estados` (`id`) ON UPDATE CASCADE;
+
+ALTER TABLE `trazabilidad_procesado`
+  ADD CONSTRAINT `fk_trazabilidad_procesado_origen` FOREIGN KEY (`palet_origen_id`) REFERENCES `palets` (`id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_trazabilidad_procesado_destino` FOREIGN KEY (`palet_destino_id`) REFERENCES `palets` (`id`) ON UPDATE CASCADE;
+
+ALTER TABLE `trazabilidad_fabricacion`
+  ADD CONSTRAINT `fk_trazabilidad_fabricacion_linea` FOREIGN KEY (`linea_fabricacion_id`) REFERENCES `lineas_fabricacion` (`id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_trazabilidad_fabricacion_palet` FOREIGN KEY (`palet_id`) REFERENCES `palets` (`id`) ON UPDATE CASCADE;
+
+ALTER TABLE `trazabilidad_producto`
+  ADD CONSTRAINT `fk_trazabilidad_producto_fabricacion` FOREIGN KEY (`trazabilidad_fabricacion_id`) REFERENCES `trazabilidad_fabricacion` (`id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_trazabilidad_producto_producto` FOREIGN KEY (`producto_id`) REFERENCES `productos` (`id`) ON UPDATE CASCADE;
+
+ALTER TABLE `botas`
+  ADD CONSTRAINT `fk_botas_vaso` FOREIGN KEY (`vaso_producto_id`) REFERENCES `productos` (`id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_botas_fondo` FOREIGN KEY (`fondo_producto_id`) REFERENCES `productos` (`id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_botas_tapa` FOREIGN KEY (`tapa_producto_id`) REFERENCES `productos` (`id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_botas_estados` FOREIGN KEY (`estado`) REFERENCES `estados` (`id`) ON UPDATE CASCADE;
 
 COMMIT;
 

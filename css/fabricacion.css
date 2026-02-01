@@ -11,3 +11,8 @@
 #vista_fabricacion[modo="contenido_orden"] table#tabla_ordenes_fabricacion{
     display: none;
 }
+
+#tabla_trazabilidad_fabricacion tbody tr.trazabilidad-inactiva * {
+    background-color: #f8d7da;
+}
+

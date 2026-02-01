@@ -22,6 +22,7 @@ var ACCIONES = {
     },
     "login": respuesta_login,
     "maestros": respuesta_maestros,
+    "fabricacion": respuesta_fabricacion,
     "cargar_planificacion_entradas": mostrar_planificacion_entradas,
     "agregar_planificacion_entradas": mostrar_planificacion_entradas,
     "cargar_cuadrantes": mostrar_cuadrantes,
@@ -30,4 +31,3 @@ var ACCIONES = {
     "actualizar_detalle_cuadrante": respuesta_cuadrantes,
     "eliminar_detalle_cuadrante": respuesta_cuadrantes,
 };
-

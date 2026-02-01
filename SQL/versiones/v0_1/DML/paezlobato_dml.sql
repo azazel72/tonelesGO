@@ -203,6 +203,7 @@ INSERT INTO `cuadrante_detalles` (`id`, `cuadrante_id`, `fecha`, `puesto_id`, `u
 --
 
 INSERT INTO `estados` (`id`, `descripcion`) VALUES
+(0, 'Sin estado'),
 (6, 'Destino definitivo'),
 (3, 'En camino'),
 (4, 'Envinado'),
@@ -269,11 +270,7 @@ INSERT INTO `plan_material` (`id`, `año`, `tipo_material`, `total_pactados`, `t
 --
 
 INSERT INTO `materiales` (`id`, `descripcion`) VALUES
-(1, 'Hileras de Duela de Roble Frances 1300x1200x35mm'),
-(2, 'Hileras de Duela de Roble Frances 1150x1200x35mm'),
-(3, 'Hileras de Duela de Roble Frances 1000x1200x3,5mm'),
-(4, 'Hileras de Duela de Roble Frances 950x1200x3,5mm'),
-(5, 'Hileras de Duela de Roble Frances 700x1200x35mm');
+(1, 'Roble Frances');
 
 --
 -- Volcado de datos para la tabla `duelas`
@@ -281,10 +278,10 @@ INSERT INTO `materiales` (`id`, `descripcion`) VALUES
 
 INSERT INTO `duelas` (`id`, `descripcion`, `material_id`) VALUES
 (1, 'Hileras de Duela de Roble Frances 1300x1200x35mm', 1),
-(2, 'Hileras de Duela de Roble Frances 1150x1200x35mm', 2),
-(3, 'Hileras de Duela de Roble Frances 1000x1200x3,5mm', 3),
-(4, 'Hileras de Duela de Roble Frances 950x1200x3,5mm', 4),
-(5, 'Hileras de Duela de Roble Frances 700x1200x35mm', 5);
+(2, 'Hileras de Duela de Roble Frances 1150x1200x35mm', 1),
+(3, 'Hileras de Duela de Roble Frances 1000x1200x3,5mm', 1),
+(4, 'Hileras de Duela de Roble Frances 950x1200x3,5mm', 1),
+(5, 'Hileras de Duela de Roble Frances 700x1200x35mm', 1);
 
 --
 -- Volcado de datos para la tabla `proveedores`

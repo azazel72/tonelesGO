@@ -21,6 +21,7 @@ class CrudRoutes:
 
         svc = {}
         clients = set()
+        client_state = {}
         ACCIONES = obtener_acciones()
 
         # =======================
@@ -67,6 +68,7 @@ class CrudRoutes:
             await ws.accept()
 
             clients.add(ws)
+            client_state[ws] = {"pantalla": None, "contexto": {}}
             await ws.send_json(ResponseMessage.ok("login", Colector.colector.maestros.usuarios.get(1)).model_dump())
 
             try:
@@ -83,6 +85,7 @@ class CrudRoutes:
 
             except WebSocketDisconnect:
                 clients.discard(ws)
+                client_state.pop(ws, None)
 
         # =======================
         # Broadcast común
@@ -98,12 +101,39 @@ class CrudRoutes:
                     to_remove.append(ws)
             for ws in to_remove:
                 clients.discard(ws)
+                client_state.pop(ws, None)
+
+        async def broadcast_pantalla(pantalla: str, data: dict):
+            if not clients:
+                return
+            to_remove = []
+            for ws in clients:
+                estado = client_state.get(ws, {})
+                if estado.get("pantalla") != pantalla:
+                    continue
+                try:
+                    rm = ResponseMessage.ok("fabricacion_actualizar", data).model_dump()
+                    safe_data = jsonable_encoder(rm)
+                    await ws.send_json(safe_data)
+                except Exception:
+                    to_remove.append(ws)
+            for ws in to_remove:
+                clients.discard(ws)
+                client_state.pop(ws, None)
 
 
         async def accion_recibida(ws: WebSocket, msg: "RequestMessage"):
-            # Procesa el mensaje recibido vía WebSocket
-            logger.info("Acción recibida: %s", msg.action)
+            # Procesa el mensaje recibido via WebSocket
+            logger.info("Accion recibida: %s", msg.action)
             try:
+                if msg.action == "set_pantalla":
+                    pantalla = (msg.data or {}).get("pantalla")
+                    contexto = (msg.data or {}).get("contexto") or {}
+                    client_state[ws] = {"pantalla": pantalla, "contexto": contexto}
+                    rm = ResponseMessage.ok(msg.action, {"ok": True}, msg.request_id).model_dump()
+                    safe_data = jsonable_encoder(rm)
+                    await ws.send_json(safe_data)
+                    return
                 handler = ACCIONES.get(msg.action)
                 if handler:
                     print("datos recibidos", msg.data)
@@ -112,14 +142,24 @@ class CrudRoutes:
                         rm: Any = ResponseMessage.ok(msg.action, result, msg.request_id).model_dump()
                         safe_data = jsonable_encoder(rm)
                         await ws.send_json(safe_data)
+                        if msg.action in {
+                            "agregar_trazabilidad_fabricacion",
+                            "actualizar_estado_trazabilidad_fabricacion",
+                            "eliminar_trazabilidad_fabricacion",
+                        }:
+                            await broadcast_pantalla("vista_fabricacion", {"tabla": "trazabilidad_fabricacion"})
+                        elif msg.action in {"modificar_maestro", "insertar_maestro", "eliminar_maestro"}:
+                            tabla = (msg.data or {}).get("tabla")
+                            if tabla in {"ordenes_fabricacion", "lineas_fabricacion", "trazabilidad_fabricacion"}:
+                                await broadcast_pantalla("vista_fabricacion", {"tabla": tabla})
                     else:
                         await ws.send_json(ResponseMessage.fail(msg.action, "no_result", msg.request_id).model_dump())
                 else:
                     await ws.send_json(ResponseMessage.fail("unknown_action", msg.action, msg.request_id).model_dump())
             except Exception as e:
-                logger.error("Error al procesar la acción %s: %s", msg.action, str(e))
+                logger.error("Error al procesar la accion %s: %s", msg.action, str(e))
                 await ws.send_json(ResponseMessage.fail(msg.action, str(e), msg.request_id).model_dump())
-        
+
         return router
 
 

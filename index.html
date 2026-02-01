@@ -328,50 +328,26 @@
                     <div class="modal-content">
 
                         <div class="modal-header">
-                            <h5 class="modal-title" id="miModalLabel2">Listado de materiales</h5>
+                            <h5 class="modal-title" id="miModalLabel2">Trazabilidad de producción</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"
                                 aria-label="Cerrar"></button>
                         </div>
 
                         <div class="modal-body">
                             <p>Materiales y lotes correspondientes al producto:
-                                <span id="productoOrden">Malaga PX Butts BM</span>
+                                <span id="productoOrden">Producto</span>
                             </p>
 
                             <div class="table-responsive">
-                                <table class="table table-bordered table-sm">
+                                <table class="table table-bordered table-sm" id="tabla_trazabilidad_fabricacion">
                                     <thead class="table-light">
                                         <tr>
-                                            <th scope="col">Material</th>
                                             <th scope="col">Palet</th>
-                                            <th scope="col">Lote</th>
+                                            <th scope="col">Cantidad</th>
+                                            <th scope="col">Estado</th>
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <!-- Primer material con 2 palets -->
-                                        <tr>
-                                            <td rowspan="2">Material 1</td>
-                                            <td>PAL001</td>
-                                            <td>LOTE-A1</td>
-                                        </tr>
-                                        <tr>
-                                            <td>PAL002</td>
-                                            <td>LOTE-A2</td>
-                                        </tr>
-
-                                        <!-- Segundo material con 1 palet -->
-                                        <tr>
-                                            <td>Material 2</td>
-                                            <td>PAL010</td>
-                                            <td>LOTE-B1</td>
-                                        </tr>
-
-                                        <tr>
-                                            <td>Material 3</td>
-                                            <td></td>
-                                            <td></td>
-                                        </tr>
-
                                     </tbody>
                                 </table>
 
@@ -379,10 +355,10 @@
 
                                     <!-- Grupo de input + botón Agregar -->
                                     <div class="input-group">
-                                        <input type="text" class="form-control"
-                                            placeholder="Agregar nuevo lote de material">
-                                        <button class="btn btn-outline-primary" type="button">
-                                            <i class="bi bi-search"></i> Agregar
+                                        <input type="text" class="form-control" id="fabricacion-palet-codigo"
+                                            placeholder="Codigo de palet">
+                                        <button class="btn btn-outline-primary" type="button" id="fabricacion-agregar-trazabilidad">
+                                            <i class="bi bi-plus-lg"></i> Agregar
                                         </button>
                                     </div>
 

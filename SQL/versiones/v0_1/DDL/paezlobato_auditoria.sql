@@ -967,4 +967,340 @@ BEGIN
   END IF;
 END$$
 
+-- === ordenes_fabricacion ===
+ALTER TABLE `ordenes_fabricacion`
+  ADD COLUMN IF NOT EXISTS `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  ADD COLUMN IF NOT EXISTS `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  ADD COLUMN IF NOT EXISTS `deleted_at` TIMESTAMP NULL DEFAULT NULL,
+  ADD COLUMN IF NOT EXISTS `is_deleted` TINYINT(1) NOT NULL DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS `created_by` VARCHAR(100) NOT NULL DEFAULT 'system',
+  ADD COLUMN IF NOT EXISTS `updated_by` VARCHAR(100) NOT NULL DEFAULT 'system',
+  ADD COLUMN IF NOT EXISTS `deleted_by` VARCHAR(100) NULL;
+DROP INDEX IF EXISTS `idx_ordenes_fabricacion_is_deleted` ON `ordenes_fabricacion`;
+DROP INDEX IF EXISTS `idx_ordenes_fabricacion_deleted_at` ON `ordenes_fabricacion`;
+ALTER TABLE `ordenes_fabricacion`
+  ADD INDEX `idx_ordenes_fabricacion_is_deleted` (`is_deleted`),
+  ADD INDEX `idx_ordenes_fabricacion_deleted_at` (`deleted_at`);
+DROP TRIGGER IF EXISTS `ordenes_fabricacion_bi`;
+DROP TRIGGER IF EXISTS `ordenes_fabricacion_bu`;
+CREATE TRIGGER `ordenes_fabricacion_bi` BEFORE INSERT ON `ordenes_fabricacion` FOR EACH ROW
+BEGIN
+  IF NEW.created_at IS NULL THEN SET NEW.created_at = CURRENT_TIMESTAMP(); END IF;
+  SET NEW.updated_at = NEW.created_at;
+  SET NEW.created_by = COALESCE(@audit_user, 'system');
+  SET NEW.updated_by = NEW.created_by;
+  IF NEW.is_deleted IS NULL THEN SET NEW.is_deleted = 0; END IF;
+  IF NEW.is_deleted = 1 THEN
+    IF NEW.deleted_at IS NULL THEN SET NEW.deleted_at = CURRENT_TIMESTAMP(); END IF;
+    SET NEW.deleted_by = COALESCE(@audit_user, 'system');
+  ELSE
+    SET NEW.deleted_at = NULL;
+    SET NEW.deleted_by = NULL;
+  END IF;
+END$$
+CREATE TRIGGER `ordenes_fabricacion_bu` BEFORE UPDATE ON `ordenes_fabricacion` FOR EACH ROW
+BEGIN
+  SET NEW.updated_at = CURRENT_TIMESTAMP();
+  SET NEW.updated_by = COALESCE(@audit_user, 'system');
+  IF NEW.is_deleted IS NULL THEN SET NEW.is_deleted = 0; END IF;
+  IF (NEW.is_deleted = 1 AND OLD.is_deleted = 0) OR (NEW.deleted_at IS NOT NULL AND OLD.deleted_at IS NULL) THEN
+    SET NEW.is_deleted = 1;
+    IF NEW.deleted_at IS NULL THEN SET NEW.deleted_at = CURRENT_TIMESTAMP(); END IF;
+    SET NEW.deleted_by = COALESCE(@audit_user, 'system');
+  END IF;
+  IF (NEW.is_deleted = 0 AND OLD.is_deleted = 1) OR (NEW.deleted_at IS NULL AND OLD.deleted_at IS NOT NULL) THEN
+    SET NEW.is_deleted = 0;
+    SET NEW.deleted_at = NULL;
+    SET NEW.deleted_by = NULL;
+  END IF;
+END$$
+
+-- === tipos_producto ===
+ALTER TABLE `tipos_producto`
+  ADD COLUMN IF NOT EXISTS `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  ADD COLUMN IF NOT EXISTS `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  ADD COLUMN IF NOT EXISTS `deleted_at` TIMESTAMP NULL DEFAULT NULL,
+  ADD COLUMN IF NOT EXISTS `is_deleted` TINYINT(1) NOT NULL DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS `created_by` VARCHAR(100) NOT NULL DEFAULT 'system',
+  ADD COLUMN IF NOT EXISTS `updated_by` VARCHAR(100) NOT NULL DEFAULT 'system',
+  ADD COLUMN IF NOT EXISTS `deleted_by` VARCHAR(100) NULL;
+DROP INDEX IF EXISTS `idx_tipos_producto_is_deleted` ON `tipos_producto`;
+DROP INDEX IF EXISTS `idx_tipos_producto_deleted_at` ON `tipos_producto`;
+ALTER TABLE `tipos_producto`
+  ADD INDEX `idx_tipos_producto_is_deleted` (`is_deleted`),
+  ADD INDEX `idx_tipos_producto_deleted_at` (`deleted_at`);
+DROP TRIGGER IF EXISTS `tipos_producto_bi`;
+DROP TRIGGER IF EXISTS `tipos_producto_bu`;
+CREATE TRIGGER `tipos_producto_bi` BEFORE INSERT ON `tipos_producto` FOR EACH ROW
+BEGIN
+  IF NEW.created_at IS NULL THEN SET NEW.created_at = CURRENT_TIMESTAMP(); END IF;
+  SET NEW.updated_at = NEW.created_at;
+  SET NEW.created_by = COALESCE(@audit_user, 'system');
+  SET NEW.updated_by = NEW.created_by;
+  IF NEW.is_deleted IS NULL THEN SET NEW.is_deleted = 0; END IF;
+  IF NEW.is_deleted = 1 THEN
+    IF NEW.deleted_at IS NULL THEN SET NEW.deleted_at = CURRENT_TIMESTAMP(); END IF;
+    SET NEW.deleted_by = COALESCE(@audit_user, 'system');
+  ELSE
+    SET NEW.deleted_at = NULL;
+    SET NEW.deleted_by = NULL;
+  END IF;
+END$$
+CREATE TRIGGER `tipos_producto_bu` BEFORE UPDATE ON `tipos_producto` FOR EACH ROW
+BEGIN
+  SET NEW.updated_at = CURRENT_TIMESTAMP();
+  SET NEW.updated_by = COALESCE(@audit_user, 'system');
+  IF NEW.is_deleted IS NULL THEN SET NEW.is_deleted = 0; END IF;
+  IF (NEW.is_deleted = 1 AND OLD.is_deleted = 0) OR (NEW.deleted_at IS NOT NULL AND OLD.deleted_at IS NULL) THEN
+    SET NEW.is_deleted = 1;
+    IF NEW.deleted_at IS NULL THEN SET NEW.deleted_at = CURRENT_TIMESTAMP(); END IF;
+    SET NEW.deleted_by = COALESCE(@audit_user, 'system');
+  END IF;
+  IF (NEW.is_deleted = 0 AND OLD.is_deleted = 1) OR (NEW.deleted_at IS NULL AND OLD.deleted_at IS NOT NULL) THEN
+    SET NEW.is_deleted = 0;
+    SET NEW.deleted_at = NULL;
+    SET NEW.deleted_by = NULL;
+  END IF;
+END$$
+
+-- === lineas_fabricacion ===
+ALTER TABLE `lineas_fabricacion`
+  ADD COLUMN IF NOT EXISTS `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  ADD COLUMN IF NOT EXISTS `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  ADD COLUMN IF NOT EXISTS `deleted_at` TIMESTAMP NULL DEFAULT NULL,
+  ADD COLUMN IF NOT EXISTS `is_deleted` TINYINT(1) NOT NULL DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS `created_by` VARCHAR(100) NOT NULL DEFAULT 'system',
+  ADD COLUMN IF NOT EXISTS `updated_by` VARCHAR(100) NOT NULL DEFAULT 'system',
+  ADD COLUMN IF NOT EXISTS `deleted_by` VARCHAR(100) NULL;
+DROP INDEX IF EXISTS `idx_lineas_fabricacion_is_deleted` ON `lineas_fabricacion`;
+DROP INDEX IF EXISTS `idx_lineas_fabricacion_deleted_at` ON `lineas_fabricacion`;
+ALTER TABLE `lineas_fabricacion`
+  ADD INDEX `idx_lineas_fabricacion_is_deleted` (`is_deleted`),
+  ADD INDEX `idx_lineas_fabricacion_deleted_at` (`deleted_at`);
+DROP TRIGGER IF EXISTS `lineas_fabricacion_bi`;
+DROP TRIGGER IF EXISTS `lineas_fabricacion_bu`;
+CREATE TRIGGER `lineas_fabricacion_bi` BEFORE INSERT ON `lineas_fabricacion` FOR EACH ROW
+BEGIN
+  IF NEW.created_at IS NULL THEN SET NEW.created_at = CURRENT_TIMESTAMP(); END IF;
+  SET NEW.updated_at = NEW.created_at;
+  SET NEW.created_by = COALESCE(@audit_user, 'system');
+  SET NEW.updated_by = NEW.created_by;
+  IF NEW.is_deleted IS NULL THEN SET NEW.is_deleted = 0; END IF;
+  IF NEW.is_deleted = 1 THEN
+    IF NEW.deleted_at IS NULL THEN SET NEW.deleted_at = CURRENT_TIMESTAMP(); END IF;
+    SET NEW.deleted_by = COALESCE(@audit_user, 'system');
+  ELSE
+    SET NEW.deleted_at = NULL;
+    SET NEW.deleted_by = NULL;
+  END IF;
+END$$
+CREATE TRIGGER `lineas_fabricacion_bu` BEFORE UPDATE ON `lineas_fabricacion` FOR EACH ROW
+BEGIN
+  SET NEW.updated_at = CURRENT_TIMESTAMP();
+  SET NEW.updated_by = COALESCE(@audit_user, 'system');
+  IF NEW.is_deleted IS NULL THEN SET NEW.is_deleted = 0; END IF;
+  IF (NEW.is_deleted = 1 AND OLD.is_deleted = 0) OR (NEW.deleted_at IS NOT NULL AND OLD.deleted_at IS NULL) THEN
+    SET NEW.is_deleted = 1;
+    IF NEW.deleted_at IS NULL THEN SET NEW.deleted_at = CURRENT_TIMESTAMP(); END IF;
+    SET NEW.deleted_by = COALESCE(@audit_user, 'system');
+  END IF;
+  IF (NEW.is_deleted = 0 AND OLD.is_deleted = 1) OR (NEW.deleted_at IS NULL AND OLD.deleted_at IS NOT NULL) THEN
+    SET NEW.is_deleted = 0;
+    SET NEW.deleted_at = NULL;
+    SET NEW.deleted_by = NULL;
+  END IF;
+END$$
+
+-- === trazabilidad_procesado ===
+ALTER TABLE `trazabilidad_procesado`
+  ADD COLUMN IF NOT EXISTS `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  ADD COLUMN IF NOT EXISTS `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  ADD COLUMN IF NOT EXISTS `deleted_at` TIMESTAMP NULL DEFAULT NULL,
+  ADD COLUMN IF NOT EXISTS `is_deleted` TINYINT(1) NOT NULL DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS `created_by` VARCHAR(100) NOT NULL DEFAULT 'system',
+  ADD COLUMN IF NOT EXISTS `updated_by` VARCHAR(100) NOT NULL DEFAULT 'system',
+  ADD COLUMN IF NOT EXISTS `deleted_by` VARCHAR(100) NULL;
+DROP INDEX IF EXISTS `idx_trazabilidad_procesado_is_deleted` ON `trazabilidad_procesado`;
+DROP INDEX IF EXISTS `idx_trazabilidad_procesado_deleted_at` ON `trazabilidad_procesado`;
+ALTER TABLE `trazabilidad_procesado`
+  ADD INDEX `idx_trazabilidad_procesado_is_deleted` (`is_deleted`),
+  ADD INDEX `idx_trazabilidad_procesado_deleted_at` (`deleted_at`);
+DROP TRIGGER IF EXISTS `trazabilidad_procesado_bi`;
+DROP TRIGGER IF EXISTS `trazabilidad_procesado_bu`;
+CREATE TRIGGER `trazabilidad_procesado_bi` BEFORE INSERT ON `trazabilidad_procesado` FOR EACH ROW
+BEGIN
+  IF NEW.created_at IS NULL THEN SET NEW.created_at = CURRENT_TIMESTAMP(); END IF;
+  SET NEW.updated_at = NEW.created_at;
+  SET NEW.created_by = COALESCE(@audit_user, 'system');
+  SET NEW.updated_by = NEW.created_by;
+  IF NEW.is_deleted IS NULL THEN SET NEW.is_deleted = 0; END IF;
+  IF NEW.is_deleted = 1 THEN
+    IF NEW.deleted_at IS NULL THEN SET NEW.deleted_at = CURRENT_TIMESTAMP(); END IF;
+    SET NEW.deleted_by = COALESCE(@audit_user, 'system');
+  ELSE
+    SET NEW.deleted_at = NULL;
+    SET NEW.deleted_by = NULL;
+  END IF;
+END$$
+CREATE TRIGGER `trazabilidad_procesado_bu` BEFORE UPDATE ON `trazabilidad_procesado` FOR EACH ROW
+BEGIN
+  SET NEW.updated_at = CURRENT_TIMESTAMP();
+  SET NEW.updated_by = COALESCE(@audit_user, 'system');
+  IF NEW.is_deleted IS NULL THEN SET NEW.is_deleted = 0; END IF;
+  IF (NEW.is_deleted = 1 AND OLD.is_deleted = 0) OR (NEW.deleted_at IS NOT NULL AND OLD.deleted_at IS NULL) THEN
+    SET NEW.is_deleted = 1;
+    IF NEW.deleted_at IS NULL THEN SET NEW.deleted_at = CURRENT_TIMESTAMP(); END IF;
+    SET NEW.deleted_by = COALESCE(@audit_user, 'system');
+  END IF;
+  IF (NEW.is_deleted = 0 AND OLD.is_deleted = 1) OR (NEW.deleted_at IS NULL AND OLD.deleted_at IS NOT NULL) THEN
+    SET NEW.is_deleted = 0;
+    SET NEW.deleted_at = NULL;
+    SET NEW.deleted_by = NULL;
+  END IF;
+END$$
+
+-- === trazabilidad_fabricacion ===
+ALTER TABLE `trazabilidad_fabricacion`
+  ADD COLUMN IF NOT EXISTS `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  ADD COLUMN IF NOT EXISTS `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  ADD COLUMN IF NOT EXISTS `deleted_at` TIMESTAMP NULL DEFAULT NULL,
+  ADD COLUMN IF NOT EXISTS `is_deleted` TINYINT(1) NOT NULL DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS `created_by` VARCHAR(100) NOT NULL DEFAULT 'system',
+  ADD COLUMN IF NOT EXISTS `updated_by` VARCHAR(100) NOT NULL DEFAULT 'system',
+  ADD COLUMN IF NOT EXISTS `deleted_by` VARCHAR(100) NULL;
+DROP INDEX IF EXISTS `idx_trazabilidad_fabricacion_is_deleted` ON `trazabilidad_fabricacion`;
+DROP INDEX IF EXISTS `idx_trazabilidad_fabricacion_deleted_at` ON `trazabilidad_fabricacion`;
+ALTER TABLE `trazabilidad_fabricacion`
+  ADD INDEX `idx_trazabilidad_fabricacion_is_deleted` (`is_deleted`),
+  ADD INDEX `idx_trazabilidad_fabricacion_deleted_at` (`deleted_at`);
+DROP TRIGGER IF EXISTS `trazabilidad_fabricacion_bi`;
+DROP TRIGGER IF EXISTS `trazabilidad_fabricacion_bu`;
+CREATE TRIGGER `trazabilidad_fabricacion_bi` BEFORE INSERT ON `trazabilidad_fabricacion` FOR EACH ROW
+BEGIN
+  IF NEW.created_at IS NULL THEN SET NEW.created_at = CURRENT_TIMESTAMP(); END IF;
+  SET NEW.updated_at = NEW.created_at;
+  SET NEW.created_by = COALESCE(@audit_user, 'system');
+  SET NEW.updated_by = NEW.created_by;
+  IF NEW.is_deleted IS NULL THEN SET NEW.is_deleted = 0; END IF;
+  IF NEW.is_deleted = 1 THEN
+    IF NEW.deleted_at IS NULL THEN SET NEW.deleted_at = CURRENT_TIMESTAMP(); END IF;
+    SET NEW.deleted_by = COALESCE(@audit_user, 'system');
+  ELSE
+    SET NEW.deleted_at = NULL;
+    SET NEW.deleted_by = NULL;
+  END IF;
+END$$
+CREATE TRIGGER `trazabilidad_fabricacion_bu` BEFORE UPDATE ON `trazabilidad_fabricacion` FOR EACH ROW
+BEGIN
+  SET NEW.updated_at = CURRENT_TIMESTAMP();
+  SET NEW.updated_by = COALESCE(@audit_user, 'system');
+  IF NEW.is_deleted IS NULL THEN SET NEW.is_deleted = 0; END IF;
+  IF (NEW.is_deleted = 1 AND OLD.is_deleted = 0) OR (NEW.deleted_at IS NOT NULL AND OLD.deleted_at IS NULL) THEN
+    SET NEW.is_deleted = 1;
+    IF NEW.deleted_at IS NULL THEN SET NEW.deleted_at = CURRENT_TIMESTAMP(); END IF;
+    SET NEW.deleted_by = COALESCE(@audit_user, 'system');
+  END IF;
+  IF (NEW.is_deleted = 0 AND OLD.is_deleted = 1) OR (NEW.deleted_at IS NULL AND OLD.deleted_at IS NOT NULL) THEN
+    SET NEW.is_deleted = 0;
+    SET NEW.deleted_at = NULL;
+    SET NEW.deleted_by = NULL;
+  END IF;
+END$$
+
+-- === trazabilidad_producto ===
+ALTER TABLE `trazabilidad_producto`
+  ADD COLUMN IF NOT EXISTS `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  ADD COLUMN IF NOT EXISTS `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  ADD COLUMN IF NOT EXISTS `deleted_at` TIMESTAMP NULL DEFAULT NULL,
+  ADD COLUMN IF NOT EXISTS `is_deleted` TINYINT(1) NOT NULL DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS `created_by` VARCHAR(100) NOT NULL DEFAULT 'system',
+  ADD COLUMN IF NOT EXISTS `updated_by` VARCHAR(100) NOT NULL DEFAULT 'system',
+  ADD COLUMN IF NOT EXISTS `deleted_by` VARCHAR(100) NULL;
+DROP INDEX IF EXISTS `idx_trazabilidad_producto_is_deleted` ON `trazabilidad_producto`;
+DROP INDEX IF EXISTS `idx_trazabilidad_producto_deleted_at` ON `trazabilidad_producto`;
+ALTER TABLE `trazabilidad_producto`
+  ADD INDEX `idx_trazabilidad_producto_is_deleted` (`is_deleted`),
+  ADD INDEX `idx_trazabilidad_producto_deleted_at` (`deleted_at`);
+DROP TRIGGER IF EXISTS `trazabilidad_producto_bi`;
+DROP TRIGGER IF EXISTS `trazabilidad_producto_bu`;
+CREATE TRIGGER `trazabilidad_producto_bi` BEFORE INSERT ON `trazabilidad_producto` FOR EACH ROW
+BEGIN
+  IF NEW.created_at IS NULL THEN SET NEW.created_at = CURRENT_TIMESTAMP(); END IF;
+  SET NEW.updated_at = NEW.created_at;
+  SET NEW.created_by = COALESCE(@audit_user, 'system');
+  SET NEW.updated_by = NEW.created_by;
+  IF NEW.is_deleted IS NULL THEN SET NEW.is_deleted = 0; END IF;
+  IF NEW.is_deleted = 1 THEN
+    IF NEW.deleted_at IS NULL THEN SET NEW.deleted_at = CURRENT_TIMESTAMP(); END IF;
+    SET NEW.deleted_by = COALESCE(@audit_user, 'system');
+  ELSE
+    SET NEW.deleted_at = NULL;
+    SET NEW.deleted_by = NULL;
+  END IF;
+END$$
+CREATE TRIGGER `trazabilidad_producto_bu` BEFORE UPDATE ON `trazabilidad_producto` FOR EACH ROW
+BEGIN
+  SET NEW.updated_at = CURRENT_TIMESTAMP();
+  SET NEW.updated_by = COALESCE(@audit_user, 'system');
+  IF NEW.is_deleted IS NULL THEN SET NEW.is_deleted = 0; END IF;
+  IF (NEW.is_deleted = 1 AND OLD.is_deleted = 0) OR (NEW.deleted_at IS NOT NULL AND OLD.deleted_at IS NULL) THEN
+    SET NEW.is_deleted = 1;
+    IF NEW.deleted_at IS NULL THEN SET NEW.deleted_at = CURRENT_TIMESTAMP(); END IF;
+    SET NEW.deleted_by = COALESCE(@audit_user, 'system');
+  END IF;
+  IF (NEW.is_deleted = 0 AND OLD.is_deleted = 1) OR (NEW.deleted_at IS NULL AND OLD.deleted_at IS NOT NULL) THEN
+    SET NEW.is_deleted = 0;
+    SET NEW.deleted_at = NULL;
+    SET NEW.deleted_by = NULL;
+  END IF;
+END$$
+
+-- === botas ===
+ALTER TABLE `botas`
+  ADD COLUMN IF NOT EXISTS `created_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  ADD COLUMN IF NOT EXISTS `updated_at` TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  ADD COLUMN IF NOT EXISTS `deleted_at` TIMESTAMP NULL DEFAULT NULL,
+  ADD COLUMN IF NOT EXISTS `is_deleted` TINYINT(1) NOT NULL DEFAULT 0,
+  ADD COLUMN IF NOT EXISTS `created_by` VARCHAR(100) NOT NULL DEFAULT 'system',
+  ADD COLUMN IF NOT EXISTS `updated_by` VARCHAR(100) NOT NULL DEFAULT 'system',
+  ADD COLUMN IF NOT EXISTS `deleted_by` VARCHAR(100) NULL;
+DROP INDEX IF EXISTS `idx_botas_is_deleted` ON `botas`;
+DROP INDEX IF EXISTS `idx_botas_deleted_at` ON `botas`;
+ALTER TABLE `botas`
+  ADD INDEX `idx_botas_is_deleted` (`is_deleted`),
+  ADD INDEX `idx_botas_deleted_at` (`deleted_at`);
+DROP TRIGGER IF EXISTS `botas_bi`;
+DROP TRIGGER IF EXISTS `botas_bu`;
+CREATE TRIGGER `botas_bi` BEFORE INSERT ON `botas` FOR EACH ROW
+BEGIN
+  IF NEW.created_at IS NULL THEN SET NEW.created_at = CURRENT_TIMESTAMP(); END IF;
+  SET NEW.updated_at = NEW.created_at;
+  SET NEW.created_by = COALESCE(@audit_user, 'system');
+  SET NEW.updated_by = NEW.created_by;
+  IF NEW.is_deleted IS NULL THEN SET NEW.is_deleted = 0; END IF;
+  IF NEW.is_deleted = 1 THEN
+    IF NEW.deleted_at IS NULL THEN SET NEW.deleted_at = CURRENT_TIMESTAMP(); END IF;
+    SET NEW.deleted_by = COALESCE(@audit_user, 'system');
+  ELSE
+    SET NEW.deleted_at = NULL;
+    SET NEW.deleted_by = NULL;
+  END IF;
+END$$
+CREATE TRIGGER `botas_bu` BEFORE UPDATE ON `botas` FOR EACH ROW
+BEGIN
+  SET NEW.updated_at = CURRENT_TIMESTAMP();
+  SET NEW.updated_by = COALESCE(@audit_user, 'system');
+  IF NEW.is_deleted IS NULL THEN SET NEW.is_deleted = 0; END IF;
+  IF (NEW.is_deleted = 1 AND OLD.is_deleted = 0) OR (NEW.deleted_at IS NOT NULL AND OLD.deleted_at IS NULL) THEN
+    SET NEW.is_deleted = 1;
+    IF NEW.deleted_at IS NULL THEN SET NEW.deleted_at = CURRENT_TIMESTAMP(); END IF;
+    SET NEW.deleted_by = COALESCE(@audit_user, 'system');
+  END IF;
+  IF (NEW.is_deleted = 0 AND OLD.is_deleted = 1) OR (NEW.deleted_at IS NULL AND OLD.deleted_at IS NOT NULL) THEN
+    SET NEW.is_deleted = 0;
+    SET NEW.deleted_at = NULL;
+    SET NEW.deleted_by = NULL;
+  END IF;
+END$$
+
 DELIMITER ;

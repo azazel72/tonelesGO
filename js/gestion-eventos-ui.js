@@ -4,6 +4,8 @@ async function getCellClick(e, cell) {
   console.log("click en acciones");
   const action = e.target.closest("button")?.getAttribute("data-action-row");
   const tabla = cell.getTable();
+  const storeKey = tabla.DATA_STORE || "maestros";
+  const store = DATOS?.[storeKey] ?? null;
   const row = cell.getRow();
   switch (action) {
     case "guardar":
@@ -11,7 +13,9 @@ async function getCellClick(e, cell) {
       respuesta = await wsRequest("insertar_maestro", { tabla: tabla.KEY, ...datos });
       console.log(respuesta);
       if (respuesta?.id) {
-        DATOS.maestros[tabla.KEY][respuesta.id] = respuesta;
+        if (store && store[tabla.KEY]) {
+          store[tabla.KEY][respuesta.id] = respuesta;
+        }
         row.update(respuesta);
         row.reformat();
         row.getElement().classList.remove('nuevo-registro');
@@ -63,7 +67,11 @@ async function eventoClickCabecera(e, tabla, cabecera) {
           windowsRegistry.delete(key);
         }
         window.__reloadKey = key;
-        send("maestros", {});
+        if (tabla.DATA_STORE === "fabricacion") {
+          send("fabricacion", {});
+        } else {
+          send("maestros", {});
+        }
       }
       break;
     case "u-add":

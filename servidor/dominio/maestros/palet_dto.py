@@ -6,8 +6,8 @@ from servidor.modelos import PaletDB
 class PaletDTO(BaseModel):
     id: int | None
     codigo: str
-    linea_entrada_id: int
-    ubicacion_id: int
+    linea_entrada_id: int | None = None
+    ubicacion_id: int | None = None
     procesado: bool = False
 
     def from_db(palet_db: PaletDB) -> "PaletDTO":

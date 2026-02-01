@@ -283,8 +283,18 @@ function crearVentanaPlanificacionEntradas(configuracion, show=true) {
   }
 
   // Tabulator
-  const tablaPlanificacionEntradas = crearTabla("planificacion_entradas", contenedor, configuracion.tabulator.planificacion_entradas.options);
-  const tablaMateriales = crearTabla("materiales", contenedor, configuracion.tabulator.materiales.options);
+  const tablaPlanificacionEntradas = crearTabla(
+    "planificacion_entradas",
+    contenedor,
+    configuracion.tabulator.planificacion_entradas.options,
+    "planificacion_entradas"
+  );
+  const tablaMateriales = crearTabla(
+    "materiales",
+    contenedor,
+    configuracion.tabulator.materiales.options,
+    "materiales"
+  );
 
   windowsRegistry.set(configuracion.KEY, { wb: wb, table: [tablaPlanificacionEntradas, tablaMateriales] });
 

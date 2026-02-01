@@ -4,6 +4,7 @@ from .plan_camion_dto import PlanCamionDTO
 from .plan_facturacion_dto import PlanFacturacionDTO
 from .plan_material_dto import PlanMaterialDTO
 from .cuadrantes_dto import CuadrantesDTO
+from .fabricacion_dto import FabricacionDTO
 
 __all__ = [
     "PlanificacionEntradasDTO",
@@ -12,4 +13,5 @@ __all__ = [
     "PlanFacturacionDTO",
     "PlanMaterialDTO",
     "CuadrantesDTO",
+    "FabricacionDTO",
 ]

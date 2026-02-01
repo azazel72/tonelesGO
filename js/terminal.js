@@ -30,6 +30,9 @@ document.addEventListener("DOMContentLoaded", function () {
     conexionInicial();
 });
 
+let pantallaActual = null;
+let contextoPantalla = {};
+
 function mostrarSeccion(id) {
     const seccionActiva = document.getElementById(id);
     if (seccionActiva) {
@@ -43,8 +46,12 @@ function mostrarSeccion(id) {
         if (id === "vista_recepcion") {
             cargarEntradasRecepcion();
         }
+        if (id === "vista_fabricacion") {
+            cargarOrdenesFabricacion();
+        }
         // Actualiza las migas de pan
         actualizarMigasPan(id);
+        setPantalla(id, {});
     }
 }
 
@@ -122,4 +129,22 @@ var ACCIONES = {
         console.warn("Acción no manejada:", msg);
     },
     "login": console.log,
+    "fabricacion_actualizar": (msg) => {
+        if (pantallaActual === "vista_fabricacion") {
+            refrescarFabricacionDesdeServidor?.(msg.data || {});
+        }
+    },
 };
+
+function setPantalla(pantalla, contexto = {}) {
+    pantallaActual = pantalla;
+    contextoPantalla = contexto;
+    enviarPantalla();
+}
+
+function enviarPantalla() {
+    const ws = conn && conn.socket;
+    if (!ws || ws.readyState !== WebSocket.OPEN) return;
+    const payload = { pantalla: pantallaActual, contexto: contextoPantalla };
+    ws.send(JSON.stringify({ action: "set_pantalla", data: payload }));
+}

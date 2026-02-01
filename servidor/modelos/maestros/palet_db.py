@@ -8,6 +8,6 @@ class PaletDB(SQLModel, table=True):
 
     id: Optional[int] = Field(default=None, primary_key=True)
     codigo: str
-    linea_entrada_id: int
-    ubicacion_id: int
+    linea_entrada_id: int | None = None
+    ubicacion_id: int | None = None
     procesado: bool = False

@@ -1,5 +1,6 @@
 const DATOS = {
     maestros: {},
+    fabricacion: {},
     planificacion_entradas: { planificacion: {} },
     salidas: { planificacion: {} },
 };
@@ -65,6 +66,27 @@ window.onload = () => {
         async "ver-archivos-subidos"() {
             await openArchivosSubidosWin();
         },
+        async "ver-ordenes-fabricacion"() {
+            await openOrdenesFabricacionWin();
+        },
+        async "ver-tipos-producto"() {
+            await openTiposProductoWin();
+        },
+        async "ver-lineas-fabricacion"() {
+            await openLineasFabricacionWin();
+        },
+        async "ver-trazabilidad-procesado"() {
+            await openTrazabilidadProcesadoWin();
+        },
+        async "ver-trazabilidad-fabricacion"() {
+            await openTrazabilidadFabricacionWin();
+        },
+        async "ver-trazabilidad-producto"() {
+            await openTrazabilidadProductoWin();
+        },
+        async "ver-botas"() {
+            await openBotasWin();
+        },
 
         async "ver-planificacion-entradas"() {
             await openPlanificacionEntradasWin();
@@ -115,6 +137,13 @@ window.onload = () => {
         palets: openPaletsWin,
         productos: openProductosWin,
         archivos_subidos: openArchivosSubidosWin,
+        ordenes_fabricacion: openOrdenesFabricacionWin,
+        tipos_producto: openTiposProductoWin,
+        lineas_fabricacion: openLineasFabricacionWin,
+        trazabilidad_procesado: openTrazabilidadProcesadoWin,
+        trazabilidad_fabricacion: openTrazabilidadFabricacionWin,
+        trazabilidad_producto: openTrazabilidadProductoWin,
+        botas: openBotasWin,
         planificacion_entradas: openPlanificacionEntradasWin,
         cuadrantes: openCuadrantesWin,
     };
@@ -162,3 +191,23 @@ function respuesta_maestros(response) {
     }
 }
 
+function respuesta_fabricacion(response) {
+    if (response.data) {
+        DATOS.fabricacion = response.data;
+        console.log("Fabricacion recibida:", DATOS.fabricacion);
+        if (window.__reloadKey) {
+            const key = window.__reloadKey;
+            window.__reloadKey = null;
+            window.WINDOW_OPENERS?.[key]?.();
+        }
+    } else {
+        alert("Error al recibir fabricacion: " + response.error);
+    }
+}
+
+function asegurarFabricacionCargada(key) {
+    if (DATOS.fabricacion && DATOS.fabricacion[key]) return true;
+    window.__reloadKey = key;
+    send("fabricacion", {});
+    return false;
+}

@@ -5,12 +5,14 @@ from typing import List
 from servidor.herramientas.utilidades import obtener_anterior_dia_semana
 
 from .modelos import ClienteDB, EstadoDB, InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB, RolDB, PuestoTrabajoDB, MaterialDB, DuelaDB, EntradaDB, LineaEntradaDB, PaletDB, ProductoDB, ArchivoSubidoDB
+from .modelos import OrdenFabricacionDB, TipoProductoDB, LineaFabricacionDB, TrazabilidadProcesadoDB, TrazabilidadFabricacionDB, TrazabilidadProductoDB, BotaDB
 from .modelos import PlanCamionDB, PlanFacturacionDB, PlanMaterialDB, CuadranteDB, CuadranteDetalleDB
 from .persistencia import GenericRepository, DB
 from sqlmodel import select
 from sqlalchemy import extract
-from .dominio import PlanificacionEntradasDTO, MaestrosDTO, PlanMaterialDTO, PlanFacturacionDTO, PlanCamionDTO, CuadranteDTO, CuadranteDetalleDTO
+from .dominio import PlanificacionEntradasDTO, MaestrosDTO, PlanMaterialDTO, PlanFacturacionDTO, PlanCamionDTO, CuadranteDTO, CuadranteDetalleDTO, FabricacionDTO
 from .dominio import ClienteDTO, EstadoDTO, InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO, RolDTO, PuestoTrabajoDTO, MaterialDTO, DuelaDTO, EntradaDTO, LineaEntradaDTO, PaletDTO, ProductoDTO, ArchivoSubidoDTO, CuadrantesDTO
+from .dominio import OrdenFabricacionDTO, TipoProductoDTO, LineaFabricacionDTO, TrazabilidadProcesadoDTO, TrazabilidadFabricacionDTO, TrazabilidadProductoDTO, BotaDTO
 
 logger = logging.getLogger("paezlobato_colector")
 
@@ -20,6 +22,7 @@ class Colector:
     planificacion_entradas: "PlanificacionEntradasDTO" = None
     maestros: "MaestrosDTO" = None
     cuadrantes: "CuadrantesDTO" = None
+    fabricacion: "FabricacionDTO" = None
 
 
     def __init__(self):
@@ -27,6 +30,7 @@ class Colector:
         self.planificacion_entradas = PlanificacionEntradasDTO()
         self.maestros = MaestrosDTO()
         self.cuadrantes = CuadrantesDTO()
+        self.fabricacion = FabricacionDTO()
 
         self.repo_facturacion = GenericRepository(PlanFacturacionDB)
         self.repo_camiones = GenericRepository(PlanCamionDB)
@@ -46,6 +50,13 @@ class Colector:
         self.repo_palets = GenericRepository(PaletDB)
         self.repo_productos = GenericRepository(ProductoDB)
         self.repo_archivos_subidos = GenericRepository(ArchivoSubidoDB)
+        self.repo_ordenes_fabricacion = GenericRepository(OrdenFabricacionDB)
+        self.repo_tipos_producto = GenericRepository(TipoProductoDB)
+        self.repo_lineas_fabricacion = GenericRepository(LineaFabricacionDB)
+        self.repo_trazabilidad_procesado = GenericRepository(TrazabilidadProcesadoDB)
+        self.repo_trazabilidad_fabricacion = GenericRepository(TrazabilidadFabricacionDB)
+        self.repo_trazabilidad_producto = GenericRepository(TrazabilidadProductoDB)
+        self.repo_botas = GenericRepository(BotaDB)
 
         self.repo_usuarios = GenericRepository(UsuarioDB)
         self.repo_roles = GenericRepository(RolDB)
@@ -93,6 +104,40 @@ class Colector:
 
             #print("Datos maestros cargados:", self.maestros)
             #print("Datos clientes cargados:", self.maestros.clientes)
+
+    def obtener_fabricacion(self) -> FabricacionDTO:
+        with DB.crear_sesion() as session:
+            ordenes = self.repo_ordenes_fabricacion.list_all(session)
+            tipos = self.repo_tipos_producto.list_all(session)
+            lineas = self.repo_lineas_fabricacion.list_all(session)
+            traz_procesado = self.repo_trazabilidad_procesado.list_all(session)
+            traz_fabricacion = self.repo_trazabilidad_fabricacion.list_all(session)
+            traz_producto = self.repo_trazabilidad_producto.list_all(session)
+            botas = self.repo_botas.list_all(session)
+
+            self.fabricacion.ordenes_fabricacion = {
+                orden.id: OrdenFabricacionDTO.from_db(orden) for orden in ordenes
+            }
+            self.fabricacion.tipos_producto = {
+                tipo.id: TipoProductoDTO.from_db(tipo) for tipo in tipos
+            }
+            self.fabricacion.lineas_fabricacion = {
+                linea.id: LineaFabricacionDTO.from_db(linea) for linea in lineas
+            }
+            self.fabricacion.trazabilidad_procesado = {
+                traz.id: TrazabilidadProcesadoDTO.from_db(traz) for traz in traz_procesado
+            }
+            self.fabricacion.trazabilidad_fabricacion = {
+                traz.id: TrazabilidadFabricacionDTO.from_db(traz) for traz in traz_fabricacion
+            }
+            self.fabricacion.trazabilidad_producto = {
+                traz.id: TrazabilidadProductoDTO.from_db(traz) for traz in traz_producto
+            }
+            self.fabricacion.botas = {
+                bota.id: BotaDTO.from_db(bota) for bota in botas
+            }
+
+            return self.fabricacion
 
 
     def modificar_maestro(self, data):
@@ -243,6 +288,133 @@ class Colector:
             return [ArchivoSubidoDTO.from_db(archivo) for archivo in archivos]
     #endregion
 
+    #region Metodos Listados Fabricacion
+    def listar_ordenes_fabricacion(self, año: int | None = None):
+        with DB.crear_sesion() as session:
+            statement = select(OrdenFabricacionDB)
+            if año:
+                statement = statement.where(extract("year", OrdenFabricacionDB.fecha) == año)
+            ordenes = session.exec(statement).all()
+            return [OrdenFabricacionDTO.from_db(orden) for orden in ordenes]
+
+    def listar_lineas_fabricacion(self, orden_id: int):
+        with DB.crear_sesion() as session:
+            statement = select(LineaFabricacionDB).where(LineaFabricacionDB.orden_id == orden_id)
+            lineas = session.exec(statement).all()
+            return [LineaFabricacionDTO.from_db(linea) for linea in lineas]
+
+    def listar_trazabilidad_fabricacion(self, linea_fabricacion_id: int):
+        with DB.crear_sesion() as session:
+            statement = select(TrazabilidadFabricacionDB).where(
+                TrazabilidadFabricacionDB.linea_fabricacion_id == linea_fabricacion_id
+            )
+            trazas = session.exec(statement).all()
+            palet_ids = {t.palet_id for t in trazas if t.palet_id}
+            palet_map = {}
+            if palet_ids:
+                palets = session.exec(select(PaletDB).where(PaletDB.id.in_(palet_ids))).all()
+                palet_map = {p.id: p.codigo for p in palets}
+            return [
+                {
+                    "id": t.id,
+                    "linea_fabricacion_id": t.linea_fabricacion_id,
+                    "palet_id": t.palet_id,
+                    "palet_codigo": palet_map.get(t.palet_id),
+                    "cantidad_fabricada": t.cantidad_fabricada,
+                    "estado": t.estado,
+                }
+                for t in trazas
+            ]
+
+    def agregar_trazabilidad_fabricacion(self, data):
+        linea_fabricacion_id = data.get("linea_fabricacion_id")
+        palet_codigo = (data.get("palet_codigo") or "").strip()
+        cantidad_fabricada = data.get("cantidad_fabricada")
+        estado = data.get("estado", 0)
+
+        if not linea_fabricacion_id:
+            raise ValueError("linea_fabricacion_id es obligatorio.")
+        if not palet_codigo:
+            raise ValueError("palet_codigo es obligatorio.")
+
+        cantidad_val = int(cantidad_fabricada) if str(cantidad_fabricada).strip() else 0
+
+        with DB.crear_sesion() as session:
+            palet = session.exec(select(PaletDB).where(PaletDB.codigo == palet_codigo)).first()
+            if not palet:
+                palet = PaletDB(
+                    codigo=palet_codigo,
+                    linea_entrada_id=None,
+                    ubicacion_id=None,
+                    procesado=False,
+                )
+                session.add(palet)
+                session.commit()
+                session.refresh(palet)
+                if self.maestros.palets is not None:
+                    self.maestros.palets[palet.id] = PaletDTO.from_db(palet)
+
+            existente = session.exec(
+                select(TrazabilidadFabricacionDB).where(
+                    TrazabilidadFabricacionDB.linea_fabricacion_id == linea_fabricacion_id,
+                    TrazabilidadFabricacionDB.palet_id == palet.id,
+                )
+            ).first()
+            if existente:
+                raise ValueError("El palet ya esta asociado a esta linea de trazabilidad.")
+
+            trazabilidad = TrazabilidadFabricacionDB(
+                linea_fabricacion_id=linea_fabricacion_id,
+                palet_id=palet.id,
+                cantidad_fabricada=cantidad_val,
+                estado=estado,
+            )
+            session.add(trazabilidad)
+            session.commit()
+            session.refresh(trazabilidad)
+
+            return {
+                "id": trazabilidad.id,
+                "linea_fabricacion_id": linea_fabricacion_id,
+                "palet_id": palet.id,
+                "palet_codigo": palet.codigo,
+                "cantidad_fabricada": trazabilidad.cantidad_fabricada,
+                "estado": trazabilidad.estado,
+            }
+
+    def eliminar_trazabilidad_fabricacion(self, data):
+        trazabilidad_id = data.get("id")
+        if not trazabilidad_id:
+            raise ValueError("id es obligatorio.")
+        with DB.crear_sesion() as session:
+            trazabilidad = session.get(TrazabilidadFabricacionDB, trazabilidad_id)
+            if not trazabilidad:
+                raise ValueError("Registro no encontrado.")
+            if trazabilidad.cantidad_fabricada and trazabilidad.cantidad_fabricada > 0:
+                raise ValueError("No se puede eliminar con cantidad > 0.")
+            session.delete(trazabilidad)
+            session.commit()
+            return {"id": trazabilidad_id}
+
+    def actualizar_estado_trazabilidad_fabricacion(self, data):
+        trazabilidad_id = data.get("id")
+        estado = data.get("estado", 0)
+        if not trazabilidad_id:
+            raise ValueError("id es obligatorio.")
+        with DB.crear_sesion() as session:
+            trazabilidad = session.get(TrazabilidadFabricacionDB, trazabilidad_id)
+            if not trazabilidad:
+                raise ValueError("Registro no encontrado.")
+            trazabilidad.estado = int(estado)
+            session.add(trazabilidad)
+            session.commit()
+            session.refresh(trazabilidad)
+            return {
+                "id": trazabilidad.id,
+                "estado": trazabilidad.estado,
+            }
+    #endregion
+
     #region Métodos Cuadrantes
     def obtener_cuadrante_actual(self) -> dict:
         if not self.cuadrantes.cuadrante_actual:
@@ -391,6 +563,34 @@ class Colector:
             repo = self.repo_archivos_subidos
             maestro = self.maestros.archivos_subidos
             objeto = ArchivoSubidoDTO
+        elif tabla == "ordenes_fabricacion":
+            repo = self.repo_ordenes_fabricacion
+            maestro = self.fabricacion.ordenes_fabricacion
+            objeto = OrdenFabricacionDTO
+        elif tabla == "tipos_producto":
+            repo = self.repo_tipos_producto
+            maestro = self.fabricacion.tipos_producto
+            objeto = TipoProductoDTO
+        elif tabla == "lineas_fabricacion":
+            repo = self.repo_lineas_fabricacion
+            maestro = self.fabricacion.lineas_fabricacion
+            objeto = LineaFabricacionDTO
+        elif tabla == "trazabilidad_procesado":
+            repo = self.repo_trazabilidad_procesado
+            maestro = self.fabricacion.trazabilidad_procesado
+            objeto = TrazabilidadProcesadoDTO
+        elif tabla == "trazabilidad_fabricacion":
+            repo = self.repo_trazabilidad_fabricacion
+            maestro = self.fabricacion.trazabilidad_fabricacion
+            objeto = TrazabilidadFabricacionDTO
+        elif tabla == "trazabilidad_producto":
+            repo = self.repo_trazabilidad_producto
+            maestro = self.fabricacion.trazabilidad_producto
+            objeto = TrazabilidadProductoDTO
+        elif tabla == "botas":
+            repo = self.repo_botas
+            maestro = self.fabricacion.botas
+            objeto = BotaDTO
         elif tabla == "plan_materiales":
             repo = self.repo_materiales
             maestro = self.planificacion_entradas.buscar_material_por_id
