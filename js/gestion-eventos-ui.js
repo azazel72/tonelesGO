@@ -19,6 +19,9 @@ async function getCellClick(e, cell) {
         row.update(respuesta);
         row.reformat();
         row.getElement().classList.remove('nuevo-registro');
+        if (tabla.KEY === "ordenes_fabricacion") {
+          actualizarLineasFabricacionEditorOrdenes?.();
+        }
       } else {
         row.delete();
         alert("Error al guardar el registro.");
@@ -31,6 +34,9 @@ async function getCellClick(e, cell) {
         respuesta = await wsRequest("eliminar_maestro", { tabla: tabla.KEY, id: id });
         if (respuesta?.id == id) {
           row.delete();
+          if (tabla.KEY === "ordenes_fabricacion") {
+            actualizarLineasFabricacionEditorOrdenes?.();
+          }
         }
       } else {
         row.delete();

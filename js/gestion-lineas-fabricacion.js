@@ -6,13 +6,7 @@ function openLineasFabricacionWin() {
   const wb = comprobarVentanaAbierta("lineas_fabricacion");
   if (wb) return wb;
 
-  const ordenesDict = Object.values(DATOS?.fabricacion?.ordenes_fabricacion ?? {}).map(
-    ({ id, numero, ...resto }) => ({
-      ...resto, id, numero,
-      value: id,
-      label: numero || String(id),
-    })
-  );
+  const ordenesDict = construirOrdenesFabricacionDict();
 
   const tiposDict = Object.values(DATOS?.fabricacion?.tipos_producto ?? {}).map(
     ({ id, descripcion, codigo, ...resto }) => ({
@@ -104,4 +98,33 @@ function openLineasFabricacionWin() {
   };
 
   return crearVentana(configuracion);
+}
+
+function construirOrdenesFabricacionDict() {
+  return Object.values(DATOS?.fabricacion?.ordenes_fabricacion ?? {}).map(
+    ({ id, numero, ...resto }) => ({
+      ...resto, id, numero,
+      value: id,
+      label: numero || String(id),
+    })
+  );
+}
+
+function actualizarLineasFabricacionEditorOrdenes() {
+  const par = windowsRegistry.get("lineas_fabricacion");
+  if (!par?.table) return;
+  const tabla = par.table;
+  const ordenesDict = construirOrdenesFabricacionDict();
+  const col = tabla.getColumn("orden_id");
+  if (!col) return;
+  col.updateDefinition({
+    editorParams: {
+      values: ordenesDict,
+      clearable: true,
+      autocomplete: true,
+      allowEmpty: true,
+      listOnEmpty: true,
+      freetext: false,
+    },
+  });
 }

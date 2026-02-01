@@ -148,10 +148,12 @@ class CrudRoutes:
                             "eliminar_trazabilidad_fabricacion",
                         }:
                             await broadcast_pantalla("vista_fabricacion", {"tabla": "trazabilidad_fabricacion"})
+                            await broadcast_pantalla("gestion_fabricacion", {"tabla": "trazabilidad_fabricacion"})
                         elif msg.action in {"modificar_maestro", "insertar_maestro", "eliminar_maestro"}:
                             tabla = (msg.data or {}).get("tabla")
                             if tabla in {"ordenes_fabricacion", "lineas_fabricacion", "trazabilidad_fabricacion"}:
                                 await broadcast_pantalla("vista_fabricacion", {"tabla": tabla})
+                                await broadcast_pantalla("gestion_fabricacion", {"tabla": tabla})
                     else:
                         await ws.send_json(ResponseMessage.fail(msg.action, "no_result", msg.request_id).model_dump())
                 else:

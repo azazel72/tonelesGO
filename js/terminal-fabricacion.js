@@ -18,6 +18,13 @@ function prepararEventosFabricacion() {
         });
     }
 
+    const btnImprimir = document.getElementById("fabricacion-imprimir-etiqueta");
+    if (btnImprimir) {
+        btnImprimir.addEventListener("click", () => {
+            imprimirEtiquetaFabricacion();
+        });
+    }
+
     const tablaTraz = document.querySelector("#tabla_trazabilidad_fabricacion tbody");
     if (tablaTraz) {
         tablaTraz.addEventListener("click", async (event) => {
@@ -292,6 +299,37 @@ async function agregarTrazabilidadFabricacionDesdeUI() {
     } catch (err) {
         console.error(err);
         alert("Error al agregar trazabilidad.");
+    }
+}
+
+async function imprimirEtiquetaFabricacion() {
+    const tbody = document.querySelector("#tabla_trazabilidad_fabricacion tbody");
+    if (!tbody) return;
+    const filas = Array.from(tbody.querySelectorAll("tr"));
+    const activas = filas.filter((tr) => Number(tr.dataset.estado || 0) === 0);
+    if (!activas.length) {
+        alert("No hay palets activos para imprimir.");
+        return;
+    }
+    const trazabilidadIds = activas
+        .map((tr) => Number(tr.dataset.trazabilidadId))
+        .filter((id) => !!id);
+    const paletCodigos = activas.map((tr) => tr.children?.[0]?.textContent?.trim()).filter(Boolean);
+
+    try {
+        const resp = await wsRequest("imprimir_etiqueta_fabricacion", {
+            trazabilidad_ids: trazabilidadIds,
+            palet_codigos: paletCodigos,
+            tipo: "BOTA",
+        });
+        console.log("Etiqueta creada:", resp);
+        cargarTrazabilidadFabricacion(lineaFabricacionActualId);
+        if (ordenFabricacionActualId) {
+            cargarLineasFabricacion(ordenFabricacionActualId);
+        }
+    } catch (err) {
+        console.error(err);
+        alert("Error al imprimir etiqueta.");
     }
 }
 

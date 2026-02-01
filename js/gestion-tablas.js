@@ -317,6 +317,9 @@ function agregarEventosTabla(wb, tabla, cabecera, configuracion) {
     if (resultado?.id != d.id) {
       alert("Error al guardar los cambios en el servidor.");
     }
+    if (t === "ordenes_fabricacion") {
+      actualizarLineasFabricacionEditorOrdenes?.();
+    }
   });
 }
 

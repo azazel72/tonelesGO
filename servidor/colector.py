@@ -413,6 +413,91 @@ class Colector:
                 "id": trazabilidad.id,
                 "estado": trazabilidad.estado,
             }
+
+    def imprimir_etiqueta_fabricacion(self, data):
+        trazabilidad_ids = data.get("trazabilidad_ids") or []
+        palet_codigos = data.get("palet_codigos") or []
+        tipo = data.get("tipo") or "BOTA"
+
+        if not trazabilidad_ids:
+            raise ValueError("No hay trazabilidades activas.")
+
+        with DB.crear_sesion() as session:
+            trazas = session.exec(
+                select(TrazabilidadFabricacionDB).where(
+                    TrazabilidadFabricacionDB.id.in_(trazabilidad_ids)
+                )
+            ).all()
+
+            if not trazas:
+                raise ValueError("Trazabilidades no encontradas.")
+
+            for t in trazas:
+                if t.estado != 0:
+                    raise ValueError("Hay trazabilidades no activas.")
+
+            if not palet_codigos:
+                palet_ids = [t.palet_id for t in trazas]
+                palets = session.exec(select(PaletDB).where(PaletDB.id.in_(palet_ids))).all()
+                palet_map = {p.id: p.codigo for p in palets}
+                palet_codigos = [palet_map.get(t.palet_id, "") for t in trazas]
+
+            base = self._construir_codigo_base(palet_codigos)
+            codigo = self._generar_codigo_producto(session, base)
+
+            producto = ProductoDB(tipo=tipo, codigo=codigo)
+            session.add(producto)
+            session.commit()
+            session.refresh(producto)
+
+            for t in trazas:
+                session.add(TrazabilidadProductoDB(trazabilidad_fabricacion_id=t.id, producto_id=producto.id))
+                t.cantidad_fabricada = int(t.cantidad_fabricada or 0) + 1
+                session.add(t)
+
+            lineas_unicas = {t.linea_fabricacion_id for t in trazas}
+            for linea_id in lineas_unicas:
+                linea = session.get(LineaFabricacionDB, linea_id)
+                if linea:
+                    linea.cantidad_fabricada = int(linea.cantidad_fabricada or 0) + 1
+                    session.add(linea)
+
+            session.commit()
+
+            return {"producto_id": producto.id, "codigo": producto.codigo}
+
+    def _construir_codigo_base(self, codigos):
+        codigos = [c for c in codigos if c]
+        if not codigos:
+            raise ValueError("Codigos de palet vacios.")
+        if len(codigos) == 1:
+            return codigos[0]
+        max_len = max(len(c) for c in codigos)
+        base = []
+        for i in range(max_len):
+            chars = []
+            for c in codigos:
+                chars.append(c[i] if i < len(c) else None)
+            first = chars[0]
+            if all(ch == first and ch is not None for ch in chars):
+                base.append(first)
+            else:
+                base.append("X")
+        return "".join(base)
+
+    def _generar_codigo_producto(self, session, base: str) -> str:
+        like_pattern = f"{base}-%"
+        statement = select(ProductoDB.codigo).where(ProductoDB.codigo.like(like_pattern)).order_by(ProductoDB.codigo.desc())
+        ultimo = session.exec(statement).first()
+        if ultimo and "-" in ultimo:
+            try:
+                suf = int(ultimo.rsplit("-", 1)[1])
+            except ValueError:
+                suf = 0
+        else:
+            suf = 0
+        siguiente = suf + 1
+        return f"{base}-{siguiente:03d}"
     #endregion
 
     #region Métodos Cuadrantes

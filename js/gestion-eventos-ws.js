@@ -23,6 +23,9 @@ var ACCIONES = {
     "login": respuesta_login,
     "maestros": respuesta_maestros,
     "fabricacion": respuesta_fabricacion,
+    "fabricacion_actualizar": () => {
+        send("fabricacion", {});
+    },
     "cargar_planificacion_entradas": mostrar_planificacion_entradas,
     "agregar_planificacion_entradas": mostrar_planificacion_entradas,
     "cargar_cuadrantes": mostrar_cuadrantes,

@@ -67,12 +67,14 @@ window.onload = () => {
             await openArchivosSubidosWin();
         },
         async "ver-ordenes-fabricacion"() {
+            setPantalla?.("gestion_fabricacion", { vista: "ordenes_fabricacion" });
             await openOrdenesFabricacionWin();
         },
         async "ver-tipos-producto"() {
             await openTiposProductoWin();
         },
         async "ver-lineas-fabricacion"() {
+            setPantalla?.("gestion_fabricacion", { vista: "lineas_fabricacion" });
             await openLineasFabricacionWin();
         },
         async "ver-trazabilidad-procesado"() {
@@ -195,6 +197,7 @@ function respuesta_fabricacion(response) {
     if (response.data) {
         DATOS.fabricacion = response.data;
         console.log("Fabricacion recibida:", DATOS.fabricacion);
+        actualizarLineasFabricacionEditorOrdenes?.();
         if (window.__reloadKey) {
             const key = window.__reloadKey;
             window.__reloadKey = null;
@@ -210,4 +213,10 @@ function asegurarFabricacionCargada(key) {
     window.__reloadKey = key;
     send("fabricacion", {});
     return false;
+}
+
+function setPantalla(pantalla, contexto = {}) {
+    const ws = conn && conn.socket;
+    if (!ws || ws.readyState !== WebSocket.OPEN) return;
+    ws.send(JSON.stringify({ action: "set_pantalla", data: { pantalla, contexto } }));
 }
