@@ -13,6 +13,7 @@ from .entrada_db import EntradaDB
 from .linea_entrada_db import LineaEntradaDB
 from .palet_db import PaletDB
 from .producto_db import ProductoDB
+from .producto_operario_db import ProductoOperarioDB
 from .archivo_subido_db import ArchivoSubidoDB
 
 __all__ = [
@@ -30,5 +31,6 @@ __all__ = [
     "LineaEntradaDB",
     "PaletDB",
     "ProductoDB",
+    "ProductoOperarioDB",
     "ArchivoSubidoDB",
 ]

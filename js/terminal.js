@@ -131,6 +131,9 @@ var ACCIONES = {
     "login": console.log,
     "fabricacion_actualizar": (msg) => {
         if (pantallaActual === "vista_fabricacion") {
+            if (msg?.data?.refetch_maestros) {
+                refrescarMaestrosFabricacion?.();
+            }
             refrescarFabricacionDesdeServidor?.(msg.data || {});
         }
     },

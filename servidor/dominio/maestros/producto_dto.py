@@ -9,7 +9,6 @@ class ProductoDTO(BaseModel):
     codigo: str
     venta_id: int | None
     produccion_id: int | None
-    fabricado_por_id: int | None = None
 
     def from_db(producto_db: ProductoDB) -> "ProductoDTO":
         return ProductoDTO(
@@ -18,7 +17,6 @@ class ProductoDTO(BaseModel):
             codigo=producto_db.codigo,
             venta_id=producto_db.venta_id,
             produccion_id=producto_db.produccion_id,
-            fabricado_por_id=producto_db.fabricado_por_id,
         )
 
     def to_db(self) -> ProductoDB:
@@ -28,5 +26,4 @@ class ProductoDTO(BaseModel):
             codigo=self.codigo,
             venta_id=self.venta_id,
             produccion_id=self.produccion_id,
-            fabricado_por_id=self.fabricado_por_id,
         )

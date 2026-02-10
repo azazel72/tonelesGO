@@ -28,15 +28,15 @@ function prepararEventosFabricacion() {
     const btnConfirmar = document.getElementById("fabricacion-confirmar-impresion");
     if (btnConfirmar) {
         btnConfirmar.addEventListener("click", async () => {
-            const operarioId = obtenerOperarioSeleccionado();
-            if (!operarioId) {
-                alert("Selecciona un operario.");
+            const operariosIds = obtenerOperariosSeleccionados();
+            if (!operariosIds.length) {
+                alert("Selecciona al menos un operario.");
                 return;
             }
             const modalEl = document.getElementById("modalOperarioFabricacion");
             const modal = modalEl ? bootstrap.Modal.getInstance(modalEl) : null;
             if (modal) modal.hide();
-            await imprimirEtiquetaFabricacion(operarioId);
+            await imprimirEtiquetaFabricacion(operariosIds);
         });
     }
 
@@ -89,7 +89,20 @@ const terminalFabricacion = {
     estados: null,
     tipos_producto: null,
     usuarios: null,
+    puestos_trabajo: null,
 };
+
+async function refrescarMaestrosFabricacion() {
+    try {
+        const maestros = await wsRequest("maestros", {});
+        terminalFabricacion.clientes = maestros?.clientes || {};
+        terminalFabricacion.estados = maestros?.estados || {};
+        terminalFabricacion.usuarios = maestros?.usuarios || {};
+        terminalFabricacion.puestos_trabajo = maestros?.puestos_trabajo || {};
+    } catch (err) {
+        console.error("No se pudieron refrescar maestros:", err);
+    }
+}
 
 async function asegurarDatosFabricacionTerminal() {
     if (terminalFabricacion.clientes && terminalFabricacion.estados && terminalFabricacion.tipos_producto && terminalFabricacion.usuarios) return;
@@ -98,6 +111,7 @@ async function asegurarDatosFabricacionTerminal() {
         terminalFabricacion.clientes = maestros?.clientes || {};
         terminalFabricacion.estados = maestros?.estados || {};
         terminalFabricacion.usuarios = maestros?.usuarios || {};
+        terminalFabricacion.puestos_trabajo = maestros?.puestos_trabajo || {};
         const fabricacion = await wsRequest("fabricacion", {});
         terminalFabricacion.tipos_producto = fabricacion?.tipos_producto || {};
     } catch (err) {
@@ -106,6 +120,7 @@ async function asegurarDatosFabricacionTerminal() {
         terminalFabricacion.estados = terminalFabricacion.estados || {};
         terminalFabricacion.tipos_producto = terminalFabricacion.tipos_producto || {};
         terminalFabricacion.usuarios = terminalFabricacion.usuarios || {};
+        terminalFabricacion.puestos_trabajo = terminalFabricacion.puestos_trabajo || {};
     }
 }
 
@@ -324,7 +339,7 @@ async function abrirModalOperarioFabricacion() {
     const modalEl = document.getElementById("modalOperarioFabricacion");
     if (!modalEl) return;
     await asegurarDatosFabricacionTerminal();
-    cargarOperariosEnModal();
+    await cargarOperariosEnModal();
     const modal = new bootstrap.Modal(modalEl);
     modal.show();
     ajustarZIndexModal(modalEl);
@@ -341,13 +356,120 @@ function ajustarZIndexModal(modalEl) {
     }
 }
 
-function cargarOperariosEnModal() {
+function obtenerFechasPreferencia() {
+    const fechas = [];
+    const hoy = new Date();
+    fechas.push(formatearFechaYYYYMMDD(hoy));
+    let cursor = new Date(hoy.getFullYear(), hoy.getMonth(), hoy.getDate());
+    let count = 0;
+    while (count < 3) {
+        cursor.setDate(cursor.getDate() - 1);
+        const day = cursor.getDay();
+        if (day === 0 || day === 6) continue;
+        fechas.push(formatearFechaYYYYMMDD(cursor));
+        count += 1;
+    }
+    return fechas;
+}
+
+function formatearFechaYYYYMMDD(fecha) {
+    const y = fecha.getFullYear();
+    const m = String(fecha.getMonth() + 1).padStart(2, "0");
+    const d = String(fecha.getDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+}
+
+function formatearFechaYYYYMMDDUtc(fecha) {
+    const y = fecha.getUTCFullYear();
+    const m = String(fecha.getUTCMonth() + 1).padStart(2, "0");
+    const d = String(fecha.getUTCDate()).padStart(2, "0");
+    return `${y}-${m}-${d}`;
+}
+
+function obtenerInicioCuadranteDesdeFecha(fechaStr) {
+    const base = obtenerAnteriorDiaSemana(4, new Date(fechaStr + "T00:00:00"));
+    return formatearFechaYYYYMMDDUtc(base);
+}
+
+async function obtenerOperariosPorPuesto(fechas) {
+    const puestosFabricacion = Object.values(terminalFabricacion.puestos_trabajo || {})
+        .filter((p) => p && p.fabricacion)
+        .map((p) => p.id);
+    if (!puestosFabricacion.length || !fechas.length) return new Map();
+
+    const fechasSet = new Set(fechas);
+    const cuadrantesPorInicio = new Map();
+    const inicios = Array.from(new Set(fechas.map(obtenerInicioCuadranteDesdeFecha)));
+    for (const inicio of inicios) {
+        try {
+            const cuadrante = await wsRequest("cargar_cuadrantes", { fecha: inicio });
+            cuadrantesPorInicio.set(inicio, cuadrante);
+        } catch (err) {
+            console.warn("No se pudo cargar cuadrante:", inicio, err);
+        }
+    }
+
+    const porPuesto = new Map();
+    for (const cuadrante of cuadrantesPorInicio.values()) {
+        const detalles = cuadrante?.detalles || [];
+        detalles.forEach((det) => {
+            if (!fechasSet.has(det.fecha)) return;
+            if (!puestosFabricacion.includes(det.puesto_id)) return;
+            if (!det.usuario_id) return;
+            if (!porPuesto.has(det.puesto_id)) {
+                porPuesto.set(det.puesto_id, new Set());
+            }
+            porPuesto.get(det.puesto_id).add(det.usuario_id);
+        });
+    }
+    return porPuesto;
+}
+
+function ordenarEmpleadosPorNombre(empleados) {
+    return empleados.sort((a, b) => {
+        const na = (a?.nombre || a?.alias || "").toString();
+        const nb = (b?.nombre || b?.alias || "").toString();
+        return na.localeCompare(nb, "es", { sensitivity: "base" });
+    });
+}
+
+function crearFilaSeccion(texto) {
+    const tr = document.createElement("tr");
+    tr.className = "table-secondary";
+    const td = document.createElement("td");
+    td.colSpan = 2;
+    td.textContent = texto;
+    tr.appendChild(td);
+    return tr;
+}
+
+function crearFilaOperario({ id, nombre, fecha, checked = false }) {
+    const tr = document.createElement("tr");
+    tr.dataset.operarioId = id;
+    if (checked) tr.classList.add("operario-row-selected");
+    const fechaTexto = fecha ? (typeof formatearFechaEuropea === "function" ? formatearFechaEuropea(fecha) : fecha) : "";
+    tr.innerHTML = `
+      <td>${fechaTexto}</td>
+      <td>${nombre}</td>
+    `;
+    tr.addEventListener("click", (e) => {
+        tr.classList.toggle("operario-row-selected");
+    });
+    return tr;
+}
+
+async function cargarOperariosEnModal() {
     const tbody = document.querySelector("#tabla_operarios_fabricacion tbody");
     const btnConfirmar = document.getElementById("fabricacion-confirmar-impresion");
     if (!tbody) return;
-    const empleados = Object.values(terminalFabricacion.usuarios || {}).filter((u) => u && u.empleado);
+    let payload = [];
+    try {
+        payload = await wsRequest("listar_operarios_planificacion_fabricacion", {}) || [];
+    } catch (err) {
+        console.warn("No se pudieron cargar operarios planificados:", err);
+    }
     tbody.innerHTML = "";
-    if (!empleados.length) {
+    if (!payload.length) {
         const tr = document.createElement("tr");
         const td = document.createElement("td");
         td.colSpan = 2;
@@ -358,27 +480,76 @@ function cargarOperariosEnModal() {
         return;
     }
     if (btnConfirmar) btnConfirmar.disabled = false;
-    empleados.forEach((u, idx) => {
-        const tr = document.createElement("tr");
-        const nombre = u.nombre || u.alias || `Empleado ${u.id}`;
-        tr.innerHTML = `
-      <td>${nombre}</td>
-      <td class="text-center">
-        <input type="radio" name="operario_fabricacion" value="${u.id}" ${idx === 0 ? "checked" : ""}>
-      </td>
-    `;
-        tbody.appendChild(tr);
+    const planificados = payload.filter((p) => p.origen === "planificacion");
+    const otros = payload.filter((p) => p.origen !== "planificacion");
+
+    const porPuesto = new Map();
+    planificados.forEach((item) => {
+        const puestoId = item.puesto_id || 0;
+        if (!porPuesto.has(puestoId)) porPuesto.set(puestoId, new Map());
+        const porUsuario = porPuesto.get(puestoId);
+        const usuarioId = item.usuario_id;
+        if (!usuarioId) return;
+        const existente = porUsuario.get(usuarioId);
+        if (!existente || (item.fecha && existente.fecha < item.fecha)) {
+            porUsuario.set(usuarioId, item);
+        }
     });
+
+    const yaListados = new Set();
+    const getPuestoNombre = (map) => map.values().next().value?.puesto_nombre || "";
+    Array.from(porPuesto.entries())
+        .sort((a, b) => getPuestoNombre(a[1]).localeCompare(getPuestoNombre(b[1]), "es", { sensitivity: "base" }))
+        .forEach(([puestoId, porUsuario]) => {
+            const sample = porUsuario.values().next().value;
+            const puestoNombre = sample?.puesto_nombre || `Puesto ${puestoId}`;
+            const lista = Array.from(porUsuario.values()).sort((a, b) => {
+                const na = a?.usuario?.nombre || a?.usuario?.alias || "";
+                const nb = b?.usuario?.nombre || b?.usuario?.alias || "";
+                return na.localeCompare(nb, "es", { sensitivity: "base" });
+            });
+            if (!lista.length) return;
+            tbody.appendChild(crearFilaSeccion(`Puesto: ${puestoNombre}`));
+            lista.forEach((item) => {
+                const u = item.usuario || {};
+                if (u.id) yaListados.add(u.id);
+                tbody.appendChild(crearFilaOperario({
+                    id: u.id,
+                    nombre: u.nombre || u.alias || `Empleado ${u.id || ""}`.trim(),
+                    fecha: item.fecha,
+                    checked: false,
+                }));
+            });
+        });
+
+    const otrosFiltrados = ordenarEmpleadosPorNombre(
+        otros
+            .map((o) => o.usuario)
+            .filter((u) => u && !yaListados.has(u.id))
+    );
+    if (otrosFiltrados.length) {
+        tbody.appendChild(crearFilaSeccion("Otros operarios"));
+        otrosFiltrados.forEach((u) => {
+            tbody.appendChild(crearFilaOperario({
+                id: u.id,
+                nombre: u.nombre || u.alias || `Empleado ${u.id}`,
+                fecha: "",
+                checked: false,
+            }));
+        });
+    }
 }
 
-function obtenerOperarioSeleccionado() {
-    const seleccionado = document.querySelector("input[name='operario_fabricacion']:checked");
-    if (!seleccionado) return null;
-    const id = Number(seleccionado.value);
-    return Number.isFinite(id) ? id : null;
+function obtenerOperariosSeleccionados() {
+    const seleccionados = Array.from(
+        document.querySelectorAll("#tabla_operarios_fabricacion tbody tr.operario-row-selected")
+    )
+        .map((tr) => Number(tr.dataset.operarioId))
+        .filter((id) => Number.isFinite(id));
+    return Array.from(new Set(seleccionados));
 }
 
-async function imprimirEtiquetaFabricacion(operarioId = null) {
+async function imprimirEtiquetaFabricacion(operariosIds = []) {
     const tbody = document.querySelector("#tabla_trazabilidad_fabricacion tbody");
     if (!tbody) return;
     const filas = Array.from(tbody.querySelectorAll("tr"));
@@ -397,7 +568,7 @@ async function imprimirEtiquetaFabricacion(operarioId = null) {
             trazabilidad_ids: trazabilidadIds,
             palet_codigos: paletCodigos,
             tipo: "BOTA",
-            fabricado_por_id: operarioId,
+            operarios_ids: operariosIds,
         });
         console.log("Etiqueta creada:", resp);
         cargarTrazabilidadFabricacion(lineaFabricacionActualId);

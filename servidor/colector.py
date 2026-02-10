@@ -1,11 +1,12 @@
 from datetime import date, timedelta
+import re
 import logging
 import threading
 from typing import List
 
 from servidor.herramientas.utilidades import obtener_anterior_dia_semana
 
-from .modelos import ClienteDB, EstadoDB, InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB, RolDB, PuestoTrabajoDB, MaterialDB, DuelaDB, EntradaDB, LineaEntradaDB, PaletDB, ProductoDB, ArchivoSubidoDB
+from .modelos import ClienteDB, EstadoDB, InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB, RolDB, PuestoTrabajoDB, MaterialDB, DuelaDB, EntradaDB, LineaEntradaDB, PaletDB, ProductoDB, ProductoOperarioDB, ArchivoSubidoDB
 from .modelos import OrdenFabricacionDB, TipoProductoDB, LineaFabricacionDB, TrazabilidadProcesadoDB, TrazabilidadFabricacionDB, TrazabilidadProductoDB, BotaDB
 from .modelos import PlanCamionDB, PlanFacturacionDB, PlanMaterialDB, CuadranteDB, CuadranteDetalleDB
 from .persistencia import GenericRepository, DB
@@ -421,12 +422,11 @@ class Colector:
         trazabilidad_ids = data.get("trazabilidad_ids") or []
         palet_codigos = data.get("palet_codigos") or []
         tipo = data.get("tipo") or "BOTA"
-        fabricado_por_id = data.get("fabricado_por_id") or data.get("operario_id")
-        if fabricado_por_id is not None:
-            try:
-                fabricado_por_id = int(fabricado_por_id)
-            except (TypeError, ValueError):
-                fabricado_por_id = None
+        operarios_ids = data.get("operarios_ids") or []
+        if not isinstance(operarios_ids, list):
+            operarios_ids = [operarios_ids]
+        operarios_ids = self._normalizar_ids_operarios(operarios_ids)
+        operarios_ids = self._normalizar_ids_operarios(operarios_ids)
 
         if not trazabilidad_ids:
             raise ValueError("No hay trazabilidades activas.")
@@ -453,8 +453,7 @@ class Colector:
                         palet_map = {p.id: p.codigo for p in palets}
                         palet_codigos = [palet_map.get(t.palet_id, "") for t in trazas]
 
-                    base, sep = self._construir_codigo_base(palet_codigos)
-                    codigo = self._generar_codigo_producto(session, base, sep)
+                    codigo = self._generar_codigo_producto(session, trazas, palet_codigos, operarios_ids)
                     logger.info("Etiqueta fabricacion: codigo=%s origenes=%s", codigo, palet_codigos)
 
                     produccion_id = None
@@ -466,11 +465,18 @@ class Colector:
                         tipo=tipo,
                         codigo=codigo,
                         produccion_id=produccion_id,
-                        fabricado_por_id=fabricado_por_id,
                     )
                     session.add(producto)
                     session.flush()
                     session.refresh(producto)
+
+                    for operario_id in operarios_ids:
+                        session.add(
+                            ProductoOperarioDB(
+                                producto_id=producto.id,
+                                usuario_id=operario_id,
+                            )
+                        )
 
                     for t in trazas:
                         session.add(TrazabilidadProductoDB(trazabilidad_fabricacion_id=t.id, producto_id=producto.id))
@@ -552,19 +558,77 @@ class Colector:
             sep = "X"
         return base, sep
 
-    def _generar_codigo_producto(self, session, base: str, sep: str) -> str:
-        like_pattern = f"{base}{sep}%"
-        statement = select(ProductoDB.codigo).where(ProductoDB.codigo.like(like_pattern)).order_by(ProductoDB.codigo.desc())
-        ultimo = session.exec(statement).first()
-        if ultimo and sep in ultimo:
+    def _normalizar_ids_operarios(self, ids):
+        vistos = set()
+        normalizados = []
+        for op in ids or []:
             try:
-                suf = int(ultimo.rsplit(sep, 1)[1])
-            except ValueError:
-                suf = 0
+                op_id = int(op)
+            except (TypeError, ValueError):
+                continue
+            if op_id in vistos:
+                continue
+            vistos.add(op_id)
+            normalizados.append(op_id)
+        return normalizados
+
+    def _extraer_prefijo_lote(self, palet_codigo: str | None) -> str:
+        if not palet_codigo:
+            return ""
+        texto = str(palet_codigo)
+        i = 0
+        while i < len(texto) and texto[i].isdigit():
+            i += 1
+        j = i
+        while j < len(texto) and texto[j].isalpha():
+            j += 1
+        k = j
+        while k < len(texto) and texto[k].isalpha() and (k - j) < 3:
+            k += 1
+        return texto[:k]
+
+    def _formatear_operarios(self, operarios_ids: list[int]) -> str:
+        op1 = operarios_ids[0] if len(operarios_ids) > 0 else None
+        op2 = operarios_ids[1] if len(operarios_ids) > 1 else None
+        part1 = f"{int(op1) % 100:02d}" if op1 is not None else "00"
+        part2 = f"{int(op2) % 100:02d}" if op2 is not None else "00"
+        return f"{part1}{part2}"
+
+    def _siguiente_contador_anual(self, session, year_two: str, sep: str) -> int:
+        like_pattern = f"%{sep}{year_two}_____"
+        statement = select(ProductoDB.codigo).where(ProductoDB.codigo.like(like_pattern))
+        codigos = session.exec(statement).all()
+        max_cont = 0
+        sufijo_len = len(sep) + 2 + 5
+        for codigo in codigos:
+            if not codigo or len(codigo) < sufijo_len:
+                continue
+            tail = codigo[-sufijo_len:]
+            if not tail.startswith(f"{sep}{year_two}") or not tail[-5:].isdigit():
+                continue
+            cont = int(tail[-5:])
+            if cont > max_cont:
+                max_cont = cont
+        return max_cont + 1
+
+    def _generar_codigo_producto(self, session, trazas, palet_codigos, operarios_ids: list[int]) -> str:
+        sep = "X" if len([c for c in palet_codigos if c]) > 1 else "-"
+
+        prefijo_lote = ""
+        if palet_codigos:
+            prefijo_lote = self._extraer_prefijo_lote(palet_codigos[0])
         else:
-            suf = 0
-        siguiente = suf + 1
-        return f"{base}{sep}{siguiente:03d}"
+            palet_id = trazas[0].palet_id if trazas else None
+            if palet_id:
+                palet = session.get(PaletDB, palet_id)
+                if palet:
+                    prefijo_lote = self._extraer_prefijo_lote(palet.codigo)
+
+        operarios_part = self._formatear_operarios(operarios_ids)
+        year_two = str(date.today().year % 100).zfill(2)
+        contador = self._siguiente_contador_anual(session, year_two, sep)
+
+        return f"{prefijo_lote}{operarios_part}{sep}{year_two}{contador:05d}"
     #endregion
 
     #region Métodos Cuadrantes
@@ -763,6 +827,89 @@ class Colector:
             raise ValueError(f"Tabla '{tabla}' no reconocida.")
 
         return repo, maestro, objeto
+
+    #region Operarios Fabricacion (planificacion)
+    def _ultimos_dias_laborables(self, dias_previos: int = 3, base: date | None = None) -> List[date]:
+        if base is None:
+            base = date.today()
+        fechas = [base]
+        cursor = base
+        count = 0
+        while count < dias_previos:
+            cursor = cursor - timedelta(days=1)
+            if cursor.weekday() >= 5:
+                continue
+            fechas.append(cursor)
+            count += 1
+        return fechas
+
+    def listar_operarios_planificacion_fabricacion(self) -> list:
+        fechas = self._ultimos_dias_laborables()
+        fechas_set = set(fechas)
+        with DB.crear_sesion() as session:
+            puestos = session.exec(
+                select(PuestoTrabajoDB).where(PuestoTrabajoDB.fabricacion == True)  # noqa: E712
+            ).all()
+            puestos_map = {p.id: p for p in puestos}
+            puestos_ids = list(puestos_map.keys())
+
+            usuarios = session.exec(
+                select(UsuarioDB).where(UsuarioDB.empleado == True)  # noqa: E712
+            ).all()
+            usuarios_map = {u.id: u for u in usuarios}
+
+            detalles = []
+            if puestos_ids:
+                detalles = session.exec(
+                    select(CuadranteDetalleDB).where(
+                        CuadranteDetalleDB.puesto_id.in_(puestos_ids),
+                        CuadranteDetalleDB.fecha.in_(list(fechas_set)),
+                    )
+                ).all()
+
+            resultado = []
+            usados = set()
+            for det in detalles:
+                usuario = usuarios_map.get(det.usuario_id)
+                if usuario:
+                    usados.add(usuario.id)
+                resultado.append({
+                    "origen": "planificacion",
+                    "fecha": det.fecha.isoformat() if det.fecha else None,
+                    "puesto_id": det.puesto_id,
+                    "puesto_nombre": puestos_map.get(det.puesto_id).nombre if det.puesto_id in puestos_map else None,
+                    "usuario_id": det.usuario_id,
+                    "usuario": {
+                        "id": usuario.id,
+                        "alias": usuario.alias,
+                        "nombre": usuario.nombre,
+                        "rol_id": usuario.rol_id,
+                        "empleado": usuario.empleado,
+                    } if usuario else None,
+                    "orden_en_puesto": det.orden_en_puesto,
+                })
+
+            for usuario in usuarios:
+                if usuario.id in usados:
+                    continue
+                resultado.append({
+                    "origen": "otros",
+                    "fecha": None,
+                    "puesto_id": None,
+                    "puesto_nombre": None,
+                    "usuario_id": usuario.id,
+                    "usuario": {
+                        "id": usuario.id,
+                        "alias": usuario.alias,
+                        "nombre": usuario.nombre,
+                        "rol_id": usuario.rol_id,
+                        "empleado": usuario.empleado,
+                    },
+                    "orden_en_puesto": None,
+                })
+
+            return resultado
+    #endregion
     
     def checkUpdate(self, objeto, tabla, entrada_id, campo):
         if not objeto:

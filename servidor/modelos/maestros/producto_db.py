@@ -11,4 +11,3 @@ class ProductoDB(SQLModel, table=True):
     codigo: str
     venta_id: Optional[int] = None
     produccion_id: Optional[int] = None
-    fabricado_por_id: Optional[int] = None

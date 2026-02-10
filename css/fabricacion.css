@@ -16,3 +16,9 @@
     background-color: #f8d7da;
 }
 
+#tabla_operarios_fabricacion tbody tr.operario-row-selected > td {
+    background-color: #d8f0ff;
+    color: #0b2f4a;
+    font-weight: 600;
+}
+
