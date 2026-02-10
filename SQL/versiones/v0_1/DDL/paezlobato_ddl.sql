@@ -207,6 +207,7 @@ CREATE TABLE `puestos_trabajo` (
   `id` int(11) NOT NULL,
   `nombre` varchar(50) NOT NULL,
   `es_maquinaria` tinyint(1) NOT NULL DEFAULT 0,
+  `fabricacion` tinyint(1) NOT NULL DEFAULT 0,
   `activo` tinyint(1) NOT NULL DEFAULT 1,
   `created_at` datetime NOT NULL DEFAULT current_timestamp(),
   `created_by` varchar(50) DEFAULT NULL,
@@ -594,6 +595,19 @@ CREATE TABLE `productos` (
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `productos_operarios`
+--
+
+CREATE TABLE `productos_operarios` (
+  `producto_id` int(11) NOT NULL,
+  `usuario_id` int(11) NOT NULL,
+  `created_at` timestamp NOT NULL DEFAULT current_timestamp(),
+  `created_by` varchar(100) NOT NULL DEFAULT 'system'
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+
+-- --------------------------------------------------------
+
+--
 -- Estructura de tabla para la tabla `archivos_subidos`
 --
 
@@ -804,6 +818,13 @@ ALTER TABLE `productos`
   ADD KEY `idx_productos_produccion` (`produccion_id`);
 
 --
+-- Indices de la tabla `productos_operarios`
+--
+ALTER TABLE `productos_operarios`
+  ADD PRIMARY KEY (`producto_id`,`usuario_id`),
+  ADD KEY `fk_productos_operarios_usuario` (`usuario_id`);
+
+--
 -- Indices de la tabla `archivos_subidos`
 --
 ALTER TABLE `archivos_subidos`
@@ -946,6 +967,11 @@ ALTER TABLE `palets`
 ALTER TABLE `trazabilidad_fabricacion`
   MODIFY `estado` smallint NOT NULL DEFAULT 0;
 
+--
+-- Ajuste fabricado_por_id en productos (si la tabla ya existe)
+--
+-- Eliminado: fabricado_por_id ahora se gestiona en productos_operarios
+
 ALTER TABLE `ordenes_fabricacion`
   ADD CONSTRAINT `fk_ordenes_fabricacion_clientes` FOREIGN KEY (`cliente_id`) REFERENCES `clientes` (`id`) ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_ordenes_fabricacion_estados` FOREIGN KEY (`estado`) REFERENCES `estados` (`id`) ON UPDATE CASCADE;
@@ -969,6 +995,10 @@ ALTER TABLE `trazabilidad_fabricacion`
 ALTER TABLE `trazabilidad_producto`
   ADD CONSTRAINT `fk_trazabilidad_producto_fabricacion` FOREIGN KEY (`trazabilidad_fabricacion_id`) REFERENCES `trazabilidad_fabricacion` (`id`) ON UPDATE CASCADE,
   ADD CONSTRAINT `fk_trazabilidad_producto_producto` FOREIGN KEY (`producto_id`) REFERENCES `productos` (`id`) ON UPDATE CASCADE;
+
+ALTER TABLE `productos_operarios`
+  ADD CONSTRAINT `fk_productos_operarios_producto` FOREIGN KEY (`producto_id`) REFERENCES `productos` (`id`) ON UPDATE CASCADE,
+  ADD CONSTRAINT `fk_productos_operarios_usuario` FOREIGN KEY (`usuario_id`) REFERENCES `usuarios` (`id`) ON UPDATE CASCADE;
 
 ALTER TABLE `botas`
   ADD CONSTRAINT `fk_botas_vaso` FOREIGN KEY (`vaso_producto_id`) REFERENCES `productos` (`id`) ON UPDATE CASCADE,

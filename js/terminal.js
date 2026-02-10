@@ -134,6 +134,21 @@ var ACCIONES = {
             refrescarFabricacionDesdeServidor?.(msg.data || {});
         }
     },
+    "async_error": (msg) => {
+        const texto = msg.error || msg.data || "Error async servidor.";
+        console.error("Error async servidor:", texto);
+        alert(texto);
+    },
+    "async_print": (msg) => {
+        const data = msg.data || {};
+        const codigo = data.codigo || "";
+        console.log("Impresion completada:", data);
+        if (codigo) {
+            alert(`Etiqueta enviada a impresora: ${codigo}`);
+        } else {
+            alert("Etiqueta enviada a impresora.");
+        }
+    },
 };
 
 function setPantalla(pantalla, contexto = {}) {

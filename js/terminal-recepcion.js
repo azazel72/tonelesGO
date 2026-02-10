@@ -21,6 +21,7 @@ const terminalMaestros = {
   proveedores: null,
   duelas: null,
 };
+let entradaRecepcionActualId = null;
 
 async function asegurarMaestrosTerminal() {
   // Si ya los tenemos, no hacemos nada
@@ -90,6 +91,7 @@ function seleccionarRecepcion(fila) {
   vista_recepcion.setAttribute("modo", "contenido_entrada");
 
   const entradaId = Number(fila.dataset.entradaId);
+  entradaRecepcionActualId = entradaId;
   const numero = fila.dataset.numero || entradaId;
   const fecha = formatearFechaEuropea(fila.dataset.fecha);
   const proveedorNombre = fila.dataset.proveedorNombre || fila.children?.[2]?.textContent || "";
@@ -104,11 +106,30 @@ function seleccionarContenidoEntrada(fila) {
     const vista_recepcion = document.getElementById("vista_recepcion");
     vista_recepcion.setAttribute("modo", "listado_entradas");
   } else {
-    imprimirEtiquetaEntradaRecepcion(fila);
+    verificarLineaEntradaRecepcion(fila);
   }
 }
 
-function imprimirEtiquetaEntradaRecepcion(fila) {
+function verificarLineaEntradaRecepcion(fila) {
+  const duela = fila.dataset.duelaNombre || fila.children?.[0]?.textContent || "";
+  const bultosPrevistos = fila.dataset.bultos || "0";
+  const kilosPrevistos = fila.dataset.kilos || "0";
+  const bultosEntregados = fila.dataset.bultosEntregados || bultosPrevistos;
+
+  const material = document.getElementById("materialEtiqueta");
+  const bultosPrev = document.getElementById("recepcion-bultos-previstos");
+  const kilosPrev = document.getElementById("recepcion-kilos-previstos");
+  const bultosRec = document.getElementById("recepcion-bultos-recibidos");
+  const btnConfirmar = document.getElementById("recepcion-confirmar-verificacion");
+
+  if (material) material.textContent = duela;
+  if (bultosPrev) bultosPrev.value = bultosPrevistos;
+  if (kilosPrev) kilosPrev.value = kilosPrevistos;
+  if (bultosRec) bultosRec.value = bultosEntregados;
+  if (btnConfirmar) {
+    btnConfirmar.dataset.lineaId = fila.dataset.lineaId || "";
+  }
+
   const modal = new bootstrap.Modal(document.getElementById("miModal"));
   modal.show();
 }
@@ -138,15 +159,20 @@ function actualizarTablaLineas(lineas) {
   }
   lineas.forEach((l) => {
     const tr = document.createElement("tr");
+    tr.dataset.lineaId = l.id ?? "";
     tr.dataset.duelaId = l.duela_id ?? "";
+    tr.dataset.bultos = l.bultos ?? 0;
+    tr.dataset.kilos = l.kilos ?? 0;
+    tr.dataset.bultosEntregados = l.bultos_entregados ?? 0;
     const duela =
       terminalMaestros.duelas?.[l.duela_id]?.descripcion ||
       (typeof l.duela_id !== "undefined" ? String(l.duela_id) : "");
+    tr.dataset.duelaNombre = duela;
     tr.innerHTML = `
       <td>${duela}</td>
       <td>${l.kilos ?? ""}</td>
       <td>${l.bultos ?? ""}</td>
-      <td><i class="bi bi-printer"></i></td>
+      <td><i class="bi bi-check-circle"></i></td>
     `;
     tbody.appendChild(tr);
   });
@@ -162,9 +188,31 @@ function formatearFechaEuropea(valor) {
   return `${dd}/${mm}/${yyyy}`;
 }
 
-function modificar(id, cambio) {
-  const el = document.getElementById(id);
-  let valor = parseInt(el.textContent);
-  valor = Math.max(1, valor + cambio); // evita números negativos o cero
-  el.textContent = valor;
-}
+document.addEventListener("click", async (event) => {
+  const btn = event.target.closest("#recepcion-confirmar-verificacion");
+  if (!btn) return;
+  const lineaId = Number(btn.dataset.lineaId || 0);
+  if (!lineaId) return;
+
+  const bultosRec = Number(document.getElementById("recepcion-bultos-recibidos")?.value || 0);
+  if (bultosRec < 0) {
+    alert("Los valores recibidos no pueden ser negativos.");
+    return;
+  }
+
+  try {
+    await wsRequest("modificar_maestro", { tabla: "lineas_entrada", id: lineaId, campo: "bultos_entregados", valor: bultosRec });
+    await wsRequest("modificar_maestro", { tabla: "lineas_entrada", id: lineaId, campo: "verificado", valor: true });
+    const modalEl = document.getElementById("miModal");
+    const modal = modalEl ? bootstrap.Modal.getInstance(modalEl) : null;
+    if (modal) modal.hide();
+    const vista_recepcion = document.getElementById("vista_recepcion");
+    const modo = vista_recepcion?.getAttribute("modo");
+    if (modo === "contenido_entrada" && entradaRecepcionActualId) {
+      await cargarLineasRecepcion(entradaRecepcionActualId);
+    }
+  } catch (err) {
+    console.error(err);
+    alert("No se pudo verificar la linea.");
+  }
+});

@@ -1,5 +1,6 @@
 from datetime import date, timedelta
 import logging
+import threading
 from typing import List
 
 from servidor.herramientas.utilidades import obtener_anterior_dia_semana
@@ -13,6 +14,8 @@ from sqlalchemy import extract
 from .dominio import PlanificacionEntradasDTO, MaestrosDTO, PlanMaterialDTO, PlanFacturacionDTO, PlanCamionDTO, CuadranteDTO, CuadranteDetalleDTO, FabricacionDTO
 from .dominio import ClienteDTO, EstadoDTO, InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO, RolDTO, PuestoTrabajoDTO, MaterialDTO, DuelaDTO, EntradaDTO, LineaEntradaDTO, PaletDTO, ProductoDTO, ArchivoSubidoDTO, CuadrantesDTO
 from .dominio import OrdenFabricacionDTO, TipoProductoDTO, LineaFabricacionDTO, TrazabilidadProcesadoDTO, TrazabilidadFabricacionDTO, TrazabilidadProductoDTO, BotaDTO
+from servidor.impresion import ImprimirEtiqueta
+from servidor.conexiones.broadcast import broadcast_error, broadcast_event
 
 logger = logging.getLogger("paezlobato_colector")
 
@@ -414,90 +417,154 @@ class Colector:
                 "estado": trazabilidad.estado,
             }
 
-    def imprimir_etiqueta_fabricacion(self, data):
+    def imprimir_etiqueta_fabricacion(self, data, ws=None):
         trazabilidad_ids = data.get("trazabilidad_ids") or []
         palet_codigos = data.get("palet_codigos") or []
         tipo = data.get("tipo") or "BOTA"
+        fabricado_por_id = data.get("fabricado_por_id") or data.get("operario_id")
+        if fabricado_por_id is not None:
+            try:
+                fabricado_por_id = int(fabricado_por_id)
+            except (TypeError, ValueError):
+                fabricado_por_id = None
 
         if not trazabilidad_ids:
             raise ValueError("No hay trazabilidades activas.")
 
         with DB.crear_sesion() as session:
-            trazas = session.exec(
-                select(TrazabilidadFabricacionDB).where(
-                    TrazabilidadFabricacionDB.id.in_(trazabilidad_ids)
-                )
-            ).all()
+            try:
+                with session.begin():
+                    trazas = session.exec(
+                        select(TrazabilidadFabricacionDB).where(
+                            TrazabilidadFabricacionDB.id.in_(trazabilidad_ids)
+                        )
+                    ).all()
 
-            if not trazas:
-                raise ValueError("Trazabilidades no encontradas.")
+                    if not trazas:
+                        raise ValueError("Trazabilidades no encontradas.")
 
-            for t in trazas:
-                if t.estado != 0:
-                    raise ValueError("Hay trazabilidades no activas.")
+                    for t in trazas:
+                        if t.estado != 0:
+                            raise ValueError("Hay trazabilidades no activas.")
 
-            if not palet_codigos:
-                palet_ids = [t.palet_id for t in trazas]
-                palets = session.exec(select(PaletDB).where(PaletDB.id.in_(palet_ids))).all()
-                palet_map = {p.id: p.codigo for p in palets}
-                palet_codigos = [palet_map.get(t.palet_id, "") for t in trazas]
+                    if not palet_codigos:
+                        palet_ids = [t.palet_id for t in trazas]
+                        palets = session.exec(select(PaletDB).where(PaletDB.id.in_(palet_ids))).all()
+                        palet_map = {p.id: p.codigo for p in palets}
+                        palet_codigos = [palet_map.get(t.palet_id, "") for t in trazas]
 
-            base = self._construir_codigo_base(palet_codigos)
-            codigo = self._generar_codigo_producto(session, base)
+                    base, sep = self._construir_codigo_base(palet_codigos)
+                    codigo = self._generar_codigo_producto(session, base, sep)
+                    logger.info("Etiqueta fabricacion: codigo=%s origenes=%s", codigo, palet_codigos)
 
-            producto = ProductoDB(tipo=tipo, codigo=codigo)
-            session.add(producto)
-            session.commit()
-            session.refresh(producto)
+                    produccion_id = None
+                    if trazas:
+                        linea_ref = session.get(LineaFabricacionDB, trazas[0].linea_fabricacion_id)
+                        if linea_ref:
+                            produccion_id = linea_ref.orden_id
+                    producto = ProductoDB(
+                        tipo=tipo,
+                        codigo=codigo,
+                        produccion_id=produccion_id,
+                        fabricado_por_id=fabricado_por_id,
+                    )
+                    session.add(producto)
+                    session.flush()
+                    session.refresh(producto)
 
-            for t in trazas:
-                session.add(TrazabilidadProductoDB(trazabilidad_fabricacion_id=t.id, producto_id=producto.id))
-                t.cantidad_fabricada = int(t.cantidad_fabricada or 0) + 1
-                session.add(t)
+                    for t in trazas:
+                        session.add(TrazabilidadProductoDB(trazabilidad_fabricacion_id=t.id, producto_id=producto.id))
+                        t.cantidad_fabricada = int(t.cantidad_fabricada or 0) + 1
+                        session.add(t)
 
-            lineas_unicas = {t.linea_fabricacion_id for t in trazas}
-            for linea_id in lineas_unicas:
-                linea = session.get(LineaFabricacionDB, linea_id)
-                if linea:
-                    linea.cantidad_fabricada = int(linea.cantidad_fabricada or 0) + 1
-                    session.add(linea)
+                    lineas_unicas = {t.linea_fabricacion_id for t in trazas}
+                    for linea_id in lineas_unicas:
+                        linea = session.get(LineaFabricacionDB, linea_id)
+                        if linea:
+                            linea.cantidad_fabricada = int(linea.cantidad_fabricada or 0) + 1
+                            session.add(linea)
+            except Exception as exc:
+                session.rollback()
+                logger.error("Error al crear etiqueta: %s", exc)
+                try:
+                    import asyncio
+                    from servidor.conexiones.broadcast import broadcast_error
 
-            session.commit()
+                    asyncio.run(
+                        broadcast_error(
+                            "No se pudo crear la etiqueta. Revisa los datos e intentalo de nuevo.",
+                            scope="cliente" if ws is not None else "all",
+                            target_ws=ws,
+                        )
+                    )
+                except Exception:
+                    pass
+                raise
+
+            threading.Thread(
+                target=self._imprimir_etiqueta_async,
+                args=(codigo, palet_codigos, ws),
+                daemon=True,
+            ).start()
 
             return {"producto_id": producto.id, "codigo": producto.codigo}
+
+    def _imprimir_etiqueta_async(self, codigo: str, origenes: list[str], ws=None):
+        try:
+            impresora = ImprimirEtiqueta()
+            impresora.imprimir_etiqueta("botas", codigo, copies=1)
+            try:
+                import asyncio
+
+                asyncio.run(
+                    broadcast_event(
+                        "async_print",
+                        {"codigo": codigo, "origenes": origenes, "tipo": "botas"},
+                        scope="cliente" if ws is not None else "all",
+                        target_ws=ws,
+                    )
+                )
+            except Exception:
+                pass
+        except Exception as exc:
+            msg = f"Fallo al imprimir etiqueta {codigo} (origenes: {origenes}): {exc}"
+            logger.error(msg)
+            try:
+                import asyncio
+
+                asyncio.run(
+                    broadcast_error(
+                        msg,
+                        scope="cliente" if ws is not None else "all",
+                        target_ws=ws,
+                    )
+                )
+            except Exception:
+                pass
 
     def _construir_codigo_base(self, codigos):
         codigos = [c for c in codigos if c]
         if not codigos:
             raise ValueError("Codigos de palet vacios.")
-        if len(codigos) == 1:
-            return codigos[0]
-        max_len = max(len(c) for c in codigos)
-        base = []
-        for i in range(max_len):
-            chars = []
-            for c in codigos:
-                chars.append(c[i] if i < len(c) else None)
-            first = chars[0]
-            if all(ch == first and ch is not None for ch in chars):
-                base.append(first)
-            else:
-                base.append("X")
-        return "".join(base)
+        base = codigos[0]
+        sep = "-"
+        if len(codigos) > 1:
+            sep = "X"
+        return base, sep
 
-    def _generar_codigo_producto(self, session, base: str) -> str:
-        like_pattern = f"{base}-%"
+    def _generar_codigo_producto(self, session, base: str, sep: str) -> str:
+        like_pattern = f"{base}{sep}%"
         statement = select(ProductoDB.codigo).where(ProductoDB.codigo.like(like_pattern)).order_by(ProductoDB.codigo.desc())
         ultimo = session.exec(statement).first()
-        if ultimo and "-" in ultimo:
+        if ultimo and sep in ultimo:
             try:
-                suf = int(ultimo.rsplit("-", 1)[1])
+                suf = int(ultimo.rsplit(sep, 1)[1])
             except ValueError:
                 suf = 0
         else:
             suf = 0
         siguiente = suf + 1
-        return f"{base}-{siguiente:03d}"
+        return f"{base}{sep}{siguiente:03d}"
     #endregion
 
     #region Métodos Cuadrantes

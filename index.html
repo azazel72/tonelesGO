@@ -132,7 +132,7 @@
                             <th scope="col">Material</th>
                             <th scope="col">Cant.</th>
                             <th scope="col">PAQ.</th>
-                            <th scope="col">Imp.</th>
+                            <th scope="col">Ver.</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -140,31 +140,31 @@
                             <td>Hileras de Duela de Roble Frances 1300x1200x35mm</td>
                             <td>168</td>
                             <td>4</td>
-                            <td><i class="bi bi-printer"></i></td>
+                            <td><i class="bi bi-check-circle"></i></td>
                         </tr>
                         <tr>
                             <td>Hileras de Duela de Roble Frances 1150x1200x35mm</td>
                             <td>42</td>
                             <td>1</td>
-                            <td><i class="bi bi-printer"></i></td>
+                            <td><i class="bi bi-check-circle"></i></td>
                         </tr>
                         <tr>
                             <td>Hileras de Duela de Roble Frances 1000x1200x3,5mm</td>
                             <td>56</td>
                             <td>2</td>
-                            <td><i class="bi bi-printer"></i></td>
+                            <td><i class="bi bi-check-circle"></i></td>
                         </tr>
                         <tr>
                             <td>Hileras de Duela de Roble Frances 950x1200x3,5mm</td>
                             <td>88</td>
                             <td>4</td>
-                            <td><i class="bi bi-printer"></i></td>
+                            <td><i class="bi bi-check-circle"></i></td>
                         </tr>
                         <tr>
                             <td>Hileras de Duela de Roble Frances 700x1200x35mm</td>
                             <td>42</td>
                             <td>1</td>
-                            <td><i class="bi bi-printer"></i></td>
+                            <td><i class="bi bi-check-circle"></i></td>
                         </tr>
                     </tbody>
                     <tfoot>
@@ -180,47 +180,34 @@
                     <div class="modal-content">
 
                         <div class="modal-header">
-                            <h5 class="modal-title" id="miModalLabel">Impresión de etiqueta</h5>
+                            <h5 class="modal-title" id="miModalLabel">Verificar línea de recepción</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"
                                 aria-label="Cerrar"></button>
                         </div>
 
                         <div class="modal-body">
-                            <p>Impresión de etiqueta identificativa para palets.</p>
-                            <p>Material: <span id="materialEtiqueta">Hileras de Duela de Roble Frances
-                                    1300x1200x35mm</span></p>
-                            <div class="d-flex justify-content-around flex-wrap mt-3 mb-3 gap-4">
-
-                                <!-- Bloque Desde -->
-                                <div>
-                                    <label class="form-label">Desde:</label>
-                                    <div class="d-flex align-items-center justify-content-center gap-2">
-                                        <button class="btn btn-outline-secondary btn-sm"
-                                            onclick="modificar('desde', -1)">−</button>
-                                        <span id="desde" class="fs-5">1</span>
-                                        <button class="btn btn-outline-secondary btn-sm"
-                                            onclick="modificar('desde', 1)">+</button>
-                                    </div>
+                            <p>Confirma la cantidad realmente recibida para esta línea.</p>
+                            <p>Material: <span id="materialEtiqueta">Material</span></p>
+                            <div class="row g-3 mt-2">
+                                <div class="col-6">
+                                    <label class="form-label">Bultos previstos</label>
+                                    <input type="text" class="form-control" id="recepcion-bultos-previstos" readonly>
                                 </div>
-
-                                <!-- Bloque Hasta -->
-                                <div>
-                                    <label class="form-label">Hasta:</label>
-                                    <div class="d-flex align-items-center justify-content-center gap-2">
-                                        <button class="btn btn-outline-secondary btn-sm"
-                                            onclick="modificar('hasta', -1)">−</button>
-                                        <span id="hasta" class="fs-5">1</span>
-                                        <button class="btn btn-outline-secondary btn-sm"
-                                            onclick="modificar('hasta', 1)">+</button>
-                                    </div>
+                                <div class="col-6">
+                                    <label class="form-label">Bultos recibidos</label>
+                                    <input type="number" class="form-control" id="recepcion-bultos-recibidos" min="0">
                                 </div>
-
+                                <div class="col-6">
+                                    <label class="form-label">Kilos previstos</label>
+                                    <input type="text" class="form-control" id="recepcion-kilos-previstos" readonly>
+                                </div>
                             </div>
 
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                                <button type="button" class="btn btn-primary"><i class="bi bi-printer"></i>
-                                    Aceptar</button>
+                                <button type="button" class="btn btn-primary" id="recepcion-confirmar-verificacion">
+                                    <i class="bi bi-check-lg"></i> Verificar
+                                </button>
                             </div>
 
                         </div>
@@ -366,7 +353,7 @@
                                     <div class="d-flex justify-content-between align-items-center">
                                         <span>Fabricar nuevo tonel</span>
                                         <button class="btn btn-primary" type="button" id="fabricacion-imprimir-etiqueta">
-                                            <i class="bi bi-printer"></i> Imprimir etiqueta
+                                            <i class="bi bi-user"></i> Seleccionar operarios
                                         </button>
                                     </div>
 
@@ -386,6 +373,39 @@
             </div>
 
         </section>
+
+        <!-- Modal Operario Fabricacion -->
+        <div class="modal fade modal-operario-50" id="modalOperarioFabricacion" tabindex="-1"
+            aria-labelledby="modalOperarioFabricacionLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalOperarioFabricacionLabel">Seleccionar operario</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Selecciona el operario que realiza la fabricación.</p>
+                        <div class="table-responsive">
+                            <table class="table table-sm" id="tabla_operarios_fabricacion">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th scope="col">Operario</th>
+                                        <th scope="col" class="text-center">Seleccion</th>
+                                    </tr>
+                                </thead>
+                                <tbody></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="button" class="btn btn-primary" id="fabricacion-confirmar-impresion">
+                            <i class="bi bi-printer"></i> Imprimir etiqueta
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
 
         <section id="vista_expedicion" class="flex-fill" modo="listado_ventas">
             <div class="table-responsive">
@@ -563,7 +583,7 @@
     <script src="./js/terminal-recepcion.js"></script>
     <script src="./js/terminal-fabricacion.js"></script>
     <script src="./js/terminal-expedicion.js"></script>
-    <script src="./js/terminal.js"></script>
+    <script src="./js/terminal.js?v=1.0.0"></script>
 
 </body>
 

@@ -44,3 +44,15 @@ section.pagina-activa {
     display: flex;
     flex-direction: column;
 }
+
+.modal-operario-50 .modal-dialog {
+    height: 50vh;
+}
+
+.modal-operario-50 .modal-content {
+    height: 100%;
+}
+
+.modal-operario-50 .modal-body {
+    overflow: auto;
+}

@@ -21,7 +21,22 @@ function prepararEventosFabricacion() {
     const btnImprimir = document.getElementById("fabricacion-imprimir-etiqueta");
     if (btnImprimir) {
         btnImprimir.addEventListener("click", () => {
-            imprimirEtiquetaFabricacion();
+            abrirModalOperarioFabricacion();
+        });
+    }
+
+    const btnConfirmar = document.getElementById("fabricacion-confirmar-impresion");
+    if (btnConfirmar) {
+        btnConfirmar.addEventListener("click", async () => {
+            const operarioId = obtenerOperarioSeleccionado();
+            if (!operarioId) {
+                alert("Selecciona un operario.");
+                return;
+            }
+            const modalEl = document.getElementById("modalOperarioFabricacion");
+            const modal = modalEl ? bootstrap.Modal.getInstance(modalEl) : null;
+            if (modal) modal.hide();
+            await imprimirEtiquetaFabricacion(operarioId);
         });
     }
 
@@ -73,14 +88,16 @@ const terminalFabricacion = {
     clientes: null,
     estados: null,
     tipos_producto: null,
+    usuarios: null,
 };
 
 async function asegurarDatosFabricacionTerminal() {
-    if (terminalFabricacion.clientes && terminalFabricacion.estados && terminalFabricacion.tipos_producto) return;
+    if (terminalFabricacion.clientes && terminalFabricacion.estados && terminalFabricacion.tipos_producto && terminalFabricacion.usuarios) return;
     try {
         const maestros = await wsRequest("maestros", {});
         terminalFabricacion.clientes = maestros?.clientes || {};
         terminalFabricacion.estados = maestros?.estados || {};
+        terminalFabricacion.usuarios = maestros?.usuarios || {};
         const fabricacion = await wsRequest("fabricacion", {});
         terminalFabricacion.tipos_producto = fabricacion?.tipos_producto || {};
     } catch (err) {
@@ -88,6 +105,7 @@ async function asegurarDatosFabricacionTerminal() {
         terminalFabricacion.clientes = terminalFabricacion.clientes || {};
         terminalFabricacion.estados = terminalFabricacion.estados || {};
         terminalFabricacion.tipos_producto = terminalFabricacion.tipos_producto || {};
+        terminalFabricacion.usuarios = terminalFabricacion.usuarios || {};
     }
 }
 
@@ -302,7 +320,65 @@ async function agregarTrazabilidadFabricacionDesdeUI() {
     }
 }
 
-async function imprimirEtiquetaFabricacion() {
+async function abrirModalOperarioFabricacion() {
+    const modalEl = document.getElementById("modalOperarioFabricacion");
+    if (!modalEl) return;
+    await asegurarDatosFabricacionTerminal();
+    cargarOperariosEnModal();
+    const modal = new bootstrap.Modal(modalEl);
+    modal.show();
+    ajustarZIndexModal(modalEl);
+}
+
+function ajustarZIndexModal(modalEl) {
+    const abiertos = document.querySelectorAll(".modal.show").length;
+    const base = 1050;
+    const zIndex = base + (abiertos * 10);
+    modalEl.style.zIndex = zIndex;
+    const backdrop = document.querySelector(".modal-backdrop.show:last-of-type");
+    if (backdrop) {
+        backdrop.style.zIndex = zIndex - 1;
+    }
+}
+
+function cargarOperariosEnModal() {
+    const tbody = document.querySelector("#tabla_operarios_fabricacion tbody");
+    const btnConfirmar = document.getElementById("fabricacion-confirmar-impresion");
+    if (!tbody) return;
+    const empleados = Object.values(terminalFabricacion.usuarios || {}).filter((u) => u && u.empleado);
+    tbody.innerHTML = "";
+    if (!empleados.length) {
+        const tr = document.createElement("tr");
+        const td = document.createElement("td");
+        td.colSpan = 2;
+        td.textContent = "No hay empleados disponibles.";
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+        if (btnConfirmar) btnConfirmar.disabled = true;
+        return;
+    }
+    if (btnConfirmar) btnConfirmar.disabled = false;
+    empleados.forEach((u, idx) => {
+        const tr = document.createElement("tr");
+        const nombre = u.nombre || u.alias || `Empleado ${u.id}`;
+        tr.innerHTML = `
+      <td>${nombre}</td>
+      <td class="text-center">
+        <input type="radio" name="operario_fabricacion" value="${u.id}" ${idx === 0 ? "checked" : ""}>
+      </td>
+    `;
+        tbody.appendChild(tr);
+    });
+}
+
+function obtenerOperarioSeleccionado() {
+    const seleccionado = document.querySelector("input[name='operario_fabricacion']:checked");
+    if (!seleccionado) return null;
+    const id = Number(seleccionado.value);
+    return Number.isFinite(id) ? id : null;
+}
+
+async function imprimirEtiquetaFabricacion(operarioId = null) {
     const tbody = document.querySelector("#tabla_trazabilidad_fabricacion tbody");
     if (!tbody) return;
     const filas = Array.from(tbody.querySelectorAll("tr"));
@@ -321,6 +397,7 @@ async function imprimirEtiquetaFabricacion() {
             trazabilidad_ids: trazabilidadIds,
             palet_codigos: paletCodigos,
             tipo: "BOTA",
+            fabricado_por_id: operarioId,
         });
         console.log("Etiqueta creada:", resp);
         cargarTrazabilidadFabricacion(lineaFabricacionActualId);

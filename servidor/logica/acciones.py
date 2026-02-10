@@ -20,7 +20,7 @@ def obtener_acciones() -> Dict[str, any]:
         "agregar_trazabilidad_fabricacion": lambda ws, req: Colector.colector.agregar_trazabilidad_fabricacion(req.data),
         "eliminar_trazabilidad_fabricacion": lambda ws, req: Colector.colector.eliminar_trazabilidad_fabricacion(req.data),
         "actualizar_estado_trazabilidad_fabricacion": lambda ws, req: Colector.colector.actualizar_estado_trazabilidad_fabricacion(req.data),
-        "imprimir_etiqueta_fabricacion": lambda ws, req: Colector.colector.imprimir_etiqueta_fabricacion(req.data),
+        "imprimir_etiqueta_fabricacion": lambda ws, req: Colector.colector.imprimir_etiqueta_fabricacion(req.data, ws),
         "listar_archivos_entidad": lambda ws, req: Colector.colector.listar_archivos_entidad(req.data.get("entidad"), req.data.get("entidad_id")),
         "modificar_maestro": lambda ws, req: Colector.colector.modificar_maestro(req.data),
         "modificar_entrada": lambda ws, req: Colector.colector.modificar_entrada(req.data),

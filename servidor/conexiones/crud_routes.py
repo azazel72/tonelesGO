@@ -10,6 +10,7 @@ from servidor.colector import Colector
 from servidor.logica.acciones import obtener_acciones
 from servidor.conexiones.request_message import RequestMessage
 from servidor.conexiones.response_message import ResponseMessage
+from servidor.conexiones.broadcast import set_registry, broadcast_error
 
 logger = logging.getLogger("paezlobato_crud_routes")
 
@@ -22,6 +23,7 @@ class CrudRoutes:
         svc = {}
         clients = set()
         client_state = {}
+        set_registry(clients, client_state)
         ACCIONES = obtener_acciones()
 
         # =======================
