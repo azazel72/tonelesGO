@@ -1,7 +1,4 @@
 import socket
-from pathlib import Path
-
-from PIL import Image, ImageOps
 
 PRINTER_IP = "192.168.1.200"
 PRINTER_PORT = 9100
@@ -13,11 +10,22 @@ MARGIN = 10
 GAP = 6
 
 FONT_H = 20
-FONT_W = 16
+FONT_W = 14
+TITLE_FONT_H = 26
+TITLE_FONT_W = 20
+TITLE_LINE_GAP = 2
+TITLE_CHAR_SPACING = 1
+TITLE_SHIFT_LEFT = 24  # ~3 mm @ 203 dpi
+TITLE_ALLOW_OVERLAP = 24  # permite meterse en zona blanca del logo (~3 mm)
 
-LOGO_MAX_W = 96
-LOGO_MAX_H = 56
-TITLE_TEXT = "Toneleria Paez Lobato"
+LOGO_MAX_W = 112
+LOGO_MAX_H = 80
+TITLE_LINE_1 = "TONELERIA"
+TITLE_LINE_2 = "PAEZ LOBATO"
+
+LOGO_W = 112
+LOGO_H = 80
+LOGO_GFA = "^GFA,1120,1120,14,000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001C000000000000000000000000003E00000000000000000000000000FF80000000000000000000000003FFE000000000000000000000000FF3F800000000000000000000001FC1FC00000000000000000000007F007F0000000000000000000001FC001FC000000000000000000003F80007E00000000000000000000FE00003F80000000000000000003F800000FE0000000000000000007F003C003F000000000000000001FC003C001FC00000000000000007F0007E0007F0000000000000001FE0007E0001FC000000000000003F8000E60000FE00000000000000FE0000E700003F80000000000003F80000E700000FE0000000000007F00001FF800007F000000000001FC00001FF800001FC00000000007F000001C38000007F0000000001FE00000381C000001FC000000003F800000381C000000FE00000000FE00000000000000003F80000003FC00000000000000000FE0000007F0000000000000000007F000001FC0000000000000000001FC00007F0001FC01C01FF07FC0007F0000FE0003FE03C01FF0FFC0003FC003F800038F03E01C0003C0000FE007E000038707E01C0007800003F00FC000038707601C000F000001F80F000003FF0E701FE00E000000780F000003FE0E701FE01C000000780F000003F80FF81C003C000000780F000003801FF81C0078000000780F000003801E381C00F0000000780F000003801C1C1FF0FFC00000780F00000180381C1FF0FFE00000780F000000000000000000000000780F000000000000000000000000780FC00000000000000000000000F807E00000000000000000000003F003F800000003E003000000000FE001FE0000000FF007800000003FC0007F0000000E7807C00000007F00001FC000000C380FC0000001FC000007F000000F000EC0000007F0000003FC00000FE00CE000001FE0000000FE000003F81CE000003F800000003F800000F81FF00000FE000000000FE0000C383FF00003F80000000007F0001C383FF00007F00000000001FC000FF83838001FC000000000007F0007F07038007F0000000000001FC003C0301001FC0000000000000FE00000000003F800000000000003F8000000000FE000000000000000FE000000003F80000000000000007F80000000FF00000000000000001FC0000001FC000000000000000007F0000007F0000000000000000001FC00001FC0000000000000000000FF00003F800000000000000000003F8000FE000000000000000000000FE003F80000000000000000000003F80FE00000000000000000000001FC1FC000000000000000000000007FFF0000000000000000000000001FFC00000000000000000000000007F000000000000000000000000003E00000000000000000000000000080000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
 
 
 def send_raw_zpl(zpl: str):
@@ -31,73 +39,45 @@ def code128_modules_for_n_chars(n: int) -> int:
     return 11 * n + 37
 
 
-def resolve_logo_path() -> Path:
-    candidates = [
-        Path("imagenes/logo-toneleria.png"),
-        Path("imagenes/Logo-Toneleria.png"),
-    ]
-    for candidate in candidates:
-        if candidate.exists():
-            return candidate
-    raise FileNotFoundError("No se encontro el logo en imagenes/logo-toneleria.png")
-
-
-def image_to_gfa_hex(image_path: Path, max_w: int, max_h: int) -> tuple[str, int, int]:
-    img = Image.open(image_path).convert("RGBA")
-    bg = Image.new("RGBA", img.size, (255, 255, 255, 255))
-    bg.paste(img, mask=img.getchannel("A"))
-    gray = ImageOps.grayscale(bg)
-    gray.thumbnail((max_w, max_h), Image.Resampling.LANCZOS)
-
-    bw = gray.point(lambda p: 0 if p < 180 else 255, mode="1")
-    width, height = bw.size
-
-    bytes_per_row = (width + 7) // 8
-    rows = []
-    pixels = bw.load()
-
-    for y in range(height):
-        row = bytearray(bytes_per_row)
-        for x in range(width):
-            # En modo "1": 0 negro, 255 blanco. En ZPL, bit=1 dibuja punto.
-            if pixels[x, y] == 0:
-                row[x // 8] |= 1 << (7 - (x % 8))
-        rows.append(row.hex().upper())
-
-    total_bytes = bytes_per_row * height
-    hex_data = "".join(rows)
-    return f"^GFA,{total_bytes},{total_bytes},{bytes_per_row},{hex_data}", width, height
-
-
 def build_barcode128_logo_label(value: str, copies: int = 1) -> str:
     if not value:
         raise ValueError("El valor no puede estar vacio.")
     if copies < 1:
         raise ValueError("copies debe ser >= 1")
 
-    logo_path = resolve_logo_path()
-    gfa, logo_w, logo_h = image_to_gfa_hex(logo_path, LOGO_MAX_W, LOGO_MAX_H)
-
-    header_y = MARGIN
-    logo_x = MARGIN
-    logo_y = header_y
-
-    title_x = logo_x + logo_w + 8
-    title_y = logo_y + max(0, (logo_h - FONT_H) // 2)
-    title_w = LABEL_W - title_x - MARGIN
-
-    header_h = max(logo_h, FONT_H) + 8
-    barcode_top = header_y + header_h
-
     avail_w = LABEL_W - 2 * MARGIN
     modules = code128_modules_for_n_chars(len(value))
     module_width = max(1, min(3, avail_w // modules))
     barcode_w = modules * module_width
+    bar_x = (LABEL_W - barcode_w) // 2
+
+    # Bloque superior alineado al ancho del barcode.
+    header_y = MARGIN
+    logo_x = bar_x
+    logo_y = header_y + max(0, (LOGO_MAX_H - LOGO_H) // 2)
+
+    title_right = LABEL_W - MARGIN
+    # Bloque de 2 lineas dentro del margen derecho de la etiqueta.
+    # Las lineas se centran dentro del mismo bloque para que la primera
+    # quede centrada respecto a la segunda.
+    title_left_min = logo_x + LOGO_W + 8 - TITLE_ALLOW_OVERLAP
+    line2_estimated_w = len(TITLE_LINE_2) * (TITLE_FONT_W + TITLE_CHAR_SPACING)
+    title_max_w = max(20, title_right - title_left_min)
+    title_w = min(title_max_w, max(20, line2_estimated_w))
+    title_x = title_right - title_w - TITLE_SHIFT_LEFT
+    title_x = max(title_left_min, title_x)
+    title_block_h = (2 * TITLE_FONT_H) + TITLE_LINE_GAP
+    title_y = logo_y + max(0, (LOGO_H - title_block_h) // 2)
+
+    header_h = max(LOGO_H, title_block_h) + 8
+    barcode_top = header_y + header_h
 
     bar_h = max(40, LABEL_H - barcode_top - GAP - FONT_H - MARGIN)
-    bar_x = (LABEL_W - barcode_w) // 2
     bar_y = barcode_top
     text_y = bar_y + bar_h + GAP
+    text_x = MARGIN
+    text_w = LABEL_W - (2 * MARGIN)
+    title_y_2 = title_y + TITLE_FONT_H + TITLE_LINE_GAP
 
     return f"""^XA
 ^PW{LABEL_W}
@@ -106,21 +86,34 @@ def build_barcode128_logo_label(value: str, copies: int = 1) -> str:
 ^LH0,0
 
 ^FO{logo_x},{logo_y}
-{gfa}
+{LOGO_GFA}
 
 ^FO{title_x},{title_y}
-^A0N,{FONT_H},{FONT_W}
-^FB{title_w},1,0,L,0
-^FD{TITLE_TEXT}^FS
+^A0N,{TITLE_FONT_H},{TITLE_FONT_W}
+^FB{title_w},1,0,C,0
+^FD{TITLE_LINE_1}^FS
+^FO{title_x + 1},{title_y}
+^A0N,{TITLE_FONT_H},{TITLE_FONT_W}
+^FB{title_w},1,0,C,0
+^FD{TITLE_LINE_1}^FS
+
+^FO{title_x},{title_y_2}
+^A0N,{TITLE_FONT_H},{TITLE_FONT_W}
+^FB{title_w},1,0,C,0
+^FD{TITLE_LINE_2}^FS
+^FO{title_x + 1},{title_y_2}
+^A0N,{TITLE_FONT_H},{TITLE_FONT_W}
+^FB{title_w},1,0,C,0
+^FD{TITLE_LINE_2}^FS
 
 ^FO{bar_x},{bar_y}
 ^BY{module_width},2,{bar_h}
 ^BCN,,N,N,N
 ^FD{value}^FS
 
-^FO0,{text_y}
+^FO{text_x},{text_y}
 ^A0N,{FONT_H},{FONT_W}
-^FB{LABEL_W},1,0,C,0
+^FB{text_w},1,0,C,0
 ^FD{value}^FS
 
 ^PQ{copies}

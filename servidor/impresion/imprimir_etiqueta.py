@@ -1,18 +1,33 @@
-
 import socket
 
 
 class ImprimirEtiqueta:
-    PRINTER_IP = "192.168.1.155"
+    PRINTER_IP = "192.168.1.200"
     PRINTER_PORT = 9100
 
     # 43mm x 29mm @ 203dpi (8 dots/mm)
     LABEL_W = 344
     LABEL_H = 232
-    MARGIN = 12
+    MARGIN = 10
+    GAP = 6
 
-    BAR_HEIGHT = 140
-    GAP = 12
+    FONT_H = 20
+    FONT_W = 14
+    TITLE_FONT_H = 26
+    TITLE_FONT_W = 20
+    TITLE_LINE_GAP = 2
+    TITLE_CHAR_SPACING = 1
+    TITLE_SHIFT_LEFT = 24  # ~3 mm @ 203 dpi
+    TITLE_ALLOW_OVERLAP = 24  # permite meterse en zona blanca del logo (~3 mm)
+
+    LOGO_MAX_W = 112
+    LOGO_MAX_H = 80
+    TITLE_LINE_1 = "TONELERIA"
+    TITLE_LINE_2 = "PAEZ LOBATO"
+
+    LOGO_W = 112
+    LOGO_H = 80
+    LOGO_GFA = "^GFA,1120,1120,14,000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000001C000000000000000000000000003E00000000000000000000000000FF80000000000000000000000003FFE000000000000000000000000FF3F800000000000000000000001FC1FC00000000000000000000007F007F0000000000000000000001FC001FC000000000000000000003F80007E00000000000000000000FE00003F80000000000000000003F800000FE0000000000000000007F003C003F000000000000000001FC003C001FC00000000000000007F0007E0007F0000000000000001FE0007E0001FC000000000000003F8000E60000FE00000000000000FE0000E700003F80000000000003F80000E700000FE0000000000007F00001FF800007F000000000001FC00001FF800001FC00000000007F000001C38000007F0000000001FE00000381C000001FC000000003F800000381C000000FE00000000FE00000000000000003F80000003FC00000000000000000FE0000007F0000000000000000007F000001FC0000000000000000001FC00007F0001FC01C01FF07FC0007F0000FE0003FE03C01FF0FFC0003FC003F800038F03E01C0003C0000FE007E000038707E01C0007800003F00FC000038707601C000F000001F80F000003FF0E701FE00E000000780F000003FE0E701FE01C000000780F000003F80FF81C003C000000780F000003801FF81C0078000000780F000003801E381C00F0000000780F000003801C1C1FF0FFC00000780F00000180381C1FF0FFE00000780F000000000000000000000000780F000000000000000000000000780FC00000000000000000000000F807E00000000000000000000003F003F800000003E003000000000FE001FE0000000FF007800000003FC0007F0000000E7807C00000007F00001FC000000C380FC0000001FC000007F000000F000EC0000007F0000003FC00000FE00CE000001FE0000000FE000003F81CE000003F800000003F800000F81FF00000FE000000000FE0000C383FF00003F80000000007F0001C383FF00007F00000000001FC000FF83838001FC000000000007F0007F07038007F0000000000001FC003C0301001FC0000000000000FE00000000003F800000000000003F8000000000FE000000000000000FE000000003F80000000000000007F80000000FF00000000000000001FC0000001FC000000000000000007F0000007F0000000000000000001FC00001FC0000000000000000000FF00003F800000000000000000003F8000FE000000000000000000000FE003F80000000000000000000003F80FE00000000000000000000001FC1FC000000000000000000000007FFF0000000000000000000000001FFC00000000000000000000000007F000000000000000000000000003E00000000000000000000000000080000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
 
     def __init__(self, printer_ip: str | None = None, printer_port: int | None = None):
         if printer_ip:
@@ -26,7 +41,7 @@ class ImprimirEtiqueta:
             s.sendall(data)
 
     def _code128_modules_for_n_chars(self, n: int) -> int:
-        # Aproximacion: Start(11) + n*11 + Check(11) + Stop(13) + Term(2) = 11n + 37
+        # Start + data + check + stop + termination
         return 11 * n + 37
 
     def _build_label_botas(self, value: str, copies: int = 1) -> str:
@@ -35,19 +50,36 @@ class ImprimirEtiqueta:
         if copies < 1:
             raise ValueError("copies debe ser >= 1")
 
-        avail_w = self.LABEL_W - 2 * self.MARGIN
-        avail_h = self.LABEL_H - 2 * self.MARGIN
+        avail_w = self.LABEL_W - (2 * self.MARGIN)
+        modules = self._code128_modules_for_n_chars(len(value))
+        module_width = max(1, min(3, avail_w // modules))
+        barcode_w = modules * module_width
+        bar_x = (self.LABEL_W - barcode_w) // 2
 
-        font_h = 24
-        font_w = 20
-        text_w = self.LABEL_W - 2 * self.MARGIN
+        # Bloque superior alineado al ancho del barcode.
+        header_y = self.MARGIN
+        logo_x = bar_x
+        logo_y = header_y + max(0, (self.LOGO_MAX_H - self.LOGO_H) // 2)
+
+        title_right = self.LABEL_W - self.MARGIN
+        title_left_min = logo_x + self.LOGO_W + 8 - self.TITLE_ALLOW_OVERLAP
+        line2_estimated_w = len(self.TITLE_LINE_2) * (self.TITLE_FONT_W + self.TITLE_CHAR_SPACING)
+        title_max_w = max(20, title_right - title_left_min)
+        title_w = min(title_max_w, max(20, line2_estimated_w))
+        title_x = title_right - title_w - self.TITLE_SHIFT_LEFT
+        title_x = max(title_left_min, title_x)
+        title_block_h = (2 * self.TITLE_FONT_H) + self.TITLE_LINE_GAP
+        title_y = logo_y + max(0, (self.LOGO_H - title_block_h) // 2)
+
+        header_h = max(self.LOGO_H, title_block_h) + 8
+        barcode_top = header_y + header_h
+
+        bar_h = max(40, self.LABEL_H - barcode_top - self.GAP - self.FONT_H - self.MARGIN)
+        bar_y = barcode_top
+        text_y = bar_y + bar_h + self.GAP
         text_x = self.MARGIN
-        text_y = self.MARGIN
-
-        avail_h_after_text = self.LABEL_H - (text_y + font_h + self.GAP) - self.MARGIN
-        qr_size = min(avail_w, max(0, avail_h_after_text))
-        x = self.MARGIN + (avail_w - qr_size) // 2
-        y = text_y + font_h + self.GAP
+        text_w = self.LABEL_W - (2 * self.MARGIN)
+        title_y_2 = title_y + self.TITLE_FONT_H + self.TITLE_LINE_GAP
 
         return f"""^XA
 ^PW{self.LABEL_W}
@@ -55,13 +87,35 @@ class ImprimirEtiqueta:
 ^CI28
 ^LH0,0
 
-^FO{text_x},{text_y}
-^A0N,{font_h},{font_w}
-^FB{text_w},1,0,C,0
+^FO{logo_x},{logo_y}
+{self.LOGO_GFA}
+
+^FO{title_x},{title_y}
+^A0N,{self.TITLE_FONT_H},{self.TITLE_FONT_W}
+^FB{title_w},1,0,C,0
+^FD{self.TITLE_LINE_1}^FS
+^FO{title_x + 1},{title_y}
+^A0N,{self.TITLE_FONT_H},{self.TITLE_FONT_W}
+^FB{title_w},1,0,C,0
+^FD{self.TITLE_LINE_1}^FS
+
+^FO{title_x},{title_y_2}
+^A0N,{self.TITLE_FONT_H},{self.TITLE_FONT_W}
+^FB{title_w},1,0,C,0
+^FD{self.TITLE_LINE_2}^FS
+^FO{title_x + 1},{title_y_2}
+^A0N,{self.TITLE_FONT_H},{self.TITLE_FONT_W}
+^FB{title_w},1,0,C,0
+^FD{self.TITLE_LINE_2}^FS
+
+^FO{bar_x},{bar_y}
+^BY{module_width},2,{bar_h}
+^BCN,,N,N,N
 ^FD{value}^FS
 
-^FO{x},{y}
-^BQN,2,6
+^FO{text_x},{text_y}
+^A0N,{self.FONT_H},{self.FONT_W}
+^FB{text_w},1,0,C,0
 ^FD{value}^FS
 
 ^PQ{copies}
