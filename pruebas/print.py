@@ -1,24 +1,20 @@
 import socket
-import math
 
-PRINTER_IP = "192.168.1.155"
+PRINTER_IP = "192.168.1.200"
 PRINTER_PORT = 9100
 
-LABEL_W = 400
-LABEL_H = 800
-MARGIN = 20
+# 43mm x 29mm @ 203dpi (8 dots/mm)
+LABEL_W = 344
+LABEL_H = 232
+MARGIN = 12
+GAP = 8
+QR_CENTER_OFFSET_X = 7
 
-BAR_HEIGHT = 200   # alto de barras (dots). Girado 90º ocupa el eje X.
-GAP = 20           # separación entre barcode y texto manual (dots)
 
 def send_raw_zpl(zpl: str):
     data = zpl.encode("utf-8")
     with socket.create_connection((PRINTER_IP, PRINTER_PORT), timeout=5) as s:
         s.sendall(data)
-
-def code128_modules_for_n_chars(n: int) -> int:
-    # Aproximación estándar: Start(11) + n*11 + Check(11) + Stop(13) + Term(2) = 11n + 37
-    return 11 * n + 37
 
 def build_label(value: str, copies: int = 1) -> str:
     if not value:
@@ -26,29 +22,24 @@ def build_label(value: str, copies: int = 1) -> str:
     if copies < 1:
         raise ValueError("copies debe ser >= 1")
 
-    avail_long = LABEL_H - 2 * MARGIN  # 760 dots (largo útil)
-    modules = code128_modules_for_n_chars(len(value))
-
-    # módulo lo más grande posible sin pasarnos del largo útil
-    module_width = max(1, avail_long // modules)
-    barcode_long = module_width * modules  # largo aproximado del símbolo (dots)
-
     avail_w = LABEL_W - 2 * MARGIN
     avail_h = LABEL_H - 2 * MARGIN
 
-    # Barcode girado 90º:
-    # - BAR_HEIGHT ocupa X
-    # - barcode_long ocupa Y
-    x = MARGIN + (avail_w - BAR_HEIGHT) // 2
-    y = MARGIN + (avail_h - barcode_long) // 2
+    font_h = 22
+    font_w = 18
+    text_h = font_h
 
-    # Texto manual “debajo” en orientación R => hacia +X
-    text_x = x + BAR_HEIGHT + GAP
-    text_y = y
+    qr_h = max(0, avail_h - text_h - GAP)
+    qr_size = min(avail_w, qr_h)
 
-    # Fuente (ajusta a gusto)
-    font_h = 38
-    font_w = 32
+    qr_x = MARGIN + (avail_w - qr_size) // 2 + QR_CENTER_OFFSET_X
+    qr_y = MARGIN
+
+    text_x = MARGIN
+    text_y = qr_y + qr_size + GAP
+    text_w = avail_w
+
+    qr_mag = 5
 
     return f"""^XA
 ^PW{LABEL_W}
@@ -56,14 +47,13 @@ def build_label(value: str, copies: int = 1) -> str:
 ^CI28
 ^LH0,0
 
-^FO{x},{y}
-^BY{module_width},2,{BAR_HEIGHT}
-^BCR,,N,N,N
-^FD{value}^FS
+^FO{qr_x},{qr_y}
+^BQN,2,{qr_mag}
+^FDLA,{value}^FS
 
 ^FO{text_x},{text_y}
-^A0R,{font_h},{font_w}
-^FB{barcode_long},1,0,C,0
+^A0N,{font_h},{font_w}
+^FB{text_w},1,0,C,0
 ^FD{value}^FS
 
 ^PQ{copies}
