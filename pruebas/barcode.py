@@ -6,6 +6,7 @@ PRINTER_PORT = 9100
 # 43mm x 29mm @ 203dpi (8 dots/mm)
 LABEL_W = 344
 LABEL_H = 232
+MARGIN = 12
 GAP = 8
 
 FONT_H = 22
@@ -18,21 +19,27 @@ def send_raw_zpl(zpl: str):
         s.sendall(data)
 
 
-def build_datamatrix_label(value: str, copies: int = 1) -> str:
+def code128_modules_for_n_chars(n: int) -> int:
+    # Start + data + check + stop + termination
+    return 11 * n + 37
+
+
+def build_barcode128_label(value: str, copies: int = 1) -> str:
     if not value:
         raise ValueError("El valor no puede estar vacio.")
     if copies < 1:
         raise ValueError("copies debe ser >= 1")
 
-    # En Data Matrix el tamano final depende del contenido.
-    # Se usa un modulo estable para 43x29mm y se centra el bloque.
-    dm_module = 5
-    dm_estimated_size = 120
+    avail_w = LABEL_W - 2 * MARGIN
+    modules = code128_modules_for_n_chars(len(value))
+    module_width = max(1, min(3, avail_w // modules))
+    barcode_w = modules * module_width
 
-    block_h = dm_estimated_size + GAP + FONT_H
-    dm_x = (LABEL_W - dm_estimated_size) // 2
-    dm_y = (LABEL_H - block_h) // 2
-    text_y = dm_y + dm_estimated_size + GAP
+    bar_h = 110
+    block_h = bar_h + GAP + FONT_H
+    x = (LABEL_W - barcode_w) // 2
+    y = (LABEL_H - block_h) // 2
+    text_y = y + bar_h + GAP
 
     return f"""^XA
 ^PW{LABEL_W}
@@ -40,8 +47,9 @@ def build_datamatrix_label(value: str, copies: int = 1) -> str:
 ^CI28
 ^LH0,0
 
-^FO{dm_x},{dm_y}
-^BXN,{dm_module},200
+^FO{x},{y}
+^BY{module_width},2,{bar_h}
+^BCN,,N,N,N
 ^FD{value}^FS
 
 ^FO0,{text_y}
@@ -55,7 +63,7 @@ def build_datamatrix_label(value: str, copies: int = 1) -> str:
 
 
 def print_label(value: str, copies: int = 1):
-    send_raw_zpl(build_datamatrix_label(value, copies=copies))
+    send_raw_zpl(build_barcode128_label(value, copies=copies))
 
 
 if __name__ == "__main__":

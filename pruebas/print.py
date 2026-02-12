@@ -9,6 +9,7 @@ LABEL_H = 232
 MARGIN = 12
 GAP = 8
 QR_CENTER_OFFSET_X = 7
+QR_OFFSET_Y = 16  # ~2 mm a 203 dpi
 
 
 def send_raw_zpl(zpl: str):
@@ -33,10 +34,11 @@ def build_label(value: str, copies: int = 1) -> str:
     qr_size = min(avail_w, qr_h)
 
     qr_x = MARGIN + (avail_w - qr_size) // 2 + QR_CENTER_OFFSET_X
-    qr_y = MARGIN
+    qr_y_base = MARGIN
+    qr_y = qr_y_base + QR_OFFSET_Y
 
     text_x = MARGIN
-    text_y = qr_y + qr_size + GAP
+    text_y = qr_y_base + qr_size + GAP
     text_w = avail_w
 
     qr_mag = 5
