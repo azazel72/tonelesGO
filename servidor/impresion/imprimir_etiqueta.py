@@ -6,12 +6,13 @@ class ImprimirEtiqueta:
     PRINTER_IP = "192.168.1.155"
     PRINTER_PORT = 9100
 
-    LABEL_W = 400
-    LABEL_H = 800
-    MARGIN = 20
+    # 43mm x 29mm @ 203dpi (8 dots/mm)
+    LABEL_W = 344
+    LABEL_H = 232
+    MARGIN = 12
 
-    BAR_HEIGHT = 200
-    GAP = 20
+    BAR_HEIGHT = 140
+    GAP = 12
 
     def __init__(self, printer_ip: str | None = None, printer_port: int | None = None):
         if printer_ip:
@@ -34,22 +35,19 @@ class ImprimirEtiqueta:
         if copies < 1:
             raise ValueError("copies debe ser >= 1")
 
-        avail_long = self.LABEL_H - 2 * self.MARGIN
-        modules = self._code128_modules_for_n_chars(len(value))
-        module_width = max(1, avail_long // modules)
-        barcode_long = module_width * modules
-
         avail_w = self.LABEL_W - 2 * self.MARGIN
         avail_h = self.LABEL_H - 2 * self.MARGIN
 
-        x = self.MARGIN + (avail_w - self.BAR_HEIGHT) // 2
-        y = self.MARGIN + (avail_h - barcode_long) // 2
+        font_h = 24
+        font_w = 20
+        text_w = self.LABEL_W - 2 * self.MARGIN
+        text_x = self.MARGIN
+        text_y = self.MARGIN
 
-        text_x = x + self.BAR_HEIGHT + self.GAP
-        text_y = y
-
-        font_h = 38
-        font_w = 32
+        avail_h_after_text = self.LABEL_H - (text_y + font_h + self.GAP) - self.MARGIN
+        qr_size = min(avail_w, max(0, avail_h_after_text))
+        x = self.MARGIN + (avail_w - qr_size) // 2
+        y = text_y + font_h + self.GAP
 
         return f"""^XA
 ^PW{self.LABEL_W}
@@ -57,14 +55,13 @@ class ImprimirEtiqueta:
 ^CI28
 ^LH0,0
 
-^FO{x},{y}
-^BY{module_width},2,{self.BAR_HEIGHT}
-^BCR,,N,N,N
+^FO{text_x},{text_y}
+^A0N,{font_h},{font_w}
+^FB{text_w},1,0,C,0
 ^FD{value}^FS
 
-^FO{text_x},{text_y}
-^A0R,{font_h},{font_w}
-^FB{barcode_long},1,0,C,0
+^FO{x},{y}
+^BQN,2,6
 ^FD{value}^FS
 
 ^PQ{copies}
