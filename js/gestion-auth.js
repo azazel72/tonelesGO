@@ -23,6 +23,9 @@ function clienteConectado() {
 }
 
 function clienteDesconectado() {
+    if (document.getElementById("vista_tareas") && typeof mostrarSeccion === "function") {
+        mostrarSeccion("vista_tareas");
+    }
     mostrarDesconectado();
     if (overlay.hidden) mostrarLogin();
     console.log("Desconectado del servidor");

@@ -1,7 +1,16 @@
-#vista_fabricacion {
+#vista_fabricacion,
+#vista_consumo {
     /*justify-content: space-evenly;*/
     padding: 20px;
     box-sizing: border-box;
+}
+
+#vista_consumo[modo="listado_ordenes"] table#tabla_contenido_orden_consumo{
+    display: none;
+}
+
+#vista_consumo[modo="contenido_orden"] table#tabla_ordenes_consumo{
+    display: none;
 }
 
 #vista_fabricacion[modo="listado_ordenes"] table#tabla_contenido_orden_fabricacion{
@@ -12,6 +21,7 @@
     display: none;
 }
 
+#tabla_trazabilidad_consumo tbody tr.trazabilidad-inactiva *,
 #tabla_trazabilidad_fabricacion tbody tr.trazabilidad-inactiva * {
     background-color: #f8d7da;
 }
@@ -20,5 +30,30 @@
     background-color: #d8f0ff;
     color: #0b2f4a;
     font-weight: 600;
+}
+
+.modal-trazabilidad .modal-dialog {
+    max-height: 84vh;
+    margin-top: 4vh;
+    margin-bottom: 4vh;
+}
+
+.modal-trazabilidad .modal-content {
+    max-height: 84vh;
+    height: 100%;
+}
+
+.modal-trazabilidad .modal-body {
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+    overflow: hidden;
+}
+
+.modal-trazabilidad .modal-body > .table-responsive,
+.modal-trazabilidad .modal-body .table-responsive {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: auto;
 }
 

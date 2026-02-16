@@ -422,6 +422,7 @@ class Colector:
         trazabilidad_ids = data.get("trazabilidad_ids") or []
         palet_codigos = data.get("palet_codigos") or []
         tipo = data.get("tipo") or "BOTA"
+        cantidad_etiquetas = int(data.get("cantidad_etiquetas") or 1)
         operarios_ids = data.get("operarios_ids") or []
         if not isinstance(operarios_ids, list):
             operarios_ids = [operarios_ids]
@@ -430,6 +431,8 @@ class Colector:
 
         if not trazabilidad_ids:
             raise ValueError("No hay trazabilidades activas.")
+        if cantidad_etiquetas < 1:
+            raise ValueError("cantidad_etiquetas debe ser mayor o igual a 1.")
 
         with DB.crear_sesion() as session:
             try:
@@ -453,41 +456,50 @@ class Colector:
                         palet_map = {p.id: p.codigo for p in palets}
                         palet_codigos = [palet_map.get(t.palet_id, "") for t in trazas]
 
-                    codigo = self._generar_codigo_producto(session, trazas, palet_codigos, operarios_ids)
-                    logger.info("Etiqueta fabricacion: codigo=%s origenes=%s", codigo, palet_codigos)
-
                     produccion_id = None
                     if trazas:
                         linea_ref = session.get(LineaFabricacionDB, trazas[0].linea_fabricacion_id)
                         if linea_ref:
                             produccion_id = linea_ref.orden_id
-                    producto = ProductoDB(
-                        tipo=tipo,
-                        codigo=codigo,
-                        produccion_id=produccion_id,
-                    )
-                    session.add(producto)
-                    session.flush()
-                    session.refresh(producto)
 
-                    for operario_id in operarios_ids:
-                        session.add(
-                            ProductoOperarioDB(
-                                producto_id=producto.id,
-                                usuario_id=operario_id,
-                            )
+                    codigos_generados = []
+                    ultimo_producto_id = None
+
+                    for _ in range(cantidad_etiquetas):
+                        codigo = self._generar_codigo_producto(session, trazas, palet_codigos, operarios_ids)
+                        logger.info("Etiqueta fabricacion: codigo=%s origenes=%s", codigo, palet_codigos)
+                        codigos_generados.append(codigo)
+
+                        producto = ProductoDB(
+                            tipo=tipo,
+                            codigo=codigo,
+                            produccion_id=produccion_id,
                         )
+                        session.add(producto)
+                        session.flush()
+                        session.refresh(producto)
+                        ultimo_producto_id = producto.id
+
+                        for operario_id in operarios_ids:
+                            session.add(
+                                ProductoOperarioDB(
+                                    producto_id=producto.id,
+                                    usuario_id=operario_id,
+                                )
+                            )
+
+                        for t in trazas:
+                            session.add(TrazabilidadProductoDB(trazabilidad_fabricacion_id=t.id, producto_id=producto.id))
 
                     for t in trazas:
-                        session.add(TrazabilidadProductoDB(trazabilidad_fabricacion_id=t.id, producto_id=producto.id))
-                        t.cantidad_fabricada = int(t.cantidad_fabricada or 0) + 1
+                        t.cantidad_fabricada = int(t.cantidad_fabricada or 0) + cantidad_etiquetas
                         session.add(t)
 
                     lineas_unicas = {t.linea_fabricacion_id for t in trazas}
                     for linea_id in lineas_unicas:
                         linea = session.get(LineaFabricacionDB, linea_id)
                         if linea:
-                            linea.cantidad_fabricada = int(linea.cantidad_fabricada or 0) + 1
+                            linea.cantidad_fabricada = int(linea.cantidad_fabricada or 0) + cantidad_etiquetas
                             session.add(linea)
             except Exception as exc:
                 session.rollback()
@@ -508,32 +520,41 @@ class Colector:
                 raise
 
             threading.Thread(
-                target=self._imprimir_etiqueta_async,
-                args=(codigo, palet_codigos, ws),
+                target=self._imprimir_etiquetas_async,
+                args=(codigos_generados, palet_codigos, ws),
                 daemon=True,
             ).start()
 
-            return {"producto_id": producto.id, "codigo": producto.codigo}
+            return {
+                "producto_id": ultimo_producto_id,
+                "codigo": codigos_generados[-1] if codigos_generados else "",
+                "codigos": codigos_generados,
+                "cantidad": cantidad_etiquetas,
+            }
 
     def _imprimir_etiqueta_async(self, codigo: str, origenes: list[str], ws=None):
+        self._imprimir_etiquetas_async([codigo], origenes, ws)
+
+    def _imprimir_etiquetas_async(self, codigos: list[str], origenes: list[str], ws=None):
         try:
             impresora = ImprimirEtiqueta()
-            impresora.imprimir_etiqueta("botas", codigo, copies=1)
-            try:
-                import asyncio
+            for codigo in codigos:
+                impresora.imprimir_etiqueta("botas", codigo, copies=1)
+                try:
+                    import asyncio
 
-                asyncio.run(
-                    broadcast_event(
-                        "async_print",
-                        {"codigo": codigo, "origenes": origenes, "tipo": "botas"},
-                        scope="cliente" if ws is not None else "all",
-                        target_ws=ws,
+                    asyncio.run(
+                        broadcast_event(
+                            "async_print",
+                            {"codigo": codigo, "origenes": origenes, "tipo": "botas"},
+                            scope="cliente" if ws is not None else "all",
+                            target_ws=ws,
+                        )
                     )
-                )
-            except Exception:
-                pass
+                except Exception:
+                    pass
         except Exception as exc:
-            msg = f"Fallo al imprimir etiqueta {codigo} (origenes: {origenes}): {exc}"
+            msg = f"Fallo al imprimir etiquetas {codigos} (origenes: {origenes}): {exc}"
             logger.error(msg)
             try:
                 import asyncio

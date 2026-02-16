@@ -59,10 +59,14 @@ function mostrarSeccion(id) {
         if (id === "vista_recepcion") {
             cargarEntradasRecepcion();
         }
-        if (id === "vista_fabricacion") {
+        if (id === "vista_consumo") {
             const activarAutoAccesoConsumo = contextoNavegacion.fabricacionOrigen === "palets" && contextoNavegacion.autoAccesoConsumo;
             contextoNavegacion.autoAccesoConsumo = false;
-            cargarOrdenesFabricacion({ autoAccesoConsumo: activarAutoAccesoConsumo });
+            cargarOrdenesFabricacion({ vistaId: "vista_consumo", autoAccesoConsumo: activarAutoAccesoConsumo });
+        }
+        if (id === "vista_fabricacion") {
+            contextoNavegacion.autoAccesoConsumo = false;
+            cargarOrdenesFabricacion({ vistaId: "vista_fabricacion", autoAccesoConsumo: false });
         }
         // Actualiza las migas de pan
         actualizarMigasPan(id);
@@ -109,18 +113,20 @@ function actualizarMigasPan(mostrarSeccion) {
             nuevaMiga = crearMigaPan("Ubicación", mostrarSeccion, true);
             migasPan.appendChild(nuevaMiga);
             break;
+        case "vista_consumo":
+            nuevaMiga = crearMigaPan("Inicio", "vista_tareas", false);
+            migasPan.appendChild(nuevaMiga);
+            nuevaMiga = crearMigaPan("Palets", "vista_menu_palets", false);
+            migasPan.appendChild(nuevaMiga);
+            nuevaMiga = crearMigaPan("Consumo", mostrarSeccion, true);
+            migasPan.appendChild(nuevaMiga);
+            break;
         case "vista_fabricacion":
             nuevaMiga = crearMigaPan("Inicio", "vista_tareas", false);
             migasPan.appendChild(nuevaMiga);
-            if (contextoNavegacion.fabricacionOrigen === "palets") {
-                nuevaMiga = crearMigaPan("Palets", "vista_menu_palets", false);
-                migasPan.appendChild(nuevaMiga);
-                nuevaMiga = crearMigaPan("Consumo", mostrarSeccion, true);
-            } else {
-                nuevaMiga = crearMigaPan("Botas", "vista_menu_botas", false);
-                migasPan.appendChild(nuevaMiga);
-                nuevaMiga = crearMigaPan("Fabricación", mostrarSeccion, true);
-            }
+            nuevaMiga = crearMigaPan("Botas", "vista_menu_botas", false);
+            migasPan.appendChild(nuevaMiga);
+            nuevaMiga = crearMigaPan("Fabricación", mostrarSeccion, true);
             migasPan.appendChild(nuevaMiga);
             break;
         case "vista_expedicion":
@@ -172,7 +178,7 @@ var ACCIONES = {
     },
     "login": console.log,
     "fabricacion_actualizar": (msg) => {
-        if (pantallaActual === "vista_fabricacion") {
+        if (pantallaActual === "vista_fabricacion" || pantallaActual === "vista_consumo") {
             if (msg?.data?.refetch_maestros) {
                 refrescarMaestrosFabricacion?.();
             }

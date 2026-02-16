@@ -49,7 +49,7 @@
                             <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_recepcion" disabled>
                                 Recepción
                             </button>
-                            <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_fabricacion" data-origen-fabricacion="palets"
+                            <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_consumo" data-origen-fabricacion="palets"
                                 data-bs-dismiss="offcanvas">
                                 Consumo
                             </button>
@@ -109,7 +109,7 @@
                 <img class="boton-icono" src="./imagenes/iconos/camion_palet.png" alt="Recepción">
                 <span>Recepción</span>
             </button>
-            <button class="boton verde boton-con-icono" mostrar="vista_fabricacion" data-origen-fabricacion="palets" data-acceso-directo-consumo="1">
+            <button class="boton verde boton-con-icono" mostrar="vista_consumo" data-origen-fabricacion="palets" data-acceso-directo-consumo="1">
                 <img class="boton-icono" src="./imagenes/iconos/palet.png" alt="Consumo">
                 <span>Consumo</span>
             </button>
@@ -300,6 +300,109 @@
             </form>
         </section>
 
+        <section id="vista_consumo" class="flex-fill" modo="listado_ordenes">
+            <div class="table-responsive">
+                <table id="tabla_ordenes_consumo" class="table table-striped table-bordered">
+                    <thead class="table-dark">
+                        <tr>
+                            <th colspan="3">Ordenes de fabricación</th>
+                        </tr>
+                        <tr>
+                            <th scope="col">Nº de Orden</th>
+                            <th scope="col">Fecha</th>
+                            <th scope="col">Cliente</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>4500720598</td>
+                            <td>31/07/2025</td>
+                            <td>Irish Distillers</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <th colspan="3">Ordenes de fabricación</th>
+                        </tr>
+                    </tfoot>
+                </table>
+
+                <table id="tabla_contenido_orden_consumo" class="table table-striped table-bordered">
+                    <thead class="table-dark">
+                        <tr>
+                            <th colspan="4"><span class="orden_consumo_seleccionada">Orden 4500720598, 30/07/2025,
+                                    Irish Distillers</span></th>
+                        </tr>
+                        <tr>
+                            <th scope="col">Material</th>
+                            <th scope="col">Cant.</th>
+                            <th scope="col">Fab.</th>
+                            <th scope="col">Falta</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Malaga PX Butts BM</td>
+                            <td>45</td>
+                            <td>0</td>
+                            <td>45</td>
+                        </tr>
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="4">Volver a listado de órdenes</td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+            <div class="modal fade modal-trazabilidad" id="modalConsumo" tabindex="-1" aria-labelledby="modalConsumoLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalConsumoLabel">Trazabilidad de consumo</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                        </div>
+
+                        <div class="modal-body">
+                            <p>Materiales y lotes correspondientes al producto:
+                                <span id="consumo-producto-orden">Producto</span>
+                            </p>
+
+                            <div class="table-responsive">
+                                <table class="table table-bordered table-sm" id="tabla_trazabilidad_consumo">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th scope="col">Palet</th>
+                                            <th scope="col">Cantidad</th>
+                                            <th scope="col">Estado</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                    </tbody>
+                                </table>
+
+                                <div class="modal-footer flex-column align-items-stretch gap-2">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control" id="consumo-palet-codigo"
+                                            placeholder="Codigo de palet">
+                                        <button class="btn btn-outline-primary" type="button" id="consumo-agregar-trazabilidad">
+                                            <i class="bi bi-plus-lg"></i>
+                                        </button>
+                                    </div>
+
+                                    <div class="d-flex justify-content-end gap-2">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section id="vista_fabricacion" class="flex-fill" modo="listado_ordenes">
             <div class="table-responsive">
                 <table id="tabla_ordenes_fabricacion" class="table table-striped table-bordered">
@@ -356,19 +459,19 @@
                 </table>
             </div>
             <!-- Modal -->
-            <div class="modal fade" id="miModal2" tabindex="-1" aria-labelledby="miModalLabel2" aria-hidden="true">
+            <div class="modal fade modal-trazabilidad" id="modalFabricacion" tabindex="-1" aria-labelledby="modalFabricacionLabel" aria-hidden="true">
                 <div class="modal-dialog modal-dialog-centered">
                     <div class="modal-content">
 
                         <div class="modal-header">
-                            <h5 class="modal-title" id="miModalLabel2">Trazabilidad de producción</h5>
+                            <h5 class="modal-title" id="modalFabricacionLabel">Trazabilidad de fabricación</h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"
                                 aria-label="Cerrar"></button>
                         </div>
 
                         <div class="modal-body">
-                            <p>Materiales y lotes correspondientes al producto:
-                                <span id="productoOrden">Producto</span>
+                            <p>Acciones para el producto seleccionado:
+                                <span id="fabricacion-producto-orden">Producto</span>
                             </p>
 
                             <div class="table-responsive">
@@ -383,38 +486,25 @@
                                     <tbody>
                                     </tbody>
                                 </table>
+                            </div>
 
-                                <div class="modal-footer flex-column align-items-stretch gap-2">
-
-                                    <!-- Grupo de input + botón Agregar -->
-                                    <div class="input-group">
-                                        <input type="text" class="form-control" id="fabricacion-palet-codigo"
-                                            placeholder="Codigo de palet">
-                                        <button class="btn btn-outline-primary" type="button" id="fabricacion-agregar-trazabilidad">
-                                            <i class="bi bi-plus-lg"></i> Agregar
-                                        </button>
-                                    </div>
-
-                                    <!-- Acción intermedia -->
-                                    <div class="d-flex justify-content-between align-items-center">
-                                        <span>Fabricar nuevo tonel</span>
-                                        <button class="btn btn-primary" type="button" id="fabricacion-imprimir-etiqueta">
-                                            <i class="bi bi-user"></i> Seleccionar operarios
-                                        </button>
-                                    </div>
-
-                                    <!-- Botones finales -->
-                                    <div class="d-flex justify-content-end gap-2">
-                                        <button type="button" class="btn btn-secondary"
-                                            data-bs-dismiss="modal">Cerrar</button>
-                                    </div>
-
+                            <div class="modal-footer flex-column align-items-stretch gap-2">
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <label for="fabricacion-cantidad-etiquetas" class="form-label mb-0">Cantidad de etiquetas</label>
+                                    <input type="number" class="form-control" id="fabricacion-cantidad-etiquetas" min="1" step="1" value="1" style="max-width: 120px;">
                                 </div>
-
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span>Fabricar nuevo tonel</span>
+                                    <button class="btn btn-primary" type="button" id="fabricacion-imprimir-etiqueta">
+                                        <i class="bi bi-user"></i> Seleccionar operarios
+                                    </button>
+                                </div>
+                                <div class="d-flex justify-content-end gap-2">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                                </div>
                             </div>
                         </div>
                     </div>
-
                 </div>
             </div>
 
