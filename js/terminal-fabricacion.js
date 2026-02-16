@@ -124,7 +124,8 @@ async function asegurarDatosFabricacionTerminal() {
     }
 }
 
-async function cargarOrdenesFabricacion() {
+async function cargarOrdenesFabricacion(opciones = {}) {
+    const autoAccesoConsumo = opciones.autoAccesoConsumo === true;
     const tbody = document.querySelector("#tabla_ordenes_fabricacion tbody");
     try {
         await asegurarDatosFabricacionTerminal();
@@ -160,13 +161,21 @@ async function cargarOrdenesFabricacion() {
       `;
             tbody.appendChild(tr);
         });
+
+        if (autoAccesoConsumo && ordenes.length === 1) {
+            const filaUnica = tbody.querySelector("tr[data-orden-id]");
+            if (filaUnica) {
+                await seleccionarFabricacion(filaUnica, { autoAbrirLineaUnica: true });
+            }
+        }
     } catch (err) {
         console.error(err);
         tbody.innerHTML = `<tr><td colspan="3">Error al cargar ordenes</td></tr>`;
     }
 }
 
-function seleccionarFabricacion(fila) {
+async function seleccionarFabricacion(fila, opciones = {}) {
+    const autoAbrirLineaUnica = opciones.autoAbrirLineaUnica === true;
     vista_fabricacion = document.getElementById("vista_fabricacion");
     vista_fabricacion.setAttribute("modo", "contenido_orden");
 
@@ -181,7 +190,7 @@ function seleccionarFabricacion(fila) {
     if (typeof setPantalla === "function") {
         setPantalla("vista_fabricacion", { orden_id: ordenId });
     }
-    cargarLineasFabricacion(ordenId);
+    await cargarLineasFabricacion(ordenId, { autoAbrirLineaUnica });
 }
 
 function seleccionarContenidoOrden(fila) {
@@ -212,11 +221,18 @@ function mostrarLotesMateriales(fila) {
     }
 }
 
-async function cargarLineasFabricacion(ordenId) {
+async function cargarLineasFabricacion(ordenId, opciones = {}) {
+    const autoAbrirLineaUnica = opciones.autoAbrirLineaUnica === true;
     const tbody = document.querySelector("#tabla_contenido_orden_fabricacion tbody");
     try {
         const lineas = (await wsRequest("listar_lineas_fabricacion", { orden_id: ordenId })) || [];
         actualizarTablaLineasFabricacion(lineas);
+        if (autoAbrirLineaUnica && lineas.length === 1) {
+            const filaUnica = tbody.querySelector("tr[data-linea-id]");
+            if (filaUnica) {
+                mostrarLotesMateriales(filaUnica);
+            }
+        }
     } catch (err) {
         console.error(err);
         tbody.innerHTML = `<tr><td colspan="4">Error al cargar lineas</td></tr>`;

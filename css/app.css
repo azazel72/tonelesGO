@@ -56,3 +56,54 @@ section.pagina-activa {
 .modal-operario-50 .modal-body {
     overflow: auto;
 }
+
+.offcanvas-menu {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+.offcanvas-menu-grupo {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.offcanvas-menu-grupo h6 {
+    margin: 4px 2px;
+    color: #b8d3e6;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.offcanvas-nav-btn {
+    width: 100%;
+    text-align: left;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.08);
+    color: #fff;
+    padding: 10px 12px;
+    font-weight: 600;
+    transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.offcanvas-nav-subop {
+    margin-left: 14px;
+    width: calc(100% - 14px);
+    padding-left: 18px;
+    border-left: 3px solid rgba(184, 211, 230, 0.45);
+}
+
+.offcanvas-nav-btn:hover {
+    background: rgba(255, 255, 255, 0.16);
+    border-color: rgba(255, 255, 255, 0.4);
+}
+
+.offcanvas-nav-btn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    background: rgba(255, 255, 255, 0.04);
+    border-color: rgba(255, 255, 255, 0.18);
+}

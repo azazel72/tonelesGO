@@ -1,11 +1,16 @@
 document.addEventListener("DOMContentLoaded", function () {
 
-    // Selecciona todos los botones con la clase 'boton'
-    const botones_tareas = document.querySelectorAll("section#vista_tareas .boton");
-
-    // Itera sobre cada botón y agrega un evento de clic
-    botones_tareas.forEach(function (boton) {
+    // Navegacion por secciones usando el atributo "mostrar"
+    const botonesNavegacion = document.querySelectorAll("button[mostrar]");
+    botonesNavegacion.forEach(function (boton) {
         boton.addEventListener("click", function () {
+            if (boton.dataset.origenFabricacion) {
+                contextoNavegacion.fabricacionOrigen = boton.dataset.origenFabricacion;
+            }
+            if (boton.dataset.contextoUbicacion) {
+                contextoNavegacion.ubicacionOrigen = boton.dataset.contextoUbicacion;
+            }
+            contextoNavegacion.autoAccesoConsumo = boton.dataset.accesoDirectoConsumo === "1";
             mostrarSeccion(boton.getAttribute("mostrar"));
         });
     });
@@ -32,8 +37,16 @@ document.addEventListener("DOMContentLoaded", function () {
 
 let pantallaActual = null;
 let contextoPantalla = {};
+const contextoNavegacion = {
+    fabricacionOrigen: "botas",
+    ubicacionOrigen: "botas",
+    autoAccesoConsumo: false,
+};
 
 function mostrarSeccion(id) {
+    if (id === "vista_inicio") {
+        id = "vista_tareas";
+    }
     const seccionActiva = document.getElementById(id);
     if (seccionActiva) {
         // Oculta todas las secciones
@@ -47,7 +60,9 @@ function mostrarSeccion(id) {
             cargarEntradasRecepcion();
         }
         if (id === "vista_fabricacion") {
-            cargarOrdenesFabricacion();
+            const activarAutoAccesoConsumo = contextoNavegacion.fabricacionOrigen === "palets" && contextoNavegacion.autoAccesoConsumo;
+            contextoNavegacion.autoAccesoConsumo = false;
+            cargarOrdenesFabricacion({ autoAccesoConsumo: activarAutoAccesoConsumo });
         }
         // Actualiza las migas de pan
         actualizarMigasPan(id);
@@ -58,35 +73,62 @@ function mostrarSeccion(id) {
 function actualizarMigasPan(mostrarSeccion) {
     const migasPan = document.querySelector("nav[aria-label='breadcrumb'] ol");
     migasPan.innerHTML = '';
-    var nuevaMiga = crearMigaPan("Inicio", "vista_inicio");
-    migasPan.appendChild(nuevaMiga);
+    var nuevaMiga = null;
     switch (mostrarSeccion) {
         case "vista_tareas":
-            nuevaMiga = crearMigaPan("Tareas", mostrarSeccion, true);
+            nuevaMiga = crearMigaPan("Inicio", "vista_tareas", true);
+            migasPan.appendChild(nuevaMiga);
+            break;
+        case "vista_menu_palets":
+            nuevaMiga = crearMigaPan("Inicio", "vista_tareas", false);
+            migasPan.appendChild(nuevaMiga);
+            nuevaMiga = crearMigaPan("Palets", mostrarSeccion, true);
+            migasPan.appendChild(nuevaMiga);
+            break;
+        case "vista_menu_botas":
+            nuevaMiga = crearMigaPan("Inicio", "vista_tareas", false);
+            migasPan.appendChild(nuevaMiga);
+            nuevaMiga = crearMigaPan("Botas", mostrarSeccion, true);
             migasPan.appendChild(nuevaMiga);
             break;
         case "vista_recepcion":
-            nuevaMiga = crearMigaPan("Tareas", "vista_tareas", false);
+            nuevaMiga = crearMigaPan("Inicio", "vista_tareas", false);
+            migasPan.appendChild(nuevaMiga);
+            nuevaMiga = crearMigaPan("Palets", "vista_menu_palets", false);
             migasPan.appendChild(nuevaMiga);
             nuevaMiga = crearMigaPan("Recepción", mostrarSeccion, true);
             migasPan.appendChild(nuevaMiga);
             break;
         case "vista_ubicacion":
-            nuevaMiga = crearMigaPan("Tareas", "vista_tareas", false);
+            nuevaMiga = crearMigaPan("Inicio", "vista_tareas", false);
             migasPan.appendChild(nuevaMiga);
+            if (contextoNavegacion.ubicacionOrigen === "botas") {
+                nuevaMiga = crearMigaPan("Botas", "vista_menu_botas", false);
+                migasPan.appendChild(nuevaMiga);
+            }
             nuevaMiga = crearMigaPan("Ubicación", mostrarSeccion, true);
             migasPan.appendChild(nuevaMiga);
             break;
         case "vista_fabricacion":
-            nuevaMiga = crearMigaPan("Tareas", "vista_tareas", false);
+            nuevaMiga = crearMigaPan("Inicio", "vista_tareas", false);
             migasPan.appendChild(nuevaMiga);
-            nuevaMiga = crearMigaPan("Fabricación", mostrarSeccion, true);
+            if (contextoNavegacion.fabricacionOrigen === "palets") {
+                nuevaMiga = crearMigaPan("Palets", "vista_menu_palets", false);
+                migasPan.appendChild(nuevaMiga);
+                nuevaMiga = crearMigaPan("Consumo", mostrarSeccion, true);
+            } else {
+                nuevaMiga = crearMigaPan("Botas", "vista_menu_botas", false);
+                migasPan.appendChild(nuevaMiga);
+                nuevaMiga = crearMigaPan("Fabricación", mostrarSeccion, true);
+            }
             migasPan.appendChild(nuevaMiga);
             break;
         case "vista_expedicion":
-            nuevaMiga = crearMigaPan("Tareas", "vista_tareas", false);
+            nuevaMiga = crearMigaPan("Inicio", "vista_tareas", false);
             migasPan.appendChild(nuevaMiga);
-            nuevaMiga = crearMigaPan("Expedición", mostrarSeccion, true);
+            nuevaMiga = crearMigaPan("Botas", "vista_menu_botas", false);
+            migasPan.appendChild(nuevaMiga);
+            nuevaMiga = crearMigaPan("Expediciones", mostrarSeccion, true);
             migasPan.appendChild(nuevaMiga);
             break;
     }

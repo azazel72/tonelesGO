@@ -36,32 +36,42 @@
                         aria-label="Close"></button>
                 </div>
                 <div class="offcanvas-body">
-                    <ul class="navbar-nav justify-content-end flex-grow-1 pe-3">
-                        <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="#">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" href="#">Link</a>
-                        </li>
-                        <li class="nav-item dropdown">
-                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                                aria-expanded="false">
-                                Dropdown
-                            </a>
-                            <ul class="dropdown-menu dropdown-menu-dark">
-                                <li><a class="dropdown-item" href="#">Action</a></li>
-                                <li><a class="dropdown-item" href="#">Another action</a></li>
-                                <li>
-                                    <hr class="dropdown-divider">
-                                </li>
-                                <li><a class="dropdown-item" href="#">Something else here</a></li>
-                            </ul>
-                        </li>
-                    </ul>
-                    <form class="d-flex mt-3" role="search">
-                        <input class="form-control me-2" type="search" placeholder="Search" aria-label="Search">
-                        <button class="btn btn-success" type="submit">Search</button>
-                    </form>
+                    <div class="offcanvas-menu">
+                        <button class="offcanvas-nav-btn" mostrar="vista_tareas" data-bs-dismiss="offcanvas">
+                            Inicio
+                        </button>
+
+                        <div class="offcanvas-menu-grupo">
+                            <h6>Palets</h6>
+                            <button class="offcanvas-nav-btn" mostrar="vista_menu_palets" data-bs-dismiss="offcanvas">
+                                Menú Palets
+                            </button>
+                            <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_recepcion" disabled>
+                                Recepción
+                            </button>
+                            <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_fabricacion" data-origen-fabricacion="palets"
+                                data-bs-dismiss="offcanvas">
+                                Consumo
+                            </button>
+                        </div>
+
+                        <div class="offcanvas-menu-grupo">
+                            <h6>Botas</h6>
+                            <button class="offcanvas-nav-btn" mostrar="vista_menu_botas" data-bs-dismiss="offcanvas">
+                                Menú Botas
+                            </button>
+                            <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_fabricacion" data-origen-fabricacion="botas"
+                                data-bs-dismiss="offcanvas">
+                                Fabricación
+                            </button>
+                            <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_ubicacion" data-contexto-ubicacion="botas" disabled>
+                                Ubicación
+                            </button>
+                            <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_expedicion" disabled>
+                                Expediciones
+                            </button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -83,11 +93,47 @@
     <!-- Contenido principal -->
     <main class="flex-fill d-flex flex-column overflow-hidden">
 
-        <section id="vista_tareas" class="flex-fill pagina-activa">
-            <button class="boton rojo" mostrar="vista_recepcion">Recepción</button>
-            <button class="boton amarillo" mostrar="vista_ubicacion">Ubicación</button>
-            <button class="boton verde" mostrar="vista_fabricacion">Fabricación</button>
-            <button class="boton violeta" mostrar="vista_expedicion">Expedición</button>
+        <section id="vista_tareas" class="flex-fill pagina-activa menu-principal">
+            <button class="boton azul boton-con-icono" mostrar="vista_menu_palets">
+                <img class="boton-icono" src="./imagenes/iconos/palet.png" alt="Palets">
+                <span>Palets</span>
+            </button>
+            <button class="boton naranja boton-con-icono" mostrar="vista_menu_botas">
+                <img class="boton-icono" src="./imagenes/iconos/tonel.png" alt="Botas">
+                <span>Botas</span>
+            </button>
+        </section>
+
+        <section id="vista_menu_palets" class="flex-fill menu-secundario">
+            <button class="boton rojo boton-con-icono" mostrar="vista_recepcion" disabled>
+                <img class="boton-icono" src="./imagenes/iconos/camion_palet.png" alt="Recepción">
+                <span>Recepción</span>
+            </button>
+            <button class="boton verde boton-con-icono" mostrar="vista_fabricacion" data-origen-fabricacion="palets" data-acceso-directo-consumo="1">
+                <img class="boton-icono" src="./imagenes/iconos/palet.png" alt="Consumo">
+                <span>Consumo</span>
+            </button>
+            <button class="boton boton-volver" mostrar="vista_tareas">
+                <span>Volver</span>
+            </button>
+        </section>
+
+        <section id="vista_menu_botas" class="flex-fill menu-secundario">
+            <button class="boton verde boton-con-icono" mostrar="vista_fabricacion" data-origen-fabricacion="botas">
+                <img class="boton-icono" src="./imagenes/iconos/tonel.png" alt="Fabricación">
+                <span>Fabricación</span>
+            </button>
+            <button class="boton amarillo boton-con-icono" mostrar="vista_ubicacion" data-contexto-ubicacion="botas" disabled>
+                <img class="boton-icono" src="./imagenes/iconos/toneles.png" alt="Ubicación de botas">
+                <span>Ubicación</span>
+            </button>
+            <button class="boton violeta boton-con-icono" mostrar="vista_expedicion" disabled>
+                <img class="boton-icono" src="./imagenes/iconos/camion_tonel.png" alt="Expediciones">
+                <span>Expediciones</span>
+            </button>
+            <button class="boton boton-volver" mostrar="vista_tareas">
+                <span>Volver</span>
+            </button>
         </section>
 
         <section id="vista_recepcion" class="flex-fill" modo="listado_entradas">
