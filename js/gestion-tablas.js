@@ -187,6 +187,7 @@ function crearBotonesGenericos(tipo) {
         type: "number",
         min: 1970,
         max: 2199,
+        value: new Date().getFullYear(),
         placeholder: "Año"
       });
     default:

@@ -182,6 +182,8 @@ window.onload = () => {
 function respuesta_maestros(response) {
     if (response.data) {
         DATOS.maestros = response.data;
+        calcularPermisosUsuarioLogado();
+        aplicarPermisosMenuGestion();
         console.log("Maestros recibidos:", DATOS.maestros);
         if (window.__reloadKey) {
             const key = window.__reloadKey;

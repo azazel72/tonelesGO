@@ -421,19 +421,33 @@ function syncGroupWidthsByTitle(masterTable, slaveTable, column=null) {
     let destino = ColumnasTablasPlanificacionEntradas[col.title];
     try {
       if (destino) {
-        if (typeof(destino) === "object" && column) {
-            col_cambiada = column.getField();
-            destino = destino[col_cambiada];
-            const slaveCol = slaveTable.getColumn(destino);
+        if (typeof destino === "object") {
+          // Grupo "Totales": sincroniza cada subcolumna por campo.
+          const columnasGrupo = Array.isArray(col.columns) ? col.columns : [];
+          if (column) {
+            const campo = column.getField();
+            const destinoCampo = destino[campo];
+            const slaveCol = destinoCampo ? slaveTable.getColumn(destinoCampo) : null;
             if (slaveCol) {
-              const width = column.getWidth();
-              slaveCol.updateDefinition({ width: width });
+              slaveCol.updateDefinition({ width: column.getWidth() });
+            }
+          } else {
+            columnasGrupo.forEach((subCol) => {
+              if (!subCol?.field) return;
+              const destinoCampo = destino[subCol.field];
+              const slaveCol = destinoCampo ? slaveTable.getColumn(destinoCampo) : null;
+              if (slaveCol) {
+                slaveCol.updateDefinition({ width: Number(subCol.width) });
+              }
+            });
           }
         } else {
           const slaveCol = slaveTable.getColumn(destino);
-          if (slaveCol) {
+          if (slaveCol && Array.isArray(col.columns)) {
             const totalWidth = col.columns.reduce((acc, subCol) => acc + (subCol.visible ? Number(subCol.width) : 0), 0);
             slaveCol.updateDefinition({ width: totalWidth });
+          } else if (slaveCol && col.width) {
+            slaveCol.updateDefinition({ width: Number(col.width) });
           }
         }
       }

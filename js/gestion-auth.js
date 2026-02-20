@@ -83,7 +83,9 @@ async function enviarLogin() {
 
 function respuesta_login(response) {
     if (response.data) {
-        document.getElementById('nav-username').innerText = response.data.fullname;
+        registrarUsuarioLogado(response.data);
+        const nombreUsuario = response.data.fullname || response.data.nombre || response.data.alias || "Usuario";
+        document.getElementById('nav-username').innerText = nombreUsuario;
         ocultarLogin();
         console.log("Inicio de sesión exitoso:", response.data);
         send("maestros", { });

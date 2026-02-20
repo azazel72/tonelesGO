@@ -21,6 +21,19 @@ button[aria-pressed="false"] i.bi-unlock {
     display: none;
 }
 
+#u-cargar-planificacion-entradas-input {
+    width: 7rem;
+    -moz-appearance: auto;
+    appearance: auto;
+}
+
+#u-cargar-planificacion-entradas-input::-webkit-outer-spin-button,
+#u-cargar-planificacion-entradas-input::-webkit-inner-spin-button {
+    -webkit-appearance: auto;
+    margin: 0;
+    opacity: 1;
+}
+
 
 /* LOGIN */
   /* Overlay de pantalla completa */
@@ -224,6 +237,18 @@ button#btn-logout:hover span * {
     width: 100%;
 }
 
+.dropdown-item.permiso-item-marcado {
+    display: flex;
+    align-items: center;
+    gap: 0.35rem;
+}
+
+.dropdown-item .permiso-lock-icon {
+    margin-left: auto;
+    opacity: 0.75;
+    font-size: 0.9em;
+}
+
 
   /* Indicador de estado WebSocket */
   .ws-status {
@@ -245,4 +270,3 @@ button#btn-logout:hover span * {
   .ws--connecting .ws-dot { background: #eab308; } /* amarillo */
   .ws--open .ws-dot       { background: #22c55e; } /* verde */
   .ws--closed .ws-dot     { background: #ef4444; } /* rojo */
-

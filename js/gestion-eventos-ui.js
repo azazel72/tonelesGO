@@ -47,7 +47,7 @@ async function getCellClick(e, cell) {
         const data = row.getData();
         console.log("Abrir gestion de planificacion de entradas para evento ID", data?.id);
         openListadoEntradasPlanificacionWin({
-          anno: data?.["año"] ?? data?.ano,
+          año: data?.["año"],
           proveedor_id: data?.proveedor_id,
           forceReload: true,
         });
