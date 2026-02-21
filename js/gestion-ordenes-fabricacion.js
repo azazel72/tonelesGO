@@ -6,14 +6,6 @@ function openOrdenesFabricacionWin() {
   const wb = comprobarVentanaAbierta("ordenes_fabricacion");
   if (wb) return wb;
 
-  const clientesDict = Object.values(DATOS?.maestros?.clientes ?? {}).map(
-    ({ id, nombre, ...resto }) => ({
-      ...resto, id, nombre,
-      value: id,
-      label: nombre,
-    })
-  );
-
   const estadosDict = Object.values(DATOS?.maestros?.estados_ordenes_fabricacion ?? {}).map(
     ({ id, descripcion, ...resto }) => ({
       ...resto, id, descripcion,
@@ -39,6 +31,7 @@ function openOrdenesFabricacionWin() {
         columns: [
           { title:"ID", field:"id", width:70, hozAlign:"right"},
           { title:"Numero", field:"numero", editor:"input", editable: tablaEditable, cssClass: "filtrable" },
+          { title:"Descripción", field:"descripcion", editor:"input", editable: tablaEditable, cssClass: "filtrable" },
           {
             title:"Fecha",
             field:"fecha",
@@ -50,20 +43,14 @@ function openOrdenesFabricacionWin() {
             cssClass: "filtrable",
           },
           {
-            title: "Cliente",
-            field: "cliente_id",
-            editor: "list",
+            title:"Fecha fin",
+            field:"fecha_finalizacion",
+            editor:"input",
             editorParams: {
-              values: clientesDict,
-              clearable: true,
-              autocomplete: true,
-              allowEmpty: true,
-              listOnEmpty: true,
-              freetext: false,
+              elementAttributes: { type: "date" },
             },
             editable: tablaEditable,
             cssClass: "filtrable",
-            formatter: cell => DATOS?.maestros?.clientes?.[cell.getValue()]?.nombre ?? cell.getValue(),
           },
           {
             title: "Estado",

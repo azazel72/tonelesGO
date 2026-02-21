@@ -8,7 +8,8 @@ class OrdenFabricacionDTO(BaseModel):
     id: int | None
     numero: str
     fecha: date | None = None
-    cliente_id: int | None = None
+    descripcion: str = ""
+    fecha_finalizacion: date | None = None
     estado: int | None = None
 
     def from_db(orden_db: OrdenFabricacionDB) -> "OrdenFabricacionDTO":
@@ -16,7 +17,8 @@ class OrdenFabricacionDTO(BaseModel):
             id=orden_db.id,
             numero=orden_db.numero,
             fecha=orden_db.fecha,
-            cliente_id=orden_db.cliente_id,
+            descripcion=orden_db.descripcion,
+            fecha_finalizacion=orden_db.fecha_finalizacion,
             estado=orden_db.estado,
         )
 
@@ -25,6 +27,7 @@ class OrdenFabricacionDTO(BaseModel):
             id=self.id,
             numero=self.numero,
             fecha=self.fecha,
-            cliente_id=self.cliente_id,
+            descripcion=self.descripcion,
+            fecha_finalizacion=self.fecha_finalizacion,
             estado=self.estado,
         )

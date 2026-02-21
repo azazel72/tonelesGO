@@ -14,6 +14,14 @@ function openBotasWin() {
     })
   );
 
+  const materialesDict = Object.values(DATOS?.maestros?.materiales ?? {}).map(
+    ({ id, descripcion, ...resto }) => ({
+      ...resto, id, descripcion,
+      value: id,
+      label: descripcion,
+    })
+  );
+
   const estadosDict = Object.values(DATOS?.maestros?.estados_botas ?? {}).map(
     ({ id, descripcion, ...resto }) => ({
       ...resto, id, descripcion,
@@ -39,6 +47,22 @@ function openBotasWin() {
         columns: [
           { title:"ID", field:"id", width:70, hozAlign:"right"},
           { title:"Codigo", field:"codigo", editor:"input", editable: tablaEditable, cssClass: "filtrable" },
+          {
+            title: "Material",
+            field: "material_id",
+            editor: "list",
+            editorParams: {
+              values: materialesDict,
+              clearable: true,
+              autocomplete: true,
+              allowEmpty: true,
+              listOnEmpty: true,
+              freetext: false,
+            },
+            editable: tablaEditable,
+            cssClass: "filtrable",
+            formatter: cell => DATOS?.maestros?.materiales?.[cell.getValue()]?.descripcion ?? cell.getValue(),
+          },
           {
             title: "Vaso",
             field: "vaso_producto_id",
@@ -74,6 +98,86 @@ function openBotasWin() {
           {
             title: "Tapa",
             field: "tapa_producto_id",
+            editor: "list",
+            editorParams: {
+              values: productosDict,
+              clearable: true,
+              autocomplete: true,
+              allowEmpty: true,
+              listOnEmpty: true,
+              freetext: false,
+            },
+            editable: tablaEditable,
+            cssClass: "filtrable",
+            formatter: cell => DATOS?.maestros?.productos?.[cell.getValue()]?.codigo ?? cell.getValue(),
+          },
+          {
+            title: "Fleje 1",
+            field: "fleje_1_id",
+            editor: "list",
+            editorParams: {
+              values: productosDict,
+              clearable: true,
+              autocomplete: true,
+              allowEmpty: true,
+              listOnEmpty: true,
+              freetext: false,
+            },
+            editable: tablaEditable,
+            cssClass: "filtrable",
+            formatter: cell => DATOS?.maestros?.productos?.[cell.getValue()]?.codigo ?? cell.getValue(),
+          },
+          {
+            title: "Fleje 2",
+            field: "fleje_2_id",
+            editor: "list",
+            editorParams: {
+              values: productosDict,
+              clearable: true,
+              autocomplete: true,
+              allowEmpty: true,
+              listOnEmpty: true,
+              freetext: false,
+            },
+            editable: tablaEditable,
+            cssClass: "filtrable",
+            formatter: cell => DATOS?.maestros?.productos?.[cell.getValue()]?.codigo ?? cell.getValue(),
+          },
+          {
+            title: "Fleje 3",
+            field: "fleje_3_id",
+            editor: "list",
+            editorParams: {
+              values: productosDict,
+              clearable: true,
+              autocomplete: true,
+              allowEmpty: true,
+              listOnEmpty: true,
+              freetext: false,
+            },
+            editable: tablaEditable,
+            cssClass: "filtrable",
+            formatter: cell => DATOS?.maestros?.productos?.[cell.getValue()]?.codigo ?? cell.getValue(),
+          },
+          {
+            title: "Fleje 4",
+            field: "fleje_4_id",
+            editor: "list",
+            editorParams: {
+              values: productosDict,
+              clearable: true,
+              autocomplete: true,
+              allowEmpty: true,
+              listOnEmpty: true,
+              freetext: false,
+            },
+            editable: tablaEditable,
+            cssClass: "filtrable",
+            formatter: cell => DATOS?.maestros?.productos?.[cell.getValue()]?.codigo ?? cell.getValue(),
+          },
+          {
+            title: "Fleje 5",
+            field: "fleje_5_id",
             editor: "list",
             editorParams: {
               values: productosDict,

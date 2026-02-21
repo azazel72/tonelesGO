@@ -10,5 +10,6 @@ class OrdenFabricacionDB(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     numero: str
     fecha: date | None = None
-    cliente_id: int | None = None
+    descripcion: str = ""
+    fecha_finalizacion: date | None = None
     estado: int | None = None

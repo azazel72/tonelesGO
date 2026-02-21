@@ -166,6 +166,7 @@ class CrudRoutes:
                                 "estados_lineas_fabricacion",
                                 "estados_botas",
                                 "estados_trazabilidad_fabricacion",
+                                "ambientes",
                             }:
                                 await broadcast_pantalla("vista_fabricacion", {"tabla": tabla, "refetch_maestros": True})
                                 await broadcast_pantalla("vista_consumo", {"tabla": tabla, "refetch_maestros": True})

@@ -75,6 +75,9 @@ window.onload = () => {
         async "ver-archivos-subidos"() {
             await openArchivosSubidosWin();
         },
+        async "ver-ambientes"() {
+            await openAmbientesWin();
+        },
         async "ver-ordenes-fabricacion"() {
             setPantalla?.("gestion_fabricacion", { vista: "ordenes_fabricacion" });
             await openOrdenesFabricacionWin();
@@ -151,6 +154,7 @@ window.onload = () => {
         palets: openPaletsWin,
         productos: openProductosWin,
         archivos_subidos: openArchivosSubidosWin,
+        ambientes: openAmbientesWin,
         ordenes_fabricacion: openOrdenesFabricacionWin,
         tipos_producto: openTiposProductoWin,
         lineas_fabricacion: openLineasFabricacionWin,
@@ -194,6 +198,7 @@ window.onload = () => {
 function respuesta_maestros(response) {
     if (response.data) {
         DATOS.maestros = response.data;
+        actualizarLineasFabricacionEditorMateriales?.();
         calcularPermisosUsuarioLogado();
         aplicarPermisosMenuGestion();
         console.log("Maestros recibidos:", DATOS.maestros);

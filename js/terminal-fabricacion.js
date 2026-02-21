@@ -227,15 +227,12 @@ async function cargarOrdenesFabricacion(opciones = {}) {
             tr.dataset.ordenId = o.id;
             tr.dataset.numero = o.numero || o.id;
             tr.dataset.fecha = o.fecha;
-            tr.dataset.clienteId = o.cliente_id;
-            const cliente =
-                terminalFabricacion.clientes?.[o.cliente_id]?.nombre ||
-                (typeof o.cliente_id !== "undefined" ? String(o.cliente_id) : "");
-            tr.dataset.clienteNombre = cliente;
+            const descripcion = o.descripcion || "";
+            tr.dataset.descripcion = descripcion;
             tr.innerHTML = `
         <td>${o.numero || o.id}</td>
         <td>${formatearFechaEuropea(o.fecha)}</td>
-        <td>${cliente}</td>
+        <td>${descripcion}</td>
       `;
             tbody.appendChild(tr);
         });
@@ -262,8 +259,8 @@ async function seleccionarFabricacion(fila, opciones = {}) {
     const ordenId = Number(fila.dataset.ordenId);
     const numero = fila.dataset.numero || ordenId;
     const fecha = formatearFechaEuropea(fila.dataset.fecha);
-    const clienteNombre = fila.dataset.clienteNombre || fila.children?.[2]?.textContent || "";
-    const titulo = `Orden ${numero}, ${fecha}${clienteNombre ? ", " + clienteNombre : ""}`;
+    const descripcion = fila.dataset.descripcion || fila.children?.[2]?.textContent || "";
+    const titulo = `Orden ${numero}, ${fecha}${descripcion ? ", " + descripcion : ""}`;
     const tituloOrden = document.querySelector(cfg.tituloOrdenSelector);
     if (tituloOrden) tituloOrden.textContent = titulo;
 

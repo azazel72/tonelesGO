@@ -16,6 +16,8 @@ function openLineasFabricacionWin() {
     })
   );
 
+  const materialesDict = construirMaterialesDict();
+
   const estadosDict = Object.values(DATOS?.maestros?.estados_lineas_fabricacion ?? {}).map(
     ({ id, descripcion, ...resto }) => ({
       ...resto, id, descripcion,
@@ -72,6 +74,22 @@ function openLineasFabricacionWin() {
             cssClass: "filtrable",
             formatter: cell => DATOS?.fabricacion?.tipos_producto?.[cell.getValue()]?.descripcion ?? cell.getValue(),
           },
+          {
+            title: "Material",
+            field: "material_id",
+            editor: "list",
+            editorParams: {
+              values: materialesDict,
+              clearable: true,
+              autocomplete: true,
+              allowEmpty: true,
+              listOnEmpty: true,
+              freetext: false,
+            },
+            editable: tablaEditable,
+            cssClass: "filtrable",
+            formatter: cell => DATOS?.maestros?.materiales?.[cell.getValue()]?.descripcion ?? cell.getValue(),
+          },
           { title:"Cantidad", field:"cantidad", editor:"number", editable: tablaEditable, cssClass: "filtrable", hozAlign:"right" },
           { title:"Cant. fabricada", field:"cantidad_fabricada", editor:"number", editable: tablaEditable, cssClass: "filtrable", hozAlign:"right" },
           {
@@ -110,6 +128,16 @@ function construirOrdenesFabricacionDict() {
   );
 }
 
+function construirMaterialesDict() {
+  return Object.values(DATOS?.maestros?.materiales ?? {}).map(
+    ({ id, descripcion, ...resto }) => ({
+      ...resto, id, descripcion,
+      value: id,
+      label: descripcion,
+    })
+  );
+}
+
 function actualizarLineasFabricacionEditorOrdenes() {
   const par = windowsRegistry.get("lineas_fabricacion");
   if (!par?.table) return;
@@ -120,6 +148,25 @@ function actualizarLineasFabricacionEditorOrdenes() {
   col.updateDefinition({
     editorParams: {
       values: ordenesDict,
+      clearable: true,
+      autocomplete: true,
+      allowEmpty: true,
+      listOnEmpty: true,
+      freetext: false,
+    },
+  });
+}
+
+function actualizarLineasFabricacionEditorMateriales() {
+  const par = windowsRegistry.get("lineas_fabricacion");
+  if (!par?.table) return;
+  const tabla = par.table;
+  const materialesDict = construirMaterialesDict();
+  const col = tabla.getColumn("material_id");
+  if (!col) return;
+  col.updateDefinition({
+    editorParams: {
+      values: materialesDict,
       clearable: true,
       autocomplete: true,
       allowEmpty: true,

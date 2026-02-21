@@ -9,6 +9,7 @@ class LineaFabricacionDB(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     orden_id: int
     tipo_producto_id: int
+    material_id: int | None = None
     cantidad: int = 0
     cantidad_fabricada: int = 0
     estado: int | None = None

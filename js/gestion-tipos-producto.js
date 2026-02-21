@@ -6,14 +6,6 @@ function openTiposProductoWin() {
   const wb = comprobarVentanaAbierta("tipos_producto");
   if (wb) return wb;
 
-  const materialesDict = Object.values(DATOS?.maestros?.materiales ?? {}).map(
-    ({ id, descripcion, ...resto }) => ({
-      ...resto, id, descripcion,
-      value: id,
-      label: descripcion,
-    })
-  );
-
   const configuracion = {
     KEY: "tipos_producto",
     data_key: "fabricacion",
@@ -32,22 +24,7 @@ function openTiposProductoWin() {
           { title:"ID", field:"id", width:70, hozAlign:"right"},
           { title:"Codigo", field:"codigo", editor:"input", editable: tablaEditable, cssClass: "filtrable" },
           { title:"Descripcion", field:"descripcion", editor:"input", editable: tablaEditable, cssClass: "filtrable" },
-          {
-            title: "Material",
-            field: "id_material",
-            editor: "list",
-            editorParams: {
-              values: materialesDict,
-              clearable: true,
-              autocomplete: true,
-              allowEmpty: true,
-              listOnEmpty: true,
-              freetext: false,
-            },
-            editable: tablaEditable,
-            cssClass: "filtrable",
-            formatter: cell => DATOS?.maestros?.materiales?.[cell.getValue()]?.descripcion ?? cell.getValue(),
-          },
+          { title:"Consumo", field:"consumo", editor:"number", editable: tablaEditable, cssClass: "filtrable", hozAlign:"right" },
           CeldaAcciones,
         ],
         data: Object.values(DATOS.fabricacion.tipos_producto || {}),
