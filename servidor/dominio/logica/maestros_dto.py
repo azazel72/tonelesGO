@@ -18,6 +18,7 @@ from servidor.dominio.maestros.palet_dto import PaletDTO
 from servidor.dominio.maestros.producto_dto import ProductoDTO
 from servidor.dominio.maestros.archivo_subido_dto import ArchivoSubidoDTO
 from servidor.dominio.maestros.ambiente_dto import AmbienteDTO
+from servidor.dominio.maestros.entrada_fleje_dto import EntradaFlejeDTO
 
 
 class MaestrosDTO(BaseModel):
@@ -41,6 +42,7 @@ class MaestrosDTO(BaseModel):
     productos: Optional[Dict[int, "ProductoDTO"]] = {}
     archivos_subidos: Optional[Dict[int, "ArchivoSubidoDTO"]] = {}
     ambientes: Optional[Dict[int, "AmbienteDTO"]] = {}
+    entradas_flejes: Optional[Dict[int, "EntradaFlejeDTO"]] = {}
 
     def buscar_usuario_por_username(self, username: str) -> UsuarioDTO | None:
         for usuario in (self.usuarios.values() if self.usuarios else []):

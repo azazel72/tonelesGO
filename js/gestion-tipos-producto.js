@@ -6,6 +6,13 @@ function openTiposProductoWin() {
   const wb = comprobarVentanaAbierta("tipos_producto");
   if (wb) return wb;
 
+  const tipos = [
+    { value: "FONDO", label: "FONDO" },
+    { value: "VASO", label: "VASO" },
+    { value: "BOTA", label: "BOTA" },
+    { value: "FLEJE", label: "FLEJE" },
+  ];
+
   const configuracion = {
     KEY: "tipos_producto",
     data_key: "fabricacion",
@@ -22,6 +29,21 @@ function openTiposProductoWin() {
         editable: false,
         columns: [
           { title:"ID", field:"id", width:70, hozAlign:"right"},
+          {
+            title:"Tipo",
+            field:"tipo",
+            editor:"list",
+            editorParams: {
+              values: tipos,
+              clearable: true,
+              autocomplete: true,
+              allowEmpty: true,
+              listOnEmpty: true,
+              freetext: false,
+            },
+            editable: tablaEditable,
+            cssClass: "filtrable",
+          },
           { title:"Codigo", field:"codigo", editor:"input", editable: tablaEditable, cssClass: "filtrable" },
           { title:"Descripcion", field:"descripcion", editor:"input", editable: tablaEditable, cssClass: "filtrable" },
           { title:"Consumo", field:"consumo", editor:"number", editable: tablaEditable, cssClass: "filtrable", hozAlign:"right" },

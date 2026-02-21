@@ -155,7 +155,7 @@ class CrudRoutes:
                             await broadcast_pantalla("gestion_fabricacion", {"tabla": "trazabilidad_fabricacion"})
                         elif msg.action in {"modificar_maestro", "insertar_maestro", "eliminar_maestro"}:
                             tabla = (msg.data or {}).get("tabla")
-                            if tabla in {"ordenes_fabricacion", "lineas_fabricacion", "trazabilidad_fabricacion"}:
+                            if tabla in {"ordenes_fabricacion", "tipos_producto", "lineas_fabricacion", "trazabilidad_fabricacion", "botas"}:
                                 await broadcast_pantalla("vista_fabricacion", {"tabla": tabla})
                                 await broadcast_pantalla("vista_consumo", {"tabla": tabla})
                                 await broadcast_pantalla("gestion_fabricacion", {"tabla": tabla})
@@ -167,6 +167,7 @@ class CrudRoutes:
                                 "estados_botas",
                                 "estados_trazabilidad_fabricacion",
                                 "ambientes",
+                                "entradas_flejes",
                             }:
                                 await broadcast_pantalla("vista_fabricacion", {"tabla": tabla, "refetch_maestros": True})
                                 await broadcast_pantalla("vista_consumo", {"tabla": tabla, "refetch_maestros": True})

@@ -63,6 +63,9 @@ window.onload = () => {
         async "ver-lineas-entrada"() {
             await openLineasEntradaWin();
         },
+        async "ver-entradas-flejes"() {
+            await openEntradasFlejesWin();
+        },
 
         async "ver-palets"() {
             await openPaletsWin();
@@ -151,6 +154,7 @@ window.onload = () => {
         duelas: openDuelasWin,
         entradas: openEntradasWin,
         lineas_entrada: openLineasEntradaWin,
+        entradas_flejes: openEntradasFlejesWin,
         palets: openPaletsWin,
         productos: openProductosWin,
         archivos_subidos: openArchivosSubidosWin,

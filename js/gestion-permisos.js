@@ -24,6 +24,7 @@ const ACCIONES_PERMISO_GESTION = {
     "ver-duelas": [],
     "ver-entradas": { permisos: [], marcarCandado: true },
     "ver-lineas-entrada": { permisos: [], marcarCandado: true },
+    "ver-entradas-flejes": [],
     "ver-palets": [],
     "ver-productos": [],
     "ver-archivos-subidos": [],

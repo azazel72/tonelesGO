@@ -245,6 +245,7 @@ function cerrarVentanasMaestros() {
     "duelas",
     "entradas",
     "lineas_entrada",
+    "entradas_flejes",
     "palets",
     "productos",
     "archivos_subidos",

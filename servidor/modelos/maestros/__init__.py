@@ -20,6 +20,7 @@ from .producto_db import ProductoDB
 from .producto_operario_db import ProductoOperarioDB
 from .archivo_subido_db import ArchivoSubidoDB
 from .ambiente_db import AmbienteDB
+from .entrada_fleje_db import EntradaFlejeDB
 
 __all__ = [
     "ClienteDB",
@@ -43,4 +44,5 @@ __all__ = [
     "ProductoOperarioDB",
     "ArchivoSubidoDB",
     "AmbienteDB",
+    "EntradaFlejeDB",
 ]
