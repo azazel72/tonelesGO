@@ -23,7 +23,10 @@ var ACCIONES = {
     "login": respuesta_login,
     "maestros": respuesta_maestros,
     "fabricacion": respuesta_fabricacion,
-    "fabricacion_actualizar": () => {
+    "fabricacion_actualizar": (msg) => {
+        if (msg?.data?.refetch_maestros) {
+            send("maestros", {});
+        }
         send("fabricacion", {});
     },
     "cargar_planificacion_entradas": mostrar_planificacion_entradas,

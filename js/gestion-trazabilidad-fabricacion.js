@@ -22,7 +22,7 @@ function openTrazabilidadFabricacionWin() {
     })
   );
 
-  const estadosDict = Object.values(DATOS?.maestros?.estados ?? {}).map(
+  const estadosDict = Object.values(DATOS?.maestros?.estados_trazabilidad_fabricacion ?? {}).map(
     ({ id, descripcion, ...resto }) => ({
       ...resto, id, descripcion,
       value: id,
@@ -93,7 +93,7 @@ function openTrazabilidadFabricacionWin() {
             },
             editable: tablaEditable,
             cssClass: "filtrable",
-            formatter: cell => DATOS?.maestros?.estados?.[cell.getValue()]?.descripcion ?? cell.getValue(),
+            formatter: cell => DATOS?.maestros?.estados_trazabilidad_fabricacion?.[cell.getValue()]?.descripcion ?? cell.getValue(),
           },
           CeldaAcciones,
         ],

@@ -31,8 +31,17 @@ window.onload = () => {
             await openUbicacionesWin();
         },
 
-        async "ver-estados"() {
-            await openEstadosWin();
+        async "ver-estados-ordenes-fabricacion"() {
+            await openEstadosOrdenesFabricacionWin();
+        },
+        async "ver-estados-lineas-fabricacion"() {
+            await openEstadosLineasFabricacionWin();
+        },
+        async "ver-estados-botas"() {
+            await openEstadosBotasWin();
+        },
+        async "ver-estados-trazabilidad-fabricacion"() {
+            await openEstadosTrazabilidadFabricacionWin();
         },
 
         async "ver-puestos-trabajo"() {
@@ -130,7 +139,10 @@ window.onload = () => {
         clientes: openClientesWin,
         instalaciones: openInstalacionesWin,
         ubicaciones: openUbicacionesWin,
-        estados: openEstadosWin,
+        estados_ordenes_fabricacion: openEstadosOrdenesFabricacionWin,
+        estados_lineas_fabricacion: openEstadosLineasFabricacionWin,
+        estados_botas: openEstadosBotasWin,
+        estados_trazabilidad_fabricacion: openEstadosTrazabilidadFabricacionWin,
         puestos_trabajo: openPuestosTrabajoWin,
         materiales: openMaterialesWin,
         duelas: openDuelasWin,

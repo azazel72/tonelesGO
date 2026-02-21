@@ -22,6 +22,10 @@ from servidor.dominio.maestros.archivo_subido_dto import ArchivoSubidoDTO
 class MaestrosDTO(BaseModel):
     clientes: Optional[Dict[int, "ClienteDTO"]] = {}
     estados: Optional[Dict[int, "EstadoDTO"]] = {}
+    estados_ordenes_fabricacion: Optional[Dict[int, "EstadoDTO"]] = {}
+    estados_lineas_fabricacion: Optional[Dict[int, "EstadoDTO"]] = {}
+    estados_botas: Optional[Dict[int, "EstadoDTO"]] = {}
+    estados_trazabilidad_fabricacion: Optional[Dict[int, "EstadoDTO"]] = {}
     instalaciones: Optional[Dict[int, InstalacionDTO]] = {}
     ubicaciones: Optional[Dict[int, UbicacionDTO]] = {}
     proveedores: Optional[Dict[int, ProveedorDTO]] = {}

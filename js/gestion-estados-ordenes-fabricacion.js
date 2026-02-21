@@ -1,14 +1,14 @@
-// ====== CREAR VENTANA ESTADOS ======
-function openEstadosWin() {
-  const wb = comprobarVentanaAbierta("estados");
+// ====== CREAR VENTANA ESTADOS ORDENES FABRICACION ======
+function openEstadosOrdenesFabricacionWin() {
+  const wb = comprobarVentanaAbierta("estados_ordenes_fabricacion");
   if (wb) return wb;
 
   const configuracion = {
-    KEY: "estados",
+    KEY: "estados_ordenes_fabricacion",
     winbox: {
       tipo: "generico",
       options: {
-        title: "Estados",
+        title: "Estados órdenes fabricación",
         x: 265,
         y: 80,
       }
@@ -21,11 +21,10 @@ function openEstadosWin() {
           { title:"Descripción", field:"descripcion", editor:"input", editable: tablaEditable, cssClass: "filtrable", },
           CeldaAcciones,
         ],
-        data: Object.values(DATOS.maestros.estados || {}),
+        data: Object.values(DATOS.maestros.estados_ordenes_fabricacion || {}),
       },
     },
   }
 
-  return crearVentana(configuracion);  
-
+  return crearVentana(configuracion);
 }

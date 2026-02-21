@@ -159,9 +159,17 @@ class CrudRoutes:
                                 await broadcast_pantalla("vista_fabricacion", {"tabla": tabla})
                                 await broadcast_pantalla("vista_consumo", {"tabla": tabla})
                                 await broadcast_pantalla("gestion_fabricacion", {"tabla": tabla})
-                            elif tabla in {"puestos_trabajo", "usuarios"}:
+                            elif tabla in {
+                                "puestos_trabajo",
+                                "usuarios",
+                                "estados_ordenes_fabricacion",
+                                "estados_lineas_fabricacion",
+                                "estados_botas",
+                                "estados_trazabilidad_fabricacion",
+                            }:
                                 await broadcast_pantalla("vista_fabricacion", {"tabla": tabla, "refetch_maestros": True})
                                 await broadcast_pantalla("vista_consumo", {"tabla": tabla, "refetch_maestros": True})
+                                await broadcast_pantalla("gestion_fabricacion", {"tabla": tabla, "refetch_maestros": True})
                     else:
                         await ws.send_json(ResponseMessage.fail(msg.action, "no_result", msg.request_id).model_dump())
                 else:

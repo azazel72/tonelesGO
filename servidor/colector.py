@@ -6,7 +6,8 @@ from typing import List
 
 from servidor.herramientas.utilidades import obtener_anterior_dia_semana
 
-from .modelos import ClienteDB, EstadoDB, InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB, RolDB, PuestoTrabajoDB, MaterialDB, DuelaDB, EntradaDB, LineaEntradaDB, PaletDB, ProductoDB, ProductoOperarioDB, ArchivoSubidoDB
+from .modelos import ClienteDB, EstadoOrdenFabricacionDB, EstadoLineaFabricacionDB, EstadoBotaDB, EstadoTrazabilidadFabricacionDB
+from .modelos import InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB, RolDB, PuestoTrabajoDB, MaterialDB, DuelaDB, EntradaDB, LineaEntradaDB, PaletDB, ProductoDB, ProductoOperarioDB, ArchivoSubidoDB
 from .modelos import OrdenFabricacionDB, TipoProductoDB, LineaFabricacionDB, TrazabilidadProcesadoDB, TrazabilidadFabricacionDB, TrazabilidadProductoDB, BotaDB
 from .modelos import PlanCamionDB, PlanFacturacionDB, PlanMaterialDB, CuadranteDB, CuadranteDetalleDB
 from .persistencia import GenericRepository, DB
@@ -41,7 +42,10 @@ class Colector:
         self.repo_materiales = GenericRepository(PlanMaterialDB)
 
         self.repo_clientes = GenericRepository(ClienteDB)
-        self.repo_estados = GenericRepository(EstadoDB)
+        self.repo_estados_ordenes_fabricacion = GenericRepository(EstadoOrdenFabricacionDB)
+        self.repo_estados_lineas_fabricacion = GenericRepository(EstadoLineaFabricacionDB)
+        self.repo_estados_botas = GenericRepository(EstadoBotaDB)
+        self.repo_estados_trazabilidad_fabricacion = GenericRepository(EstadoTrazabilidadFabricacionDB)
         self.repo_instalaciones = GenericRepository(InstalacionDB)
         self.repo_ubicaciones = GenericRepository(UbicacionDB)
         self.repo_proveedores = GenericRepository(ProveedorDB)
@@ -75,7 +79,10 @@ class Colector:
     def obtener_datos_maestros(self) -> dict:
         with DB.crear_sesion() as session:
             clientes = self.repo_clientes.list_all(session)
-            estados = self.repo_estados.list_all(session)
+            estados_ordenes_fabricacion = self.repo_estados_ordenes_fabricacion.list_all(session)
+            estados_lineas_fabricacion = self.repo_estados_lineas_fabricacion.list_all(session)
+            estados_botas = self.repo_estados_botas.list_all(session)
+            estados_trazabilidad_fabricacion = self.repo_estados_trazabilidad_fabricacion.list_all(session)
             instalaciones = self.repo_instalaciones.list_all(session)
             ubicaciones = self.repo_ubicaciones.list_all(session)
             proveedores = self.repo_proveedores.list_all(session)
@@ -91,7 +98,10 @@ class Colector:
             archivos_subidos = self.repo_archivos_subidos.list_all(session)
 
             self.maestros.clientes = {cliente.id: ClienteDTO.from_db(cliente) for cliente in clientes}
-            self.maestros.estados = {estado.id: EstadoDTO.from_db(estado) for estado in estados}
+            self.maestros.estados_ordenes_fabricacion = {estado.id: EstadoDTO.from_db(estado) for estado in estados_ordenes_fabricacion}
+            self.maestros.estados_lineas_fabricacion = {estado.id: EstadoDTO.from_db(estado) for estado in estados_lineas_fabricacion}
+            self.maestros.estados_botas = {estado.id: EstadoDTO.from_db(estado) for estado in estados_botas}
+            self.maestros.estados_trazabilidad_fabricacion = {estado.id: EstadoDTO.from_db(estado) for estado in estados_trazabilidad_fabricacion}
             self.maestros.instalaciones = {instalacion.id: InstalacionDTO.from_db(instalacion) for instalacion in instalaciones}
             self.maestros.ubicaciones = {ubicacion.id: UbicacionDTO.from_db(ubicacion) for ubicacion in ubicaciones}
             self.maestros.proveedores = {proveedor.id: ProveedorDTO.from_db(proveedor) for proveedor in proveedores}
@@ -801,9 +811,21 @@ class Colector:
             repo = self.repo_clientes
             maestro = self.maestros.clientes
             objeto = ClienteDTO
-        elif tabla == "estados":
-            repo = self.repo_estados
-            maestro = self.maestros.estados
+        elif tabla == "estados_ordenes_fabricacion":
+            repo = self.repo_estados_ordenes_fabricacion
+            maestro = self.maestros.estados_ordenes_fabricacion
+            objeto = EstadoDTO
+        elif tabla == "estados_lineas_fabricacion":
+            repo = self.repo_estados_lineas_fabricacion
+            maestro = self.maestros.estados_lineas_fabricacion
+            objeto = EstadoDTO
+        elif tabla == "estados_botas":
+            repo = self.repo_estados_botas
+            maestro = self.maestros.estados_botas
+            objeto = EstadoDTO
+        elif tabla == "estados_trazabilidad_fabricacion":
+            repo = self.repo_estados_trazabilidad_fabricacion
+            maestro = self.maestros.estados_trazabilidad_fabricacion
             objeto = EstadoDTO
         elif tabla == "instalaciones":
             repo = self.repo_instalaciones

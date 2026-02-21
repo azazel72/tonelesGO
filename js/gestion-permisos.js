@@ -11,7 +11,10 @@ const COLUMNAS_PERMISOS_ROL = [
 const ACCIONES_PERMISO_GESTION = {
     "ver-usuarios": [],
     "ver-roles": [],
-    "ver-estados": [],
+    "ver-estados-ordenes-fabricacion": [],
+    "ver-estados-lineas-fabricacion": [],
+    "ver-estados-botas": [],
+    "ver-estados-trazabilidad-fabricacion": [],
     "ver-puestos-trabajo": [],
     "ver-proveedores": [],
     "ver-clientes": [],

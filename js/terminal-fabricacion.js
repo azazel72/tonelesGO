@@ -161,7 +161,7 @@ function obtenerConfigVistaProduccion(vistaId = null) {
 // Cache sencillo para datos que necesitamos mostrar
 const terminalFabricacion = {
     clientes: null,
-    estados: null,
+    estados_trazabilidad_fabricacion: null,
     tipos_producto: null,
     usuarios: null,
     puestos_trabajo: null,
@@ -171,7 +171,7 @@ async function refrescarMaestrosFabricacion() {
     try {
         const maestros = await wsRequest("maestros", {});
         terminalFabricacion.clientes = maestros?.clientes || {};
-        terminalFabricacion.estados = maestros?.estados || {};
+        terminalFabricacion.estados_trazabilidad_fabricacion = maestros?.estados_trazabilidad_fabricacion || {};
         terminalFabricacion.usuarios = maestros?.usuarios || {};
         terminalFabricacion.puestos_trabajo = maestros?.puestos_trabajo || {};
     } catch (err) {
@@ -180,11 +180,11 @@ async function refrescarMaestrosFabricacion() {
 }
 
 async function asegurarDatosFabricacionTerminal() {
-    if (terminalFabricacion.clientes && terminalFabricacion.estados && terminalFabricacion.tipos_producto && terminalFabricacion.usuarios) return;
+    if (terminalFabricacion.clientes && terminalFabricacion.estados_trazabilidad_fabricacion && terminalFabricacion.tipos_producto && terminalFabricacion.usuarios) return;
     try {
         const maestros = await wsRequest("maestros", {});
         terminalFabricacion.clientes = maestros?.clientes || {};
-        terminalFabricacion.estados = maestros?.estados || {};
+        terminalFabricacion.estados_trazabilidad_fabricacion = maestros?.estados_trazabilidad_fabricacion || {};
         terminalFabricacion.usuarios = maestros?.usuarios || {};
         terminalFabricacion.puestos_trabajo = maestros?.puestos_trabajo || {};
         const fabricacion = await wsRequest("fabricacion", {});
@@ -192,7 +192,7 @@ async function asegurarDatosFabricacionTerminal() {
     } catch (err) {
         console.error("No se pudieron cargar datos de fabricacion:", err);
         terminalFabricacion.clientes = terminalFabricacion.clientes || {};
-        terminalFabricacion.estados = terminalFabricacion.estados || {};
+        terminalFabricacion.estados_trazabilidad_fabricacion = terminalFabricacion.estados_trazabilidad_fabricacion || {};
         terminalFabricacion.tipos_producto = terminalFabricacion.tipos_producto || {};
         terminalFabricacion.usuarios = terminalFabricacion.usuarios || {};
         terminalFabricacion.puestos_trabajo = terminalFabricacion.puestos_trabajo || {};
@@ -391,7 +391,7 @@ async function cargarTrazabilidadFabricacion(lineaId, vistaId = "vista_consumo")
         }
         trazas.forEach((t) => {
             const tr = document.createElement("tr");
-            const estado = terminalFabricacion.estados?.[t.estado]?.descripcion || (t.estado ?? "");
+            const estado = terminalFabricacion.estados_trazabilidad_fabricacion?.[t.estado]?.descripcion || (t.estado ?? "");
             tr.dataset.trazabilidadId = t.id ?? "";
             tr.dataset.estado = t.estado ?? 0;
             tr.dataset.cantidad = t.cantidad_fabricada ?? 0;
