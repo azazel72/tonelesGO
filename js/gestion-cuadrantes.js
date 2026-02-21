@@ -60,15 +60,23 @@ function crearColumnasCuadrantes(cuadrante) {
   const mie = sumarDiasYYYYMMDD(cuadrante?.fecha_inicio, 6);
 
   const columnas = [
-    { title: "ID", field: "id", visible: false },
-    { title: "Puesto", field: "nombre", width: 150, frozen: true },
-    { title: titulo_con_fecha("Jue", jue), field: jue, formatter: formatterColumnasCuadrante, variableHeight: true, cssClass: "celda-cuadrante"},
-    { title: titulo_con_fecha("Vie", vie), field: vie, formatter: formatterColumnasCuadrante, variableHeight: true, cssClass: "celda-cuadrante"},
-    { title: titulo_con_fecha("Lun", lun), field: lun, formatter: formatterColumnasCuadrante, variableHeight: true, cssClass: "celda-cuadrante"},
-    { title: titulo_con_fecha("Mar", mar), field: mar, formatter: formatterColumnasCuadrante, variableHeight: true, cssClass: "celda-cuadrante"},
-    { title: titulo_con_fecha("Mié", mie), field: mie, formatter: formatterColumnasCuadrante, variableHeight: true, cssClass: "celda-cuadrante"},
+    { title: "ID", field: "id", visible: false, headerSort: false },
+    { title: "Puesto", field: "nombre", width: 150, frozen: true, headerSort: true },
+    { title: crearTituloClonableDia("Jue", jue), field: jue, formatter: formatterColumnasCuadrante, variableHeight: true, cssClass: "celda-cuadrante", headerSort: false },
+    { title: crearTituloClonableDia("Vie", vie), field: vie, formatter: formatterColumnasCuadrante, variableHeight: true, cssClass: "celda-cuadrante", headerSort: false },
+    { title: crearTituloClonableDia("Lun", lun), field: lun, formatter: formatterColumnasCuadrante, variableHeight: true, cssClass: "celda-cuadrante", headerSort: false },
+    { title: crearTituloClonableDia("Mar", mar), field: mar, formatter: formatterColumnasCuadrante, variableHeight: true, cssClass: "celda-cuadrante", headerSort: false },
+    { title: crearTituloClonableDia("Mié", mie), field: mie, formatter: formatterColumnasCuadrante, variableHeight: true, cssClass: "celda-cuadrante", headerSort: false },
   ];
   return columnas;
+}
+
+function crearTituloClonableDia(dia, fecha) {
+  return `
+    <div class="cuadrante-header-title" draggable="true" title="Arrastra esta columna a otro día para clonar">
+      <span>${titulo_con_fecha(dia, fecha)}</span>
+    </div>
+  `;
 }
 
 function formatterColumnasCuadrante(cell, formatterParams, onRendered) {
@@ -247,12 +255,219 @@ function crearVentanaCuadrantes(configuracion, show=true) {
   // Tabulator
   const tablaCuadrante = contenedor.querySelector("#tablaCuadrante");
   const tabla = crearTabla("cuadrantes", tablaCuadrante, configuracion.tabulator);
+  inicializarUiClonadoColumnas(contenedor, tabla);
 
   windowsRegistry.set(configuracion.KEY, { wb: wb, table: tabla });
 
   agregarEventosCuadrantes(wb, configuracion, contenedor);
 
   return wb;
+}
+
+function inicializarUiClonadoColumnas(contenedor, tabla) {
+  if (tabla.__uiClonadoInicializada) return;
+  tabla.__uiClonadoInicializada = true;
+
+  asegurarModalClonadoCuadrantes();
+
+  tabla.on("tableBuilt", () => {
+    bindInteraccionesCabeceraCuadrantes(tabla);
+  });
+}
+
+function asegurarModalClonadoCuadrantes() {
+  if (document.getElementById("cuadrantes-clonar-columna-modal")) return;
+  const modalHtml = `
+  <div class="modal fade" id="cuadrantes-clonar-columna-modal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <div class="modal-header">
+          <h5 class="modal-title">Clonar columna de día</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-2">
+            <label for="cuadrantes-clonar-origen" class="form-label">Origen</label>
+            <select id="cuadrantes-clonar-origen" class="form-select"></select>
+          </div>
+          <div>
+            <label for="cuadrantes-clonar-destino" class="form-label">Destino</label>
+            <select id="cuadrantes-clonar-destino" class="form-select"></select>
+          </div>
+          <div class="form-check mt-3">
+            <input class="form-check-input" type="checkbox" id="cuadrantes-clonar-mantener-destino">
+            <label class="form-check-label" for="cuadrantes-clonar-mantener-destino">
+              Mantener datos de destino
+            </label>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          <button type="button" class="btn btn-primary" id="cuadrantes-clonar-confirmar">Clonar</button>
+        </div>
+      </div>
+    </div>
+  </div>`;
+  document.body.insertAdjacentHTML("beforeend", modalHtml);
+}
+
+function bindInteraccionesCabeceraCuadrantes(tabla) {
+  const host = tabla.element;
+  if (!host || host.dataset.clonadoBind === "1") return;
+  host.dataset.clonadoBind = "1";
+
+  host.addEventListener("mouseover", (e) => {
+    const title = e.target.closest(".cuadrante-header-title");
+    if (!title) return;
+    const colEl = title.closest(".tabulator-col");
+    const field = colEl?.getAttribute("tabulator-field");
+    if (!esCampoDiaCuadrante(field)) return;
+    aplicarClaseColumnaCompleta(tabla, "cuadrante-columna-hover", field);
+  });
+
+  host.addEventListener("mouseout", (e) => {
+    const title = e.target.closest(".cuadrante-header-title");
+    if (!title) return;
+    const relatedTitle = e.relatedTarget?.closest?.(".cuadrante-header-title");
+    if (relatedTitle) return;
+    limpiarClaseColumnaCompleta(tabla, "cuadrante-columna-hover");
+  });
+
+  host.addEventListener("dragstart", (e) => {
+    const title = e.target.closest(".cuadrante-header-title");
+    if (!title) return;
+    const colEl = title.closest(".tabulator-col");
+    const field = colEl?.getAttribute("tabulator-field");
+    if (!esCampoDiaCuadrante(field)) return;
+    e.dataTransfer.setData("text/cuadrante-col-field", field);
+    e.dataTransfer.effectAllowed = "copy";
+    aplicarClaseColumnaCompleta(tabla, "cuadrante-columna-origen", field);
+  });
+
+  host.addEventListener("dragend", () => {
+    limpiarClaseColumnaCompleta(tabla, "cuadrante-columna-origen");
+    limpiarClaseColumnaCompleta(tabla, "cuadrante-columna-destino");
+  });
+
+  host.addEventListener("dragover", (e) => {
+    if (!e.dataTransfer?.types?.includes("text/cuadrante-col-field")) return;
+    const colEl = e.target.closest(".tabulator-col");
+    const field = colEl?.getAttribute("tabulator-field");
+    if (!esCampoDiaCuadrante(field)) return;
+    e.preventDefault();
+    e.dataTransfer.dropEffect = "copy";
+    aplicarClaseColumnaCompleta(tabla, "cuadrante-columna-destino", field);
+  });
+
+  host.addEventListener("dragleave", (e) => {
+    const colEl = e.target.closest(".tabulator-col");
+    if (!colEl) return;
+    const relatedCol = e.relatedTarget?.closest?.(".tabulator-col");
+    if (relatedCol === colEl) return;
+    limpiarClaseColumnaCompleta(tabla, "cuadrante-columna-destino");
+  });
+
+  host.addEventListener("drop", (e) => {
+    const fieldOrigen = e.dataTransfer?.getData("text/cuadrante-col-field");
+    if (!fieldOrigen) return;
+    const colEl = e.target.closest(".tabulator-col");
+    const fieldDestino = colEl?.getAttribute("tabulator-field");
+    if (!esCampoDiaCuadrante(fieldDestino) || fieldDestino === fieldOrigen) return;
+    e.preventDefault();
+    limpiarClaseColumnaCompleta(tabla, "cuadrante-columna-origen");
+    limpiarClaseColumnaCompleta(tabla, "cuadrante-columna-destino");
+    abrirModalClonadoCuadrantes(tabla, fieldOrigen, fieldDestino);
+  });
+}
+
+function obtenerColumnasDiasCuadrante(tabla) {
+  return tabla.getColumns()
+    .filter((col) => {
+      const field = col.getField?.();
+      return field && field !== "id" && field !== "nombre";
+    })
+    .map((col) => {
+      const field = col.getField();
+      const titulo = col.getElement()?.querySelector(".cuadrante-header-title span")?.textContent?.trim();
+      return { field, label: titulo || field };
+    });
+}
+
+function esCampoDiaCuadrante(field) {
+  return Boolean(field) && field !== "id" && field !== "nombre";
+}
+
+function aplicarClaseColumnaCompleta(tabla, clase, field) {
+  limpiarClaseColumnaCompleta(tabla, clase);
+  if (!field) return;
+  tabla.element.querySelectorAll(`.tabulator-col[tabulator-field="${field}"]`).forEach((el) => el.classList.add(clase));
+  tabla.element.querySelectorAll(`.tabulator-cell[tabulator-field="${field}"]`).forEach((el) => el.classList.add(clase));
+}
+
+function limpiarClaseColumnaCompleta(tabla, clase) {
+  tabla.element.querySelectorAll(`.${clase}`).forEach((el) => el.classList.remove(clase));
+}
+
+function abrirModalClonadoCuadrantes(tabla, fieldOrigen = null, fieldDestino = null) {
+  const modalEl = document.getElementById("cuadrantes-clonar-columna-modal");
+  if (!modalEl) return;
+  const selectOrigen = modalEl.querySelector("#cuadrantes-clonar-origen");
+  const selectDestino = modalEl.querySelector("#cuadrantes-clonar-destino");
+  const checkMantenerDestino = modalEl.querySelector("#cuadrantes-clonar-mantener-destino");
+  const btnConfirmar = modalEl.querySelector("#cuadrantes-clonar-confirmar");
+  if (!selectOrigen || !selectDestino || !checkMantenerDestino || !btnConfirmar) return;
+
+  const columnasDias = obtenerColumnasDiasCuadrante(tabla);
+  const optionsHtml = columnasDias.map((col) => `<option value="${col.field}">${col.label}</option>`).join("");
+  selectOrigen.innerHTML = optionsHtml;
+  selectDestino.innerHTML = optionsHtml;
+
+  const origenFinal = fieldOrigen || columnasDias[0]?.field;
+  if (origenFinal) selectOrigen.value = origenFinal;
+  if (fieldDestino) selectDestino.value = fieldDestino;
+  else if (columnasDias.length > 1) {
+    const destinoDefecto = columnasDias.find((c) => c.field !== selectOrigen.value)?.field;
+    if (destinoDefecto) selectDestino.value = destinoDefecto;
+  }
+
+  checkMantenerDestino.checked = false;
+
+  btnConfirmar.onclick = () => {
+    const origen = selectOrigen.value;
+    const destino = selectDestino.value;
+    const mantenerDatosDestino = checkMantenerDestino.checked;
+    if (!origen || !destino || origen === destino) {
+      alert("Selecciona origen y destino diferentes.");
+      return;
+    }
+
+    const btn = btnConfirmar;
+    btn.disabled = true;
+    wsRequest("clonar_columna_cuadrante", {
+      cuadrante_id: DATOS.cuadrante?.id,
+      fecha_origen: origen,
+      fecha_destino: destino,
+      mantener_datos_destino: mantenerDatosDestino,
+    })
+      .then((data) => {
+        if (!data) {
+          alert("No se recibió respuesta válida del servidor.");
+          return;
+        }
+        mostrar_cuadrantes({ data });
+        bootstrap.Modal.getOrCreateInstance(modalEl).hide();
+      })
+      .catch((err) => {
+        console.error(err);
+        alert("Error al clonar columna: " + (err?.message || err));
+      })
+      .finally(() => {
+        btn.disabled = false;
+      });
+  };
+
+  const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
+  modal.show();
 }
 
 function completarEmpleadosCuadrantes(key, listaUsuarios, usuarios, configuracion) {

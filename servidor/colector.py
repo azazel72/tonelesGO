@@ -732,6 +732,67 @@ class Colector:
                 raise
             logger.info(f"Detalle de cuadrante ID {id} eliminado.")
             return {"id": id }
+
+    def clonar_columna_cuadrante(self, data) -> CuadranteDTO:
+        cuadrante_id = data.get("cuadrante_id")
+        fecha_origen = data.get("fecha_origen")
+        fecha_destino = data.get("fecha_destino")
+        mantener_datos_destino = bool(data.get("mantener_datos_destino"))
+
+        if not cuadrante_id:
+            raise ValueError("cuadrante_id requerido")
+        if not fecha_origen or not fecha_destino:
+            raise ValueError("fecha_origen y fecha_destino son requeridas")
+        if fecha_origen == fecha_destino:
+            raise ValueError("fecha_origen y fecha_destino deben ser diferentes")
+
+        fecha_origen_date = date.fromisoformat(fecha_origen)
+        fecha_destino_date = date.fromisoformat(fecha_destino)
+
+        with DB.crear_sesion() as session:
+            cuadrante = self.repo_cuadrantes.get(session, cuadrante_id)
+            if not cuadrante:
+                raise ValueError(f"No existe cuadrante con id {cuadrante_id}")
+
+            detalles = self.repo_cuadrante_detalles.list_by_cuadrante_id(session, cuadrante_id)
+            detalles_origen = [d for d in detalles if d.fecha == fecha_origen_date]
+            detalles_destino = [d for d in detalles if d.fecha == fecha_destino_date]
+
+            if not mantener_datos_destino:
+                for det in detalles_destino:
+                    session.delete(det)
+                detalles_destino = []
+
+            firmas_destino = {(d.puesto_id, d.usuario_id) for d in detalles_destino}
+            nuevos_detalles = []
+            for det in detalles_origen:
+                firma = (det.puesto_id, det.usuario_id)
+                if firma in firmas_destino:
+                    continue
+                firmas_destino.add(firma)
+                nuevos_detalles.append(
+                    CuadranteDetalleDB(
+                        fecha=fecha_destino_date,
+                        cuadrante_id=cuadrante_id,
+                        puesto_id=det.puesto_id,
+                        usuario_id=det.usuario_id,
+                        orden_en_puesto=det.orden_en_puesto,
+                    )
+                )
+
+            if nuevos_detalles:
+                session.add_all(nuevos_detalles)
+
+            try:
+                session.commit()
+            except Exception:
+                session.rollback()
+                raise
+
+            detalles_actualizados = self.repo_cuadrante_detalles.list_by_cuadrante_id(session, cuadrante_id)
+            cuadrante_dto = CuadranteDTO.from_db(cuadrante)
+            cuadrante_dto.detalles = [CuadranteDetalleDTO.from_db(det) for det in detalles_actualizados]
+            return cuadrante_dto
     #endregion
 
     #region Métodos Auxiliares

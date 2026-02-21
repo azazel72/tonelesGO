@@ -71,7 +71,9 @@ div.contenedor-tabla {
     outline-offset: -2px;
     background-color: rgba(13, 110, 253, .08); /* azul muy suave de fondo */
 }
-
+.usuario-pill {
+  cursor: pointer;
+}
 #contenedor-cuadrante.mismo-ancho .usuario-pill {
   display: block;
 }

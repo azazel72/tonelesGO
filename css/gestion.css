@@ -249,6 +249,30 @@ button#btn-logout:hover span * {
     font-size: 0.9em;
 }
 
+.cuadrante-header-title {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 1.4rem;
+    cursor: pointer;
+    user-select: none;
+}
+
+.tabulator-col.cuadrante-columna-hover,
+.tabulator-cell.cuadrante-columna-hover {
+    background: rgba(13, 110, 253, 0.12) !important;
+}
+
+.tabulator-col.cuadrante-columna-origen,
+.tabulator-cell.cuadrante-columna-origen {
+    background: rgba(255, 193, 7, 0.2) !important;
+}
+
+.tabulator-col.cuadrante-columna-destino,
+.tabulator-cell.cuadrante-columna-destino {
+    background: rgba(25, 135, 84, 0.18) !important;
+}
+
 
   /* Indicador de estado WebSocket */
   .ws-status {
