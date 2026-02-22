@@ -22,6 +22,7 @@ def obtener_acciones() -> Dict[str, any]:
         "imprimir_etiqueta_fabricacion": lambda ws, req: Colector.colector.imprimir_etiqueta_fabricacion(req.data, ws),
         "listar_operarios_planificacion_fabricacion": lambda ws, req: Colector.colector.listar_operarios_planificacion_fabricacion(),
         "listar_archivos_entidad": lambda ws, req: Colector.colector.listar_archivos_entidad(req.data.get("entidad"), req.data.get("entidad_id")),
+        "informe_material": lambda ws, req: Colector.colector.informe_material(),
         "modificar_maestro": lambda ws, req: Colector.colector.modificar_maestro(req.data),
         "modificar_entrada": lambda ws, req: Colector.colector.modificar_entrada(req.data),
         "eliminar_maestro": lambda ws, req: Colector.colector.eliminar_maestro(req.data),

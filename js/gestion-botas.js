@@ -14,6 +14,14 @@ function openBotasWin() {
     })
   );
 
+  const tiposProductoDict = Object.values(DATOS?.fabricacion?.tipos_producto ?? {}).map(
+    ({ id, descripcion, codigo, ...resto }) => ({
+      ...resto, id, descripcion, codigo,
+      value: id,
+      label: descripcion || codigo || String(id),
+    })
+  );
+
   const materialesDict = Object.values(DATOS?.maestros?.materiales ?? {}).map(
     ({ id, descripcion, ...resto }) => ({
       ...resto, id, descripcion,
@@ -47,6 +55,22 @@ function openBotasWin() {
         columns: [
           { title:"ID", field:"id", width:70, hozAlign:"right"},
           { title:"Codigo", field:"codigo", editor:"input", editable: tablaEditable, cssClass: "filtrable" },
+          {
+            title: "Tipo producto",
+            field: "tipo_producto_id",
+            editor: "list",
+            editorParams: {
+              values: tiposProductoDict,
+              clearable: true,
+              autocomplete: true,
+              allowEmpty: true,
+              listOnEmpty: true,
+              freetext: false,
+            },
+            editable: tablaEditable,
+            cssClass: "filtrable",
+            formatter: cell => DATOS?.fabricacion?.tipos_producto?.[cell.getValue()]?.descripcion ?? cell.getValue(),
+          },
           {
             title: "Material",
             field: "material_id",

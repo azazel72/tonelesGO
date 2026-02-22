@@ -8,6 +8,7 @@ class BotaDB(SQLModel, table=True):
 
     id: Optional[int] = Field(default=None, primary_key=True)
     codigo: str
+    tipo_producto_id: int | None = None
     material_id: int | None = None
     vaso_producto_id: int
     fondo_producto_id: int

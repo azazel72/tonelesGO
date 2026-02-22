@@ -5,6 +5,7 @@ from .estado_orden_fabricacion_db import EstadoOrdenFabricacionDB
 from .estado_linea_fabricacion_db import EstadoLineaFabricacionDB
 from .estado_bota_db import EstadoBotaDB
 from .estado_trazabilidad_fabricacion_db import EstadoTrazabilidadFabricacionDB
+from .estado_palet_db import EstadoPaletDB
 from .instalacion_db import InstalacionDB
 from .ubicacion_db import UbicacionDB
 from .proveedor_db import ProveedorDB
@@ -29,6 +30,7 @@ __all__ = [
     "EstadoLineaFabricacionDB",
     "EstadoBotaDB",
     "EstadoTrazabilidadFabricacionDB",
+    "EstadoPaletDB",
     "InstalacionDB",
     "UbicacionDB",
     "ProveedorDB",

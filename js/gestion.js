@@ -43,6 +43,9 @@ window.onload = () => {
         async "ver-estados-trazabilidad-fabricacion"() {
             await openEstadosTrazabilidadFabricacionWin();
         },
+        async "ver-estados-palets"() {
+            await openEstadosPaletsWin();
+        },
 
         async "ver-puestos-trabajo"() {
             await openPuestosTrabajoWin();
@@ -111,6 +114,9 @@ window.onload = () => {
         async "ver-cuadrantes"() {
             await openCuadrantesWin();
         },
+        async "ver-informe-material"() {
+            await openInformeMaterialWin();
+        },
 
         async "cerrar-maestros"() {
             cerrarVentanasMaestros();
@@ -149,6 +155,7 @@ window.onload = () => {
         estados_lineas_fabricacion: openEstadosLineasFabricacionWin,
         estados_botas: openEstadosBotasWin,
         estados_trazabilidad_fabricacion: openEstadosTrazabilidadFabricacionWin,
+        estados_palets: openEstadosPaletsWin,
         puestos_trabajo: openPuestosTrabajoWin,
         materiales: openMaterialesWin,
         duelas: openDuelasWin,

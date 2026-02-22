@@ -166,6 +166,7 @@ class CrudRoutes:
                                 "estados_lineas_fabricacion",
                                 "estados_botas",
                                 "estados_trazabilidad_fabricacion",
+                                "estados_palets",
                                 "ambientes",
                                 "entradas_flejes",
                             }:

@@ -6,6 +6,7 @@ from servidor.modelos import BotaDB
 class BotaDTO(BaseModel):
     id: int | None
     codigo: str
+    tipo_producto_id: int | None = None
     material_id: int | None = None
     vaso_producto_id: int
     fondo_producto_id: int
@@ -21,6 +22,7 @@ class BotaDTO(BaseModel):
         return BotaDTO(
             id=bota_db.id,
             codigo=bota_db.codigo,
+            tipo_producto_id=bota_db.tipo_producto_id,
             material_id=bota_db.material_id,
             vaso_producto_id=bota_db.vaso_producto_id,
             fondo_producto_id=bota_db.fondo_producto_id,
@@ -37,6 +39,7 @@ class BotaDTO(BaseModel):
         return BotaDB(
             id=self.id,
             codigo=self.codigo,
+            tipo_producto_id=self.tipo_producto_id,
             material_id=self.material_id,
             vaso_producto_id=self.vaso_producto_id,
             fondo_producto_id=self.fondo_producto_id,

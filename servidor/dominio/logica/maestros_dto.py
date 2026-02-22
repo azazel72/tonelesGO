@@ -28,6 +28,7 @@ class MaestrosDTO(BaseModel):
     estados_lineas_fabricacion: Optional[Dict[int, "EstadoDTO"]] = {}
     estados_botas: Optional[Dict[int, "EstadoDTO"]] = {}
     estados_trazabilidad_fabricacion: Optional[Dict[int, "EstadoDTO"]] = {}
+    estados_palets: Optional[Dict[int, "EstadoDTO"]] = {}
     instalaciones: Optional[Dict[int, InstalacionDTO]] = {}
     ubicaciones: Optional[Dict[int, UbicacionDTO]] = {}
     proveedores: Optional[Dict[int, ProveedorDTO]] = {}

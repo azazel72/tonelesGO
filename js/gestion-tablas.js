@@ -241,6 +241,7 @@ function cerrarVentanasMaestros() {
     "estados_lineas_fabricacion",
     "estados_botas",
     "estados_trazabilidad_fabricacion",
+    "estados_palets",
     "materiales",
     "duelas",
     "entradas",

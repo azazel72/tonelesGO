@@ -6,13 +6,13 @@ from typing import List
 
 from servidor.herramientas.utilidades import obtener_anterior_dia_semana
 
-from .modelos import ClienteDB, EstadoOrdenFabricacionDB, EstadoLineaFabricacionDB, EstadoBotaDB, EstadoTrazabilidadFabricacionDB
+from .modelos import ClienteDB, EstadoOrdenFabricacionDB, EstadoLineaFabricacionDB, EstadoBotaDB, EstadoTrazabilidadFabricacionDB, EstadoPaletDB
 from .modelos import InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB, RolDB, PuestoTrabajoDB, MaterialDB, DuelaDB, EntradaDB, LineaEntradaDB, PaletDB, ProductoDB, ProductoOperarioDB, ArchivoSubidoDB, AmbienteDB, EntradaFlejeDB
 from .modelos import OrdenFabricacionDB, TipoProductoDB, LineaFabricacionDB, TrazabilidadProcesadoDB, TrazabilidadFabricacionDB, TrazabilidadProductoDB, BotaDB
 from .modelos import PlanCamionDB, PlanFacturacionDB, PlanMaterialDB, CuadranteDB, CuadranteDetalleDB
 from .persistencia import GenericRepository, DB
 from sqlmodel import select
-from sqlalchemy import extract
+from sqlalchemy import extract, func
 from .dominio import PlanificacionEntradasDTO, MaestrosDTO, PlanMaterialDTO, PlanFacturacionDTO, PlanCamionDTO, CuadranteDTO, CuadranteDetalleDTO, FabricacionDTO
 from .dominio import ClienteDTO, EstadoDTO, InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO, RolDTO, PuestoTrabajoDTO, MaterialDTO, DuelaDTO, EntradaDTO, LineaEntradaDTO, PaletDTO, ProductoDTO, ArchivoSubidoDTO, AmbienteDTO, EntradaFlejeDTO, CuadrantesDTO
 from .dominio import OrdenFabricacionDTO, TipoProductoDTO, LineaFabricacionDTO, TrazabilidadProcesadoDTO, TrazabilidadFabricacionDTO, TrazabilidadProductoDTO, BotaDTO
@@ -46,6 +46,7 @@ class Colector:
         self.repo_estados_lineas_fabricacion = GenericRepository(EstadoLineaFabricacionDB)
         self.repo_estados_botas = GenericRepository(EstadoBotaDB)
         self.repo_estados_trazabilidad_fabricacion = GenericRepository(EstadoTrazabilidadFabricacionDB)
+        self.repo_estados_palets = GenericRepository(EstadoPaletDB)
         self.repo_instalaciones = GenericRepository(InstalacionDB)
         self.repo_ubicaciones = GenericRepository(UbicacionDB)
         self.repo_proveedores = GenericRepository(ProveedorDB)
@@ -85,6 +86,7 @@ class Colector:
             estados_lineas_fabricacion = self.repo_estados_lineas_fabricacion.list_all(session)
             estados_botas = self.repo_estados_botas.list_all(session)
             estados_trazabilidad_fabricacion = self.repo_estados_trazabilidad_fabricacion.list_all(session)
+            estados_palets = self.repo_estados_palets.list_all(session)
             instalaciones = self.repo_instalaciones.list_all(session)
             ubicaciones = self.repo_ubicaciones.list_all(session)
             proveedores = self.repo_proveedores.list_all(session)
@@ -106,6 +108,7 @@ class Colector:
             self.maestros.estados_lineas_fabricacion = {estado.id: EstadoDTO.from_db(estado) for estado in estados_lineas_fabricacion}
             self.maestros.estados_botas = {estado.id: EstadoDTO.from_db(estado) for estado in estados_botas}
             self.maestros.estados_trazabilidad_fabricacion = {estado.id: EstadoDTO.from_db(estado) for estado in estados_trazabilidad_fabricacion}
+            self.maestros.estados_palets = {estado.id: EstadoDTO.from_db(estado) for estado in estados_palets}
             self.maestros.instalaciones = {instalacion.id: InstalacionDTO.from_db(instalacion) for instalacion in instalaciones}
             self.maestros.ubicaciones = {ubicacion.id: UbicacionDTO.from_db(ubicacion) for ubicacion in ubicaciones}
             self.maestros.proveedores = {proveedor.id: ProveedorDTO.from_db(proveedor) for proveedor in proveedores}
@@ -666,6 +669,62 @@ class Colector:
         contador = self._siguiente_contador_anual(session, year_two, sep)
 
         return f"{prefijo_lote}{operarios_part}{sep}{year_two}{contador:05d}"
+
+    def informe_material(self) -> dict:
+        with DB.crear_sesion() as session:
+            palets_stmt = (
+                select(
+                    PaletDB.duela_tipo_id,
+                    DuelaDB.descripcion,
+                    func.count(PaletDB.id).label("total_palets"),
+                    func.coalesce(func.sum(LineaEntradaDB.kilos), 0).label("total_kilos"),
+                )
+                .select_from(PaletDB)
+                .join(DuelaDB, DuelaDB.id == PaletDB.duela_tipo_id, isouter=True)
+                .join(LineaEntradaDB, LineaEntradaDB.id == PaletDB.linea_entrada_id, isouter=True)
+                .where(PaletDB.procesado == False)
+                .group_by(PaletDB.duela_tipo_id, DuelaDB.descripcion)
+                .order_by(DuelaDB.descripcion)
+            )
+            palets_rows = session.exec(palets_stmt).all()
+
+            botas_stmt = (
+                select(
+                    BotaDB.tipo_producto_id,
+                    TipoProductoDB.tipo,
+                    BotaDB.material_id,
+                    MaterialDB.descripcion,
+                    func.count(BotaDB.id).label("total_botas"),
+                )
+                .select_from(BotaDB)
+                .join(TipoProductoDB, TipoProductoDB.id == BotaDB.tipo_producto_id, isouter=True)
+                .join(MaterialDB, MaterialDB.id == BotaDB.material_id, isouter=True)
+                .group_by(BotaDB.tipo_producto_id, TipoProductoDB.tipo, BotaDB.material_id, MaterialDB.descripcion)
+                .order_by(TipoProductoDB.tipo, MaterialDB.descripcion)
+            )
+            botas_rows = session.exec(botas_stmt).all()
+
+            return {
+                "palets_por_duela": [
+                    {
+                        "duela_tipo_id": row[0],
+                        "duela": row[1] or "Sin tipo",
+                        "total_palets": int(row[2] or 0),
+                        "total_kilos": float(row[3] or 0),
+                    }
+                    for row in palets_rows
+                ],
+                "botas_por_tipo_material": [
+                    {
+                        "tipo_producto_id": row[0],
+                        "tipo": row[1] or "Sin tipo",
+                        "material_id": row[2],
+                        "material": row[3] or "Sin material",
+                        "total_botas": int(row[4] or 0),
+                    }
+                    for row in botas_rows
+                ],
+            }
     #endregion
 
     #region Métodos Cuadrantes
@@ -832,6 +891,10 @@ class Colector:
         elif tabla == "estados_trazabilidad_fabricacion":
             repo = self.repo_estados_trazabilidad_fabricacion
             maestro = self.maestros.estados_trazabilidad_fabricacion
+            objeto = EstadoDTO
+        elif tabla == "estados_palets":
+            repo = self.repo_estados_palets
+            maestro = self.maestros.estados_palets
             objeto = EstadoDTO
         elif tabla == "instalaciones":
             repo = self.repo_instalaciones

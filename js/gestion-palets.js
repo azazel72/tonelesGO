@@ -20,6 +20,22 @@ function openPaletsWin() {
     })
   );
 
+  const duelasDict = Object.values(DATOS?.maestros?.duelas ?? {}).map(
+    ({ id, descripcion, ...resto }) => ({
+      ...resto, id, descripcion,
+      value: id,
+      label: descripcion,
+    })
+  );
+
+  const estadosDict = Object.values(DATOS?.maestros?.estados_palets ?? {}).map(
+    ({ id, descripcion, ...resto }) => ({
+      ...resto, id, descripcion,
+      value: id,
+      label: descripcion,
+    })
+  );
+
   const parametros_check = {
     hozAlign: "center",
     formatter: "tickCross",
@@ -75,6 +91,40 @@ function openPaletsWin() {
             editable: tablaEditable,
             cssClass: "filtrable",
             formatter: cell => DATOS?.maestros?.ubicaciones?.[cell.getValue()]?.descripcion ?? cell.getValue(),
+          },
+          {
+            title: "Tipo duela",
+            field: "duela_tipo_id",
+            editor: "list",
+            editorParams: {
+              values: duelasDict,
+              clearable: true,
+              autocomplete: true,
+              allowEmpty: true,
+              listOnEmpty: true,
+              freetext: false,
+            },
+            editable: tablaEditable,
+            cssClass: "filtrable",
+            formatter: cell => DATOS?.maestros?.duelas?.[cell.getValue()]?.descripcion ?? cell.getValue(),
+          },
+          { title:"Cubicaje", field:"cubicaje", editor:"number", editable: tablaEditable, cssClass: "filtrable", hozAlign:"right" },
+          { title:"Consumido", field:"consumido", editor:"number", editable: tablaEditable, cssClass: "filtrable", hozAlign:"right" },
+          {
+            title: "Estado",
+            field: "estado",
+            editor: "list",
+            editorParams: {
+              values: estadosDict,
+              clearable: true,
+              autocomplete: true,
+              allowEmpty: true,
+              listOnEmpty: true,
+              freetext: false,
+            },
+            editable: tablaEditable,
+            cssClass: "filtrable",
+            formatter: cell => DATOS?.maestros?.estados_palets?.[cell.getValue()]?.descripcion ?? cell.getValue(),
           },
           { title:"Procesado", field:"procesado", ...parametros_check },
           CeldaAcciones,
