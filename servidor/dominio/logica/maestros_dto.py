@@ -46,7 +46,8 @@ class MaestrosDTO(BaseModel):
     entradas_flejes: Optional[Dict[int, "EntradaFlejeDTO"]] = {}
 
     def buscar_usuario_por_username(self, username: str) -> UsuarioDTO | None:
+        buscado = (username or "").strip().lower()
         for usuario in (self.usuarios.values() if self.usuarios else []):
-            if usuario.username == username:
+            if (usuario.alias or "").strip().lower() == buscado:
                 return usuario
         return None

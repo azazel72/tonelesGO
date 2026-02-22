@@ -1,22 +1,32 @@
 .toolbar {
   display: flex;
   align-items: center;
-  gap: 1rem;
-  margin-bottom: 0.75rem;
+  gap: 0.9rem;
+  margin-bottom: 0.9rem;
+  flex-wrap: wrap;
 }
 
 .meta {
-  font-size: 0.875rem;
-  color: #475569;
+  font-size: 0.86rem;
+  color: #53657e;
+  background: #eef4fc;
+  border: 1px solid #d9e5f4;
+  border-radius: 999px;
+  padding: 0.2rem 0.55rem;
 }
 
 .error {
   color: #b91c1c;
+  background: #fee2e2;
+  border: 1px solid #fecaca;
+  border-radius: 10px;
+  padding: 0.45rem 0.65rem;
 }
 
 .grid {
   width: 100%;
   height: min(65vh, 700px);
-  border: 1px solid #dbe1ea;
+  border: 1px solid #d9e3f0;
+  border-radius: 14px;
+  overflow: hidden;
 }
-
