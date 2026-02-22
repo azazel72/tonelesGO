@@ -1,0 +1,22 @@
+{
+  "/api": {
+    "target": "http://localhost:5000",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "warn"
+  },
+  "/auth": {
+    "target": "http://localhost:5000",
+    "secure": false,
+    "changeOrigin": true,
+    "logLevel": "warn"
+  },
+  "/ws": {
+    "target": "ws://localhost:5000",
+    "secure": false,
+    "ws": true,
+    "changeOrigin": true,
+    "logLevel": "warn"
+  }
+}
+

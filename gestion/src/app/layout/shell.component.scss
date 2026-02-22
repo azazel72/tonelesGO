@@ -1,0 +1,40 @@
+.shell-container {
+  height: 100vh;
+}
+
+.shell-sidenav {
+  width: 260px;
+  border-right: 1px solid #dbe1ea;
+}
+
+.brand {
+  font-size: 1rem;
+  font-weight: 700;
+  padding: 1rem;
+  border-bottom: 1px solid #e7ecf3;
+}
+
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.spacer {
+  flex: 1;
+}
+
+.username {
+  margin-right: 1rem;
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.content {
+  padding: 1rem;
+}
+
+.active-link {
+  background: rgba(15, 23, 42, 0.08);
+}
+

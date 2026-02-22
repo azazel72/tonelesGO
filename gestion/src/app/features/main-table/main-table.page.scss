@@ -1,0 +1,22 @@
+.toolbar {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.75rem;
+}
+
+.meta {
+  font-size: 0.875rem;
+  color: #475569;
+}
+
+.error {
+  color: #b91c1c;
+}
+
+.grid {
+  width: 100%;
+  height: min(70vh, 760px);
+  border: 1px solid #dbe1ea;
+}
+

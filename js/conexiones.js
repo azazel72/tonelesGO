@@ -1,9 +1,13 @@
 async function POST(url, body = {}) {
     try {
+        const token = window.SharedAuthToken?.getToken?.();
         const res = await fetch(url, {
             method:"POST",
             credentials:"same-origin",
-            headers:{ "Content-Type":"application/json" },
+            headers:{
+                "Content-Type":"application/json",
+                ...(token ? { "Authorization": `Bearer ${token}` } : {}),
+            },
             body: JSON.stringify(body)
         });
         if (!res.ok) throw new Error(await res.text());
@@ -15,7 +19,12 @@ async function POST(url, body = {}) {
 
 async function GET(url) {
     try {
-        const res = await fetch(url, { method:"GET", credentials:"same-origin" });
+        const token = window.SharedAuthToken?.getToken?.();
+        const res = await fetch(url, {
+            method:"GET",
+            credentials:"same-origin",
+            headers: token ? { "Authorization": `Bearer ${token}` } : undefined,
+        });
         if (!res.ok) throw new Error(await res.text());
         return await res.json();
     } catch {
