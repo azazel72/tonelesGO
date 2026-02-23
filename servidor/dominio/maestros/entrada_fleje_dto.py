@@ -1,4 +1,4 @@
-from datetime import date
+from datetime import date, datetime
 from pydantic import BaseModel, field_validator
 from servidor.modelos import EntradaFlejeDB
 
@@ -11,6 +11,14 @@ class EntradaFlejeDTO(BaseModel):
     peso: float = 0.0
     consumido: float = 0.0
     restante: float = 0.0
+    estado: int = 0
+    created_at: datetime | None = None
+    updated_at: datetime | None = None
+    deleted_at: datetime | None = None
+    is_deleted: bool = False
+    created_by: str = "system"
+    updated_by: str = "system"
+    deleted_by: str | None = None
 
     @field_validator("peso", "consumido", "restante", mode="before")
     @classmethod
@@ -28,6 +36,14 @@ class EntradaFlejeDTO(BaseModel):
             peso=entrada_db.peso,
             consumido=entrada_db.consumido,
             restante=entrada_db.restante,
+            estado=entrada_db.estado,
+            created_at=entrada_db.created_at,
+            updated_at=entrada_db.updated_at,
+            deleted_at=entrada_db.deleted_at,
+            is_deleted=entrada_db.is_deleted,
+            created_by=entrada_db.created_by,
+            updated_by=entrada_db.updated_by,
+            deleted_by=entrada_db.deleted_by,
         )
 
     def to_db(self) -> EntradaFlejeDB:
@@ -39,4 +55,12 @@ class EntradaFlejeDTO(BaseModel):
             peso=self.peso,
             consumido=self.consumido,
             restante=self.restante,
+            estado=self.estado,
+            created_at=self.created_at,
+            updated_at=self.updated_at,
+            deleted_at=self.deleted_at,
+            is_deleted=self.is_deleted,
+            created_by=self.created_by,
+            updated_by=self.updated_by,
+            deleted_by=self.deleted_by,
         )

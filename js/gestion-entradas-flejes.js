@@ -1,11 +1,13 @@
 // ====== CREAR VENTANA ENTRADAS FLEJES ======
 function openEntradasFlejesWin() {
-  if (!asegurarFabricacionCargada("tipos_producto")) return null;
+  if (!asegurarFabricacionCargada("tipos_producto", "entradas_flejes")) return null;
 
   const wb = comprobarVentanaAbierta("entradas_flejes");
   if (wb) return wb;
 
-  const tiposProductoDict = Object.values(DATOS?.fabricacion?.tipos_producto ?? {}).map(
+  const tiposProductoDict = Object.values(DATOS?.fabricacion?.tipos_producto ?? {})
+    .filter((tp) => String(tp?.tipo || "").toUpperCase() === "FLEJE")
+    .map(
     ({ id, descripcion, codigo, ...resto }) => ({
       ...resto, id, descripcion, codigo,
       value: id,
@@ -57,7 +59,7 @@ function openEntradasFlejesWin() {
           { title:"Lote", field:"lote", editor:"input", editable: tablaEditable, cssClass: "filtrable" },
           { title:"Peso", field:"peso", editor:"number", editable: tablaEditable, cssClass: "filtrable", hozAlign:"right" },
           { title:"Consumido", field:"consumido", editor:"number", editable: tablaEditable, cssClass: "filtrable", hozAlign:"right" },
-          { title:"Restante", field:"restante", editor:"number", editable: tablaEditable, cssClass: "filtrable", hozAlign:"right" },
+          { title:"Estado", field:"estado", editor:"number", editable: tablaEditable, cssClass: "filtrable", hozAlign:"right" },
           CeldaAcciones,
         ],
         data: Object.values(DATOS.maestros.entradas_flejes || {}),

@@ -114,8 +114,11 @@ window.onload = () => {
         async "ver-cuadrantes"() {
             await openCuadrantesWin();
         },
-        async "ver-informe-material"() {
-            await openInformeMaterialWin();
+        async "ver-inventario-duelas"() {
+            await openInventarioDuelasWin();
+        },
+        async "ver-inventario-flejes"() {
+            await openInventarioFlejesWin();
         },
 
         async "cerrar-maestros"() {
@@ -175,6 +178,7 @@ window.onload = () => {
         botas: openBotasWin,
         planificacion_entradas: openPlanificacionEntradasWin,
         cuadrantes: openCuadrantesWin,
+        inventario_flejes: openInventarioFlejesWin,
     };
 
     // Delegación de eventos (un solo listener para toda la página)
@@ -238,9 +242,9 @@ function respuesta_fabricacion(response) {
     }
 }
 
-function asegurarFabricacionCargada(key) {
+function asegurarFabricacionCargada(key, reloadKey = key) {
     if (DATOS.fabricacion && DATOS.fabricacion[key]) return true;
-    window.__reloadKey = key;
+    window.__reloadKey = reloadKey;
     send("fabricacion", {});
     return false;
 }

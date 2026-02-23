@@ -177,6 +177,8 @@ class Colector:
             self.checkUpdate(DTO, tabla, entrada_id, campo)
             
             setattr(DTO, campo, valor)
+            if tabla == "entradas_flejes":
+                DTO.restante = max(float(DTO.peso or 0) - float(DTO.consumido or 0), 0.0)
             updated = DTO.to_db()
             repo.update(session, updated)
 
@@ -213,6 +215,8 @@ class Colector:
             repo, maestro, objeto = self.obtener_repo(tabla)
 
             objeto_DTO = objeto(id=0, **data)
+            if tabla == "entradas_flejes":
+                objeto_DTO.restante = max(float(objeto_DTO.peso or 0) - float(objeto_DTO.consumido or 0), 0.0)
             objeto_DB = objeto_DTO.to_db()
             objeto_DB.id = None  # Asegura que el ID sea None para la inserción
             new = repo.insert(session, objeto_DB)
@@ -670,60 +674,103 @@ class Colector:
 
         return f"{prefijo_lote}{operarios_part}{sep}{year_two}{contador:05d}"
 
-    def informe_material(self) -> dict:
+    def inventario_duelas(self) -> dict:
         with DB.crear_sesion() as session:
             palets_stmt = (
                 select(
                     PaletDB.duela_tipo_id,
                     DuelaDB.descripcion,
+                    UbicacionDB.id,
+                    UbicacionDB.descripcion,
                     func.count(PaletDB.id).label("total_palets"),
-                    func.coalesce(func.sum(LineaEntradaDB.kilos), 0).label("total_kilos"),
+                    func.coalesce(func.sum(PaletDB.cubicaje), 0).label("total_volumen"),
+                    func.coalesce(func.sum(PaletDB.consumido), 0).label("total_consumido"),
+                    func.coalesce(func.sum(PaletDB.cubicaje - PaletDB.consumido), 0).label("total_restante"),
                 )
                 .select_from(PaletDB)
+                .join(UbicacionDB, UbicacionDB.id == PaletDB.ubicacion_id, isouter=True)
                 .join(DuelaDB, DuelaDB.id == PaletDB.duela_tipo_id, isouter=True)
-                .join(LineaEntradaDB, LineaEntradaDB.id == PaletDB.linea_entrada_id, isouter=True)
                 .where(PaletDB.procesado == False)
-                .group_by(PaletDB.duela_tipo_id, DuelaDB.descripcion)
-                .order_by(DuelaDB.descripcion)
+                .group_by(
+                    PaletDB.duela_tipo_id,
+                    DuelaDB.descripcion,
+                    UbicacionDB.id,
+                    UbicacionDB.descripcion,
+                )
+                .order_by(DuelaDB.descripcion, UbicacionDB.descripcion)
             )
             palets_rows = session.exec(palets_stmt).all()
 
-            botas_stmt = (
-                select(
-                    BotaDB.tipo_producto_id,
-                    TipoProductoDB.tipo,
-                    BotaDB.material_id,
-                    MaterialDB.descripcion,
-                    func.count(BotaDB.id).label("total_botas"),
-                )
-                .select_from(BotaDB)
-                .join(TipoProductoDB, TipoProductoDB.id == BotaDB.tipo_producto_id, isouter=True)
-                .join(MaterialDB, MaterialDB.id == BotaDB.material_id, isouter=True)
-                .group_by(BotaDB.tipo_producto_id, TipoProductoDB.tipo, BotaDB.material_id, MaterialDB.descripcion)
-                .order_by(TipoProductoDB.tipo, MaterialDB.descripcion)
-            )
-            botas_rows = session.exec(botas_stmt).all()
-
             return {
-                "palets_por_duela": [
+                "palets_por_duela_ubicacion": [
                     {
                         "duela_tipo_id": row[0],
                         "duela": row[1] or "Sin tipo",
-                        "total_palets": int(row[2] or 0),
-                        "total_kilos": float(row[3] or 0),
+                        "ubicacion_id": row[2],
+                        "ubicacion": row[3] or "Sin ubicación",
+                        "total_palets": int(row[4] or 0),
+                        "total_volumen": float(row[5] or 0),
+                        "total_consumido": float(row[6] or 0),
+                        "total_restante": float(row[7] or 0),
                     }
                     for row in palets_rows
                 ],
-                "botas_por_tipo_material": [
+            }
+
+    def inventario_flejes(self) -> dict:
+        with DB.crear_sesion() as session:
+            stmt = (
+                select(
+                    EntradaFlejeDB.id,
+                    EntradaFlejeDB.fecha,
+                    EntradaFlejeDB.tipo_producto_id,
+                    TipoProductoDB.tipo,
+                    TipoProductoDB.descripcion,
+                    TipoProductoDB.consumo,
+                    EntradaFlejeDB.lote,
+                    EntradaFlejeDB.peso,
+                    EntradaFlejeDB.consumido,
+                    func.greatest(EntradaFlejeDB.peso - EntradaFlejeDB.consumido, 0).label("restante_calc"),
+                    EntradaFlejeDB.estado,
+                    EntradaFlejeDB.created_at,
+                    EntradaFlejeDB.updated_at,
+                    EntradaFlejeDB.deleted_at,
+                    EntradaFlejeDB.is_deleted,
+                    EntradaFlejeDB.created_by,
+                    EntradaFlejeDB.updated_by,
+                    EntradaFlejeDB.deleted_by,
+                )
+                .select_from(EntradaFlejeDB)
+                .join(TipoProductoDB, TipoProductoDB.id == EntradaFlejeDB.tipo_producto_id, isouter=True)
+                .where(EntradaFlejeDB.is_deleted == False)
+                .order_by(EntradaFlejeDB.fecha.desc(), EntradaFlejeDB.id.desc())
+            )
+            rows = session.exec(stmt).all()
+
+            return {
+                "inventario_flejes": [
                     {
-                        "tipo_producto_id": row[0],
-                        "tipo": row[1] or "Sin tipo",
-                        "material_id": row[2],
-                        "material": row[3] or "Sin material",
-                        "total_botas": int(row[4] or 0),
+                        "id": row[0],
+                        "fecha": row[1].isoformat() if row[1] else None,
+                        "tipo_producto_id": row[2],
+                        "tipo_producto_tipo": row[3] or "",
+                        "tipo_producto_descripcion": row[4] or "",
+                        "tipo_producto_consumo": float(row[5] or 0),
+                        "lote": row[6] or "",
+                        "peso": float(row[7] or 0),
+                        "consumido": float(row[8] or 0),
+                        "restante": float(row[9] or 0),
+                        "estado": int(row[10] or 0),
+                        "created_at": row[11].isoformat() if row[11] else None,
+                        "updated_at": row[12].isoformat() if row[12] else None,
+                        "deleted_at": row[13].isoformat() if row[13] else None,
+                        "is_deleted": bool(row[14]),
+                        "created_by": row[15] or "",
+                        "updated_by": row[16] or "",
+                        "deleted_by": row[17] or "",
                     }
-                    for row in botas_rows
-                ],
+                    for row in rows
+                ]
             }
     #endregion
 
