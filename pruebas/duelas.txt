@@ -1,0 +1,43 @@
+11,Hileras de Duelas de Castaño 1.30 X 0,035
+12,Hileras de Duelas de Roble americano 1.30 X 0,035
+13,Hileras de Duelas de Roble bulgaro 1.30 X 0,035
+14,Hileras de Duelas de Roble europeo 1.30 X 0,035
+15,Hileras de Duelas de Roble americano 1.15 X 0,035
+16,Hileras de Duelas de Roble bulgaro 1.15 X 0,035
+17,Hileras de Duelas de Roble europeo 1.15 X 0,035
+18,Hileras de Duelas de Castaño 1.00 X 0,035
+19,Hileras de Duelas de Roble americano 1.00 X 0,035
+20,Hileras de Duelas de Roble bulgaro 1.00 X 0,035
+21,Hileras de Duelas de Roble europeo 1.00 X 0,035
+22,Hileras de Duelas de Roble bulgaro 0.95 X 0,035
+23,Hileras de Duelas de Roble europeo 0.95 X 0,035
+24,Hileras de Duelas de Roble bulgaro 0.85 X 0,035
+25,Hileras de Duelas de Roble europeo 0.85 X 0,035
+26,Hileras de Duelas de Roble americano 0.80 X 0,035
+27,Hileras de Duelas de Roble bulgaro 0.80 X 0,035
+28,Hileras de Duelas de Roble europeo 0.80 X 0,035
+29,Hileras de Duelas de Roble americano 0.70 X 0,035
+30,Hileras de Duelas de Roble bulgaro 0.70 X 0,035
+31,Hileras de Duelas de Roble europeo 0.70 X 0,035
+32,Hileras de Duelas de Castaño 0.60 X 0,035
+33,Hileras de Duelas de Roble americano 0.60 X 0,035
+34,Hileras de Duelas de Roble bulgaro 0.60 X 0,035
+35,Hileras de Duelas de Roble europeo 0.60 X 0,035
+36,Hileras de Duelas de Castaño 0.50 X 0,035
+37,Hileras de Duelas de Roble americano 0.50 X 0,035
+38,Hileras de Duelas de Roble bulgaro 0.50 X 0,035
+39,Hileras de Duelas de Roble europeo 0.50 X 0,035
+
+
+
+
+id	descripcion	created_at	updated_at	deleted_at	is_deleted	created_by	updated_by	deleted_by	
+1	Roble Europeo	2025-12-31 02:19:32	2026-02-21 02:44:55	NULL	0	system	system	NULL	
+2	Roble Americano	2026-02-21 02:45:24	2026-02-22 01:09:02	NULL	0	system	system	NULL	
+3	Roble Español	2025-12-31 12:33:12	2026-02-21 02:45:06	NULL	0	system	system	NULL	
+4	Roble Europa Este	2026-02-21 02:45:39	2026-02-22 01:09:18	NULL	0	system	system	NULL	
+6	Castaño Español	2026-02-21 02:45:53	2026-02-21 02:45:53	NULL	0	system	system	NULL	
+7	Castaño Frances	2026-02-21 02:46:01	2026-02-21 02:46:01	NULL	0	system	system	NULL	
+8	RC	2026-02-23 00:29:06	2026-02-23 00:29:06	NULL	0	system	system	NULL	
+9	RCPalillos	2026-02-23 00:29:20	2026-02-23 00:29:20	NULL	0	system	system	NULL	
+10	Castaño	2026-02-23 00:29:30	2026-02-23 00:29:30	NULL	0	system	system	NULL	
