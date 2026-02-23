@@ -5,6 +5,7 @@ import threading
 from typing import List
 
 from servidor.herramientas.utilidades import obtener_anterior_dia_semana
+from servidor.herramientas.BcryptHelper import BcryptHelper
 
 from .modelos import ClienteDB, EstadoOrdenFabricacionDB, EstadoLineaFabricacionDB, EstadoBotaDB, EstadoTrazabilidadFabricacionDB, EstadoPaletDB
 from .modelos import InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB, RolDB, PuestoTrabajoDB, MaterialDB, DuelaDB, EntradaDB, LineaEntradaDB, PaletDB, ProductoDB, ProductoOperarioDB, ArchivoSubidoDB, AmbienteDB, EntradaFlejeDB
@@ -74,7 +75,6 @@ class Colector:
 
         self.repo_cuadrantes = GenericRepository(CuadranteDB)
         self.repo_cuadrante_detalles = GenericRepository(CuadranteDetalleDB)
-
 
     #region Métodos Maestros
 
@@ -175,7 +175,11 @@ class Colector:
             
             DTO = maestro.get(entrada_id)
             self.checkUpdate(DTO, tabla, entrada_id, campo)
-            
+            if tabla == "usuarios":
+                if campo == "codigo":
+                    valor = str(valor or "").strip()[:2]
+                if campo == "clave":
+                    valor = BcryptHelper.hash_password(valor or "")
             setattr(DTO, campo, valor)
             if tabla == "entradas_flejes":
                 DTO.restante = max(float(DTO.peso or 0) - float(DTO.consumido or 0), 0.0)
@@ -183,8 +187,10 @@ class Colector:
             repo.update(session, updated)
 
             maestro[entrada_id] = DTO
-            logger.info(f"Entrada ID {entrada_id} modificada: {campo} = {valor}")
-            return  {"id": entrada_id, "campo": campo, "valor": valor}
+            valor_respuesta = "" if (tabla == "usuarios" and campo == "clave") else valor
+            valor_log = "<oculto>" if (tabla == "usuarios" and campo == "clave") else valor
+            logger.info(f"Entrada ID {entrada_id} modificada: {campo} = {valor_log}")
+            return  {"id": entrada_id, "campo": campo, "valor": valor_respuesta}
 
 
     def eliminar_maestro(self, data):
@@ -213,6 +219,17 @@ class Colector:
 
         with DB.crear_sesion() as session:
             repo, maestro, objeto = self.obtener_repo(tabla)
+            if tabla == "usuarios":
+                data = dict(data or {})
+                data["alias"] = data.get("alias")
+                data["nombre"] = data.get("nombre")
+                data["codigo"] = data.get("codigo")[:2] or None
+                data["rol_id"] = int(data.get("rol_id") or self.maestros.obtener_rol_id_por_defecto())
+                clave_plana = str(data.get("clave") or "")
+                if clave_plana.strip() == "":
+                    raise ValueError("La clave es obligatoria.")
+                data["clave"] = BcryptHelper.hash_password(clave_plana)
+                data["empleado"] = bool(data.get("empleado", False))
 
             objeto_DTO = objeto(id=0, **data)
             if tabla == "entradas_flejes":
@@ -224,7 +241,9 @@ class Colector:
             maestro[new.id] = objeto_DTO
 
             logger.info(f"Insertado ID {new.id} en la tabla {tabla}")
-          
+
+            if tabla == "usuarios":
+                return objeto_DTO.model_copy(update={"clave": ""})
             return objeto_DTO
     #endregion
 
@@ -277,7 +296,7 @@ class Colector:
             repo, busqueda, objeto = self.obtener_repo(tabla)
 
             DTO = busqueda(entrada_id)
-            self.checkUpdate(DTO, tabla, entrada_id, campo)            
+            self.checkUpdate(DTO, tabla, entrada_id, campo)  
 
             setattr(DTO, campo, valor)
             updated = DTO.to_db()

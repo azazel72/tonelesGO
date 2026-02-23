@@ -8,7 +8,7 @@ from servidor.conexiones.sesiones import Sesiones
 
 from .colector import Colector
 
-from .conexiones import ExtraRoutes, CrudRoutes #, NuevaApiRoutes
+from .conexiones import ExtraRoutes, CrudRoutes
 import logging
 from .configurar_logs import configurar_logs
 
@@ -46,10 +46,8 @@ app.add_middleware(
 
 crud_routes = CrudRoutes.get_router()
 extra_routes = ExtraRoutes.get_router()
-#nueva_api_routes = NuevaApiRoutes.get_router()
 
 # Montar routers
 app.include_router(crud_routes)
 app.include_router(extra_routes)
-#app.include_router(nueva_api_routes)
 logger.info("Rutas montadas correctamente")

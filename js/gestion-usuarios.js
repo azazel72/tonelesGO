@@ -45,17 +45,46 @@ function openUsuariosWin() {
           },
           { title:"Alias", field:"alias", editor:"input", editable: tablaEditable, cssClass: "filtrable", },
           { title:"Nombre", field:"nombre", editor:"input", editable: tablaEditable, cssClass: "filtrable", },
-          { title: "Rol",
+          {
+            title:"Clave *",
+            field:"clave",
+            editor:"input",
+            editorParams: {
+              elementAttributes: {
+                type: "password",
+                autocomplete: "new-password",
+              },
+            },
+            formatter: () => "••••••••",
+            validator: [
+              {
+                type: function(cell, value) {
+                  return (value ?? "").toString().trim() !== "";
+                },
+                parameters: {},
+              },
+            ],
+            editable: tablaEditable,
+          },
+          { title: "Rol *",
             field: "rol_id",
             editor: "list",
             editorParams: {
               values: rolesDict,
-              clearable:true,
+              clearable:false,
               autocomplete: true,
-              allowEmpty: true,
+              allowEmpty: false,
               listOnEmpty: true,
               freetext: false,
             },
+            validator: [
+              {
+                type: function(cell, value) {
+                  return value !== null && value !== undefined && `${value}`.trim() !== "";
+                },
+                parameters: {},
+              },
+            ],
             editable: tablaEditable,
             cssClass: "filtrable",
             formatter: cell => DATOS?.maestros?.roles[cell.getValue()]?.nombre ?? cell.getValue(),

@@ -310,6 +310,8 @@ function agregarEventosTabla(wb, tabla, cabecera, configuracion) {
   });
 */
   tabla.on("cellEdited", async (cell) => {
+    if (tabla.__suppressCellEdited === true) return;
+
     //no guarda en un row nuevo, esto se hace desde el boton Crear
     const row = cell.getRow().getData();
     if (!row.id) return;
@@ -318,9 +320,22 @@ function agregarEventosTabla(wb, tabla, cabecera, configuracion) {
     const d = cell.getRow().getData();
     const f = cell.getField();
     const t = configuracion.KEY;
-    resultado = await wsRequest("modificar_maestro", { tabla: t, id: d.id, campo: f, valor: d[f], valores: d });
+    const resultado = await wsRequest("modificar_maestro", { tabla: t, id: d.id, campo: f, valor: d[f], valores: d });
     console.log(resultado);
-    cell.setValue(resultado["valor"]); // actualizar con valor confirmado por el servidor
+
+    // Evita bucle: aplicar eco del servidor no debe volver a disparar cellEdited.
+    if (resultado && Object.prototype.hasOwnProperty.call(resultado, "valor")) {
+      const valorServidor = resultado["valor"];
+      if (valorServidor !== cell.getValue()) {
+        tabla.__suppressCellEdited = true;
+        try {
+          cell.setValue(valorServidor);
+        } finally {
+          tabla.__suppressCellEdited = false;
+        }
+      }
+    }
+
     if (resultado?.id != d.id) {
       alert("Error al guardar los cambios en el servidor.");
     }

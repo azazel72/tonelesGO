@@ -2,7 +2,7 @@ import socket
 
 
 class ImprimirEtiqueta:
-    PRINTER_IP = "192.168.1.200"
+    PRINTER_IP = "192.168.1.69"
     PRINTER_PORT = 9100
 
     # 43mm x 29mm @ 203dpi (8 dots/mm)
@@ -23,7 +23,8 @@ class ImprimirEtiqueta:
     LOGO_MAX_W = 112
     LOGO_MAX_H = 80
     TITLE_LINE_1 = "TONELERIA"
-    TITLE_LINE_2 = "PAEZ LOBATO"
+    TITLE_LINE_2 = "ANTONIO"
+    TITLE_LINE_3 = "PAEZ LOBATO"
 
     LOGO_W = 112
     LOGO_H = 80
@@ -64,11 +65,12 @@ class ImprimirEtiqueta:
         title_right = self.LABEL_W - self.MARGIN
         title_left_min = logo_x + self.LOGO_W + 8 - self.TITLE_ALLOW_OVERLAP
         line2_estimated_w = len(self.TITLE_LINE_2) * (self.TITLE_FONT_W + self.TITLE_CHAR_SPACING)
+        line3_estimated_w = len(self.TITLE_LINE_3) * (self.TITLE_FONT_W + self.TITLE_CHAR_SPACING)
         title_max_w = max(20, title_right - title_left_min)
-        title_w = min(title_max_w, max(20, line2_estimated_w))
+        title_w = min(title_max_w, max(20, line2_estimated_w, line3_estimated_w))
         title_x = title_right - title_w - self.TITLE_SHIFT_LEFT
         title_x = max(title_left_min, title_x)
-        title_block_h = (2 * self.TITLE_FONT_H) + self.TITLE_LINE_GAP
+        title_block_h = (3 * self.TITLE_FONT_H) + (2 * self.TITLE_LINE_GAP)
         title_y = logo_y + max(0, (self.LOGO_H - title_block_h) // 2)
 
         header_h = max(self.LOGO_H, title_block_h) + 8
@@ -80,6 +82,7 @@ class ImprimirEtiqueta:
         text_x = self.MARGIN
         text_w = self.LABEL_W - (2 * self.MARGIN)
         title_y_2 = title_y + self.TITLE_FONT_H + self.TITLE_LINE_GAP
+        title_y_3 = title_y_2 + self.TITLE_FONT_H + self.TITLE_LINE_GAP
 
         return f"""^XA
 ^PW{self.LABEL_W}
@@ -107,6 +110,15 @@ class ImprimirEtiqueta:
 ^A0N,{self.TITLE_FONT_H},{self.TITLE_FONT_W}
 ^FB{title_w},1,0,C,0
 ^FD{self.TITLE_LINE_2}^FS
+
+^FO{title_x},{title_y_3}
+^A0N,{self.TITLE_FONT_H},{self.TITLE_FONT_W}
+^FB{title_w},1,0,C,0
+^FD{self.TITLE_LINE_3}^FS
+^FO{title_x + 1},{title_y_3}
+^A0N,{self.TITLE_FONT_H},{self.TITLE_FONT_W}
+^FB{title_w},1,0,C,0
+^FD{self.TITLE_LINE_3}^FS
 
 ^FO{bar_x},{bar_y}
 ^BY{module_width},2,{bar_h}

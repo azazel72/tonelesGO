@@ -51,3 +51,11 @@ class MaestrosDTO(BaseModel):
             if (usuario.alias or "").strip().lower() == buscado:
                 return usuario
         return None
+
+    def obtener_rol_id_por_defecto(self) -> int:
+        if not self.roles:
+            return 0
+        for rol in self.roles.values():
+            if rol.nombre == "operario":
+                return rol.id
+        return 0

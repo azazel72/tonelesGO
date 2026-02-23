@@ -1,6 +1,6 @@
 import socket
 
-PRINTER_IP = "192.168.1.200"
+PRINTER_IP = "192.168.1.69"
 PRINTER_PORT = 9100
 
 # 43mm x 29mm @ 203dpi (8 dots/mm)
@@ -21,7 +21,8 @@ TITLE_ALLOW_OVERLAP = 24  # permite meterse en zona blanca del logo (~3 mm)
 LOGO_MAX_W = 112
 LOGO_MAX_H = 80
 TITLE_LINE_1 = "TONELERIA"
-TITLE_LINE_2 = "PAEZ LOBATO"
+TITLE_LINE_2 = "ANTONIO"
+TITLE_LINE_3 = "PAEZ LOBATO"
 
 LOGO_W = 112
 LOGO_H = 80
@@ -57,16 +58,15 @@ def build_barcode128_logo_label(value: str, copies: int = 1) -> str:
     logo_y = header_y + max(0, (LOGO_MAX_H - LOGO_H) // 2)
 
     title_right = LABEL_W - MARGIN
-    # Bloque de 2 lineas dentro del margen derecho de la etiqueta.
-    # Las lineas se centran dentro del mismo bloque para que la primera
-    # quede centrada respecto a la segunda.
+    # Bloque de 3 lineas dentro del margen derecho de la etiqueta.
     title_left_min = logo_x + LOGO_W + 8 - TITLE_ALLOW_OVERLAP
     line2_estimated_w = len(TITLE_LINE_2) * (TITLE_FONT_W + TITLE_CHAR_SPACING)
+    line3_estimated_w = len(TITLE_LINE_3) * (TITLE_FONT_W + TITLE_CHAR_SPACING)
     title_max_w = max(20, title_right - title_left_min)
-    title_w = min(title_max_w, max(20, line2_estimated_w))
+    title_w = min(title_max_w, max(20, line2_estimated_w, line3_estimated_w))
     title_x = title_right - title_w - TITLE_SHIFT_LEFT
     title_x = max(title_left_min, title_x)
-    title_block_h = (2 * TITLE_FONT_H) + TITLE_LINE_GAP
+    title_block_h = (3 * TITLE_FONT_H) + (2 * TITLE_LINE_GAP)
     title_y = logo_y + max(0, (LOGO_H - title_block_h) // 2)
 
     header_h = max(LOGO_H, title_block_h) + 8
@@ -78,6 +78,7 @@ def build_barcode128_logo_label(value: str, copies: int = 1) -> str:
     text_x = MARGIN
     text_w = LABEL_W - (2 * MARGIN)
     title_y_2 = title_y + TITLE_FONT_H + TITLE_LINE_GAP
+    title_y_3 = title_y_2 + TITLE_FONT_H + TITLE_LINE_GAP
 
     return f"""^XA
 ^PW{LABEL_W}
@@ -105,6 +106,15 @@ def build_barcode128_logo_label(value: str, copies: int = 1) -> str:
 ^A0N,{TITLE_FONT_H},{TITLE_FONT_W}
 ^FB{title_w},1,0,C,0
 ^FD{TITLE_LINE_2}^FS
+
+^FO{title_x},{title_y_3}
+^A0N,{TITLE_FONT_H},{TITLE_FONT_W}
+^FB{title_w},1,0,C,0
+^FD{TITLE_LINE_3}^FS
+^FO{title_x + 1},{title_y_3}
+^A0N,{TITLE_FONT_H},{TITLE_FONT_W}
+^FB{title_w},1,0,C,0
+^FD{TITLE_LINE_3}^FS
 
 ^FO{bar_x},{bar_y}
 ^BY{module_width},2,{bar_h}

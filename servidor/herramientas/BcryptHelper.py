@@ -4,6 +4,7 @@ from typing import Union
 
 BytesLike = Union[bytes, str]
 
+
 class BcryptHelper:
     """
     Utilidades estáticas para bcrypt:
@@ -63,7 +64,7 @@ class BcryptHelper:
     def needs_rehash(stored_hash: str, desired_rounds: int) -> bool:
         """
         Comprueba si el hash usa un coste distinto al deseado.
-        Útil para re-hashear contraseñas cuando subes el coste.
+        Util para re-hashear contraseñas cuando subes el coste.
         """
         try:
             current = BcryptHelper.get_rounds(stored_hash)
