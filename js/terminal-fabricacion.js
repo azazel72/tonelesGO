@@ -1,4 +1,5 @@
 function prepararEventosFabricacion() {
+    console.log("[fabricar-bota] prepararEventosFabricacion iniciado");
     registrarEventosVistaProduccion("vista_consumo");
     registrarEventosVistaProduccion("vista_fabricacion");
 
@@ -10,9 +11,14 @@ function prepararEventosFabricacion() {
     }
 
     const btnImprimir = document.getElementById("fabricacion-imprimir-etiqueta");
-    if (btnImprimir) {
-        btnImprimir.addEventListener("click", () => {
-            abrirModalOperarioFabricacion();
+    console.log("[fabricar-bota] boton abrir modal encontrado:", !!btnImprimir);
+
+    const btnImprimirFabricarBota = document.getElementById("fabricar-bota-imprimir");
+    console.log("[fabricar-bota] boton imprimir encontrado:", !!btnImprimirFabricarBota);
+    if (btnImprimirFabricarBota) {
+        btnImprimirFabricarBota.addEventListener("click", async () => {
+            console.log("[fabricar-bota] click en boton imprimir (listener js)");
+            await imprimirEtiquetaFabricarBotaDesdeUI();
         });
     }
 
@@ -121,6 +127,7 @@ let lineaFabricacionActualId = null;
 let ordenFabricacionActualId = null;
 const LIMITE_REACTIVAR_ESTADO = 1400;
 let vistaProduccionActiva = "vista_fabricacion";
+let trazabilidadesActivasFabricarBota = [];
 
 function obtenerVistaProduccionActiva(vistaId = null) {
     if (vistaId === "vista_consumo" || vistaId === "vista_fabricacion") return vistaId;
@@ -296,6 +303,13 @@ function mostrarLotesMateriales(fila, vistaId = null) {
         "Producto";
     const titulo = document.getElementById(cfg.productoSpanId);
     if (titulo) titulo.textContent = descripcion;
+    if (cfg.vistaId === "vista_fabricacion") {
+        abrirModalFabricarBota();
+        if (typeof setPantalla === "function") {
+            setPantalla(cfg.vistaId, { orden_id: ordenFabricacionActualId, linea_fabricacion_id: lineaFabricacionActualId });
+        }
+        return;
+    }
     const modalEl = document.getElementById(cfg.modalId);
     const modal = new bootstrap.Modal(modalEl);
     modal.show();
@@ -503,6 +517,221 @@ async function abrirModalOperarioFabricacion() {
     const modal = new bootstrap.Modal(modalEl);
     modal.show();
     ajustarZIndexModal(modalEl);
+}
+
+function cargarCodigosBatideroEnSelector() {
+    const selector = document.getElementById("fabricar-bota-batidero");
+    if (!selector) return;
+    const dias = ["Jueves", "Viernes", "Lunes", "Martes", "Miércoles"];
+    const options = [`<option value="">Seleccione código...</option>`];
+    for (let i = 0; i < dias.length; i += 1) {
+        const base = (i + 1) * 10;
+        const manana = base + 1;
+        const tarde = base + 2;
+        options.push(`<option value="${manana}">${manana} (${dias[i]} mañana)</option>`);
+        options.push(`<option value="${tarde}">${tarde} (${dias[i]} tarde)</option>`);
+    }
+    selector.innerHTML = options.join("");
+}
+
+async function cargarLotesMaderaFabricarBota() {
+    const selector = document.getElementById("fabricar-bota-lote-madera");
+    if (!selector) return;
+    selector.innerHTML = `<option value="">Cargando lotes de madera...</option>`;
+    trazabilidadesActivasFabricarBota = [];
+    if (!lineaFabricacionActualId) {
+        selector.innerHTML = `<option value="">Seleccione una linea de fabricacion</option>`;
+        return;
+    }
+    try {
+        const trazas = (await wsRequest("listar_trazabilidad_fabricacion", { linea_fabricacion_id: lineaFabricacionActualId })) || [];
+        trazabilidadesActivasFabricarBota = trazas.filter((t) => Number(t.estado || 0) === 0);
+        if (!trazabilidadesActivasFabricarBota.length) {
+            selector.innerHTML = `<option value="">Sin lotes activos (estado 0)</option>`;
+            return;
+        }
+        selector.innerHTML = `<option value="">Seleccione lote de madera...</option>` + trazabilidadesActivasFabricarBota.map((t) => {
+            const palet = t.palet_codigo || t.palet_id || "";
+            const cantidad = Number(t.cantidad_fabricada || 0);
+            const estado = Number(t.estado || 0);
+            return `<option value="${t.id}">${palet} | Cantidad ${cantidad} | Estado ${estado}</option>`;
+        }).join("");
+    } catch (err) {
+        console.error("No se pudieron cargar lotes de madera para fabricar bota:", err);
+        selector.innerHTML = `<option value="">Error cargando lotes</option>`;
+    }
+}
+
+async function cargarLotesFlejeFabricarBota() {
+    const selector = document.getElementById("fabricar-bota-lote-fleje");
+    if (!selector) return;
+    selector.innerHTML = `<option value="">Cargando lotes de fleje...</option>`;
+    try {
+        const resp = (await wsRequest("inventario_flejes", {})) || {};
+        const items = (resp.inventario_flejes || [])
+            .filter((f) => Number(f.estado || 0) === 0)
+            .filter((f) => Number(f.restante || 0) > 0);
+        if (!items.length) {
+            selector.innerHTML = `<option value="">Sin flejes disponibles</option>`;
+            return;
+        }
+        selector.innerHTML = `<option value="">Seleccione lote de fleje...</option>` + items.map((f) => {
+            const restante = Number(f.restante || 0).toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
+            const lote = f.lote || `Entrada ${f.id}`;
+            const tipo = f.tipo_producto_descripcion || f.tipo_producto_tipo || "FLEJE";
+            return `<option value="${f.id}">${lote} | ${tipo} | restante ${restante} kg</option>`;
+        }).join("");
+    } catch (err) {
+        console.error("No se pudieron cargar lotes de fleje:", err);
+        selector.innerHTML = `<option value="">Error cargando flejes</option>`;
+    }
+}
+
+function obtenerUltimaAsignacionPorUsuario(items = []) {
+    const porUsuario = new Map();
+    for (const item of items) {
+        const usuario = item?.usuario || null;
+        if (!usuario?.id) continue;
+        const existente = porUsuario.get(usuario.id);
+        if (!existente || ((item.fecha || "") > (existente.fecha || ""))) {
+            porUsuario.set(usuario.id, item);
+        }
+    }
+    return Array.from(porUsuario.values());
+}
+
+async function cargarOperariosFondadoEnSelector() {
+    const selector = document.getElementById("fabricar-bota-operario-fondado");
+    if (!selector) return;
+    selector.innerHTML = `<option value="">Cargando operarios...</option>`;
+    try {
+        const payload = (await wsRequest("listar_operarios_planificacion_fabricacion", {
+            puesto_nombre: "FONDAR",
+            dias_previos: 2,
+            incluir_otros: false,
+        })) || [];
+        const lista = obtenerUltimaAsignacionPorUsuario(payload)
+            .sort((a, b) => {
+                const na = (a?.usuario?.nombre || a?.usuario?.alias || "").toString();
+                const nb = (b?.usuario?.nombre || b?.usuario?.alias || "").toString();
+                return na.localeCompare(nb, "es", { sensitivity: "base" });
+            });
+
+        if (!lista.length) {
+            selector.innerHTML = `<option value="">Sin operarios de FONDAR (ultimos 2 dias)</option>`;
+            return;
+        }
+
+        selector.innerHTML = `<option value="">Seleccione operario...</option>` + lista.map((item) => {
+            const u = item.usuario || {};
+            const nombre = u.nombre || u.alias || `Empleado ${u.id || ""}`.trim();
+            const fecha = item.fecha ? formatearFechaEuropea(item.fecha) : "";
+            return `<option value="${u.id}">${nombre}${fecha ? " | " + fecha : ""}</option>`;
+        }).join("");
+    } catch (err) {
+        console.error("No se pudieron cargar operarios de fondado:", err);
+        selector.innerHTML = `<option value="">Error cargando operarios</option>`;
+    }
+}
+
+async function abrirModalFabricarBota() {
+    console.log("[fabricar-bota] abrirModalFabricarBota lineaFabricacionActualId:", lineaFabricacionActualId);
+    if (!lineaFabricacionActualId) {
+        alert("Seleccione una linea de fabricacion.");
+        return;
+    }
+    const productoOrigen = document.getElementById("fabricacion-producto-orden");
+    const productoDestino = document.getElementById("fabricar-bota-producto");
+    if (productoDestino) {
+        productoDestino.textContent = productoOrigen?.textContent || "Producto";
+    }
+    const inputCantidad = document.getElementById("fabricar-bota-cantidad-etiquetas");
+    if (inputCantidad && (!inputCantidad.value || Number(inputCantidad.value) < 1)) {
+        inputCantidad.value = "1";
+    }
+    await Promise.all([
+        cargarLotesMaderaFabricarBota(),
+        cargarLotesFlejeFabricarBota(),
+        cargarOperariosFondadoEnSelector(),
+    ]);
+    console.log("[fabricar-bota] datos cargados para modal", {
+        lotesMadera: trazabilidadesActivasFabricarBota.length,
+        loteMaderaSeleccionado: document.getElementById("fabricar-bota-lote-madera")?.value || "",
+        loteFlejeSeleccionado: document.getElementById("fabricar-bota-lote-fleje")?.value || "",
+        operarioSeleccionado: document.getElementById("fabricar-bota-operario-fondado")?.value || "",
+    });
+    cargarCodigosBatideroEnSelector();
+
+    const modalEl = document.getElementById("modalFabricarBota");
+    if (!modalEl) return;
+    const modal = new bootstrap.Modal(modalEl);
+    modal.show();
+    ajustarZIndexModal(modalEl);
+}
+
+async function imprimirEtiquetaFabricarBotaDesdeUI() {
+    console.log("[fabricar-bota] imprimirEtiquetaFabricarBotaDesdeUI inicio");
+    if (!lineaFabricacionActualId) {
+        console.log("[fabricar-bota] bloqueado: sin lineaFabricacionActualId");
+        alert("Seleccione una linea de fabricacion.");
+        return;
+    }
+    const trazabilidadId = Number(document.getElementById("fabricar-bota-lote-madera")?.value || 0);
+    const loteFlejeId = Number(document.getElementById("fabricar-bota-lote-fleje")?.value || 0);
+    const batidero = Number(document.getElementById("fabricar-bota-batidero")?.value || 0);
+    const operarioFondadoId = Number(document.getElementById("fabricar-bota-operario-fondado")?.value || 0);
+    const cantidad = Math.max(1, Number.parseInt(document.getElementById("fabricar-bota-cantidad-etiquetas")?.value || "1", 10) || 1);
+    console.log("[fabricar-bota] valores formulario", {
+        lineaFabricacionActualId,
+        trazabilidadId,
+        loteFlejeId,
+        batidero,
+        operarioFondadoId,
+        cantidad,
+    });
+
+    if (!trazabilidadId || !loteFlejeId || !batidero || !operarioFondadoId) {
+        console.log("[fabricar-bota] bloqueado: faltan campos obligatorios");
+        alert("Debes completar lote de madera, lote de fleje, batidero y operario de fondado.");
+        return;
+    }
+
+    const traza = trazabilidadesActivasFabricarBota.find((t) => Number(t.id) === trazabilidadId);
+    if (!traza) {
+        console.log("[fabricar-bota] bloqueado: trazabilidad no encontrada en activas", {
+            trazabilidadId,
+            activas: trazabilidadesActivasFabricarBota.map((t) => t.id),
+        });
+        alert("El lote de madera seleccionado no esta disponible.");
+        return;
+    }
+    const paletCodigo = traza.palet_codigo || traza.palet_id || "";
+    try {
+        const payload = {
+            trazabilidad_ids: [trazabilidadId],
+            palet_codigos: paletCodigo ? [paletCodigo] : [],
+            tipo: "BOTA",
+            operarios_ids: [operarioFondadoId],
+            batidero,
+            lote_fleje_id: loteFlejeId,
+            cantidad_etiquetas: cantidad,
+        };
+        console.log("[fabricar-bota] enviando wsRequest imprimir_etiqueta_fabricacion", payload);
+        const resp = await wsRequest("imprimir_etiqueta_fabricacion", payload);
+        console.log("[fabricar-bota] respuesta wsRequest imprimir_etiqueta_fabricacion", resp);
+        const modalEl = document.getElementById("modalFabricarBota");
+        const modal = modalEl ? bootstrap.Modal.getInstance(modalEl) : null;
+        if (modal) modal.hide();
+        cargarTrazabilidadFabricacion(lineaFabricacionActualId, "vista_fabricacion");
+        cargarTrazabilidadFabricacion(lineaFabricacionActualId, "vista_consumo");
+        if (ordenFabricacionActualId) {
+            cargarLineasFabricacion(ordenFabricacionActualId, { vistaId: "vista_fabricacion" });
+            cargarLineasFabricacion(ordenFabricacionActualId, { vistaId: "vista_consumo" });
+        }
+    } catch (err) {
+        console.error("[fabricar-bota] error en imprimir_etiqueta_fabricacion", err);
+        alert("Error al imprimir etiqueta.");
+    }
 }
 
 function ajustarZIndexModal(modalEl) {

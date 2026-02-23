@@ -26,6 +26,23 @@ function openUsuariosWin() {
         editable: false,
         columns: [
           { title:"ID", field:"id", width:70, hozAlign:"right"},
+          {
+            title:"Codigo",
+            field:"codigo",
+            editor:"input",
+            editable: tablaEditable,
+            cssClass: "filtrable",
+            validator: [
+              {
+                type: function(cell, value) {
+                  const v = (value ?? "").toString().trim();
+                  return v === "" || /^\d{1,2}$/.test(v);
+                },
+                parameters: {},
+              },
+            ],
+            mutatorEdit: (value) => (value ?? "").toString().trim().slice(0, 2),
+          },
           { title:"Alias", field:"alias", editor:"input", editable: tablaEditable, cssClass: "filtrable", },
           { title:"Nombre", field:"nombre", editor:"input", editable: tablaEditable, cssClass: "filtrable", },
           { title: "Rol",

@@ -511,11 +511,24 @@ class Colector:
         palet_codigos = data.get("palet_codigos") or []
         tipo = data.get("tipo") or "BOTA"
         cantidad_etiquetas = int(data.get("cantidad_etiquetas") or 1)
-        operarios_ids = data.get("operarios_ids") or []
-        if not isinstance(operarios_ids, list):
-            operarios_ids = [operarios_ids]
-        operarios_ids = self._normalizar_ids_operarios(operarios_ids)
-        operarios_ids = self._normalizar_ids_operarios(operarios_ids)
+        operarios_ids_input = data.get("operarios_ids") or []
+        batidero = data.get("batidero")
+        if not isinstance(operarios_ids_input, list):
+            operarios_ids_input = [operarios_ids_input]
+        operarios_ids_producto = self._normalizar_ids_operarios(operarios_ids_input)
+        operarios_ids_codigo = list(operarios_ids_producto)
+        batidero_id = None
+        try:
+            if batidero is not None and batidero != "":
+                batidero_id = int(batidero)
+        except (TypeError, ValueError):
+            batidero_id = None
+        if batidero_id is not None:
+            if operarios_ids_codigo:
+                resto = [op for op in operarios_ids_codigo[1:] if op != batidero_id]
+                operarios_ids_codigo = [operarios_ids_codigo[0], batidero_id] + resto
+            else:
+                operarios_ids_codigo = [batidero_id]
 
         if not trazabilidad_ids:
             raise ValueError("No hay trazabilidades activas.")
@@ -525,6 +538,12 @@ class Colector:
         with DB.crear_sesion() as session:
             try:
                 with session.begin():
+                    if operarios_ids_producto:
+                        ids_existentes = set(session.exec(
+                            select(UsuarioDB.id).where(UsuarioDB.id.in_(operarios_ids_producto))
+                        ).all())
+                        operarios_ids_producto = [op for op in operarios_ids_producto if op in ids_existentes]
+
                     trazas = session.exec(
                         select(TrazabilidadFabricacionDB).where(
                             TrazabilidadFabricacionDB.id.in_(trazabilidad_ids)
@@ -554,7 +573,7 @@ class Colector:
                     ultimo_producto_id = None
 
                     for _ in range(cantidad_etiquetas):
-                        codigo = self._generar_codigo_producto(session, trazas, palet_codigos, operarios_ids)
+                        codigo = self._generar_codigo_producto(session, trazas, palet_codigos, operarios_ids_codigo)
                         logger.info("Etiqueta fabricacion: codigo=%s origenes=%s", codigo, palet_codigos)
                         codigos_generados.append(codigo)
 
@@ -568,7 +587,7 @@ class Colector:
                         session.refresh(producto)
                         ultimo_producto_id = producto.id
 
-                        for operario_id in operarios_ids:
+                        for operario_id in operarios_ids_producto:
                             session.add(
                                 ProductoOperarioDB(
                                     producto_id=producto.id,
@@ -684,17 +703,9 @@ class Colector:
     def _extraer_prefijo_lote(self, palet_codigo: str | None) -> str:
         if not palet_codigo:
             return ""
-        texto = str(palet_codigo)
-        i = 0
-        while i < len(texto) and texto[i].isdigit():
-            i += 1
-        j = i
-        while j < len(texto) and texto[j].isalpha():
-            j += 1
-        k = j
-        while k < len(texto) and texto[k].isalpha() and (k - j) < 3:
-            k += 1
-        return texto[:k]
+        # Para los codigos de palet tipo "lote#000001" tomamos solo la parte lote.
+        texto = str(palet_codigo).split("#", 1)[0]
+        return texto[:5]
 
     def _formatear_operarios(self, operarios_ids: list[int]) -> str:
         op1 = operarios_ids[0] if len(operarios_ids) > 0 else None
@@ -704,11 +715,11 @@ class Colector:
         return f"{part1}{part2}"
 
     def _siguiente_contador_anual(self, session, year_two: str, sep: str) -> int:
-        like_pattern = f"%{sep}{year_two}_____"
+        like_pattern = f"%{sep}{year_two}_______"
         statement = select(ProductoDB.codigo).where(ProductoDB.codigo.like(like_pattern))
         codigos = session.exec(statement).all()
         max_cont = 0
-        sufijo_len = len(sep) + 2 + 5
+        sufijo_len = len(sep) + 2 + 2 + 5
         for codigo in codigos:
             if not codigo or len(codigo) < sufijo_len:
                 continue
@@ -750,9 +761,10 @@ class Colector:
 
         operarios_part = self._formatear_operarios(operarios_ids)
         year_two = str(date.today().year % 100).zfill(2)
+        month_two = str(date.today().month).zfill(2)
         contador = self._siguiente_contador_anual(session, year_two, sep)
 
-        return f"{prefijo_lote}{operarios_part}{sep}{year_two}{contador:05d}"
+        return f"{prefijo_lote}{operarios_part}{sep}{year_two}{month_two}{contador:05d}"
 
     def inventario_duelas(self) -> dict:
         with DB.crear_sesion() as session:
@@ -1151,13 +1163,22 @@ class Colector:
             count += 1
         return fechas
 
-    def listar_operarios_planificacion_fabricacion(self) -> list:
-        fechas = self._ultimos_dias_laborables()
+    def listar_operarios_planificacion_fabricacion(self, filtros: dict | None = None) -> list:
+        filtros = filtros or {}
+        dias_previos = int(filtros.get("dias_previos") or 3)
+        if dias_previos < 0:
+            dias_previos = 0
+        incluir_otros = bool(filtros.get("incluir_otros", True))
+        puesto_nombre = (filtros.get("puesto_nombre") or "").strip().upper()
+
+        fechas = self._ultimos_dias_laborables(dias_previos=dias_previos)
         fechas_set = set(fechas)
         with DB.crear_sesion() as session:
             puestos = session.exec(
                 select(PuestoTrabajoDB).where(PuestoTrabajoDB.fabricacion == True)  # noqa: E712
             ).all()
+            if puesto_nombre:
+                puestos = [p for p in puestos if (p.nombre or "").strip().upper() == puesto_nombre]
             puestos_map = {p.id: p for p in puestos}
             puestos_ids = list(puestos_map.keys())
 
@@ -1197,24 +1218,25 @@ class Colector:
                     "orden_en_puesto": det.orden_en_puesto,
                 })
 
-            for usuario in usuarios:
-                if usuario.id in usados:
-                    continue
-                resultado.append({
-                    "origen": "otros",
-                    "fecha": None,
-                    "puesto_id": None,
-                    "puesto_nombre": None,
-                    "usuario_id": usuario.id,
-                    "usuario": {
-                        "id": usuario.id,
-                        "alias": usuario.alias,
-                        "nombre": usuario.nombre,
-                        "rol_id": usuario.rol_id,
-                        "empleado": usuario.empleado,
-                    },
-                    "orden_en_puesto": None,
-                })
+            if incluir_otros:
+                for usuario in usuarios:
+                    if usuario.id in usados:
+                        continue
+                    resultado.append({
+                        "origen": "otros",
+                        "fecha": None,
+                        "puesto_id": None,
+                        "puesto_nombre": None,
+                        "usuario_id": usuario.id,
+                        "usuario": {
+                            "id": usuario.id,
+                            "alias": usuario.alias,
+                            "nombre": usuario.nombre,
+                            "rol_id": usuario.rol_id,
+                            "empleado": usuario.empleado,
+                        },
+                        "orden_en_puesto": None,
+                    })
 
             return resultado
     #endregion

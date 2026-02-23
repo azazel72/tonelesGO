@@ -31,7 +31,7 @@ const ACCIONES_PERMISO_GESTION = {
     "ver-archivos-subidos": [],
     "ver-ambientes": [],
     "cerrar-maestros": [],
-    "ver-planificacion-entradas": [],
+    "ver-planificacion-entradas": { permisos: ["planificacion"], marcarCandado: true },
     "ver-cuadrantes": [],
     "ver-ordenes-fabricacion": [],
     "ver-tipos-producto": [],
@@ -126,6 +126,7 @@ function bloquearAccionMenu(el) {
         return;
     }
     el.classList.add("disabled", "pe-none");
+    el.setAttribute("disabled", "true");
     el.setAttribute("aria-disabled", "true");
     el.setAttribute("tabindex", "-1");
     el.dataset.permisoBloqueado = "1";
@@ -138,6 +139,7 @@ function desbloquearAccionMenu(el) {
     }
     if (el.dataset.permisoBloqueado === "1") {
         el.classList.remove("disabled", "pe-none");
+        el.removeAttribute("disabled");
         el.removeAttribute("aria-disabled");
         el.removeAttribute("tabindex");
         delete el.dataset.permisoBloqueado;
@@ -153,7 +155,7 @@ function aplicarPermisosMenuGestion() {
         if (!action) continue;
         const config = obtenerConfigAccionGestion(action);
         aplicarMarcaCandadoMenu(el, config.marcarCandado);
-        const permitido = tienePermisoAccionGestion(action);
+        const permitido = config.marcarCandado ? false : tienePermisoAccionGestion(action);
         if (permitido) desbloquearAccionMenu(el);
         else bloquearAccionMenu(el);
     }

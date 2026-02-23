@@ -4,6 +4,7 @@ from servidor.modelos import UsuarioDB
 
 class UsuarioDTO(BaseModel):
     id: int | None
+    codigo: str | None = None
     alias: str
     nombre: str
     rol_id: int | None
@@ -13,6 +14,7 @@ class UsuarioDTO(BaseModel):
     def from_db(usuario_db: UsuarioDB) -> "UsuarioDTO":
         return UsuarioDTO(
             id=usuario_db.id,
+            codigo=usuario_db.codigo,
             alias=usuario_db.alias,
             nombre=usuario_db.nombre,
             rol_id=usuario_db.rol_id,
@@ -23,6 +25,7 @@ class UsuarioDTO(BaseModel):
     def to_db(self) -> UsuarioDB:
         return UsuarioDB(
             id=self.id,
+            codigo=self.codigo,
             alias=self.alias,
             nombre=self.nombre,
             rol_id=self.rol_id,

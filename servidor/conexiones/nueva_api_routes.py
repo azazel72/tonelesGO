@@ -26,12 +26,14 @@ class JwtLoginResponse(BaseModel):
 
 class UserDto(BaseModel):
     id: int
+    code: Optional[str] = None
     username: str
     fullname: Optional[str] = None
     role_id: Optional[int] = None
 
 
 class UserPatchDto(BaseModel):
+    code: Optional[str] = None
     username: Optional[str] = None
     fullname: Optional[str] = None
     role_id: Optional[int] = None
@@ -107,6 +109,7 @@ class NuevaApiRoutes:
                 return [
                     UserDto(
                         id=user.id,
+                        code=user.codigo,
                         username=user.alias,
                         fullname=user.nombre,
                         role_id=user.rol_id,
@@ -125,6 +128,11 @@ class NuevaApiRoutes:
                     user.alias = payload.username
                 if payload.fullname is not None:
                     user.nombre = payload.fullname
+                if payload.code is not None:
+                    code = str(payload.code).strip()
+                    if len(code) > 2:
+                        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="code must have at most 2 characters")
+                    user.codigo = code
                 if payload.role_id is not None:
                     user.rol_id = payload.role_id
 
@@ -142,6 +150,7 @@ class NuevaApiRoutes:
 
                 return UserDto(
                     id=user.id,
+                    code=user.codigo,
                     username=user.alias,
                     fullname=user.nombre,
                     role_id=user.rol_id,

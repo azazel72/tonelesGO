@@ -6,15 +6,15 @@
     <title>Paez Lobato - GO</title>
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <link rel="stylesheet" href="./static/css/bootstrap.min.css" />
-    <link rel="stylesheet" href="./static/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="./static/css/bootstrap.min.css?v=20260223a" />
+    <link rel="stylesheet" href="./static/font/bootstrap-icons.css?v=20260223a">
 
-    <link rel="stylesheet" href="./css/app.css" />
-    <link rel="stylesheet" href="./css/tareas.css" />
-    <link rel="stylesheet" href="./css/recepcion.css" />
-    <link rel="stylesheet" href="./css/ubicacion.css" />
-    <link rel="stylesheet" href="./css/fabricacion.css" />
-    <link rel="stylesheet" href="./css/expedicion.css" />
+    <link rel="stylesheet" href="./css/app.css?v=20260223a" />
+    <link rel="stylesheet" href="./css/tareas.css?v=20260223a" />
+    <link rel="stylesheet" href="./css/recepcion.css?v=20260223a" />
+    <link rel="stylesheet" href="./css/ubicacion.css?v=20260223a" />
+    <link rel="stylesheet" href="./css/fabricacion.css?v=20260223a" />
+    <link rel="stylesheet" href="./css/expedicion.css?v=20260223a" />
     <link rel="icon" href="data:,">
 </head>
 
@@ -566,12 +566,6 @@
                                     <label for="fabricacion-cantidad-etiquetas" class="form-label mb-0">Cantidad de etiquetas</label>
                                     <input type="number" class="form-control" id="fabricacion-cantidad-etiquetas" min="1" step="1" value="1" style="max-width: 120px;">
                                 </div>
-                                <div class="d-flex justify-content-between align-items-center">
-                                    <span>Fabricar nuevo tonel</span>
-                                    <button class="btn btn-primary" type="button" id="fabricacion-imprimir-etiqueta">
-                                        <i class="bi bi-user"></i> Seleccionar operarios
-                                    </button>
-                                </div>
                                 <div class="d-flex justify-content-end gap-2">
                                     <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
                                 </div>
@@ -581,8 +575,59 @@
                 </div>
             </div>
 
+            <div class="modal fade modal-trazabilidad" id="modalFabricarBota" tabindex="-1" aria-labelledby="modalFabricarBotaLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="modalFabricarBotaLabel">Fabricar bota</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                        </div>
+                        <div class="modal-body">
+                            <p>Producto seleccionado: <span id="fabricar-bota-producto">Producto</span></p>
+                            <div class="vstack gap-2">
+                                <div>
+                                    <label for="fabricar-bota-lote-madera" class="form-label mb-1">Selección Lote de madera</label>
+                                    <select id="fabricar-bota-lote-madera" class="form-select">
+                                        <option value="">Seleccione lote de madera...</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="fabricar-bota-lote-fleje" class="form-label mb-1">Lote de fleje</label>
+                                    <select id="fabricar-bota-lote-fleje" class="form-select">
+                                        <option value="">Seleccione lote de fleje...</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="fabricar-bota-batidero" class="form-label mb-1">Código de batidero</label>
+                                    <select id="fabricar-bota-batidero" class="form-select">
+                                        <option value="">Seleccione código...</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label for="fabricar-bota-operario-fondado" class="form-label mb-1">Operario de fondado</label>
+                                    <select id="fabricar-bota-operario-fondado" class="form-select">
+                                        <option value="">Seleccione operario...</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer flex-column align-items-stretch gap-2">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <label for="fabricar-bota-cantidad-etiquetas" class="form-label mb-0">Cantidad de etiquetas</label>
+                                <input type="number" class="form-control" id="fabricar-bota-cantidad-etiquetas" min="1" step="1" value="1" style="max-width: 120px;">
+                            </div>
+                            <div class="d-flex justify-content-end gap-2">
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                            <button type="button" class="btn btn-primary" id="fabricar-bota-imprimir">
+                                <i class="bi bi-printer"></i> Imprimir etiqueta
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                </div>
+            </div>
         </section>
-
+        
         <!-- Modal Operario Fabricacion -->
         <div class="modal fade modal-operario-50" id="modalOperarioFabricacion" tabindex="-1"
             aria-labelledby="modalOperarioFabricacionLabel" aria-hidden="true">
@@ -785,15 +830,16 @@
     </div>
 
 
-    <script src="./static/js/bootstrap.bundle.min.js"></script>
-    <script src="./js/constantes.js"></script>
-    <script src="./js/conexiones.js"></script>
-    <script src="./js/gestion-auth.js"></script>
-    <script src="./js/terminal-recepcion.js"></script>
-    <script src="./js/terminal-fabricacion.js"></script>
-    <script src="./js/terminal-expedicion.js"></script>
-    <script src="./js/terminal.js?v=1.0.0"></script>
+    <script src="./static/js/bootstrap.bundle.min.js?v=20260223a"></script>
+    <script src="./js/constantes.js?v=20260223a"></script>
+    <script src="./js/conexiones.js?v=20260223a"></script>
+    <script src="./js/gestion-auth.js?v=20260223a"></script>
+    <script src="./js/terminal-recepcion.js?v=20260223a"></script>
+    <script src="./js/terminal-fabricacion.js?v=20260223e"></script>
+    <script src="./js/terminal-expedicion.js?v=20260223a"></script>
+    <script src="./js/terminal.js?v=20260223a"></script>
 
 </body>
 
 </html>
+

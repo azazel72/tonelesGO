@@ -158,6 +158,19 @@ async function manejarDropEnCelda(e, cellDestino) {
   const rowDestino = cellDestino.getRow();
   const dataRowDestino = rowDestino.getData();
   let valoresDestino = cellDestino.getValue() || [];
+  const detalleOrigenId = origen?.id ? Number(origen.id) : null;
+
+  const conflictos = buscarAsignacionesUsuarioEnFecha(tabla, Number(origen.usuario_id), fieldDestino, detalleOrigenId);
+  if (conflictos.length) {
+    const puestos = conflictos
+      .map((c) => c.puestoNombre)
+      .filter((v, i, arr) => arr.indexOf(v) === i)
+      .join(", ");
+    const confirmar = confirm(
+      `El operario ya está asignado este día en: ${puestos}. ¿Quieres asignarlo también en este puesto?`
+    );
+    if (!confirmar) return;
+  }
 
   if (valoresDestino.some(e => e.usuario_id == origen.usuario_id)) {
     console.log("Ya existe el usuario en destino (repetido o misma celda origen destino)");
@@ -201,6 +214,22 @@ async function manejarDropEnCelda(e, cellDestino) {
   nuevoDetalle.empleado = DATOS.maestros.usuarios[origen.usuario_id];
   const nuevaDestino = valoresDestino.concat(nuevoDetalle);
   rowDestino.update({ [fieldDestino]: nuevaDestino });
+}
+
+function buscarAsignacionesUsuarioEnFecha(tabla, usuarioId, fecha, excluirDetalleId = null) {
+  if (!tabla || !usuarioId || !fecha) return [];
+  const rows = tabla.getRows() || [];
+  const encontrados = [];
+  for (const row of rows) {
+    const data = row.getData() || {};
+    const valores = data[fecha] || [];
+    valores.forEach((d) => {
+      if (String(d.usuario_id) !== String(usuarioId)) return;
+      if (excluirDetalleId != null && String(d.id) === String(excluirDetalleId)) return;
+      encontrados.push({ row, data, valores, detalle: d, puestoNombre: data.nombre || `Puesto ${data.id}` });
+    });
+  }
+  return encontrados;
 }
 
 function crearDatosCuadrantes(cuadrante) {

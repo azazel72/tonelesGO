@@ -185,6 +185,15 @@ window.onload = () => {
     document.addEventListener("click", async (ev) => {
         const el = ev.target.closest("[data-action]");
         if (!el) return;
+        if (
+            el.classList.contains("disabled") ||
+            el.dataset.permisoBloqueado === "1" ||
+            el.getAttribute("aria-disabled") === "true"
+        ) {
+            ev.preventDefault();
+            ev.stopPropagation();
+            return;
+        }
         ev.preventDefault();
 
         const action = el?.dataset?.action ?? "";

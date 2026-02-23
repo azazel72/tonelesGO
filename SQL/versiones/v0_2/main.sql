@@ -18,3 +18,4 @@ SOURCE ./DDL/010_v0_2_palets_campos_y_estados_sin_fk.sql;
 SOURCE ./DML/004_v0_2_estados_palets_seed.sql;
 SOURCE ./DDL/011_v0_2_palets_estado_fk.sql;
 SOURCE ./DDL/012_v0_2_entradas_flejes_estado_auditoria.sql;
+SOURCE ./DDL/013_v0_2_usuarios_codigo.sql;
