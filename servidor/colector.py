@@ -353,33 +353,94 @@ class Colector:
                 for t in trazas
             ]
 
+    def listar_palets_consumo(self):
+        with DB.crear_sesion() as session:
+            stmt = (
+                select(
+                    PaletDB.id,
+                    PaletDB.codigo,
+                    PaletDB.ubicacion_id,
+                    UbicacionDB.descripcion,
+                    PaletDB.duela_tipo_id,
+                    DuelaDB.descripcion,
+                    PaletDB.cubicaje,
+                    PaletDB.consumido,
+                )
+                .select_from(PaletDB)
+                .join(UbicacionDB, UbicacionDB.id == PaletDB.ubicacion_id, isouter=True)
+                .join(DuelaDB, DuelaDB.id == PaletDB.duela_tipo_id, isouter=True)
+                .where(PaletDB.procesado == False, PaletDB.ubicacion_id.is_not(None))
+                .order_by(UbicacionDB.descripcion, DuelaDB.descripcion, PaletDB.codigo)
+            )
+            rows = session.exec(stmt).all()
+            resultado = []
+            for row in rows:
+                restante = max(float(row[6] or 0) - float(row[7] or 0), 0.0)
+                if restante <= 0:
+                    continue
+                resultado.append(
+                    {
+                        "id": row[0],
+                        "codigo": row[1] or "",
+                        "ubicacion_id": row[2],
+                        "ubicacion": row[3] or "Sin ubicación",
+                        "duela_tipo_id": row[4],
+                        "duela": row[5] or "Sin duela",
+                        "cubicaje": float(row[6] or 0),
+                        "consumido": float(row[7] or 0),
+                        "restante": restante,
+                    }
+                )
+            return resultado
+
     def agregar_trazabilidad_fabricacion(self, data):
         linea_fabricacion_id = data.get("linea_fabricacion_id")
-        palet_codigo = (data.get("palet_codigo") or "").strip()
+        palet_origen_id = data.get("palet_origen_id")
+        lote = (data.get("lote") or "").strip()
+        volumen = data.get("volumen")
         cantidad_fabricada = data.get("cantidad_fabricada")
         estado = data.get("estado", 0)
 
         if not linea_fabricacion_id:
             raise ValueError("linea_fabricacion_id es obligatorio.")
-        if not palet_codigo:
-            raise ValueError("palet_codigo es obligatorio.")
+        if not palet_origen_id:
+            raise ValueError("palet_origen_id es obligatorio.")
+        if not lote:
+            raise ValueError("lote es obligatorio.")
+        if volumen is None or str(volumen).strip() == "":
+            raise ValueError("volumen es obligatorio.")
 
         cantidad_val = int(cantidad_fabricada) if str(cantidad_fabricada).strip() else 0
+        volumen_val = float(volumen)
+        if volumen_val <= 0:
+            raise ValueError("volumen debe ser mayor que 0.")
 
         with DB.crear_sesion() as session:
-            palet = session.exec(select(PaletDB).where(PaletDB.codigo == palet_codigo)).first()
-            if not palet:
-                palet = PaletDB(
-                    codigo=palet_codigo,
-                    linea_entrada_id=None,
-                    ubicacion_id=None,
-                    procesado=False,
-                )
-                session.add(palet)
-                session.commit()
-                session.refresh(palet)
-                if self.maestros.palets is not None:
-                    self.maestros.palets[palet.id] = PaletDTO.from_db(palet)
+            palet_origen = session.get(PaletDB, int(palet_origen_id))
+            if not palet_origen:
+                raise ValueError("palet_origen no encontrado.")
+            restante_origen = max(float(palet_origen.cubicaje or 0) - float(palet_origen.consumido or 0), 0.0)
+            if volumen_val > restante_origen:
+                raise ValueError("El volumen supera el restante disponible del palet origen.")
+
+            contador = self._siguiente_contador_global_palets(session)
+            codigo_nuevo = f"{lote}#{contador:06d}"
+            while session.exec(select(PaletDB).where(PaletDB.codigo == codigo_nuevo)).first():
+                contador += 1
+                codigo_nuevo = f"{lote}#{contador:06d}"
+
+            palet = PaletDB(
+                codigo=codigo_nuevo,
+                linea_entrada_id=None,
+                duela_tipo_id=palet_origen.duela_tipo_id,
+                cubicaje=volumen_val,
+                consumido=0.0,
+                estado=palet_origen.estado,
+                ubicacion_id=None,
+                procesado=False,
+            )
+            session.add(palet)
+            session.flush()
 
             existente = session.exec(
                 select(TrazabilidadFabricacionDB).where(
@@ -397,8 +458,11 @@ class Colector:
                 estado=estado,
             )
             session.add(trazabilidad)
+            palet_origen.consumido = float(palet_origen.consumido or 0) + volumen_val
+            session.add(palet_origen)
             session.commit()
             session.refresh(trazabilidad)
+            session.refresh(palet)
 
             return {
                 "id": trazabilidad.id,
@@ -407,6 +471,7 @@ class Colector:
                 "palet_codigo": palet.codigo,
                 "cantidad_fabricada": trazabilidad.cantidad_fabricada,
                 "estado": trazabilidad.estado,
+                "volumen": volumen_val,
             }
 
     def eliminar_trazabilidad_fabricacion(self, data):
@@ -651,6 +716,21 @@ class Colector:
             if not tail.startswith(f"{sep}{year_two}") or not tail[-5:].isdigit():
                 continue
             cont = int(tail[-5:])
+            if cont > max_cont:
+                max_cont = cont
+        return max_cont + 1
+
+    def _siguiente_contador_global_palets(self, session) -> int:
+        codigos = session.exec(select(PaletDB.codigo)).all()
+        patron = re.compile(r"#(\d{6})$")
+        max_cont = 0
+        for codigo in codigos:
+            if not codigo:
+                continue
+            m = patron.search(str(codigo))
+            if not m:
+                continue
+            cont = int(m.group(1))
             if cont > max_cont:
                 max_cont = cont
         return max_cont + 1

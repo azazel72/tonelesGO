@@ -142,7 +142,9 @@ function obtenerConfigVistaProduccion(vistaId = null) {
             modalId: "modalConsumo",
             productoSpanId: "consumo-producto-orden",
             tablaTrazabilidadSelector: "#tabla_trazabilidad_consumo",
-            inputCodigoId: "consumo-palet-codigo",
+            selectPaletOrigenId: "consumo-palet-origen",
+            inputLoteId: "consumo-lote",
+            inputVolumenId: "consumo-volumen",
         };
     }
     return {
@@ -154,7 +156,9 @@ function obtenerConfigVistaProduccion(vistaId = null) {
         modalId: "modalFabricacion",
         productoSpanId: "fabricacion-producto-orden",
         tablaTrazabilidadSelector: "#tabla_trazabilidad_fabricacion",
-        inputCodigoId: null,
+        selectPaletOrigenId: null,
+        inputLoteId: null,
+        inputVolumenId: null,
     };
 }
 
@@ -295,11 +299,35 @@ function mostrarLotesMateriales(fila, vistaId = null) {
     const modalEl = document.getElementById(cfg.modalId);
     const modal = new bootstrap.Modal(modalEl);
     modal.show();
+    if (cfg.vistaId === "vista_consumo") {
+        cargarPaletsConsumoEnSelector();
+    }
     if (typeof setPantalla === "function") {
         setPantalla(cfg.vistaId, { orden_id: ordenFabricacionActualId, linea_fabricacion_id: lineaFabricacionActualId });
     }
     if (lineaFabricacionActualId) {
         cargarTrazabilidadFabricacion(lineaFabricacionActualId, cfg.vistaId);
+    }
+}
+
+async function cargarPaletsConsumoEnSelector() {
+    const selector = document.getElementById("consumo-palet-origen");
+    if (!selector) return;
+    selector.innerHTML = `<option value="">Cargando palets...</option>`;
+    try {
+        const palets = (await wsRequest("listar_palets_consumo", {})) || [];
+        if (!palets.length) {
+            selector.innerHTML = `<option value="">Sin palets disponibles</option>`;
+            return;
+        }
+        selector.innerHTML = `<option value="">Seleccione palet...</option>` + palets.map((p) => {
+            const restante = Number(p.restante || 0).toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 3 });
+            const etiqueta = `${p.codigo} | ${p.ubicacion} | ${p.duela} | restante ${restante}`;
+            return `<option value="${p.id}">${etiqueta}</option>`;
+        }).join("");
+    } catch (err) {
+        console.error("No se pudo cargar el selector de palets de consumo:", err);
+        selector.innerHTML = `<option value="">Error cargando palets</option>`;
     }
 }
 
@@ -427,26 +455,35 @@ async function cargarTrazabilidadFabricacion(lineaId, vistaId = "vista_consumo")
 
 async function agregarTrazabilidadFabricacionDesdeUI(_vistaId = "vista_consumo") {
     const cfg = obtenerConfigVistaProduccion("vista_consumo");
-    const codigoInput = document.getElementById(cfg.inputCodigoId);
-    const codigo = (codigoInput?.value || "").trim();
+    const selectPaletOrigen = document.getElementById(cfg.selectPaletOrigenId);
+    const loteInput = document.getElementById(cfg.inputLoteId);
+    const volumenInput = document.getElementById(cfg.inputVolumenId);
+    const paletOrigenId = Number(selectPaletOrigen?.value || 0);
+    const lote = (loteInput?.value || "").trim();
+    const volumen = Number.parseFloat((volumenInput?.value || "").toString().replace(",", "."));
     const cantidad = 0;
 
     if (!lineaFabricacionActualId) {
         alert("Seleccione una linea de fabricacion.");
         return;
     }
-    if (!codigo) {
-        alert("Ingrese un codigo de palet.");
+    if (!paletOrigenId || !lote || !Number.isFinite(volumen) || volumen <= 0) {
+        alert("Debes completar palet origen, lote y volumen.");
         return;
     }
 
     try {
         await wsRequest("agregar_trazabilidad_fabricacion", {
             linea_fabricacion_id: lineaFabricacionActualId,
-            palet_codigo: codigo,
+            palet_origen_id: paletOrigenId,
+            lote,
+            volumen,
             cantidad_fabricada: cantidad,
         });
-        if (codigoInput) codigoInput.value = "";
+        if (loteInput) loteInput.value = "";
+        if (volumenInput) volumenInput.value = "";
+        if (selectPaletOrigen) selectPaletOrigen.value = "";
+        cargarPaletsConsumoEnSelector();
         cargarTrazabilidadFabricacion(lineaFabricacionActualId, "vista_consumo");
     } catch (err) {
         console.error(err);

@@ -16,6 +16,7 @@ def obtener_acciones() -> Dict[str, any]:
         "listar_ordenes_fabricacion": lambda ws, req: Colector.colector.listar_ordenes_fabricacion(req.data.get("año")),
         "listar_lineas_fabricacion": lambda ws, req: Colector.colector.listar_lineas_fabricacion(req.data.get("orden_id")),
         "listar_trazabilidad_fabricacion": lambda ws, req: Colector.colector.listar_trazabilidad_fabricacion(req.data.get("linea_fabricacion_id")),
+        "listar_palets_consumo": lambda ws, req: Colector.colector.listar_palets_consumo(),
         "agregar_trazabilidad_fabricacion": lambda ws, req: Colector.colector.agregar_trazabilidad_fabricacion(req.data),
         "eliminar_trazabilidad_fabricacion": lambda ws, req: Colector.colector.eliminar_trazabilidad_fabricacion(req.data),
         "actualizar_estado_trazabilidad_fabricacion": lambda ws, req: Colector.colector.actualizar_estado_trazabilidad_fabricacion(req.data),

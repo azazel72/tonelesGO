@@ -7,6 +7,12 @@ document.addEventListener("DOMContentLoaded", function () {
             if (boton.dataset.origenFabricacion) {
                 contextoNavegacion.fabricacionOrigen = boton.dataset.origenFabricacion;
             }
+            if (boton.dataset.contextoRecepcion) {
+                contextoNavegacion.recepcionOrigen = boton.dataset.contextoRecepcion;
+            }
+            if (boton.dataset.contextoConsumo) {
+                contextoNavegacion.consumoOrigen = boton.dataset.contextoConsumo;
+            }
             if (boton.dataset.contextoUbicacion) {
                 contextoNavegacion.ubicacionOrigen = boton.dataset.contextoUbicacion;
             }
@@ -38,7 +44,9 @@ document.addEventListener("DOMContentLoaded", function () {
 let pantallaActual = null;
 let contextoPantalla = {};
 const contextoNavegacion = {
-    fabricacionOrigen: "botas",
+    fabricacionOrigen: "maderas_madera",
+    recepcionOrigen: "maderas_madera",
+    consumoOrigen: "maderas_madera",
     ubicacionOrigen: "botas",
     autoAccesoConsumo: false,
 };
@@ -83,10 +91,26 @@ function actualizarMigasPan(mostrarSeccion) {
             nuevaMiga = crearMigaPan("Inicio", "vista_tareas", true);
             migasPan.appendChild(nuevaMiga);
             break;
-        case "vista_menu_palets":
+        case "vista_menu_maderas":
             nuevaMiga = crearMigaPan("Inicio", "vista_tareas", false);
             migasPan.appendChild(nuevaMiga);
-            nuevaMiga = crearMigaPan("Palets", mostrarSeccion, true);
+            nuevaMiga = crearMigaPan("Maderas", mostrarSeccion, true);
+            migasPan.appendChild(nuevaMiga);
+            break;
+        case "vista_menu_maderas_fleje":
+            nuevaMiga = crearMigaPan("Inicio", "vista_tareas", false);
+            migasPan.appendChild(nuevaMiga);
+            nuevaMiga = crearMigaPan("Maderas", "vista_menu_maderas", false);
+            migasPan.appendChild(nuevaMiga);
+            nuevaMiga = crearMigaPan("Fleje", mostrarSeccion, true);
+            migasPan.appendChild(nuevaMiga);
+            break;
+        case "vista_menu_maderas_madera":
+            nuevaMiga = crearMigaPan("Inicio", "vista_tareas", false);
+            migasPan.appendChild(nuevaMiga);
+            nuevaMiga = crearMigaPan("Maderas", "vista_menu_maderas", false);
+            migasPan.appendChild(nuevaMiga);
+            nuevaMiga = crearMigaPan("Madera", mostrarSeccion, true);
             migasPan.appendChild(nuevaMiga);
             break;
         case "vista_menu_botas":
@@ -98,7 +122,13 @@ function actualizarMigasPan(mostrarSeccion) {
         case "vista_recepcion":
             nuevaMiga = crearMigaPan("Inicio", "vista_tareas", false);
             migasPan.appendChild(nuevaMiga);
-            nuevaMiga = crearMigaPan("Palets", "vista_menu_palets", false);
+            nuevaMiga = crearMigaPan("Maderas", "vista_menu_maderas", false);
+            migasPan.appendChild(nuevaMiga);
+            if (contextoNavegacion.recepcionOrigen === "maderas_fleje") {
+                nuevaMiga = crearMigaPan("Fleje", "vista_menu_maderas_fleje", false);
+            } else {
+                nuevaMiga = crearMigaPan("Madera", "vista_menu_maderas_madera", false);
+            }
             migasPan.appendChild(nuevaMiga);
             nuevaMiga = crearMigaPan("Recepción", mostrarSeccion, true);
             migasPan.appendChild(nuevaMiga);
@@ -109,14 +139,28 @@ function actualizarMigasPan(mostrarSeccion) {
             if (contextoNavegacion.ubicacionOrigen === "botas") {
                 nuevaMiga = crearMigaPan("Botas", "vista_menu_botas", false);
                 migasPan.appendChild(nuevaMiga);
+                nuevaMiga = crearMigaPan("Ubicación", mostrarSeccion, true);
+            } else if (contextoNavegacion.ubicacionOrigen === "maderas_madera") {
+                nuevaMiga = crearMigaPan("Maderas", "vista_menu_maderas", false);
+                migasPan.appendChild(nuevaMiga);
+                nuevaMiga = crearMigaPan("Madera", "vista_menu_maderas_madera", false);
+                migasPan.appendChild(nuevaMiga);
+                nuevaMiga = crearMigaPan("Movimientos", mostrarSeccion, true);
+            } else {
+                nuevaMiga = crearMigaPan("Ubicación", mostrarSeccion, true);
             }
-            nuevaMiga = crearMigaPan("Ubicación", mostrarSeccion, true);
             migasPan.appendChild(nuevaMiga);
             break;
         case "vista_consumo":
             nuevaMiga = crearMigaPan("Inicio", "vista_tareas", false);
             migasPan.appendChild(nuevaMiga);
-            nuevaMiga = crearMigaPan("Palets", "vista_menu_palets", false);
+            nuevaMiga = crearMigaPan("Maderas", "vista_menu_maderas", false);
+            migasPan.appendChild(nuevaMiga);
+            if (contextoNavegacion.consumoOrigen === "maderas_fleje") {
+                nuevaMiga = crearMigaPan("Fleje", "vista_menu_maderas_fleje", false);
+            } else {
+                nuevaMiga = crearMigaPan("Madera", "vista_menu_maderas_madera", false);
+            }
             migasPan.appendChild(nuevaMiga);
             nuevaMiga = crearMigaPan("Consumo", mostrarSeccion, true);
             migasPan.appendChild(nuevaMiga);
