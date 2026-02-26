@@ -10,4 +10,3 @@ class TipoProductoDB(SQLModel, table=True):
     tipo: str = ""
     codigo: str
     descripcion: str
-    consumo: float = 0.0

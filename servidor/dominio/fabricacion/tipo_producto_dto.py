@@ -8,7 +8,6 @@ class TipoProductoDTO(BaseModel):
     tipo: str = ""
     codigo: str
     descripcion: str
-    consumo: float = 0.0
 
     def from_db(tipo_db: TipoProductoDB) -> "TipoProductoDTO":
         return TipoProductoDTO(
@@ -16,7 +15,6 @@ class TipoProductoDTO(BaseModel):
             tipo=tipo_db.tipo,
             codigo=tipo_db.codigo,
             descripcion=tipo_db.descripcion,
-            consumo=tipo_db.consumo,
         )
 
     def to_db(self) -> TipoProductoDB:
@@ -25,5 +23,4 @@ class TipoProductoDTO(BaseModel):
             tipo=self.tipo,
             codigo=self.codigo,
             descripcion=self.descripcion,
-            consumo=self.consumo,
         )

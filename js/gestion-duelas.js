@@ -1,6 +1,8 @@
 
 // ====== CREAR VENTANA DUELAS ======
 function openDuelasWin() {
+  if (!asegurarFabricacionCargada("tipos_producto", "duelas")) return null;
+
   const wb = comprobarVentanaAbierta("duelas");
   if (wb) return wb;
 
@@ -11,6 +13,15 @@ function openDuelasWin() {
       label: descripcion,
     })
   );
+  const tiposProductoDuelaDict = Object.values(DATOS?.fabricacion?.tipos_producto ?? {})
+    .filter((tp) => String(tp?.tipo || "").toUpperCase() === "DUELA")
+    .map(
+      ({ id, descripcion, codigo, ...resto }) => ({
+        ...resto, id, descripcion, codigo,
+        value: id,
+        label: descripcion || codigo || String(id),
+      })
+    );
 
   const configuracion = {
     KEY: "duelas",
@@ -43,6 +54,22 @@ function openDuelasWin() {
             editable: tablaEditable,
             cssClass: "filtrable",
             formatter: cell => DATOS?.maestros?.materiales?.[cell.getValue()]?.descripcion ?? cell.getValue(),
+          },
+          {
+            title: "Tipo producto",
+            field: "tipo_producto_id",
+            editor: "list",
+            editorParams: {
+              values: tiposProductoDuelaDict,
+              clearable: true,
+              autocomplete: true,
+              allowEmpty: true,
+              listOnEmpty: true,
+              freetext: false,
+            },
+            editable: tablaEditable,
+            cssClass: "filtrable",
+            formatter: cell => DATOS?.fabricacion?.tipos_producto?.[cell.getValue()]?.descripcion ?? cell.getValue(),
           },
           CeldaAcciones,
         ],

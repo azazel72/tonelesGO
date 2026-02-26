@@ -34,6 +34,7 @@ document.addEventListener("DOMContentLoaded", function () {
     prepararEventosRecepcion();
     prepararEventosFabricacion();
     prepararEventosExpedicion();
+    prepararEventosMenuFlejes();
 
     // Muestra la sección de tareas al cargar la página
     mostrarSeccion("vista_tareas");
@@ -75,6 +76,9 @@ function mostrarSeccion(id) {
         if (id === "vista_fabricacion") {
             contextoNavegacion.autoAccesoConsumo = false;
             cargarOrdenesFabricacion({ vistaId: "vista_fabricacion", autoAccesoConsumo: false });
+        }
+        if (id === "vista_menu_maderas_fleje") {
+            cargarEntradasFlejesMenu();
         }
         // Actualiza las migas de pan
         actualizarMigasPan(id);
@@ -196,6 +200,97 @@ function crearMigaPan(nombre, mostrarSeccion, activo = false) {
         nuevaMiga.innerHTML = `<a href="#">${nombre}</a>`;
     }
     return nuevaMiga;
+}
+
+function prepararEventosMenuFlejes() {
+    const tbody = document.querySelector("#tabla_entradas_flejes_menu tbody");
+    if (!tbody) return;
+
+    tbody.addEventListener("click", async (event) => {
+        const fila = event.target.closest("tr");
+        if (!fila || !fila.dataset.entradaId || fila.dataset.loading === "1") return;
+        await alternarEstadoEntradaFlejeMenu(fila);
+    });
+}
+
+async function cargarEntradasFlejesMenu() {
+    const tbody = document.querySelector("#tabla_entradas_flejes_menu tbody");
+    if (!tbody) return;
+
+    tbody.innerHTML = `<tr><td colspan="3">Cargando entradas de fleje...</td></tr>`;
+    try {
+        const resp = (await wsRequest("inventario_flejes", {})) || {};
+        const filas = (resp.inventario_flejes || [])
+            .filter((item) => Number(item.estado || 0) < 2)
+            .sort((a, b) => {
+                const ea = Number(a.estado || 0);
+                const eb = Number(b.estado || 0);
+                if (ea !== eb) return ea - eb;
+                return String(a.lote || "").localeCompare(String(b.lote || ""), "es");
+            });
+
+        tbody.innerHTML = "";
+        if (!filas.length) {
+            tbody.innerHTML = `<tr><td colspan="3">No hay entradas de fleje con estado menor de 2.</td></tr>`;
+            return;
+        }
+
+        filas.forEach((item) => {
+            const tr = document.createElement("tr");
+            const estado = Number(item.estado || 0);
+            tr.dataset.entradaId = item.id ?? "";
+            tr.dataset.estado = String(estado);
+            if (estado === 1) tr.classList.add("fleje-estado-1");
+
+            const tdTipo = document.createElement("td");
+            tdTipo.textContent = item.tipo_producto_descripcion || item.tipo_producto_tipo || item.tipo_producto_nombre || "FLEJE";
+
+            const tdLote = document.createElement("td");
+            tdLote.textContent = item.lote || item.palet_codigo || `Entrada ${item.id ?? ""}`;
+
+            const tdRestante = document.createElement("td");
+            tdRestante.classList.add("text-end");
+            const restante = Number(item.restante || 0);
+            tdRestante.textContent = Number.isFinite(restante)
+                ? restante.toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 2 })
+                : "0";
+
+            tr.appendChild(tdTipo);
+            tr.appendChild(tdLote);
+            tr.appendChild(tdRestante);
+            tbody.appendChild(tr);
+        });
+    } catch (err) {
+        console.error("No se pudo cargar inventario de flejes:", err);
+        tbody.innerHTML = `<tr><td colspan="3">Error al cargar entradas de fleje.</td></tr>`;
+    }
+}
+
+async function alternarEstadoEntradaFlejeMenu(fila) {
+    const entradaId = Number(fila.dataset.entradaId || 0);
+    const estadoActual = Number(fila.dataset.estado || 0);
+    if (!entradaId || ![0, 1].includes(estadoActual)) return;
+
+    const estadoNuevo = estadoActual === 1 ? 0 : 1;
+    fila.dataset.loading = "1";
+    fila.classList.add("opacity-50");
+
+    try {
+        await wsRequest("modificar_maestro", {
+            tabla: "entradas_flejes",
+            id: entradaId,
+            campo: "estado",
+            valor: estadoNuevo,
+        });
+        fila.dataset.estado = String(estadoNuevo);
+        fila.classList.toggle("fleje-estado-1", estadoNuevo === 1);
+    } catch (err) {
+        console.error("No se pudo actualizar el estado de entrada_fleje:", err);
+        alert("No se pudo actualizar el estado del fleje.");
+    } finally {
+        fila.dataset.loading = "0";
+        fila.classList.remove("opacity-50");
+    }
 }
 
 function routeMessage(data) {

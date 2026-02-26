@@ -11,6 +11,7 @@ function openTiposProductoWin() {
     { value: "VASO", label: "VASO" },
     { value: "BOTA", label: "BOTA" },
     { value: "FLEJE", label: "FLEJE" },
+    { value: "DUELA", label: "DUELA" },
   ];
 
   const configuracion = {
@@ -46,7 +47,6 @@ function openTiposProductoWin() {
           },
           { title:"Codigo", field:"codigo", editor:"input", editable: tablaEditable, cssClass: "filtrable" },
           { title:"Descripcion", field:"descripcion", editor:"input", editable: tablaEditable, cssClass: "filtrable" },
-          { title:"Consumo", field:"consumo", editor:"number", editable: tablaEditable, cssClass: "filtrable", hozAlign:"right" },
           CeldaAcciones,
         ],
         data: Object.values(DATOS.fabricacion.tipos_producto || {}),

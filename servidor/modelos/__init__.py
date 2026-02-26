@@ -6,7 +6,7 @@ from .maestros import MaterialDB, DuelaDB, EntradaDB, LineaEntradaDB, PaletDB, P
 from .maestros import AmbienteDB
 from .maestros import EntradaFlejeDB
 from .fabricacion import OrdenFabricacionDB, TipoProductoDB, LineaFabricacionDB, TrazabilidadProcesadoDB
-from .fabricacion import TrazabilidadFabricacionDB, TrazabilidadProductoDB, BotaDB
+from .fabricacion import TrazabilidadFabricacionDB, TrazabilidadProductoDB, BotaDB, ConsumoDB
 
 __all__ = [
     "PlanCamionDB",
@@ -44,4 +44,5 @@ __all__ = [
     "TrazabilidadFabricacionDB",
     "TrazabilidadProductoDB",
     "BotaDB",
+    "ConsumoDB",
 ]

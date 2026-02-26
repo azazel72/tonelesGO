@@ -37,6 +37,7 @@ const ACCIONES_PERMISO_GESTION = {
     "ver-tipos-producto": [],
     "ver-lineas-fabricacion": [],
     "ver-botas": [],
+    "ver-consumos": [],
     "ver-trazabilidad-procesado": [],
     "ver-trazabilidad-fabricacion": [],
     "ver-trazabilidad-producto": [],

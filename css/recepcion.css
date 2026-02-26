@@ -11,3 +11,21 @@
 #vista_recepcion[modo="contenido_entrada"] table#tabla_entradas_recepcion{
     display: none;
 }
+
+#vista_menu_maderas_fleje.vista-flejes {
+    padding: 20px;
+    box-sizing: border-box;
+    gap: 16px;
+}
+
+.fleje-card {
+    width: 100%;
+}
+
+#tabla_entradas_flejes_menu tbody tr.fleje-estado-1 > td {
+    background-color: #d1e7dd;
+}
+
+#tabla_entradas_flejes_menu tbody tr[data-entrada-id] {
+    cursor: pointer;
+}

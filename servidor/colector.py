@@ -9,14 +9,14 @@ from servidor.herramientas.BcryptHelper import BcryptHelper
 
 from .modelos import ClienteDB, EstadoOrdenFabricacionDB, EstadoLineaFabricacionDB, EstadoBotaDB, EstadoTrazabilidadFabricacionDB, EstadoPaletDB
 from .modelos import InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB, RolDB, PuestoTrabajoDB, MaterialDB, DuelaDB, EntradaDB, LineaEntradaDB, PaletDB, ProductoDB, ProductoOperarioDB, ArchivoSubidoDB, AmbienteDB, EntradaFlejeDB
-from .modelos import OrdenFabricacionDB, TipoProductoDB, LineaFabricacionDB, TrazabilidadProcesadoDB, TrazabilidadFabricacionDB, TrazabilidadProductoDB, BotaDB
+from .modelos import OrdenFabricacionDB, TipoProductoDB, LineaFabricacionDB, TrazabilidadProcesadoDB, TrazabilidadFabricacionDB, TrazabilidadProductoDB, BotaDB, ConsumoDB
 from .modelos import PlanCamionDB, PlanFacturacionDB, PlanMaterialDB, CuadranteDB, CuadranteDetalleDB
 from .persistencia import GenericRepository, DB
 from sqlmodel import select
 from sqlalchemy import extract, func
 from .dominio import PlanificacionEntradasDTO, MaestrosDTO, PlanMaterialDTO, PlanFacturacionDTO, PlanCamionDTO, CuadranteDTO, CuadranteDetalleDTO, FabricacionDTO
 from .dominio import ClienteDTO, EstadoDTO, InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO, RolDTO, PuestoTrabajoDTO, MaterialDTO, DuelaDTO, EntradaDTO, LineaEntradaDTO, PaletDTO, ProductoDTO, ArchivoSubidoDTO, AmbienteDTO, EntradaFlejeDTO, CuadrantesDTO
-from .dominio import OrdenFabricacionDTO, TipoProductoDTO, LineaFabricacionDTO, TrazabilidadProcesadoDTO, TrazabilidadFabricacionDTO, TrazabilidadProductoDTO, BotaDTO
+from .dominio import OrdenFabricacionDTO, TipoProductoDTO, LineaFabricacionDTO, TrazabilidadProcesadoDTO, TrazabilidadFabricacionDTO, TrazabilidadProductoDTO, BotaDTO, ConsumoDTO
 from servidor.impresion import ImprimirEtiqueta
 from servidor.conexiones.broadcast import broadcast_error, broadcast_event
 
@@ -69,6 +69,7 @@ class Colector:
         self.repo_trazabilidad_fabricacion = GenericRepository(TrazabilidadFabricacionDB)
         self.repo_trazabilidad_producto = GenericRepository(TrazabilidadProductoDB)
         self.repo_botas = GenericRepository(BotaDB)
+        self.repo_consumos = GenericRepository(ConsumoDB)
 
         self.repo_usuarios = GenericRepository(UsuarioDB)
         self.repo_roles = GenericRepository(RolDB)
@@ -137,6 +138,7 @@ class Colector:
             traz_fabricacion = self.repo_trazabilidad_fabricacion.list_all(session)
             traz_producto = self.repo_trazabilidad_producto.list_all(session)
             botas = self.repo_botas.list_all(session)
+            consumos = self.repo_consumos.list_all(session)
 
             self.fabricacion.ordenes_fabricacion = {
                 orden.id: OrdenFabricacionDTO.from_db(orden) for orden in ordenes
@@ -158,6 +160,9 @@ class Colector:
             }
             self.fabricacion.botas = {
                 bota.id: BotaDTO.from_db(bota) for bota in botas
+            }
+            self.fabricacion.consumos = {
+                consumo.id: ConsumoDTO.from_db(consumo) for consumo in consumos
             }
 
             return self.fabricacion
@@ -837,7 +842,6 @@ class Colector:
                     EntradaFlejeDB.tipo_producto_id,
                     TipoProductoDB.tipo,
                     TipoProductoDB.descripcion,
-                    TipoProductoDB.consumo,
                     EntradaFlejeDB.lote,
                     EntradaFlejeDB.peso,
                     EntradaFlejeDB.consumido,
@@ -866,19 +870,19 @@ class Colector:
                         "tipo_producto_id": row[2],
                         "tipo_producto_tipo": row[3] or "",
                         "tipo_producto_descripcion": row[4] or "",
-                        "tipo_producto_consumo": float(row[5] or 0),
-                        "lote": row[6] or "",
-                        "peso": float(row[7] or 0),
-                        "consumido": float(row[8] or 0),
-                        "restante": float(row[9] or 0),
-                        "estado": int(row[10] or 0),
-                        "created_at": row[11].isoformat() if row[11] else None,
-                        "updated_at": row[12].isoformat() if row[12] else None,
-                        "deleted_at": row[13].isoformat() if row[13] else None,
-                        "is_deleted": bool(row[14]),
-                        "created_by": row[15] or "",
-                        "updated_by": row[16] or "",
-                        "deleted_by": row[17] or "",
+                        "tipo_producto_consumo": 0.0,
+                        "lote": row[5] or "",
+                        "peso": float(row[6] or 0),
+                        "consumido": float(row[7] or 0),
+                        "restante": float(row[8] or 0),
+                        "estado": int(row[9] or 0),
+                        "created_at": row[10].isoformat() if row[10] else None,
+                        "updated_at": row[11].isoformat() if row[11] else None,
+                        "deleted_at": row[12].isoformat() if row[12] else None,
+                        "is_deleted": bool(row[13]),
+                        "created_by": row[14] or "",
+                        "updated_by": row[15] or "",
+                        "deleted_by": row[16] or "",
                     }
                     for row in rows
                 ]
@@ -1146,6 +1150,10 @@ class Colector:
             repo = self.repo_botas
             maestro = self.fabricacion.botas
             objeto = BotaDTO
+        elif tabla == "consumos":
+            repo = self.repo_consumos
+            maestro = self.fabricacion.consumos
+            objeto = ConsumoDTO
         elif tabla == "plan_materiales":
             repo = self.repo_materiales
             maestro = self.planificacion_entradas.buscar_material_por_id

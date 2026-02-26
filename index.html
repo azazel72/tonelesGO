@@ -46,7 +46,7 @@
                             <button class="offcanvas-nav-btn" mostrar="vista_menu_maderas" data-bs-dismiss="offcanvas">
                                 Menú Maderas
                             </button>
-                            <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_menu_maderas_fleje" data-bs-dismiss="offcanvas" disabled>
+                            <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_menu_maderas_fleje" data-bs-dismiss="offcanvas">
                                 Fleje
                             </button>
                             <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_menu_maderas_madera" data-bs-dismiss="offcanvas">
@@ -132,7 +132,7 @@
         </section>
 
         <section id="vista_menu_maderas" class="flex-fill menu-secundario">
-            <button class="boton rojo boton-con-icono" mostrar="vista_menu_maderas_fleje" disabled>
+            <button class="boton rojo boton-con-icono" mostrar="vista_menu_maderas_fleje">
                 <img class="boton-icono" src="./imagenes/iconos/camion_tonel.png" alt="Fleje">
                 <span>Fleje</span>
             </button>
@@ -145,15 +145,30 @@
             </button>
         </section>
 
-        <section id="vista_menu_maderas_fleje" class="flex-fill menu-secundario">
-            <button class="boton rojo boton-con-icono" mostrar="vista_recepcion" data-contexto-recepcion="maderas_fleje">
-                <img class="boton-icono" src="./imagenes/iconos/camion_palet.png" alt="Recepción">
-                <span>Recepción</span>
-            </button>
-            <button class="boton verde boton-con-icono" mostrar="vista_consumo" data-origen-fabricacion="maderas_fleje" data-contexto-consumo="maderas_fleje">
-                <img class="boton-icono" src="./imagenes/iconos/palet.png" alt="Consumo">
-                <span>Consumo</span>
-            </button>
+        <section id="vista_menu_maderas_fleje" class="flex-fill vista-flejes">
+            <div class="card shadow-sm fleje-card">
+                <div class="card-header d-flex justify-content-between align-items-center gap-2">
+                    <h5 class="mb-0">Flejes disponibles</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table id="tabla_entradas_flejes_menu" class="table table-striped table-bordered align-middle mb-0">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th scope="col">Tipo de producto</th>
+                                    <th scope="col">Lote</th>
+                                    <th scope="col" class="text-end">Restante</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td colspan="3">Cargando entradas de fleje...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
             <button class="boton boton-volver" mostrar="vista_menu_maderas">
                 <span>Volver</span>
             </button>
@@ -168,8 +183,10 @@
                 <img class="boton-icono" src="./imagenes/iconos/palet.png" alt="Consumo">
                 <span>Consumo</span>
             </button>
-            <button class="boton amarillo boton-con-icono" mostrar="vista_ubicacion" data-contexto-ubicacion="maderas_madera" disabled>
-                <img class="boton-icono" src="./imagenes/iconos/toneles.png" alt="Movimientos">
+            <button class="boton amarillo boton-con-icono" mostrar="vista_ubicacion" data-contexto-ubicacion="maderas_madera">
+                <div class="d-flex gap-2 fs-2" aria-hidden="true">
+                    <i class="bi bi-shuffle"></i>
+                </div>
                 <span>Movimientos</span>
             </button>
             <button class="boton boton-volver" mostrar="vista_menu_maderas">

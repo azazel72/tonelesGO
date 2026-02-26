@@ -107,6 +107,9 @@ window.onload = () => {
         async "ver-botas"() {
             await openBotasWin();
         },
+        async "ver-consumos"() {
+            await openConsumosWin();
+        },
 
         async "ver-planificacion-entradas"() {
             await openPlanificacionEntradasWin();
@@ -176,6 +179,7 @@ window.onload = () => {
         trazabilidad_fabricacion: openTrazabilidadFabricacionWin,
         trazabilidad_producto: openTrazabilidadProductoWin,
         botas: openBotasWin,
+        consumos: openConsumosWin,
         planificacion_entradas: openPlanificacionEntradasWin,
         cuadrantes: openCuadrantesWin,
         inventario_flejes: openInventarioFlejesWin,
