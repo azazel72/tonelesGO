@@ -9,6 +9,18 @@ function prepararEventosFabricacion() {
             agregarTrazabilidadFabricacionDesdeUI("vista_consumo");
         });
     }
+    const selectUbicacionConsumo = document.getElementById("consumo-ubicacion-origen");
+    if (selectUbicacionConsumo) {
+        selectUbicacionConsumo.addEventListener("change", () => {
+            actualizarPaletsConsumoEnSelector();
+        });
+    }
+    const selectPaletConsumo = document.getElementById("consumo-palet-origen");
+    if (selectPaletConsumo) {
+        selectPaletConsumo.addEventListener("change", () => {
+            autocompletarCamposConsumoDesdePalet();
+        });
+    }
 
     const btnImprimir = document.getElementById("fabricacion-imprimir-etiqueta");
     console.log("[fabricar-bota] boton abrir modal encontrado:", !!btnImprimir);
@@ -124,6 +136,7 @@ function registrarEventosVistaProduccion(vistaId) {
 }
 
 let lineaFabricacionActualId = null;
+let lineaFabricacionMaterialActualId = null;
 let ordenFabricacionActualId = null;
 const LIMITE_REACTIVAR_ESTADO = 1400;
 let vistaProduccionActiva = "vista_fabricacion";
@@ -174,8 +187,13 @@ const terminalFabricacion = {
     clientes: null,
     estados_trazabilidad_fabricacion: null,
     tipos_producto: null,
+    materiales: null,
+    duelas: null,
+    ubicaciones: null,
+    palets: null,
     usuarios: null,
     puestos_trabajo: null,
+    paletsConsumo: [],
 };
 
 async function refrescarMaestrosFabricacion() {
@@ -183,6 +201,10 @@ async function refrescarMaestrosFabricacion() {
         const maestros = await wsRequest("maestros", {});
         terminalFabricacion.clientes = maestros?.clientes || {};
         terminalFabricacion.estados_trazabilidad_fabricacion = maestros?.estados_trazabilidad_fabricacion || {};
+        terminalFabricacion.materiales = maestros?.materiales || {};
+        terminalFabricacion.duelas = maestros?.duelas || {};
+        terminalFabricacion.ubicaciones = maestros?.ubicaciones || {};
+        terminalFabricacion.palets = maestros?.palets || {};
         terminalFabricacion.usuarios = maestros?.usuarios || {};
         terminalFabricacion.puestos_trabajo = maestros?.puestos_trabajo || {};
     } catch (err) {
@@ -191,11 +213,23 @@ async function refrescarMaestrosFabricacion() {
 }
 
 async function asegurarDatosFabricacionTerminal() {
-    if (terminalFabricacion.clientes && terminalFabricacion.estados_trazabilidad_fabricacion && terminalFabricacion.tipos_producto && terminalFabricacion.usuarios) return;
+    if (
+        terminalFabricacion.clientes &&
+        terminalFabricacion.estados_trazabilidad_fabricacion &&
+        terminalFabricacion.tipos_producto &&
+        terminalFabricacion.materiales &&
+        terminalFabricacion.duelas &&
+        terminalFabricacion.ubicaciones &&
+        terminalFabricacion.usuarios
+    ) return;
     try {
         const maestros = await wsRequest("maestros", {});
         terminalFabricacion.clientes = maestros?.clientes || {};
         terminalFabricacion.estados_trazabilidad_fabricacion = maestros?.estados_trazabilidad_fabricacion || {};
+        terminalFabricacion.materiales = maestros?.materiales || {};
+        terminalFabricacion.duelas = maestros?.duelas || {};
+        terminalFabricacion.ubicaciones = maestros?.ubicaciones || {};
+        terminalFabricacion.palets = maestros?.palets || {};
         terminalFabricacion.usuarios = maestros?.usuarios || {};
         terminalFabricacion.puestos_trabajo = maestros?.puestos_trabajo || {};
         const fabricacion = await wsRequest("fabricacion", {});
@@ -205,6 +239,10 @@ async function asegurarDatosFabricacionTerminal() {
         terminalFabricacion.clientes = terminalFabricacion.clientes || {};
         terminalFabricacion.estados_trazabilidad_fabricacion = terminalFabricacion.estados_trazabilidad_fabricacion || {};
         terminalFabricacion.tipos_producto = terminalFabricacion.tipos_producto || {};
+        terminalFabricacion.materiales = terminalFabricacion.materiales || {};
+        terminalFabricacion.duelas = terminalFabricacion.duelas || {};
+        terminalFabricacion.ubicaciones = terminalFabricacion.ubicaciones || {};
+        terminalFabricacion.palets = terminalFabricacion.palets || {};
         terminalFabricacion.usuarios = terminalFabricacion.usuarios || {};
         terminalFabricacion.puestos_trabajo = terminalFabricacion.puestos_trabajo || {};
     }
@@ -296,13 +334,24 @@ function mostrarLotesMateriales(fila, vistaId = null) {
     const cfg = obtenerConfigVistaProduccion(vistaId);
     vistaProduccionActiva = cfg.vistaId;
     lineaFabricacionActualId = Number(fila.dataset.lineaId || 0) || null;
+    lineaFabricacionMaterialActualId = Number(fila.dataset.materialId || 0) || null;
     const tipoId = Number(fila.dataset.tipoProductoId || 0) || null;
-    const descripcion =
+    const descripcionProducto =
         (tipoId && terminalFabricacion.tipos_producto?.[tipoId]?.descripcion) ||
         fila.children?.[0]?.textContent ||
         "Producto";
+    const descripcionMaterial =
+        (lineaFabricacionMaterialActualId && terminalFabricacion.materiales?.[lineaFabricacionMaterialActualId]?.descripcion) ||
+        descripcionProducto;
     const titulo = document.getElementById(cfg.productoSpanId);
-    if (titulo) titulo.textContent = descripcion;
+    if (titulo) {
+        if (cfg.vistaId === "vista_consumo") {
+            const tieneMaterial = Boolean(lineaFabricacionMaterialActualId && terminalFabricacion.materiales?.[lineaFabricacionMaterialActualId]?.descripcion);
+            titulo.textContent = tieneMaterial ? `${descripcionProducto} | ${descripcionMaterial}` : descripcionProducto;
+        } else {
+            titulo.textContent = descripcionProducto;
+        }
+    }
     if (cfg.vistaId === "vista_fabricacion") {
         abrirModalFabricarBota();
         if (typeof setPantalla === "function") {
@@ -326,22 +375,111 @@ function mostrarLotesMateriales(fila, vistaId = null) {
 
 async function cargarPaletsConsumoEnSelector() {
     const selector = document.getElementById("consumo-palet-origen");
-    if (!selector) return;
+    const selectorUbicacion = document.getElementById("consumo-ubicacion-origen");
+    if (!selector || !selectorUbicacion) return;
     selector.innerHTML = `<option value="">Cargando palets...</option>`;
+    selectorUbicacion.innerHTML = `<option value="">Cargando ubicaciones...</option>`;
     try {
-        const palets = (await wsRequest("listar_palets_consumo", {})) || [];
-        if (!palets.length) {
-            selector.innerHTML = `<option value="">Sin palets disponibles</option>`;
-            return;
-        }
-        selector.innerHTML = `<option value="">Seleccione palet...</option>` + palets.map((p) => {
-            const restante = Number(p.restante || 0).toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 3 });
-            const etiqueta = `${p.codigo} | ${p.ubicacion} | ${p.duela} | restante ${restante}`;
-            return `<option value="${p.id}">${etiqueta}</option>`;
-        }).join("");
+        terminalFabricacion.paletsConsumo = (await wsRequest("listar_palets_consumo", {})) || [];
+        console.log("[consumo] palets recibidos:", terminalFabricacion.paletsConsumo);
+        actualizarPaletsConsumoEnSelector();
     } catch (err) {
         console.error("No se pudo cargar el selector de palets de consumo:", err);
         selector.innerHTML = `<option value="">Error cargando palets</option>`;
+        selectorUbicacion.innerHTML = `<option value="">Error cargando ubicaciones</option>`;
+    }
+}
+
+function actualizarPaletsConsumoEnSelector() {
+    const selectorPalet = document.getElementById("consumo-palet-origen");
+    const selectorUbicacion = document.getElementById("consumo-ubicacion-origen");
+    if (!selectorPalet || !selectorUbicacion) return;
+
+    const ubicacionSeleccionada = selectorUbicacion.value === "" ? null : String(selectorUbicacion.value);
+    const palets = (terminalFabricacion.paletsConsumo || []).filter((p) => {
+        const maestroPalet = terminalFabricacion.palets?.[p.id];
+        const conLineaEntrada = maestroPalet?.linea_entrada_id !== null && typeof maestroPalet?.linea_entrada_id !== "undefined";
+        const pasa = Boolean(p?.procesado);// || conLineaEntrada;
+        console.log( p.codigo,Boolean(p?.procesado),maestroPalet?.linea_entrada_id ?? null);
+        return true;
+        return pasa;
+    });
+    const materialId = lineaFabricacionMaterialActualId;
+
+    const opcionesUbicacion = new Map();
+    palets.forEach((p) => {
+        const ubicId = p?.ubicacion_id;
+        if (ubicId === null || typeof ubicId === "undefined" || ubicId === "") return;
+        opcionesUbicacion.set(String(ubicId), p.ubicacion || `Ubicación ${ubicId}`);
+    });
+    const opcionesUbicacionOrdenadas = Array.from(opcionesUbicacion.entries())
+        .sort((a, b) => String(a[1]).localeCompare(String(b[1]), "es"));
+
+    const valorPrevio = selectorUbicacion.value;
+    selectorUbicacion.innerHTML = `<option value="">Todas las ubicaciones</option>` + opcionesUbicacionOrdenadas
+        .map(([id, nombre]) => `<option value="${id}">${nombre}</option>`)
+        .join("");
+    if (valorPrevio && opcionesUbicacion.has(String(valorPrevio))) {
+        selectorUbicacion.value = valorPrevio;
+    }
+
+    const filtroUbicacion = selectorUbicacion.value === "" ? ubicacionSeleccionada : String(selectorUbicacion.value);
+    const filtrados = palets.filter((p) => {
+        const duela = terminalFabricacion.duelas?.[p.duela_tipo_id];
+        const materialDeDuelaId = Number(duela?.material_id || 0);
+        const cumpleUbicacion = !filtroUbicacion || String(p?.ubicacion_id ?? "") === String(filtroUbicacion);
+        const cumpleMaterial = !materialId || materialDeDuelaId === Number(materialId);
+        const pasa = cumpleUbicacion && cumpleMaterial;
+if (p.procesado)         console.log( p.codigo,Boolean(p?.procesado));
+
+        return pasa;
+    });
+    console.log("[consumo] palets tras filtro material+ubicacion:", filtrados, { materialId, filtroUbicacion });
+
+    if (!filtrados.length) {
+        selectorPalet.innerHTML = `<option value="">Sin palets disponibles</option>`;
+        return;
+    }
+    selectorPalet.innerHTML = `<option value="">Seleccione palet...</option>` + filtrados.map((p) => {
+        const restante = Number(p.restante || 0).toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 3 });
+        const etiqueta = `${p.codigo} | ${p.ubicacion} | ${p.duela} | restante ${restante}`;
+        return `<option value="${p.id}">${etiqueta}</option>`;
+    }).join("");
+    autocompletarCamposConsumoDesdePalet();
+}
+
+function autocompletarCamposConsumoDesdePalet() {
+    const selectPalet = document.getElementById("consumo-palet-origen");
+    const inputLote = document.getElementById("consumo-lote");
+    const inputVolumen = document.getElementById("consumo-volumen");
+    if (!selectPalet || !inputLote || !inputVolumen) return;
+
+    const paletId = Number(selectPalet.value || 0);
+    if (!paletId) {
+        inputLote.value = "";
+        inputVolumen.value = "";
+        return;
+    }
+    const palet = (terminalFabricacion.paletsConsumo || []).find((p) => Number(p.id) === paletId);
+    if (!palet) {
+        inputLote.value = "";
+        inputVolumen.value = "";
+        return;
+    }
+
+    const codigo = String(palet.codigo || "");
+    const esPaletDirecto = Boolean(palet.procesado) || codigo.includes("#");
+    if (!esPaletDirecto) {
+        inputLote.value = "";
+        inputVolumen.value = "";
+        return;
+    }
+
+    const lote = codigo.includes("#") ? codigo.split("#")[0] : codigo;
+    const restante = Number(palet.restante || 0);
+    if (lote) inputLote.value = lote;
+    if (Number.isFinite(restante) && restante > 0) {
+        inputVolumen.value = String(restante);
     }
 }
 
@@ -384,6 +522,7 @@ function actualizarTablaLineasFabricacion(lineas, vistaId = null) {
         const tr = document.createElement("tr");
         tr.dataset.lineaId = l.id ?? "";
         tr.dataset.tipoProductoId = l.tipo_producto_id ?? "";
+        tr.dataset.materialId = l.material_id ?? "";
         const tipo =
             terminalFabricacion.tipos_producto?.[l.tipo_producto_id]?.descripcion ||
             (typeof l.tipo_producto_id !== "undefined" ? String(l.tipo_producto_id) : "");
@@ -476,7 +615,6 @@ async function agregarTrazabilidadFabricacionDesdeUI(_vistaId = "vista_consumo")
     const lote = (loteInput?.value || "").trim();
     const volumen = Number.parseFloat((volumenInput?.value || "").toString().replace(",", "."));
     const cantidad = 0;
-
     if (!lineaFabricacionActualId) {
         alert("Seleccione una linea de fabricacion.");
         return;
@@ -569,7 +707,7 @@ async function cargarLotesFlejeFabricarBota() {
     try {
         const resp = (await wsRequest("inventario_flejes", {})) || {};
         const items = (resp.inventario_flejes || [])
-            .filter((f) => Number(f.estado || 0) === 0)
+            .filter((f) => Number(f.estado || 0) < 2)
             .filter((f) => Number(f.restante || 0) > 0);
         if (!items.length) {
             selector.innerHTML = `<option value="">Sin flejes disponibles</option>`;

@@ -1,3 +1,4 @@
+import asyncio
 import socket
 
 PRINTER_IP = "192.168.1.69"
@@ -80,6 +81,16 @@ def build_barcode128_logo_label(value: str, copies: int = 1) -> str:
     title_y_2 = title_y + TITLE_FONT_H + TITLE_LINE_GAP
     title_y_3 = title_y_2 + TITLE_FONT_H + TITLE_LINE_GAP
 
+    return f"""
+    ^XA
+    ^MMT
+    ^PW366
+    ^LL232
+    ^LS0
+    ^FO16,4^GFA,1597,8358,42,:Z64:eJzt2b1r5EYUAPA3N0HjQr6BQMImGMl/QAqFA9twYvf+kBQKBh8hJrg0nPGOI/CmWLIprwikuCblpXcxy4bdEBxMmkCKMzoccmkCKlUomrzR98c6NiRd9LQYrfTbkea9N1pYA+SxUewAj4emqZ6zWJlb8I/BY/VlJqcdKZpv5XxmyoEB88udFqSy+X4urlIpO5KHbfnTdP2YQ7ctLy+z+9xvyWNrvUzMliQBE215qK++MsdNySQJ2tLVcjFVzSE4QHNKcj5N5Xw6b0qXiI+aElOuvnkTzy9bMqLCbkpdTZTyTyGbE3ogW1O6JZgw5IPgLqXDBuMJRPeRJ8A8GN5HhrAZ6EzdGdhI5nanndYFF7DhQKtKayPvjuO7ZU6qKe05u4ltGF5EYoadVx4nYXkThdzbTcYrYz8hSUMySQNvxINqSoeu43mr832DTDbPwagmBIYTOCCrdtJSPj0/oMRHaZZyC2W4TUQ1pcMdlAdLlHrMah3vgXH01TOU5aHlIy0PUCaDVTyoSfb6+Q6FdTJG6ZRyAAaJHKMmkw9fotxBKewlHNWvTr7dxvsubp0oJ0RpaTn6Hbz6mNQc2V45JvFReksLsyScA5D1MR+YjzdlXR554+VDzLxwnv6lamOW6cqCkpeOl1VTeLs16bblrVE+aO5sJlyVJDSrTrk9sDPI4H3dKXdJ7AzyhQX3WUgnuDLers3s9sAHzfEjuM+CZ4JsjIAGd0sSEPNTaD6YPBooslBcNGlEoo9F8/nt8UidLdSodaEheE/ESVOag7nvOY7XlGl+mnn3BqaWntOUelW2Hja3SF3HVt5RKsPpSMw9WF15vkZanUZCKVdhV2Lug668iroSv+NkS5oDeTnoZAlz326k8SxS04HTzjz2UbuRxn6gBqbTrmb3+/32uM9DPgvSuUof/zI++eHnZy/euX713uODA7377m9f//rjB5/98erFd7/0spe97GUve9nLXvayl73sZS972cte/r9lH/9RkNBWM7VQYgtiOM63LYi4WqnXSj6EU6oCly4ksDiXLlUkyTZwaZJLiyhfRankSSV9RdMNXKYquVBxTa6UOGFqkm96X8sbJYe0lLYNnOsfs2M2WV1N0k3EfCbYRFCJd7m4kcNUWly/mKAx91eTLPyYM4EvKknC5jfSSqXBYaglizm9yrdVTJmwtaQJOyskcHBRXrALWskL/KiF8ppek0pacIwyMVwo5dLVn0epqAWklImWXL3lAivk9y6MtWTqcwvojXQzGUPIMU8C5SyX0oVTOGaYJ4myyFIuZyh5R65QsoUKM6lIwJXP8KzNKzkWIVNzP7CAF9UErqXQZ4c1ybSUBKVNi6uzs4Drn5TxijVJZaj/D4NyRPMaAfNlLuO6nAe5PKVFjVJJ8SyJKklTSc5QxoW0Usm1DCvJU8m0jAppZ3KC4wQs7xDhcj+Vi8AiIcoh0/05w7bB8giXSVZ0nctWvsRqvpEWDXBGNvdRqlRijXRN8k7G/VRijSj2My4gX4Us0TJbEYtydeBflESJTHI8GNJYS73KuJqXK44kWoLCCaOMWIKSRFpi9VHKYhW7OjcoTzMZkBjl36gcbgA=:BAF4
+    ^PQ1,0,1,Y
+    ^XZ"""
+    
     return f"""^XA
 ^PW{LABEL_W}
 ^LL{LABEL_H}
@@ -131,9 +142,14 @@ def build_barcode128_logo_label(value: str, copies: int = 1) -> str:
 """
 
 
-def print_label(value: str, copies: int = 1):
-    send_raw_zpl(build_barcode128_logo_label(value, copies=copies))
+async def print_label(value: str, copies: int = 1):
+    a = ""
+    for i in range(20):
+        a = a + build_barcode128_logo_label(f"TEST-{i+1:03d}", copies=copies)
+    send_raw_zpl(a)
+    #await asyncio.sleep(0.5)
 
 
 if __name__ == "__main__":
-    print_label("A1B2C3D4E5F6G7H-000*", copies=1)
+    #print_label("A1B2C3D4E5F6G7H-000*", copies=1)
+    asyncio.run(print_label("", copies=1))

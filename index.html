@@ -6,15 +6,15 @@
     <title>Paez Lobato - GO</title>
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <link rel="stylesheet" href="./static/css/bootstrap.min.css?v=20260223a" />
-    <link rel="stylesheet" href="./static/font/bootstrap-icons.css?v=20260223a">
+    <link rel="stylesheet" href="./static/css/bootstrap.min.css?v=20260227b" />
+    <link rel="stylesheet" href="./static/font/bootstrap-icons.css?v=20260227b">
 
-    <link rel="stylesheet" href="./css/app.css?v=20260223a" />
-    <link rel="stylesheet" href="./css/tareas.css?v=20260223a" />
-    <link rel="stylesheet" href="./css/recepcion.css?v=20260223a" />
-    <link rel="stylesheet" href="./css/ubicacion.css?v=20260223a" />
-    <link rel="stylesheet" href="./css/fabricacion.css?v=20260223a" />
-    <link rel="stylesheet" href="./css/expedicion.css?v=20260223a" />
+    <link rel="stylesheet" href="./css/app.css?v=20260227b" />
+    <link rel="stylesheet" href="./css/tareas.css?v=20260227b" />
+    <link rel="stylesheet" href="./css/recepcion.css?v=20260227b" />
+    <link rel="stylesheet" href="./css/ubicacion.css?v=20260227b" />
+    <link rel="stylesheet" href="./css/fabricacion.css?v=20260227b" />
+    <link rel="stylesheet" href="./css/expedicion.css?v=20260227b" />
     <link rel="icon" href="data:,">
 </head>
 
@@ -76,7 +76,7 @@
                                 data-contexto-consumo="maderas_madera" data-bs-dismiss="offcanvas">
                                 Consumo
                             </button>
-                            <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_ubicacion" data-contexto-ubicacion="maderas_madera"
+                            <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_menu_movimientos"
                                 data-bs-dismiss="offcanvas">
                                 Movimientos
                             </button>
@@ -183,13 +183,31 @@
                 <img class="boton-icono" src="./imagenes/iconos/palet.png" alt="Consumo">
                 <span>Consumo</span>
             </button>
-            <button class="boton amarillo boton-con-icono" mostrar="vista_ubicacion" data-contexto-ubicacion="maderas_madera">
+            <button class="boton amarillo boton-con-icono" mostrar="vista_menu_movimientos">
                 <div class="d-flex gap-2 fs-2" aria-hidden="true">
                     <i class="bi bi-shuffle"></i>
                 </div>
                 <span>Movimientos</span>
             </button>
             <button class="boton boton-volver" mostrar="vista_menu_maderas">
+                <span>Volver</span>
+            </button>
+        </section>
+
+        <section id="vista_menu_movimientos" class="flex-fill menu-secundario">
+            <button class="boton rojo boton-con-icono" disabled>
+                <i class="bi bi-box-arrow-down fs-2" aria-hidden="true"></i>
+                <span>Baja</span>
+            </button>
+            <button class="boton naranja boton-con-icono" disabled>
+                <i class="bi bi-bezier2 fs-2" aria-hidden="true"></i>
+                <span>Baja Procesado</span>
+            </button>
+            <button class="boton verde boton-con-icono" mostrar="vista_ubicacion" data-contexto-ubicacion="maderas_madera">
+                <i class="bi bi-plus-square fs-2" aria-hidden="true"></i>
+                <span>Crear a partir de Stock</span>
+            </button>
+            <button class="boton boton-volver" mostrar="vista_menu_maderas_madera">
                 <span>Volver</span>
             </button>
         </section>
@@ -340,39 +358,54 @@
         </section>
 
         <section id="vista_ubicacion" class="flex-fill">
-
-            <form class="container-sm">
-
-                <!-- Input de búsqueda -->
-                <div class="mb-3">
-                    <label for="entradaUbicacion" class="form-label">ID de palet o ubicación</label>
-                    <div class="input-group mb-3">
-                        <input type="text" class="form-control" id="entradaUbicacion"
-                            placeholder="Ej: PAL12345 o UBIC001">
-                        <button class="btn btn-primary" type="button" id="buscarUbicacion">Buscar</button>
+            <form id="form-crear-stock" class="container-sm crear-stock-form" autocomplete="off">
+                <div class="card shadow-sm">
+                    <div class="card-header">
+                        <h5 class="mb-0">Crear a partir de Stock</h5>
                     </div>
-
-                </div>
-
-                <!-- Cuadro informativo de resultado -->
-                <div id="resultadoUbicacion" class="border rounded p-3 mb-3 bg-light text-dark">
-                    <!-- Se completará dinámicamente -->
-                    <strong>Resultado:</strong>
-                    <p class="mb-0">Palet: <span id="infoPalet">PAL12345</span></p>
-                    <p class="mb-0">Material: <span id="infoMaterial">Hileras de Duela de Roble Frances
-                            950x1200x3,5mm</span></p>
-                    <p class="mb-0">Ubicación actual: <span id="infoUbicacion">UBIC001</span></p>
-                </div>
-
-                <!-- Nueva ubicación -->
-                <div class="mb-3">
-                    <label for="nuevaUbicacion" class="form-label">Nueva ubicación</label>
-                    <!-- Nueva ubicación + botón reubicar -->
-                    <div class="input-group mb-3">
-                        <input type="text" class="form-control" id="nuevaUbicacion" placeholder="Ej: UBIC002">
-                        <button class="btn btn-success" type="submit">Reubicar</button>
+                    <div class="card-body">
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <label for="crearstock-tipo-producto" class="form-label">Tipo de producto</label>
+                                <select class="form-select" id="crearstock-tipo-producto">
+                                    <option value="">Seleccione tipo...</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="crearstock-material" class="form-label">Madera</label>
+                                <select class="form-select" id="crearstock-material">
+                                    <option value="">Seleccione madera...</option>
+                                </select>
+                            </div>
+                            <div class="col-md-4">
+                                <label for="crearstock-ubicacion" class="form-label">Instalaciones</label>
+                                <select class="form-select" id="crearstock-ubicacion">
+                                    <option value="">Seleccione instalación...</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="crearstock-lote" class="form-label">Lote</label>
+                                <input type="text" class="form-control" id="crearstock-lote" placeholder="Lote" required>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="crearstock-cubico" class="form-label">Cúbico</label>
+                                <input type="number" step="0.001" min="0.001" class="form-control" id="crearstock-cubico" placeholder="0" required>
+                            </div>
+                            <div class="col-12">
+                                <label for="crearstock-origen" class="form-label">Origen</label>
+                                <select class="form-select" id="crearstock-origen" required>
+                                    <option value="">Seleccione origen...</option>
+                                </select>
+                                <div id="crearstock-estado" class="small text-muted"></div>
+                            </div>
+                            <div class="col-12 d-flex justify-content-end">
+                                <button class="btn btn-primary" type="button" id="crearstock-crear">
+                                    <i class="bi bi-plus-lg"></i> Crear
+                                </button>
+                            </div>
+                        </div>
                     </div>
-
+                </div>
             </form>
         </section>
 
@@ -441,9 +474,7 @@
                         </div>
 
                         <div class="modal-body">
-                            <p>Materiales y lotes correspondientes al producto:
-                                <span id="consumo-producto-orden">Producto</span>
-                            </p>
+                            <div class="small fw-semibold mb-2" id="consumo-producto-orden">Producto</div>
 
                             <div class="table-responsive">
                                 <table class="table table-bordered table-sm" id="tabla_trazabilidad_consumo">
@@ -460,6 +491,12 @@
 
                                 <div class="modal-footer flex-column align-items-stretch gap-2">
                                     <div class="row g-2">
+                                        <div class="col-12">
+                                            <label class="form-label mb-1" for="consumo-ubicacion-origen">Ubicación</label>
+                                            <select class="form-select" id="consumo-ubicacion-origen">
+                                                <option value="">Todas las ubicaciones</option>
+                                            </select>
+                                        </div>
                                         <div class="col-12">
                                             <label class="form-label mb-1" for="consumo-palet-origen">Palet origen</label>
                                             <select class="form-select" id="consumo-palet-origen">
@@ -847,16 +884,18 @@
     </div>
 
 
-    <script src="./static/js/bootstrap.bundle.min.js?v=20260223a"></script>
-    <script src="./js/constantes.js?v=20260223a"></script>
-    <script src="./js/conexiones.js?v=20260223a"></script>
-    <script src="./js/gestion-auth.js?v=20260223a"></script>
-    <script src="./js/terminal-recepcion.js?v=20260223a"></script>
-    <script src="./js/terminal-fabricacion.js?v=20260223e"></script>
-    <script src="./js/terminal-expedicion.js?v=20260223a"></script>
-    <script src="./js/terminal.js?v=20260223a"></script>
+    <script src="./static/js/bootstrap.bundle.min.js?v=20260227b"></script>
+    <script src="./js/constantes.js?v=20260227b"></script>
+    <script src="./js/conexiones.js?v=20260227b"></script>
+    <script src="./js/gestion-auth.js?v=20260227b"></script>
+    <script src="./js/terminal-recepcion.js?v=20260227b"></script>
+    <script src="./js/terminal-fabricacion.js?v=20260227b"></script>
+    <script src="./js/terminal-expedicion.js?v=20260227b"></script>
+    <script src="./js/terminal-ubicacion.js?v=20260227b"></script>
+    <script src="./js/terminal.js?v=20260227b"></script>
 
 </body>
 
 </html>
+
 

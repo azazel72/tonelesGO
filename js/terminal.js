@@ -35,6 +35,7 @@ document.addEventListener("DOMContentLoaded", function () {
     prepararEventosFabricacion();
     prepararEventosExpedicion();
     prepararEventosMenuFlejes();
+    prepararEventosUbicacion();
 
     // Muestra la sección de tareas al cargar la página
     mostrarSeccion("vista_tareas");
@@ -77,6 +78,9 @@ function mostrarSeccion(id) {
             contextoNavegacion.autoAccesoConsumo = false;
             cargarOrdenesFabricacion({ vistaId: "vista_fabricacion", autoAccesoConsumo: false });
         }
+        if (id === "vista_ubicacion") {
+            cargarFormularioCrearStock();
+        }
         if (id === "vista_menu_maderas_fleje") {
             cargarEntradasFlejesMenu();
         }
@@ -117,6 +121,16 @@ function actualizarMigasPan(mostrarSeccion) {
             nuevaMiga = crearMigaPan("Madera", mostrarSeccion, true);
             migasPan.appendChild(nuevaMiga);
             break;
+        case "vista_menu_movimientos":
+            nuevaMiga = crearMigaPan("Inicio", "vista_tareas", false);
+            migasPan.appendChild(nuevaMiga);
+            nuevaMiga = crearMigaPan("Maderas", "vista_menu_maderas", false);
+            migasPan.appendChild(nuevaMiga);
+            nuevaMiga = crearMigaPan("Madera", "vista_menu_maderas_madera", false);
+            migasPan.appendChild(nuevaMiga);
+            nuevaMiga = crearMigaPan("Movimientos", mostrarSeccion, true);
+            migasPan.appendChild(nuevaMiga);
+            break;
         case "vista_menu_botas":
             nuevaMiga = crearMigaPan("Inicio", "vista_tareas", false);
             migasPan.appendChild(nuevaMiga);
@@ -149,7 +163,9 @@ function actualizarMigasPan(mostrarSeccion) {
                 migasPan.appendChild(nuevaMiga);
                 nuevaMiga = crearMigaPan("Madera", "vista_menu_maderas_madera", false);
                 migasPan.appendChild(nuevaMiga);
-                nuevaMiga = crearMigaPan("Movimientos", mostrarSeccion, true);
+                nuevaMiga = crearMigaPan("Movimientos", "vista_menu_movimientos", false);
+                migasPan.appendChild(nuevaMiga);
+                nuevaMiga = crearMigaPan("Crear a partir de Stock", mostrarSeccion, true);
             } else {
                 nuevaMiga = crearMigaPan("Ubicación", mostrarSeccion, true);
             }

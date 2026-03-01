@@ -25,6 +25,7 @@ def obtener_acciones() -> Dict[str, any]:
         "listar_archivos_entidad": lambda ws, req: Colector.colector.listar_archivos_entidad(req.data.get("entidad"), req.data.get("entidad_id")),
         "inventario_duelas": lambda ws, req: Colector.colector.inventario_duelas(),
         "inventario_flejes": lambda ws, req: Colector.colector.inventario_flejes(),
+        "siguiente_codigo_palet": lambda ws, req: Colector.colector.siguiente_codigo_palet(req.data or {}),
         "modificar_maestro": lambda ws, req: Colector.colector.modificar_maestro(req.data),
         "modificar_entrada": lambda ws, req: Colector.colector.modificar_entrada(req.data),
         "eliminar_maestro": lambda ws, req: Colector.colector.eliminar_maestro(req.data),

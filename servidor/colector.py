@@ -383,6 +383,7 @@ class Colector:
                 select(
                     PaletDB.id,
                     PaletDB.codigo,
+                    PaletDB.procesado,
                     PaletDB.ubicacion_id,
                     UbicacionDB.descripcion,
                     PaletDB.duela_tipo_id,
@@ -393,25 +394,25 @@ class Colector:
                 .select_from(PaletDB)
                 .join(UbicacionDB, UbicacionDB.id == PaletDB.ubicacion_id, isouter=True)
                 .join(DuelaDB, DuelaDB.id == PaletDB.duela_tipo_id, isouter=True)
-                .where(PaletDB.procesado == False, PaletDB.ubicacion_id.is_not(None))
                 .order_by(UbicacionDB.descripcion, DuelaDB.descripcion, PaletDB.codigo)
             )
             rows = session.exec(stmt).all()
             resultado = []
             for row in rows:
-                restante = max(float(row[6] or 0) - float(row[7] or 0), 0.0)
+                restante = max(float(row[7] or 0) - float(row[8] or 0), 0.0)
                 if restante <= 0:
                     continue
                 resultado.append(
                     {
                         "id": row[0],
                         "codigo": row[1] or "",
-                        "ubicacion_id": row[2],
-                        "ubicacion": row[3] or "Sin ubicación",
-                        "duela_tipo_id": row[4],
-                        "duela": row[5] or "Sin duela",
-                        "cubicaje": float(row[6] or 0),
-                        "consumido": float(row[7] or 0),
+                        "procesado": bool(row[2]),
+                        "ubicacion_id": row[3],
+                        "ubicacion": row[4] or "Sin ubicación",
+                        "duela_tipo_id": row[5],
+                        "duela": row[6] or "Sin duela",
+                        "cubicaje": float(row[7] or 0),
+                        "consumido": float(row[8] or 0),
                         "restante": restante,
                     }
                 )
@@ -443,33 +444,46 @@ class Colector:
             palet_origen = session.get(PaletDB, int(palet_origen_id))
             if not palet_origen:
                 raise ValueError("palet_origen no encontrado.")
+            if not lote:
+                raise ValueError("lote es obligatorio.")
+            if volumen is None or str(volumen).strip() == "":
+                raise ValueError("volumen es obligatorio.")
+            if volumen_val <= 0:
+                raise ValueError("volumen debe ser mayor que 0.")
             restante_origen = max(float(palet_origen.cubicaje or 0) - float(palet_origen.consumido or 0), 0.0)
             if volumen_val > restante_origen:
                 raise ValueError("El volumen supera el restante disponible del palet origen.")
 
-            contador = self._siguiente_contador_global_palets(session)
-            codigo_nuevo = f"{lote}#{contador:06d}"
-            while session.exec(select(PaletDB).where(PaletDB.codigo == codigo_nuevo)).first():
-                contador += 1
+            palet_objetivo = palet_origen
+            # generamos un nuevo palet
+            if not bool(palet_origen.procesado) and not bool(palet_origen.ubicacion_id):
+                contador = self._siguiente_contador_global_palets(session)
                 codigo_nuevo = f"{lote}#{contador:06d}"
 
-            palet = PaletDB(
-                codigo=codigo_nuevo,
-                linea_entrada_id=None,
-                duela_tipo_id=palet_origen.duela_tipo_id,
-                cubicaje=volumen_val,
-                consumido=0.0,
-                estado=palet_origen.estado,
-                ubicacion_id=None,
-                procesado=False,
-            )
-            session.add(palet)
-            session.flush()
+                palet = PaletDB(
+                    codigo=codigo_nuevo,
+                    linea_entrada_id=None,
+                    duela_tipo_id=palet_origen.duela_tipo_id,
+                    cubicaje=volumen_val,
+                    consumido=0.0,
+                    estado=palet_origen.estado,
+                    ubicacion_id=palet_origen.ubicacion_id,
+                    procesado=True,
+                )
+                session.add(palet)
+                session.flush()
+                palet_objetivo = palet
+
+                trazabilidad_procesado = TrazabilidadProcesadoDB(
+                    palet_origen_id=palet_origen.id,
+                    palet_destino_id=palet.id,
+                )
+                session.add(trazabilidad_procesado)
 
             existente = session.exec(
                 select(TrazabilidadFabricacionDB).where(
                     TrazabilidadFabricacionDB.linea_fabricacion_id == linea_fabricacion_id,
-                    TrazabilidadFabricacionDB.palet_id == palet.id,
+                    TrazabilidadFabricacionDB.palet_id == palet_objetivo.id,
                 )
             ).first()
             if existente:
@@ -477,7 +491,7 @@ class Colector:
 
             trazabilidad = TrazabilidadFabricacionDB(
                 linea_fabricacion_id=linea_fabricacion_id,
-                palet_id=palet.id,
+                palet_id=palet_objetivo.id,
                 cantidad_fabricada=cantidad_val,
                 estado=estado,
             )
@@ -486,13 +500,13 @@ class Colector:
             session.add(palet_origen)
             session.commit()
             session.refresh(trazabilidad)
-            session.refresh(palet)
+            session.refresh(palet_objetivo)
 
             return {
                 "id": trazabilidad.id,
                 "linea_fabricacion_id": linea_fabricacion_id,
-                "palet_id": palet.id,
-                "palet_codigo": palet.codigo,
+                "palet_id": palet_objetivo.id,
+                "palet_codigo": palet_objetivo.codigo,
                 "cantidad_fabricada": trazabilidad.cantidad_fabricada,
                 "estado": trazabilidad.estado,
                 "volumen": volumen_val,
@@ -769,6 +783,21 @@ class Colector:
             if cont > max_cont:
                 max_cont = cont
         return max_cont + 1
+
+    def siguiente_codigo_palet(self, data):
+        lote = (data.get("lote") or "").strip()
+        palet_codigo = data.get("palet_codigo")
+        prefijo = lote or self._extraer_prefijo_lote(palet_codigo)
+        if not prefijo:
+            raise ValueError("No se pudo determinar el prefijo del lote.")
+
+        with DB.crear_sesion() as session:
+            contador = self._siguiente_contador_global_palets(session)
+            codigo_nuevo = f"{prefijo}#{contador:06d}"
+            while session.exec(select(PaletDB).where(PaletDB.codigo == codigo_nuevo)).first():
+                contador += 1
+                codigo_nuevo = f"{prefijo}#{contador:06d}"
+            return {"codigo": codigo_nuevo, "prefijo": prefijo, "contador": contador}
 
     def _generar_codigo_producto(self, session, trazas, palet_codigos, operarios_ids: list[int]) -> str:
         sep = "X" if len([c for c in palet_codigos if c]) > 1 else "-"
