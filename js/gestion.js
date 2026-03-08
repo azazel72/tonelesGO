@@ -73,6 +73,10 @@ window.onload = () => {
         async "ver-palets"() {
             await openPaletsWin();
         },
+        async "ver-stocks"() {
+            if (!asegurarFabricacionCargada("tipos_producto", "stocks")) return;
+            await openStocksWin();
+        },
 
         async "ver-productos"() {
             await openProductosWin();
@@ -169,6 +173,7 @@ window.onload = () => {
         lineas_entrada: openLineasEntradaWin,
         entradas_flejes: openEntradasFlejesWin,
         palets: openPaletsWin,
+        stocks: openStocksWin,
         productos: openProductosWin,
         archivos_subidos: openArchivosSubidosWin,
         ambientes: openAmbientesWin,

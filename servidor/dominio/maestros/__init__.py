@@ -21,6 +21,7 @@ from .producto_operario_dto import ProductoOperarioDTO
 from .archivo_subido_dto import ArchivoSubidoDTO
 from .ambiente_dto import AmbienteDTO
 from .entrada_fleje_dto import EntradaFlejeDTO
+from .stock_dto import StockDTO
 
 __all__ = [
     "ClienteDTO",
@@ -45,4 +46,5 @@ __all__ = [
     "ArchivoSubidoDTO",
     "AmbienteDTO",
     "EntradaFlejeDTO",
+    "StockDTO",
 ]

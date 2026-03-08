@@ -248,6 +248,7 @@ function cerrarVentanasMaestros() {
     "lineas_entrada",
     "entradas_flejes",
     "palets",
+    "stocks",
     "productos",
     "archivos_subidos",
     "ambientes",

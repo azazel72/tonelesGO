@@ -8,6 +8,7 @@ from servidor.modelos import ProductoOperarioDB
 class ProductoOperarioDTO(BaseModel):
     producto_id: int
     usuario_id: int
+    codigo_batidero: int | None = None
     created_at: datetime | None = None
     created_by: str = "system"
 
@@ -15,6 +16,7 @@ class ProductoOperarioDTO(BaseModel):
         return ProductoOperarioDTO(
             producto_id=producto_operario_db.producto_id,
             usuario_id=producto_operario_db.usuario_id,
+            codigo_batidero=producto_operario_db.codigo_batidero,
             created_at=producto_operario_db.created_at,
             created_by=producto_operario_db.created_by,
         )
@@ -23,6 +25,7 @@ class ProductoOperarioDTO(BaseModel):
         return ProductoOperarioDB(
             producto_id=self.producto_id,
             usuario_id=self.usuario_id,
+            codigo_batidero=self.codigo_batidero,
             created_at=self.created_at,
             created_by=self.created_by,
         )

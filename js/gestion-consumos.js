@@ -9,7 +9,7 @@ function openConsumosWin() {
   const tiposProducto = Object.values(DATOS?.fabricacion?.tipos_producto ?? {});
 
   const botasDict = tiposProducto
-    .filter((tp) => String(tp?.tipo || "").toUpperCase() === "BOTA")
+    .filter((tp) => ["BOTA", "FONDO"].includes(String(tp?.tipo || "").toUpperCase()))
     .map(({ id, descripcion, codigo, ...resto }) => ({
       ...resto,
       id,
@@ -44,7 +44,7 @@ function openConsumosWin() {
         columns: [
           { title: "ID", field: "id", width: 70, hozAlign: "right" },
           {
-            title: "Bota",
+            title: "Producto",
             field: "bota_id",
             editor: "list",
             editorParams: {

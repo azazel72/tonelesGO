@@ -45,6 +45,13 @@ function openPedidosWin() {
         columns: [
           { title:"ID", field:"id", width:70, hozAlign:"right"},
           {
+            title: "Descripcion",
+            field: "descripcion",
+            editor: "input",
+            editable: tablaEditable,
+            cssClass: "filtrable",
+          },
+          {
             title: "Tipo de producto",
             field: "tipo_producto_id",
             editor: "list",
@@ -107,13 +114,6 @@ function openPedidosWin() {
             editable: tablaEditable,
             cssClass: "filtrable",
             hozAlign: "right",
-          },
-          {
-            title: "Descripcion",
-            field: "descripcion",
-            editor: "input",
-            editable: tablaEditable,
-            cssClass: "filtrable",
           },
           {
             title: "Fecha",

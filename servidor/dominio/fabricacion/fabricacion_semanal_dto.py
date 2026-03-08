@@ -1,5 +1,5 @@
 
-from pydantic import BaseModel
+from pydantic import BaseModel, field_validator
 from datetime import date
 from servidor.modelos import FabricacionSemanalDB
 
@@ -13,6 +13,13 @@ class FabricacionSemanalDTO(BaseModel):
     cantidad: int = 0
     cantidad_fabricada: int = 0
     estado: int | None = None
+
+    @field_validator("cantidad", "cantidad_fabricada", mode="before")
+    @classmethod
+    def normalizar_entero_vacio(cls, value):
+        if value in ("", None):
+            return 0
+        return value
 
     def from_db(linea_db: FabricacionSemanalDB) -> "FabricacionSemanalDTO":
         return FabricacionSemanalDTO(

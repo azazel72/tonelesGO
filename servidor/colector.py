@@ -2,20 +2,20 @@ from datetime import date, timedelta
 import re
 import logging
 import threading
-from typing import List
+from typing import List, get_args
 
 from servidor.herramientas.utilidades import obtener_anterior_dia_semana
 from servidor.herramientas.BcryptHelper import BcryptHelper
 
 from .modelos import ClienteDB, EstadoPedidoDB, EstadoFabricacionSemanalDB, EstadoBotaDB, EstadoTrazabilidadFabricacionDB, EstadoPaletDB
-from .modelos import InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB, RolDB, PuestoTrabajoDB, MaterialDB, DuelaDB, EntradaDB, LineaEntradaDB, PaletDB, ProductoDB, ProductoOperarioDB, ArchivoSubidoDB, AmbienteDB, EntradaFlejeDB
+from .modelos import InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB, RolDB, PuestoTrabajoDB, MaterialDB, DuelaDB, EntradaDB, LineaEntradaDB, PaletDB, ProductoDB, ProductoOperarioDB, ArchivoSubidoDB, AmbienteDB, EntradaFlejeDB, StockDB
 from .modelos import PedidoDB, TipoProductoDB, FabricacionSemanalDB, TrazabilidadProcesadoDB, TrazabilidadFabricacionDB, TrazabilidadProductoDB, BotaDB, ConsumoDB
 from .modelos import PlanCamionDB, PlanFacturacionDB, PlanMaterialDB, CuadranteDB, CuadranteDetalleDB
 from .persistencia import GenericRepository, DB
 from sqlmodel import select
 from sqlalchemy import extract, func
 from .dominio import PlanificacionEntradasDTO, MaestrosDTO, PlanMaterialDTO, PlanFacturacionDTO, PlanCamionDTO, CuadranteDTO, CuadranteDetalleDTO, FabricacionDTO
-from .dominio import ClienteDTO, EstadoPedidoDTO, EstadoFabricacionSemanalDTO, EstadoBotaDTO, EstadoTrazabilidadFabricacionDTO, EstadoPaletDTO, InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO, RolDTO, PuestoTrabajoDTO, MaterialDTO, DuelaDTO, EntradaDTO, LineaEntradaDTO, PaletDTO, ProductoDTO, ArchivoSubidoDTO, AmbienteDTO, EntradaFlejeDTO, CuadrantesDTO
+from .dominio import ClienteDTO, EstadoPedidoDTO, EstadoFabricacionSemanalDTO, EstadoBotaDTO, EstadoTrazabilidadFabricacionDTO, EstadoPaletDTO, InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO, RolDTO, PuestoTrabajoDTO, MaterialDTO, DuelaDTO, EntradaDTO, LineaEntradaDTO, PaletDTO, ProductoDTO, ArchivoSubidoDTO, AmbienteDTO, EntradaFlejeDTO, StockDTO, CuadrantesDTO
 from .dominio import PedidoDTO, TipoProductoDTO, FabricacionSemanalDTO, TrazabilidadProcesadoDTO, TrazabilidadFabricacionDTO, TrazabilidadProductoDTO, BotaDTO, ConsumoDTO
 from servidor.impresion import ImprimirEtiqueta
 from servidor.conexiones.broadcast import broadcast_error, broadcast_event
@@ -62,6 +62,7 @@ class Colector:
         self.repo_archivos_subidos = GenericRepository(ArchivoSubidoDB)
         self.repo_ambientes = GenericRepository(AmbienteDB)
         self.repo_entradas_flejes = GenericRepository(EntradaFlejeDB)
+        self.repo_stocks = GenericRepository(StockDB)
         self.repo_pedidos = GenericRepository(PedidoDB)
         self.repo_tipos_producto = GenericRepository(TipoProductoDB)
         self.repo_fabricacion_semanal = GenericRepository(FabricacionSemanalDB)
@@ -103,6 +104,7 @@ class Colector:
             archivos_subidos = self.repo_archivos_subidos.list_all(session)
             ambientes = self.repo_ambientes.list_all(session)
             entradas_flejes = self.repo_entradas_flejes.list_all(session)
+            stocks = self.repo_stocks.list_all(session)
 
             self.maestros.clientes = {cliente.id: ClienteDTO.from_db(cliente) for cliente in clientes}
             self.maestros.estados_pedidos = {estado.id: EstadoPedidoDTO.from_db(estado) for estado in estados_pedidos}
@@ -125,6 +127,7 @@ class Colector:
             self.maestros.archivos_subidos = {archivo.id: ArchivoSubidoDTO.from_db(archivo) for archivo in archivos_subidos}
             self.maestros.ambientes = {ambiente.id: AmbienteDTO.from_db(ambiente) for ambiente in ambientes}
             self.maestros.entradas_flejes = {entrada.id: EntradaFlejeDTO.from_db(entrada) for entrada in entradas_flejes}
+            self.maestros.stocks = {stock.id: StockDTO.from_db(stock) for stock in stocks}
 
             #print("Datos maestros cargados:", self.maestros)
             #print("Datos clientes cargados:", self.maestros.clientes)
@@ -185,6 +188,7 @@ class Colector:
                     valor = str(valor or "").strip()[:2]
                 if campo == "clave":
                     valor = BcryptHelper.hash_password(valor or "")
+            valor = self._normalizar_vacio_numerico(objeto, campo, valor)
             setattr(DTO, campo, valor)
             if tabla == "entradas_flejes":
                 DTO.restante = max(float(DTO.peso or 0) - float(DTO.consumido or 0), 0.0)
@@ -226,6 +230,7 @@ class Colector:
 
         with DB.crear_sesion() as session:
             repo, maestro, objeto = self.obtener_repo(tabla)
+            data = self._normalizar_data_vacia_numerica(objeto, data)
             if tabla == "usuarios":
                 data = dict(data or {})
                 data["alias"] = data.get("alias")
@@ -307,6 +312,7 @@ class Colector:
             DTO = busqueda(entrada_id)
             self.checkUpdate(DTO, tabla, entrada_id, campo)  
 
+            valor = self._normalizar_vacio_numerico(objeto, campo, valor)
             setattr(DTO, campo, valor)
             updated = DTO.to_db()
             repo.update(session, updated)
@@ -560,11 +566,14 @@ class Colector:
         operarios_ids_producto = self._normalizar_ids_operarios(operarios_ids_input)
         operarios_ids_codigo = list(operarios_ids_producto)
         batidero_id = None
+        codigos_batidero_validos = {11, 12, 13, 21, 22, 23}
         try:
             if batidero is not None and batidero != "":
                 batidero_id = int(batidero)
         except (TypeError, ValueError):
             batidero_id = None
+        if batidero_id is not None and batidero_id not in codigos_batidero_validos:
+            raise ValueError("Codigo de batidero invalido. Valores permitidos: 11, 12, 13, 21, 22, 23.")
         if batidero_id is not None:
             if operarios_ids_codigo:
                 resto = [op for op in operarios_ids_codigo[1:] if op != batidero_id]
@@ -634,6 +643,7 @@ class Colector:
                                 ProductoOperarioDB(
                                     producto_id=producto.id,
                                     usuario_id=operario_id,
+                                    codigo_batidero=batidero_id if tipo == "BOTA" else None,
                                 )
                             )
 
@@ -1160,6 +1170,10 @@ class Colector:
             repo = self.repo_entradas_flejes
             maestro = self.maestros.entradas_flejes
             objeto = EntradaFlejeDTO
+        elif tabla == "stocks":
+            repo = self.repo_stocks
+            maestro = self.maestros.stocks
+            objeto = StockDTO
         elif tabla == "pedidos":
             repo = self.repo_pedidos
             maestro = self.fabricacion.pedidos
@@ -1311,6 +1325,45 @@ class Colector:
             raise ValueError(f"Entrada con ID {entrada_id} no encontrada en la tabla '{tabla}'.")
         if not hasattr(objeto, campo):
             raise ValueError(f"Campo '{campo}' no existe en la entrada de la tabla '{tabla}'.")
+
+    def _es_union_con_none(self, annotation) -> tuple[bool, tuple]:
+        args = tuple(get_args(annotation) or ())
+        if not args:
+            return False, ()
+        contiene_none = any(arg is type(None) for arg in args)
+        return contiene_none, args
+
+    def _normalizar_vacio_numerico(self, dto_cls, campo: str, valor):
+        # Solo normaliza campos de negocio de tipo cantidad*/estado* cuando llega "".
+        if valor != "":
+            return valor
+        nombre = str(campo or "").strip().lower()
+        if not (nombre.startswith("cantidad") or nombre.startswith("estado")):
+            return valor
+        field_info = getattr(dto_cls, "model_fields", {}).get(campo) if dto_cls else None
+        if not field_info:
+            return valor
+
+        annotation = field_info.annotation
+        contiene_none, args = self._es_union_con_none(annotation)
+        tipos = args if args else (annotation,)
+
+        es_int = int in tipos
+        es_float = float in tipos
+
+        if not (es_int or es_float):
+            return valor
+
+        if nombre.startswith("estado"):
+            # En estados opcionales respetamos null; en no opcionales usamos 0.
+            return None if contiene_none else 0
+        return 0.0 if es_float else 0
+
+    def _normalizar_data_vacia_numerica(self, dto_cls, data: dict | None):
+        normalizada = dict(data or {})
+        for campo, valor in list(normalizada.items()):
+            normalizada[campo] = self._normalizar_vacio_numerico(dto_cls, campo, valor)
+        return normalizada
 
     def limpiar_datos(self):
         #self.datos.clear()

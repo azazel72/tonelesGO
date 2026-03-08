@@ -5,6 +5,7 @@ from .maestros import InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB, RolDB,
 from .maestros import MaterialDB, DuelaDB, EntradaDB, LineaEntradaDB, PaletDB, ProductoDB, ProductoOperarioDB, ArchivoSubidoDB
 from .maestros import AmbienteDB
 from .maestros import EntradaFlejeDB
+from .maestros import StockDB
 from .fabricacion import PedidoDB, TipoProductoDB, FabricacionSemanalDB, TrazabilidadProcesadoDB
 from .fabricacion import TrazabilidadFabricacionDB, TrazabilidadProductoDB, BotaDB, ConsumoDB
 
@@ -34,6 +35,7 @@ __all__ = [
     "ArchivoSubidoDB",
     "AmbienteDB",
     "EntradaFlejeDB",
+    "StockDB",
     "CuadranteDB",
     "CuadranteDetalleDB",
     "PedidoDB",

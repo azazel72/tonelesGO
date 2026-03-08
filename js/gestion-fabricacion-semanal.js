@@ -57,11 +57,18 @@ function openFabricacionSemanalWin() {
             editable: tablaEditable,
             cssClass: "filtrable",
             formatter: (cell) => getEtiquetaPedido(DATOS?.fabricacion?.pedidos?.[cell.getValue()]),
+            cellEdited: onPedidoCellEditedFabricacionSemanal,
           },
           {
             title: "Fecha inicio",
             field: "fecha_inicio",
             editor: "date",
+            editorParams: {
+              elementAttributes: {
+                min: "0001-01-01",
+                step: 7,
+              },
+            },
             editable: tablaEditable,
             cssClass: "filtrable",
             sorter: "date",
@@ -78,7 +85,7 @@ function openFabricacionSemanalWin() {
               listOnEmpty: true,
               freetext: false,
             },
-            editable: tablaEditable,
+            editable: false,
             cssClass: "filtrable",
             formatter: cell => DATOS?.fabricacion?.tipos_producto?.[cell.getValue()]?.descripcion ?? cell.getValue(),
           },
@@ -94,7 +101,7 @@ function openFabricacionSemanalWin() {
               listOnEmpty: true,
               freetext: false,
             },
-            editable: tablaEditable,
+            editable: false,
             cssClass: "filtrable",
             formatter: cell => DATOS?.maestros?.materiales?.[cell.getValue()]?.descripcion ?? cell.getValue(),
           },
@@ -127,24 +134,42 @@ function openFabricacionSemanalWin() {
 }
 
 function construirOrdenesFabricacionDict() {
-  return Object.values(DATOS?.fabricacion?.pedidos ?? {}).map(
+  return Object.values(DATOS?.fabricacion?.pedidos ?? {}).filter(
+    (pedido) => {
+      const estado = Number.parseInt(String(pedido?.estado ?? ""), 10);
+      return estado === 1 || estado === 2;
+    }
+  ).map(
     ({ id, ...resto }) => ({
       ...resto, id,
       value: id,
-      label: getEtiquetaPedido({ id, ...resto }),
+      label: getEtiquetaPedidoSelector({ id, ...resto }),
     })
   );
 }
 
 function getEtiquetaPedido(pedido) {
   if (!pedido) return "";
+  const descripcion = (pedido.descripcion || "").trim();
   const tipo = DATOS?.fabricacion?.tipos_producto?.[pedido.tipo_producto_id]?.descripcion || "";
   const material = DATOS?.maestros?.materiales?.[pedido.material_id]?.descripcion || "";
   const cantidad = Number.parseInt(String(pedido.cantidad ?? ""), 10);
   const cantidadTxt = Number.isFinite(cantidad) ? String(cantidad) : "";
-  const partes = [tipo, material, cantidadTxt ? `Cant. ${cantidadTxt}` : ""].filter(Boolean);
+  const partes = [descripcion, tipo, material, cantidadTxt ? `Cant. ${cantidadTxt}` : ""].filter(Boolean);
   if (partes.length) return partes.join(" | ");
   return pedido.numero || pedido.descripcion || String(pedido.id);
+}
+
+function getEtiquetaPedidoSelector(pedido) {
+  if (!pedido) return "";
+  const descripcion = (pedido.descripcion || "").trim();
+  const tipo = DATOS?.fabricacion?.tipos_producto?.[pedido.tipo_producto_id]?.descripcion || "";
+  const material = DATOS?.maestros?.materiales?.[pedido.material_id]?.descripcion || "";
+  const cantidad = Number.parseInt(String(pedido.cantidad ?? ""), 10);
+  const cantidadTxt = Number.isFinite(cantidad) ? `Cant. ${cantidad}` : "";
+  const partes = [descripcion, tipo, material, cantidadTxt].filter(Boolean);
+  if (partes.length) return partes.join(" | ");
+  return pedido.numero || String(pedido.id);
 }
 
 function construirMaterialesDict() {
@@ -193,4 +218,64 @@ function actualizarLineasFabricacionEditorMateriales() {
       freetext: false,
     },
   });
+}
+
+function obtenerDerivadosPedidoFabricacion(pedidoId) {
+  const pedido = DATOS?.fabricacion?.pedidos?.[pedidoId];
+  if (!pedido) {
+    return {
+      tipo_producto_id: null,
+      material_id: null,
+    };
+  }
+  return {
+    tipo_producto_id: pedido.tipo_producto_id ?? null,
+    material_id: pedido.material_id ?? null,
+  };
+}
+
+async function onPedidoCellEditedFabricacionSemanal(cell) {
+  const tabla = cell.getTable();
+  const row = cell.getRow();
+  const actual = row.getData();
+  const derivados = obtenerDerivadosPedidoFabricacion(actual.pedido_id);
+  const cambios = Object.entries(derivados).filter(([campo, valor]) => actual[campo] !== valor);
+  if (!cambios.length) return;
+
+  tabla.__suppressCellEdited = true;
+  try {
+    await row.update(derivados);
+  } finally {
+    tabla.__suppressCellEdited = false;
+  }
+
+  const actualizado = row.getData();
+  if (!actualizado?.id) return; // Fila nueva: se guarda al crear
+
+  try {
+    for (const [campo] of cambios) {
+      const valor = actualizado[campo];
+      const resultado = await wsRequest("modificar_maestro", {
+        tabla: "fabricacion_semanal",
+        id: actualizado.id,
+        campo,
+        valor,
+        valores: actualizado,
+      });
+      if (resultado && Object.prototype.hasOwnProperty.call(resultado, "valor")) {
+        const valorServidor = resultado.valor;
+        if (valorServidor !== row.getData()[campo]) {
+          tabla.__suppressCellEdited = true;
+          try {
+            await row.update({ [campo]: valorServidor });
+          } finally {
+            tabla.__suppressCellEdited = false;
+          }
+        }
+      }
+    }
+  } catch (e) {
+    console.error("Error al sincronizar campos derivados del pedido:", e);
+    alert("No se pudieron guardar tipo/material/cantidad derivados del pedido.");
+  }
 }
