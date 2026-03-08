@@ -137,6 +137,17 @@ class ImprimirEtiqueta:
     def _build_label_palets(self, value: str, copies: int = 1) -> str:
         # Placeholder: usa mismo esquema que botas hasta que se defina uno distinto.
         return self._build_label_botas(value, copies=copies)
+    
+    def obtener_etiqueta(self, tipo: str, value: str, copies: int = 1):
+        if tipo == "botas":
+            return self._build_label_botas(value, copies=copies)
+        elif tipo == "palets":
+            return self._build_label_palets(value, copies=copies)
+        else:
+            raise ValueError("Tipo de etiqueta no soportado.")
+        
+    def imprimir_zpl(self, zpl: str):
+        self.send_raw_zpl(zpl)
 
     def imprimir_etiqueta(self, tipo: str, value: str, copies: int = 1):
         if tipo == "botas":

@@ -1,8 +1,7 @@
 
 from .cliente_db import ClienteDB
-from .estado_db import EstadoDB
-from .estado_orden_fabricacion_db import EstadoOrdenFabricacionDB
-from .estado_linea_fabricacion_db import EstadoLineaFabricacionDB
+from .estado_pedido_db import EstadoPedidoDB
+from .estado_fabricacion_semanal_db import EstadoFabricacionSemanalDB
 from .estado_bota_db import EstadoBotaDB
 from .estado_trazabilidad_fabricacion_db import EstadoTrazabilidadFabricacionDB
 from .estado_palet_db import EstadoPaletDB
@@ -25,9 +24,8 @@ from .entrada_fleje_db import EntradaFlejeDB
 
 __all__ = [
     "ClienteDB",
-    "EstadoDB",
-    "EstadoOrdenFabricacionDB",
-    "EstadoLineaFabricacionDB",
+    "EstadoPedidoDB",
+    "EstadoFabricacionSemanalDB",
     "EstadoBotaDB",
     "EstadoTrazabilidadFabricacionDB",
     "EstadoPaletDB",

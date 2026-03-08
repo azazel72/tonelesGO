@@ -7,16 +7,16 @@ from typing import List
 from servidor.herramientas.utilidades import obtener_anterior_dia_semana
 from servidor.herramientas.BcryptHelper import BcryptHelper
 
-from .modelos import ClienteDB, EstadoOrdenFabricacionDB, EstadoLineaFabricacionDB, EstadoBotaDB, EstadoTrazabilidadFabricacionDB, EstadoPaletDB
+from .modelos import ClienteDB, EstadoPedidoDB, EstadoFabricacionSemanalDB, EstadoBotaDB, EstadoTrazabilidadFabricacionDB, EstadoPaletDB
 from .modelos import InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB, RolDB, PuestoTrabajoDB, MaterialDB, DuelaDB, EntradaDB, LineaEntradaDB, PaletDB, ProductoDB, ProductoOperarioDB, ArchivoSubidoDB, AmbienteDB, EntradaFlejeDB
-from .modelos import OrdenFabricacionDB, TipoProductoDB, LineaFabricacionDB, TrazabilidadProcesadoDB, TrazabilidadFabricacionDB, TrazabilidadProductoDB, BotaDB, ConsumoDB
+from .modelos import PedidoDB, TipoProductoDB, FabricacionSemanalDB, TrazabilidadProcesadoDB, TrazabilidadFabricacionDB, TrazabilidadProductoDB, BotaDB, ConsumoDB
 from .modelos import PlanCamionDB, PlanFacturacionDB, PlanMaterialDB, CuadranteDB, CuadranteDetalleDB
 from .persistencia import GenericRepository, DB
 from sqlmodel import select
 from sqlalchemy import extract, func
 from .dominio import PlanificacionEntradasDTO, MaestrosDTO, PlanMaterialDTO, PlanFacturacionDTO, PlanCamionDTO, CuadranteDTO, CuadranteDetalleDTO, FabricacionDTO
-from .dominio import ClienteDTO, EstadoDTO, InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO, RolDTO, PuestoTrabajoDTO, MaterialDTO, DuelaDTO, EntradaDTO, LineaEntradaDTO, PaletDTO, ProductoDTO, ArchivoSubidoDTO, AmbienteDTO, EntradaFlejeDTO, CuadrantesDTO
-from .dominio import OrdenFabricacionDTO, TipoProductoDTO, LineaFabricacionDTO, TrazabilidadProcesadoDTO, TrazabilidadFabricacionDTO, TrazabilidadProductoDTO, BotaDTO, ConsumoDTO
+from .dominio import ClienteDTO, EstadoPedidoDTO, EstadoFabricacionSemanalDTO, EstadoBotaDTO, EstadoTrazabilidadFabricacionDTO, EstadoPaletDTO, InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO, RolDTO, PuestoTrabajoDTO, MaterialDTO, DuelaDTO, EntradaDTO, LineaEntradaDTO, PaletDTO, ProductoDTO, ArchivoSubidoDTO, AmbienteDTO, EntradaFlejeDTO, CuadrantesDTO
+from .dominio import PedidoDTO, TipoProductoDTO, FabricacionSemanalDTO, TrazabilidadProcesadoDTO, TrazabilidadFabricacionDTO, TrazabilidadProductoDTO, BotaDTO, ConsumoDTO
 from servidor.impresion import ImprimirEtiqueta
 from servidor.conexiones.broadcast import broadcast_error, broadcast_event
 
@@ -43,8 +43,8 @@ class Colector:
         self.repo_materiales = GenericRepository(PlanMaterialDB)
 
         self.repo_clientes = GenericRepository(ClienteDB)
-        self.repo_estados_ordenes_fabricacion = GenericRepository(EstadoOrdenFabricacionDB)
-        self.repo_estados_lineas_fabricacion = GenericRepository(EstadoLineaFabricacionDB)
+        self.repo_estados_pedidos = GenericRepository(EstadoPedidoDB)
+        self.repo_estados_fabricacion_semanal = GenericRepository(EstadoFabricacionSemanalDB)
         self.repo_estados_botas = GenericRepository(EstadoBotaDB)
         self.repo_estados_trazabilidad_fabricacion = GenericRepository(EstadoTrazabilidadFabricacionDB)
         self.repo_estados_palets = GenericRepository(EstadoPaletDB)
@@ -62,9 +62,9 @@ class Colector:
         self.repo_archivos_subidos = GenericRepository(ArchivoSubidoDB)
         self.repo_ambientes = GenericRepository(AmbienteDB)
         self.repo_entradas_flejes = GenericRepository(EntradaFlejeDB)
-        self.repo_ordenes_fabricacion = GenericRepository(OrdenFabricacionDB)
+        self.repo_pedidos = GenericRepository(PedidoDB)
         self.repo_tipos_producto = GenericRepository(TipoProductoDB)
-        self.repo_lineas_fabricacion = GenericRepository(LineaFabricacionDB)
+        self.repo_fabricacion_semanal = GenericRepository(FabricacionSemanalDB)
         self.repo_trazabilidad_procesado = GenericRepository(TrazabilidadProcesadoDB)
         self.repo_trazabilidad_fabricacion = GenericRepository(TrazabilidadFabricacionDB)
         self.repo_trazabilidad_producto = GenericRepository(TrazabilidadProductoDB)
@@ -83,8 +83,8 @@ class Colector:
     def obtener_datos_maestros(self) -> dict:
         with DB.crear_sesion() as session:
             clientes = self.repo_clientes.list_all(session)
-            estados_ordenes_fabricacion = self.repo_estados_ordenes_fabricacion.list_all(session)
-            estados_lineas_fabricacion = self.repo_estados_lineas_fabricacion.list_all(session)
+            estados_pedidos = self.repo_estados_pedidos.list_all(session)
+            estados_fabricacion_semanal = self.repo_estados_fabricacion_semanal.list_all(session)
             estados_botas = self.repo_estados_botas.list_all(session)
             estados_trazabilidad_fabricacion = self.repo_estados_trazabilidad_fabricacion.list_all(session)
             estados_palets = self.repo_estados_palets.list_all(session)
@@ -105,11 +105,11 @@ class Colector:
             entradas_flejes = self.repo_entradas_flejes.list_all(session)
 
             self.maestros.clientes = {cliente.id: ClienteDTO.from_db(cliente) for cliente in clientes}
-            self.maestros.estados_ordenes_fabricacion = {estado.id: EstadoDTO.from_db(estado) for estado in estados_ordenes_fabricacion}
-            self.maestros.estados_lineas_fabricacion = {estado.id: EstadoDTO.from_db(estado) for estado in estados_lineas_fabricacion}
-            self.maestros.estados_botas = {estado.id: EstadoDTO.from_db(estado) for estado in estados_botas}
-            self.maestros.estados_trazabilidad_fabricacion = {estado.id: EstadoDTO.from_db(estado) for estado in estados_trazabilidad_fabricacion}
-            self.maestros.estados_palets = {estado.id: EstadoDTO.from_db(estado) for estado in estados_palets}
+            self.maestros.estados_pedidos = {estado.id: EstadoPedidoDTO.from_db(estado) for estado in estados_pedidos}
+            self.maestros.estados_fabricacion_semanal = {estado.id: EstadoFabricacionSemanalDTO.from_db(estado) for estado in estados_fabricacion_semanal}
+            self.maestros.estados_botas = {estado.id: EstadoBotaDTO.from_db(estado) for estado in estados_botas}
+            self.maestros.estados_trazabilidad_fabricacion = {estado.id: EstadoTrazabilidadFabricacionDTO.from_db(estado) for estado in estados_trazabilidad_fabricacion}
+            self.maestros.estados_palets = {estado.id: EstadoPaletDTO.from_db(estado) for estado in estados_palets}
             self.maestros.instalaciones = {instalacion.id: InstalacionDTO.from_db(instalacion) for instalacion in instalaciones}
             self.maestros.ubicaciones = {ubicacion.id: UbicacionDTO.from_db(ubicacion) for ubicacion in ubicaciones}
             self.maestros.proveedores = {proveedor.id: ProveedorDTO.from_db(proveedor) for proveedor in proveedores}
@@ -131,23 +131,23 @@ class Colector:
 
     def obtener_fabricacion(self) -> FabricacionDTO:
         with DB.crear_sesion() as session:
-            ordenes = self.repo_ordenes_fabricacion.list_all(session)
+            ordenes = self.repo_pedidos.list_all(session)
             tipos = self.repo_tipos_producto.list_all(session)
-            lineas = self.repo_lineas_fabricacion.list_all(session)
+            lineas = self.repo_fabricacion_semanal.list_all(session)
             traz_procesado = self.repo_trazabilidad_procesado.list_all(session)
             traz_fabricacion = self.repo_trazabilidad_fabricacion.list_all(session)
             traz_producto = self.repo_trazabilidad_producto.list_all(session)
             botas = self.repo_botas.list_all(session)
             consumos = self.repo_consumos.list_all(session)
 
-            self.fabricacion.ordenes_fabricacion = {
-                orden.id: OrdenFabricacionDTO.from_db(orden) for orden in ordenes
+            self.fabricacion.pedidos = {
+                orden.id: PedidoDTO.from_db(orden) for orden in ordenes
             }
             self.fabricacion.tipos_producto = {
                 tipo.id: TipoProductoDTO.from_db(tipo) for tipo in tipos
             }
-            self.fabricacion.lineas_fabricacion = {
-                linea.id: LineaFabricacionDTO.from_db(linea) for linea in lineas
+            self.fabricacion.fabricacion_semanal = {
+                linea.id: FabricacionSemanalDTO.from_db(linea) for linea in lineas
             }
             self.fabricacion.trazabilidad_procesado = {
                 traz.id: TrazabilidadProcesadoDTO.from_db(traz) for traz in traz_procesado
@@ -188,6 +188,8 @@ class Colector:
             setattr(DTO, campo, valor)
             if tabla == "entradas_flejes":
                 DTO.restante = max(float(DTO.peso or 0) - float(DTO.consumido or 0), 0.0)
+            if hasattr(DTO, "bind_db_model"):
+                DTO.bind_db_model(repo.model)
             updated = DTO.to_db()
             repo.update(session, updated)
 
@@ -239,6 +241,8 @@ class Colector:
             objeto_DTO = objeto(id=0, **data)
             if tabla == "entradas_flejes":
                 objeto_DTO.restante = max(float(objeto_DTO.peso or 0) - float(objeto_DTO.consumido or 0), 0.0)
+            if hasattr(objeto_DTO, "bind_db_model"):
+                objeto_DTO.bind_db_model(repo.model)
             objeto_DB = objeto_DTO.to_db()
             objeto_DB.id = None  # Asegura que el ID sea None para la inserción
             new = repo.insert(session, objeto_DB)
@@ -340,19 +344,19 @@ class Colector:
     #endregion
 
     #region Metodos Listados Fabricacion
-    def listar_ordenes_fabricacion(self, año: int | None = None):
+    def listar_pedidos(self, año: int | None = None):
         with DB.crear_sesion() as session:
-            statement = select(OrdenFabricacionDB)
+            statement = select(PedidoDB)
             if año:
-                statement = statement.where(extract("year", OrdenFabricacionDB.fecha) == año)
+                statement = statement.where(extract("year", PedidoDB.fecha) == año)
             ordenes = session.exec(statement).all()
-            return [OrdenFabricacionDTO.from_db(orden) for orden in ordenes]
+            return [PedidoDTO.from_db(orden) for orden in ordenes]
 
-    def listar_lineas_fabricacion(self, orden_id: int):
+    def listar_fabricacion_semanal(self, pedido_id: int):
         with DB.crear_sesion() as session:
-            statement = select(LineaFabricacionDB).where(LineaFabricacionDB.orden_id == orden_id)
+            statement = select(FabricacionSemanalDB).where(FabricacionSemanalDB.pedido_id == pedido_id)
             lineas = session.exec(statement).all()
-            return [LineaFabricacionDTO.from_db(linea) for linea in lineas]
+            return [FabricacionSemanalDTO.from_db(linea) for linea in lineas]
 
     def listar_trazabilidad_fabricacion(self, linea_fabricacion_id: int):
         with DB.crear_sesion() as session:
@@ -603,9 +607,9 @@ class Colector:
 
                     produccion_id = None
                     if trazas:
-                        linea_ref = session.get(LineaFabricacionDB, trazas[0].linea_fabricacion_id)
+                        linea_ref = session.get(FabricacionSemanalDB, trazas[0].linea_fabricacion_id)
                         if linea_ref:
-                            produccion_id = linea_ref.orden_id
+                            produccion_id = linea_ref.pedido_id
 
                     codigos_generados = []
                     ultimo_producto_id = None
@@ -642,7 +646,7 @@ class Colector:
 
                     lineas_unicas = {t.linea_fabricacion_id for t in trazas}
                     for linea_id in lineas_unicas:
-                        linea = session.get(LineaFabricacionDB, linea_id)
+                        linea = session.get(FabricacionSemanalDB, linea_id)
                         if linea:
                             linea.cantidad_fabricada = int(linea.cantidad_fabricada or 0) + cantidad_etiquetas
                             session.add(linea)
@@ -683,21 +687,26 @@ class Colector:
     def _imprimir_etiquetas_async(self, codigos: list[str], origenes: list[str], ws=None):
         try:
             impresora = ImprimirEtiqueta()
+            etiqueta = ""
             for codigo in codigos:
-                impresora.imprimir_etiqueta("botas", codigo, copies=1)
-                try:
-                    import asyncio
+                etiqueta = etiqueta + impresora.obtener_etiqueta("botas", codigo, copies=1)
+                #impresora.imprimir_etiqueta("botas", codigo, copies=1)
+            impresora.imprimir_zpl(etiqueta)
+            try:
+                import asyncio
 
-                    asyncio.run(
-                        broadcast_event(
-                            "async_print",
-                            {"codigo": codigo, "origenes": origenes, "tipo": "botas"},
-                            scope="cliente" if ws is not None else "all",
-                            target_ws=ws,
-                        )
+                #si error, probar await broadcast_event(...) sin asyncio.run
+                # o asyncio.create_task(broadcast_event(...)) si ya estamos dentro de un loop
+                asyncio.run(
+                    broadcast_event(
+                        "async_print",
+                        {"codigo": codigos, "origenes": origenes, "tipo": "botas"},
+                        scope="cliente" if ws is not None else "all",
+                        target_ws=ws,
                     )
-                except Exception:
-                    pass
+                )
+            except Exception:
+                pass
         except Exception as exc:
             msg = f"Fallo al imprimir etiquetas {codigos} (origenes: {origenes}): {exc}"
             logger.error(msg)
@@ -1067,26 +1076,26 @@ class Colector:
             repo = self.repo_clientes
             maestro = self.maestros.clientes
             objeto = ClienteDTO
-        elif tabla == "estados_ordenes_fabricacion":
-            repo = self.repo_estados_ordenes_fabricacion
-            maestro = self.maestros.estados_ordenes_fabricacion
-            objeto = EstadoDTO
-        elif tabla == "estados_lineas_fabricacion":
-            repo = self.repo_estados_lineas_fabricacion
-            maestro = self.maestros.estados_lineas_fabricacion
-            objeto = EstadoDTO
+        elif tabla == "estados_pedidos":
+            repo = self.repo_estados_pedidos
+            maestro = self.maestros.estados_pedidos
+            objeto = EstadoPedidoDTO
+        elif tabla == "estados_fabricacion_semanal":
+            repo = self.repo_estados_fabricacion_semanal
+            maestro = self.maestros.estados_fabricacion_semanal
+            objeto = EstadoFabricacionSemanalDTO
         elif tabla == "estados_botas":
             repo = self.repo_estados_botas
             maestro = self.maestros.estados_botas
-            objeto = EstadoDTO
+            objeto = EstadoBotaDTO
         elif tabla == "estados_trazabilidad_fabricacion":
             repo = self.repo_estados_trazabilidad_fabricacion
             maestro = self.maestros.estados_trazabilidad_fabricacion
-            objeto = EstadoDTO
+            objeto = EstadoTrazabilidadFabricacionDTO
         elif tabla == "estados_palets":
             repo = self.repo_estados_palets
             maestro = self.maestros.estados_palets
-            objeto = EstadoDTO
+            objeto = EstadoPaletDTO
         elif tabla == "instalaciones":
             repo = self.repo_instalaciones
             maestro = self.maestros.instalaciones
@@ -1151,18 +1160,18 @@ class Colector:
             repo = self.repo_entradas_flejes
             maestro = self.maestros.entradas_flejes
             objeto = EntradaFlejeDTO
-        elif tabla == "ordenes_fabricacion":
-            repo = self.repo_ordenes_fabricacion
-            maestro = self.fabricacion.ordenes_fabricacion
-            objeto = OrdenFabricacionDTO
+        elif tabla == "pedidos":
+            repo = self.repo_pedidos
+            maestro = self.fabricacion.pedidos
+            objeto = PedidoDTO
         elif tabla == "tipos_producto":
             repo = self.repo_tipos_producto
             maestro = self.fabricacion.tipos_producto
             objeto = TipoProductoDTO
-        elif tabla == "lineas_fabricacion":
-            repo = self.repo_lineas_fabricacion
-            maestro = self.fabricacion.lineas_fabricacion
-            objeto = LineaFabricacionDTO
+        elif tabla == "fabricacion_semanal":
+            repo = self.repo_fabricacion_semanal
+            maestro = self.fabricacion.fabricacion_semanal
+            objeto = FabricacionSemanalDTO
         elif tabla == "trazabilidad_procesado":
             repo = self.repo_trazabilidad_procesado
             maestro = self.fabricacion.trazabilidad_procesado
@@ -1307,3 +1316,4 @@ class Colector:
         #self.datos.clear()
         pass
     #endregion
+

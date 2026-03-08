@@ -155,15 +155,15 @@ class CrudRoutes:
                             await broadcast_pantalla("gestion_fabricacion", {"tabla": "trazabilidad_fabricacion"})
                         elif msg.action in {"modificar_maestro", "insertar_maestro", "eliminar_maestro"}:
                             tabla = (msg.data or {}).get("tabla")
-                            if tabla in {"ordenes_fabricacion", "tipos_producto", "lineas_fabricacion", "trazabilidad_fabricacion", "botas", "consumos"}:
+                            if tabla in {"pedidos", "tipos_producto", "fabricacion_semanal", "trazabilidad_fabricacion", "botas", "consumos"}:
                                 await broadcast_pantalla("vista_fabricacion", {"tabla": tabla})
                                 await broadcast_pantalla("vista_consumo", {"tabla": tabla})
                                 await broadcast_pantalla("gestion_fabricacion", {"tabla": tabla})
                             elif tabla in {
                                 "puestos_trabajo",
                                 "usuarios",
-                                "estados_ordenes_fabricacion",
-                                "estados_lineas_fabricacion",
+                                "estados_pedidos",
+                                "estados_fabricacion_semanal",
                                 "estados_botas",
                                 "estados_trazabilidad_fabricacion",
                                 "estados_palets",

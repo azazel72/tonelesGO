@@ -1,11 +1,11 @@
 
 from .logica import PlanCamionDB, PlanFacturacionDB, PlanMaterialDB, CuadranteDB, CuadranteDetalleDB
-from .maestros import ClienteDB, EstadoDB, EstadoOrdenFabricacionDB, EstadoLineaFabricacionDB, EstadoBotaDB, EstadoTrazabilidadFabricacionDB, EstadoPaletDB
+from .maestros import ClienteDB, EstadoPedidoDB, EstadoFabricacionSemanalDB, EstadoBotaDB, EstadoTrazabilidadFabricacionDB, EstadoPaletDB
 from .maestros import InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB, RolDB, PuestoTrabajoDB
 from .maestros import MaterialDB, DuelaDB, EntradaDB, LineaEntradaDB, PaletDB, ProductoDB, ProductoOperarioDB, ArchivoSubidoDB
 from .maestros import AmbienteDB
 from .maestros import EntradaFlejeDB
-from .fabricacion import OrdenFabricacionDB, TipoProductoDB, LineaFabricacionDB, TrazabilidadProcesadoDB
+from .fabricacion import PedidoDB, TipoProductoDB, FabricacionSemanalDB, TrazabilidadProcesadoDB
 from .fabricacion import TrazabilidadFabricacionDB, TrazabilidadProductoDB, BotaDB, ConsumoDB
 
 __all__ = [
@@ -13,9 +13,8 @@ __all__ = [
     "PlanFacturacionDB",
     "PlanMaterialDB",
     "ClienteDB",
-    "EstadoDB",
-    "EstadoOrdenFabricacionDB",
-    "EstadoLineaFabricacionDB",
+    "EstadoPedidoDB",
+    "EstadoFabricacionSemanalDB",
     "EstadoBotaDB",
     "EstadoTrazabilidadFabricacionDB",
     "EstadoPaletDB",
@@ -37,9 +36,9 @@ __all__ = [
     "EntradaFlejeDB",
     "CuadranteDB",
     "CuadranteDetalleDB",
-    "OrdenFabricacionDB",
+    "PedidoDB",
     "TipoProductoDB",
-    "LineaFabricacionDB",
+    "FabricacionSemanalDB",
     "TrazabilidadProcesadoDB",
     "TrazabilidadFabricacionDB",
     "TrazabilidadProductoDB",

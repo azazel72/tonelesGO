@@ -3,7 +3,11 @@ from typing import Dict, Optional
 from pydantic import BaseModel
 
 from servidor.dominio.maestros.cliente_dto import ClienteDTO
-from servidor.dominio.maestros.estado_dto import EstadoDTO
+from servidor.dominio.maestros.estado_pedido_dto import EstadoPedidoDTO
+from servidor.dominio.maestros.estado_fabricacion_semanal_dto import EstadoFabricacionSemanalDTO
+from servidor.dominio.maestros.estado_bota_dto import EstadoBotaDTO
+from servidor.dominio.maestros.estado_trazabilidad_fabricacion_dto import EstadoTrazabilidadFabricacionDTO
+from servidor.dominio.maestros.estado_palet_dto import EstadoPaletDTO
 from servidor.dominio.maestros.instalacion_dto import InstalacionDTO
 from servidor.dominio.maestros.puesto_trabajo_dto import PuestoTrabajoDTO
 from servidor.dominio.maestros.ubicacion_dto import UbicacionDTO
@@ -23,12 +27,11 @@ from servidor.dominio.maestros.entrada_fleje_dto import EntradaFlejeDTO
 
 class MaestrosDTO(BaseModel):
     clientes: Optional[Dict[int, "ClienteDTO"]] = {}
-    estados: Optional[Dict[int, "EstadoDTO"]] = {}
-    estados_ordenes_fabricacion: Optional[Dict[int, "EstadoDTO"]] = {}
-    estados_lineas_fabricacion: Optional[Dict[int, "EstadoDTO"]] = {}
-    estados_botas: Optional[Dict[int, "EstadoDTO"]] = {}
-    estados_trazabilidad_fabricacion: Optional[Dict[int, "EstadoDTO"]] = {}
-    estados_palets: Optional[Dict[int, "EstadoDTO"]] = {}
+    estados_pedidos: Optional[Dict[int, "EstadoPedidoDTO"]] = {}
+    estados_fabricacion_semanal: Optional[Dict[int, "EstadoFabricacionSemanalDTO"]] = {}
+    estados_botas: Optional[Dict[int, "EstadoBotaDTO"]] = {}
+    estados_trazabilidad_fabricacion: Optional[Dict[int, "EstadoTrazabilidadFabricacionDTO"]] = {}
+    estados_palets: Optional[Dict[int, "EstadoPaletDTO"]] = {}
     instalaciones: Optional[Dict[int, InstalacionDTO]] = {}
     ubicaciones: Optional[Dict[int, UbicacionDTO]] = {}
     proveedores: Optional[Dict[int, ProveedorDTO]] = {}

@@ -5,19 +5,19 @@
     box-sizing: border-box;
 }
 
-#vista_consumo[modo="listado_ordenes"] table#tabla_contenido_orden_consumo{
+#vista_consumo[modo="listado_pedidos"] table#tabla_contenido_orden_consumo{
     display: none;
 }
 
-#vista_consumo[modo="contenido_orden"] table#tabla_ordenes_consumo{
+#vista_consumo[modo="contenido_pedido"] table#tabla_ordenes_consumo{
     display: none;
 }
 
-#vista_fabricacion[modo="listado_ordenes"] table#tabla_contenido_orden_fabricacion{
+#vista_fabricacion[modo="listado_pedidos"] table#tabla_fabricacion_semanal{
     display: none;
 }
 
-#vista_fabricacion[modo="contenido_orden"] table#tabla_ordenes_fabricacion{
+#vista_fabricacion[modo="contenido_pedido"] table#tabla_pedidos{
     display: none;
 }
 

@@ -1,9 +1,9 @@
 
-// ====== CREAR VENTANA LINEAS FABRICACION ======
-function openLineasFabricacionWin() {
-  if (!asegurarFabricacionCargada("lineas_fabricacion")) return null;
+// ====== CREAR VENTANA FABRICACION SEMANAL ======
+function openFabricacionSemanalWin() {
+  if (!asegurarFabricacionCargada("fabricacion_semanal")) return null;
 
-  const wb = comprobarVentanaAbierta("lineas_fabricacion");
+  const wb = comprobarVentanaAbierta("fabricacion_semanal");
   if (wb) return wb;
 
   const ordenesDict = construirOrdenesFabricacionDict();
@@ -18,7 +18,7 @@ function openLineasFabricacionWin() {
 
   const materialesDict = construirMaterialesDict();
 
-  const estadosDict = Object.values(DATOS?.maestros?.estados_lineas_fabricacion ?? {}).map(
+  const estadosDict = Object.values(DATOS?.maestros?.estados_fabricacion_semanal ?? {}).map(
     ({ id, descripcion, ...resto }) => ({
       ...resto, id, descripcion,
       value: id,
@@ -27,12 +27,12 @@ function openLineasFabricacionWin() {
   );
 
   const configuracion = {
-    KEY: "lineas_fabricacion",
+    KEY: "fabricacion_semanal",
     data_key: "fabricacion",
     winbox: {
       tipo: "generico",
       options: {
-        title: "Lineas de fabricacion",
+        title: "Fabricacion semanal",
         x: 160,
         y: 180,
       }
@@ -43,8 +43,8 @@ function openLineasFabricacionWin() {
         columns: [
           { title:"ID", field:"id", width:70, hozAlign:"right"},
           {
-            title: "Orden",
-            field: "orden_id",
+            title: "Pedido",
+            field: "pedido_id",
             editor: "list",
             editorParams: {
               values: ordenesDict,
@@ -56,7 +56,15 @@ function openLineasFabricacionWin() {
             },
             editable: tablaEditable,
             cssClass: "filtrable",
-            formatter: cell => DATOS?.fabricacion?.ordenes_fabricacion?.[cell.getValue()]?.numero ?? cell.getValue(),
+            formatter: (cell) => getEtiquetaPedido(DATOS?.fabricacion?.pedidos?.[cell.getValue()]),
+          },
+          {
+            title: "Fecha inicio",
+            field: "fecha_inicio",
+            editor: "date",
+            editable: tablaEditable,
+            cssClass: "filtrable",
+            sorter: "date",
           },
           {
             title: "Tipo",
@@ -106,11 +114,11 @@ function openLineasFabricacionWin() {
             },
             editable: tablaEditable,
             cssClass: "filtrable",
-            formatter: cell => DATOS?.maestros?.estados_lineas_fabricacion?.[cell.getValue()]?.descripcion ?? cell.getValue(),
+            formatter: cell => DATOS?.maestros?.estados_fabricacion_semanal?.[cell.getValue()]?.descripcion ?? cell.getValue(),
           },
           CeldaAcciones,
         ],
-        data: Object.values(DATOS.fabricacion.lineas_fabricacion || {}),
+        data: Object.values(DATOS.fabricacion.fabricacion_semanal || {}),
       },
     },
   };
@@ -119,13 +127,24 @@ function openLineasFabricacionWin() {
 }
 
 function construirOrdenesFabricacionDict() {
-  return Object.values(DATOS?.fabricacion?.ordenes_fabricacion ?? {}).map(
-    ({ id, numero, ...resto }) => ({
-      ...resto, id, numero,
+  return Object.values(DATOS?.fabricacion?.pedidos ?? {}).map(
+    ({ id, ...resto }) => ({
+      ...resto, id,
       value: id,
-      label: numero || String(id),
+      label: getEtiquetaPedido({ id, ...resto }),
     })
   );
+}
+
+function getEtiquetaPedido(pedido) {
+  if (!pedido) return "";
+  const tipo = DATOS?.fabricacion?.tipos_producto?.[pedido.tipo_producto_id]?.descripcion || "";
+  const material = DATOS?.maestros?.materiales?.[pedido.material_id]?.descripcion || "";
+  const cantidad = Number.parseInt(String(pedido.cantidad ?? ""), 10);
+  const cantidadTxt = Number.isFinite(cantidad) ? String(cantidad) : "";
+  const partes = [tipo, material, cantidadTxt ? `Cant. ${cantidadTxt}` : ""].filter(Boolean);
+  if (partes.length) return partes.join(" | ");
+  return pedido.numero || pedido.descripcion || String(pedido.id);
 }
 
 function construirMaterialesDict() {
@@ -139,11 +158,11 @@ function construirMaterialesDict() {
 }
 
 function actualizarLineasFabricacionEditorOrdenes() {
-  const par = windowsRegistry.get("lineas_fabricacion");
+  const par = windowsRegistry.get("fabricacion_semanal");
   if (!par?.table) return;
   const tabla = par.table;
   const ordenesDict = construirOrdenesFabricacionDict();
-  const col = tabla.getColumn("orden_id");
+  const col = tabla.getColumn("pedido_id");
   if (!col) return;
   col.updateDefinition({
     editorParams: {
@@ -158,7 +177,7 @@ function actualizarLineasFabricacionEditorOrdenes() {
 }
 
 function actualizarLineasFabricacionEditorMateriales() {
-  const par = windowsRegistry.get("lineas_fabricacion");
+  const par = windowsRegistry.get("fabricacion_semanal");
   if (!par?.table) return;
   const tabla = par.table;
   const materialesDict = construirMaterialesDict();

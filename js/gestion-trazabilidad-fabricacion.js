@@ -6,7 +6,7 @@ function openTrazabilidadFabricacionWin() {
   const wb = comprobarVentanaAbierta("trazabilidad_fabricacion");
   if (wb) return wb;
 
-  const lineasDict = Object.values(DATOS?.fabricacion?.lineas_fabricacion ?? {}).map(
+  const lineasDict = Object.values(DATOS?.fabricacion?.fabricacion_semanal ?? {}).map(
     ({ id, orden_id, ...resto }) => ({
       ...resto, id, orden_id,
       value: id,
@@ -60,7 +60,7 @@ function openTrazabilidadFabricacionWin() {
             },
             editable: tablaEditable,
             cssClass: "filtrable",
-            formatter: cell => DATOS?.fabricacion?.lineas_fabricacion?.[cell.getValue()]?.id ?? cell.getValue(),
+            formatter: cell => DATOS?.fabricacion?.fabricacion_semanal?.[cell.getValue()]?.id ?? cell.getValue(),
           },
           {
             title: "Palet",
@@ -104,3 +104,4 @@ function openTrazabilidadFabricacionWin() {
 
   return crearVentana(configuracion);
 }
+

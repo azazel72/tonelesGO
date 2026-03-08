@@ -237,8 +237,8 @@ function cerrarVentanasMaestros() {
     "instalaciones",
     "puestos_trabajo",
     "ubicaciones",
-    "estados_ordenes_fabricacion",
-    "estados_lineas_fabricacion",
+    "estados_pedidos",
+    "estados_fabricacion_semanal",
     "estados_botas",
     "estados_trazabilidad_fabricacion",
     "estados_palets",
@@ -339,7 +339,7 @@ function agregarEventosTabla(wb, tabla, cabecera, configuracion) {
     if (resultado?.id != d.id) {
       alert("Error al guardar los cambios en el servidor.");
     }
-    if (t === "ordenes_fabricacion") {
+    if (t === "pedidos") {
       actualizarLineasFabricacionEditorOrdenes?.();
     }
   });
@@ -359,3 +359,4 @@ function comprobarVentanaAbierta(clave) {
 function tablaEditable(cell) {
   return cell.getTable().options.editable || cell.getRow().getData().id === undefined;
 }
+

@@ -170,9 +170,9 @@ function obtenerConfigVistaProduccion(vistaId = null) {
     return {
         vistaId: "vista_fabricacion",
         sectionSelector: "#vista_fabricacion",
-        tablaOrdenesSelector: "#tabla_ordenes_fabricacion",
-        tablaLineasSelector: "#tabla_contenido_orden_fabricacion",
-        tituloOrdenSelector: ".orden_fabricacion_seleccionada",
+        tablaOrdenesSelector: "#tabla_pedidos",
+        tablaLineasSelector: "#tabla_fabricacion_semanal",
+        tituloOrdenSelector: ".pedido_seleccionado",
         modalId: "modalFabricacion",
         productoSpanId: "fabricacion-producto-orden",
         tablaTrazabilidadSelector: "#tabla_trazabilidad_fabricacion",
@@ -257,14 +257,14 @@ async function cargarOrdenesFabricacion(opciones = {}) {
     try {
         await asegurarDatosFabricacionTerminal();
         const añoActual = new Date().getFullYear();
-        const ordenes = (await wsRequest("listar_ordenes_fabricacion", { "año": añoActual })) || [];
+        const ordenes = (await wsRequest("listar_pedidos", { "año": añoActual })) || [];
 
         tbody.innerHTML = "";
         if (!ordenes.length) {
             const tr = document.createElement("tr");
             const td = document.createElement("td");
             td.colSpan = 3;
-            td.textContent = "No hay ordenes de fabricacion";
+            td.textContent = "No hay pedidos";
             tr.appendChild(td);
             tbody.appendChild(tr);
             actualizarTablaLineasFabricacion([], cfg.vistaId);
@@ -274,14 +274,16 @@ async function cargarOrdenesFabricacion(opciones = {}) {
         ordenes.forEach((o) => {
             const tr = document.createElement("tr");
             tr.dataset.ordenId = o.id;
-            tr.dataset.numero = o.numero || o.id;
-            tr.dataset.fecha = o.fecha;
-            const descripcion = o.descripcion || "";
-            tr.dataset.descripcion = descripcion;
+            const tipoProducto = terminalFabricacion.tipos_producto?.[o.tipo_producto_id]?.descripcion || "";
+            const material = terminalFabricacion.materiales?.[o.material_id]?.descripcion || "";
+            const cantidad = Number.parseInt(String(o.cantidad ?? ""), 10);
+            tr.dataset.tipoProducto = tipoProducto;
+            tr.dataset.material = material;
+            tr.dataset.cantidad = Number.isFinite(cantidad) ? String(cantidad) : "";
             tr.innerHTML = `
-        <td>${o.numero || o.id}</td>
-        <td>${formatearFechaEuropea(o.fecha)}</td>
-        <td>${descripcion}</td>
+        <td>${tipoProducto || "-"}</td>
+        <td>${material || "-"}</td>
+        <td>${Number.isFinite(cantidad) ? cantidad : 0}</td>
       `;
             tbody.appendChild(tr);
         });
@@ -294,7 +296,7 @@ async function cargarOrdenesFabricacion(opciones = {}) {
         }
     } catch (err) {
         console.error(err);
-        tbody.innerHTML = `<tr><td colspan="3">Error al cargar ordenes</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="3">Error al cargar pedidos</td></tr>`;
     }
 }
 
@@ -303,28 +305,28 @@ async function seleccionarFabricacion(fila, opciones = {}) {
     vistaProduccionActiva = cfg.vistaId;
     const autoAbrirLineaUnica = opciones.autoAbrirLineaUnica === true;
     vista_fabricacion = document.getElementById(cfg.vistaId);
-    vista_fabricacion.setAttribute("modo", "contenido_orden");
+    vista_fabricacion.setAttribute("modo", "contenido_pedido");
 
-    const ordenId = Number(fila.dataset.ordenId);
-    const numero = fila.dataset.numero || ordenId;
-    const fecha = formatearFechaEuropea(fila.dataset.fecha);
-    const descripcion = fila.dataset.descripcion || fila.children?.[2]?.textContent || "";
-    const titulo = `Orden ${numero}, ${fecha}${descripcion ? ", " + descripcion : ""}`;
+    const pedidoId = Number(fila.dataset.ordenId);
+    const tipoProducto = fila.dataset.tipoProducto || fila.children?.[0]?.textContent || "-";
+    const material = fila.dataset.material || fila.children?.[1]?.textContent || "-";
+    const cantidad = fila.dataset.cantidad || fila.children?.[2]?.textContent || "0";
+    const titulo = `Pedido ${pedidoId}: ${tipoProducto} | ${material} | Cantidad ${cantidad}`;
     const tituloOrden = document.querySelector(cfg.tituloOrdenSelector);
     if (tituloOrden) tituloOrden.textContent = titulo;
 
-    ordenFabricacionActualId = ordenId;
+    ordenFabricacionActualId = pedidoId;
     if (typeof setPantalla === "function") {
-        setPantalla(cfg.vistaId, { orden_id: ordenId });
+        setPantalla(cfg.vistaId, { pedido_id: pedidoId });
     }
-    await cargarLineasFabricacion(ordenId, { autoAbrirLineaUnica, vistaId: cfg.vistaId });
+    await cargarLineasFabricacion(pedidoId, { autoAbrirLineaUnica, vistaId: cfg.vistaId });
 }
 
 function seleccionarContenidoOrden(fila, vistaId = null) {
     const cfg = obtenerConfigVistaProduccion(vistaId);
     if (fila.closest("tfoot")) {
         vista_fabricacion = document.getElementById(cfg.vistaId);
-        vista_fabricacion.setAttribute("modo", "listado_ordenes");
+        vista_fabricacion.setAttribute("modo", "listado_pedidos");
     } else {
         mostrarLotesMateriales(fila, cfg.vistaId);
     }
@@ -355,7 +357,7 @@ function mostrarLotesMateriales(fila, vistaId = null) {
     if (cfg.vistaId === "vista_fabricacion") {
         abrirModalFabricarBota();
         if (typeof setPantalla === "function") {
-            setPantalla(cfg.vistaId, { orden_id: ordenFabricacionActualId, linea_fabricacion_id: lineaFabricacionActualId });
+            setPantalla(cfg.vistaId, { pedido_id: ordenFabricacionActualId, linea_fabricacion_id: lineaFabricacionActualId });
         }
         return;
     }
@@ -366,7 +368,7 @@ function mostrarLotesMateriales(fila, vistaId = null) {
         cargarPaletsConsumoEnSelector();
     }
     if (typeof setPantalla === "function") {
-        setPantalla(cfg.vistaId, { orden_id: ordenFabricacionActualId, linea_fabricacion_id: lineaFabricacionActualId });
+        setPantalla(cfg.vistaId, { pedido_id: ordenFabricacionActualId, linea_fabricacion_id: lineaFabricacionActualId });
     }
     if (lineaFabricacionActualId) {
         cargarTrazabilidadFabricacion(lineaFabricacionActualId, cfg.vistaId);
@@ -483,14 +485,14 @@ function autocompletarCamposConsumoDesdePalet() {
     }
 }
 
-async function cargarLineasFabricacion(ordenId, opciones = {}) {
+async function cargarLineasFabricacion(pedidoId, opciones = {}) {
     const cfg = obtenerConfigVistaProduccion(opciones.vistaId);
     vistaProduccionActiva = cfg.vistaId;
     const autoAbrirLineaUnica = opciones.autoAbrirLineaUnica === true;
     const tbody = document.querySelector(`${cfg.tablaLineasSelector} tbody`);
     if (!tbody) return;
     try {
-        const lineas = (await wsRequest("listar_lineas_fabricacion", { orden_id: ordenId })) || [];
+        const lineas = (await wsRequest("listar_fabricacion_semanal", { pedido_id: pedidoId })) || [];
         actualizarTablaLineasFabricacion(lineas, cfg.vistaId);
         if (autoAbrirLineaUnica && lineas.length === 1) {
             const filaUnica = tbody.querySelector("tr[data-linea-id]");
@@ -1124,3 +1126,4 @@ function refrescarFabricacionDesdeServidor(_data = {}) {
         cargarTrazabilidadFabricacion(lineaFabricacionActualId, "vista_fabricacion");
     }
 }
+

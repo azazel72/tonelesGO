@@ -1,14 +1,14 @@
-// ====== CREAR VENTANA ESTADOS ORDENES FABRICACION ======
-function openEstadosOrdenesFabricacionWin() {
-  const wb = comprobarVentanaAbierta("estados_ordenes_fabricacion");
+// ====== CREAR VENTANA ESTADOS FABRICACION SEMANAL ======
+function openEstadosFabricacionSemanalWin() {
+  const wb = comprobarVentanaAbierta("estados_fabricacion_semanal");
   if (wb) return wb;
 
   const configuracion = {
-    KEY: "estados_ordenes_fabricacion",
+    KEY: "estados_fabricacion_semanal",
     winbox: {
       tipo: "generico",
       options: {
-        title: "Estados órdenes fabricación",
+        title: "Estados fabricacion semanal",
         x: 265,
         y: 80,
       }
@@ -21,7 +21,7 @@ function openEstadosOrdenesFabricacionWin() {
           { title:"Descripción", field:"descripcion", editor:"input", editable: tablaEditable, cssClass: "filtrable", },
           CeldaAcciones,
         ],
-        data: Object.values(DATOS.maestros.estados_ordenes_fabricacion || {}),
+        data: Object.values(DATOS.maestros.estados_fabricacion_semanal || {}),
       },
     },
   }

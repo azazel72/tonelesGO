@@ -1,18 +1,23 @@
 
 from .logica import PlanificacionEntradasDTO, MaestrosDTO, PlanCamionDTO, PlanFacturacionDTO, PlanMaterialDTO, CuadrantesDTO, FabricacionDTO
-from .maestros import ClienteDTO, EstadoDTO, InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO, RolDTO, PuestoTrabajoDTO
-from .maestros import MaterialDTO, DuelaDTO, EntradaDTO, LineaEntradaDTO, PaletDTO, ProductoDTO, ArchivoSubidoDTO
+from .maestros import ClienteDTO, EstadoPedidoDTO, EstadoFabricacionSemanalDTO, EstadoBotaDTO, EstadoTrazabilidadFabricacionDTO, EstadoPaletDTO
+from .maestros import InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO, RolDTO, PuestoTrabajoDTO
+from .maestros import MaterialDTO, DuelaDTO, EntradaDTO, LineaEntradaDTO, PaletDTO, ProductoDTO, ProductoOperarioDTO, ArchivoSubidoDTO
 from .maestros import AmbienteDTO
 from .maestros import EntradaFlejeDTO
 from .cuadrantes import CuadranteDTO, CuadranteDetalleDTO
-from .fabricacion import OrdenFabricacionDTO, TipoProductoDTO, LineaFabricacionDTO, TrazabilidadProcesadoDTO
+from .fabricacion import PedidoDTO, TipoProductoDTO, FabricacionSemanalDTO, TrazabilidadProcesadoDTO
 from .fabricacion import TrazabilidadFabricacionDTO, TrazabilidadProductoDTO, BotaDTO, ConsumoDTO
 
 __all__ = [
     "PlanificacionEntradasDTO",
     "MaestrosDTO",
     "ClienteDTO",
-    "EstadoDTO",
+    "EstadoPedidoDTO",
+    "EstadoFabricacionSemanalDTO",
+    "EstadoBotaDTO",
+    "EstadoTrazabilidadFabricacionDTO",
+    "EstadoPaletDTO",
     "InstalacionDTO",
     "UbicacionDTO",
     "ProveedorDTO",
@@ -28,6 +33,7 @@ __all__ = [
     "LineaEntradaDTO",
     "PaletDTO",
     "ProductoDTO",
+    "ProductoOperarioDTO",
     "ArchivoSubidoDTO",
     "AmbienteDTO",
     "EntradaFlejeDTO",
@@ -35,9 +41,9 @@ __all__ = [
     "CuadranteDTO",
     "CuadranteDetalleDTO",
     "FabricacionDTO",
-    "OrdenFabricacionDTO",
+    "PedidoDTO",
     "TipoProductoDTO",
-    "LineaFabricacionDTO",
+    "FabricacionSemanalDTO",
     "TrazabilidadProcesadoDTO",
     "TrazabilidadFabricacionDTO",
     "TrazabilidadProductoDTO",

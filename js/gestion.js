@@ -31,11 +31,11 @@ window.onload = () => {
             await openUbicacionesWin();
         },
 
-        async "ver-estados-ordenes-fabricacion"() {
-            await openEstadosOrdenesFabricacionWin();
+        async "ver-estados-pedidos"() {
+            await openEstadosPedidosWin();
         },
-        async "ver-estados-lineas-fabricacion"() {
-            await openEstadosLineasFabricacionWin();
+        async "ver-estados-fabricacion-semanal"() {
+            await openEstadosFabricacionSemanalWin();
         },
         async "ver-estados-botas"() {
             await openEstadosBotasWin();
@@ -84,16 +84,16 @@ window.onload = () => {
         async "ver-ambientes"() {
             await openAmbientesWin();
         },
-        async "ver-ordenes-fabricacion"() {
-            setPantalla?.("gestion_fabricacion", { vista: "ordenes_fabricacion" });
-            await openOrdenesFabricacionWin();
+        async "ver-pedidos"() {
+            setPantalla?.("gestion_fabricacion", { vista: "pedidos" });
+            await openPedidosWin();
         },
         async "ver-tipos-producto"() {
             await openTiposProductoWin();
         },
-        async "ver-lineas-fabricacion"() {
-            setPantalla?.("gestion_fabricacion", { vista: "lineas_fabricacion" });
-            await openLineasFabricacionWin();
+        async "ver-fabricacion-semanal"() {
+            setPantalla?.("gestion_fabricacion", { vista: "fabricacion_semanal" });
+            await openFabricacionSemanalWin();
         },
         async "ver-trazabilidad-procesado"() {
             await openTrazabilidadProcesadoWin();
@@ -157,8 +157,8 @@ window.onload = () => {
         clientes: openClientesWin,
         instalaciones: openInstalacionesWin,
         ubicaciones: openUbicacionesWin,
-        estados_ordenes_fabricacion: openEstadosOrdenesFabricacionWin,
-        estados_lineas_fabricacion: openEstadosLineasFabricacionWin,
+        estados_pedidos: openEstadosPedidosWin,
+        estados_fabricacion_semanal: openEstadosFabricacionSemanalWin,
         estados_botas: openEstadosBotasWin,
         estados_trazabilidad_fabricacion: openEstadosTrazabilidadFabricacionWin,
         estados_palets: openEstadosPaletsWin,
@@ -172,9 +172,9 @@ window.onload = () => {
         productos: openProductosWin,
         archivos_subidos: openArchivosSubidosWin,
         ambientes: openAmbientesWin,
-        ordenes_fabricacion: openOrdenesFabricacionWin,
+        pedidos: openPedidosWin,
         tipos_producto: openTiposProductoWin,
-        lineas_fabricacion: openLineasFabricacionWin,
+        fabricacion_semanal: openFabricacionSemanalWin,
         trazabilidad_procesado: openTrazabilidadProcesadoWin,
         trazabilidad_fabricacion: openTrazabilidadFabricacionWin,
         trazabilidad_producto: openTrazabilidadProductoWin,
@@ -267,3 +267,4 @@ function setPantalla(pantalla, contexto = {}) {
     if (!ws || ws.readyState !== WebSocket.OPEN) return;
     ws.send(JSON.stringify({ action: "set_pantalla", data: { pantalla, contexto } }));
 }
+

@@ -1,6 +1,10 @@
 
 from .cliente_dto import ClienteDTO
-from .estado_dto import EstadoDTO
+from .estado_pedido_dto import EstadoPedidoDTO
+from .estado_fabricacion_semanal_dto import EstadoFabricacionSemanalDTO
+from .estado_bota_dto import EstadoBotaDTO
+from .estado_trazabilidad_fabricacion_dto import EstadoTrazabilidadFabricacionDTO
+from .estado_palet_dto import EstadoPaletDTO
 from .instalacion_dto import InstalacionDTO
 from .ubicacion_dto import UbicacionDTO
 from .proveedor_dto import ProveedorDTO
@@ -13,13 +17,18 @@ from .entrada_dto import EntradaDTO
 from .linea_entrada_dto import LineaEntradaDTO
 from .palet_dto import PaletDTO
 from .producto_dto import ProductoDTO
+from .producto_operario_dto import ProductoOperarioDTO
 from .archivo_subido_dto import ArchivoSubidoDTO
 from .ambiente_dto import AmbienteDTO
 from .entrada_fleje_dto import EntradaFlejeDTO
 
 __all__ = [
     "ClienteDTO",
-    "EstadoDTO",
+    "EstadoPedidoDTO",
+    "EstadoFabricacionSemanalDTO",
+    "EstadoBotaDTO",
+    "EstadoTrazabilidadFabricacionDTO",
+    "EstadoPaletDTO",
     "InstalacionDTO",
     "UbicacionDTO",
     "ProveedorDTO",
@@ -32,6 +41,7 @@ __all__ = [
     "LineaEntradaDTO",
     "PaletDTO",
     "ProductoDTO",
+    "ProductoOperarioDTO",
     "ArchivoSubidoDTO",
     "AmbienteDTO",
     "EntradaFlejeDTO",

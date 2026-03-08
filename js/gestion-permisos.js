@@ -11,8 +11,8 @@ const COLUMNAS_PERMISOS_ROL = [
 const ACCIONES_PERMISO_GESTION = {
     "ver-usuarios": [],
     "ver-roles": [],
-    "ver-estados-ordenes-fabricacion": [],
-    "ver-estados-lineas-fabricacion": [],
+    "ver-estados-pedidos": [],
+    "ver-estados-fabricacion-semanal": [],
     "ver-estados-botas": [],
     "ver-estados-trazabilidad-fabricacion": [],
     "ver-estados-palets": [],
@@ -33,9 +33,9 @@ const ACCIONES_PERMISO_GESTION = {
     "cerrar-maestros": [],
     "ver-planificacion-entradas": { permisos: ["planificacion"], marcarCandado: true },
     "ver-cuadrantes": [],
-    "ver-ordenes-fabricacion": [],
+    "ver-pedidos": [],
     "ver-tipos-producto": [],
-    "ver-lineas-fabricacion": [],
+    "ver-fabricacion-semanal": [],
     "ver-botas": [],
     "ver-consumos": [],
     "ver-trazabilidad-procesado": [],
@@ -161,3 +161,4 @@ function aplicarPermisosMenuGestion() {
         else bloquearAccionMenu(el);
     }
 }
+
