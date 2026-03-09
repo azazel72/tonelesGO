@@ -357,7 +357,7 @@ function mostrarLotesMateriales(fila, vistaId = null) {
     if (cfg.vistaId === "vista_fabricacion") {
         abrirModalFabricarBota();
         if (typeof setPantalla === "function") {
-            setPantalla(cfg.vistaId, { pedido_id: ordenFabricacionActualId, linea_fabricacion_id: lineaFabricacionActualId });
+            setPantalla(cfg.vistaId, { pedido_id: ordenFabricacionActualId, fabricacion_semanal_id: lineaFabricacionActualId });
         }
         return;
     }
@@ -368,7 +368,7 @@ function mostrarLotesMateriales(fila, vistaId = null) {
         cargarPaletsConsumoEnSelector();
     }
     if (typeof setPantalla === "function") {
-        setPantalla(cfg.vistaId, { pedido_id: ordenFabricacionActualId, linea_fabricacion_id: lineaFabricacionActualId });
+        setPantalla(cfg.vistaId, { pedido_id: ordenFabricacionActualId, fabricacion_semanal_id: lineaFabricacionActualId });
     }
     if (lineaFabricacionActualId) {
         cargarTrazabilidadFabricacion(lineaFabricacionActualId, cfg.vistaId);
@@ -558,7 +558,7 @@ async function cargarTrazabilidadFabricacion(lineaId, vistaId = "vista_consumo")
     if (!tbody) return;
     try {
         await asegurarDatosFabricacionTerminal();
-        const trazas = (await wsRequest("listar_trazabilidad_fabricacion", { linea_fabricacion_id: lineaId })) || [];
+        const trazas = (await wsRequest("listar_trazabilidad_fabricacion", { fabricacion_semanal_id: lineaId })) || [];
         tbody.innerHTML = "";
         if (!trazas.length) {
             const tr = document.createElement("tr");
@@ -628,7 +628,7 @@ async function agregarTrazabilidadFabricacionDesdeUI(_vistaId = "vista_consumo")
 
     try {
         await wsRequest("agregar_trazabilidad_fabricacion", {
-            linea_fabricacion_id: lineaFabricacionActualId,
+            fabricacion_semanal_id: lineaFabricacionActualId,
             palet_origen_id: paletOrigenId,
             lote,
             volumen,
@@ -684,7 +684,7 @@ async function cargarLotesMaderaFabricarBota() {
         return;
     }
     try {
-        const trazas = (await wsRequest("listar_trazabilidad_fabricacion", { linea_fabricacion_id: lineaFabricacionActualId })) || [];
+        const trazas = (await wsRequest("listar_trazabilidad_fabricacion", { fabricacion_semanal_id: lineaFabricacionActualId })) || [];
         trazabilidadesActivasFabricarBota = trazas.filter((t) => Number(t.estado || 0) === 0);
         if (!trazabilidadesActivasFabricarBota.length) {
             selector.innerHTML = `<option value="">Sin lotes activos (estado 0)</option>`;
@@ -1084,7 +1084,7 @@ async function imprimirEtiquetaFabricacion(operariosIds = [], cantidadEtiquetas 
         return;
     }
     try {
-        const trazas = (await wsRequest("listar_trazabilidad_fabricacion", { linea_fabricacion_id: lineaFabricacionActualId })) || [];
+        const trazas = (await wsRequest("listar_trazabilidad_fabricacion", { fabricacion_semanal_id: lineaFabricacionActualId })) || [];
         const activas = trazas.filter((t) => Number(t.estado || 0) === 0);
         if (!activas.length) {
             alert("No hay palets activos para imprimir.");

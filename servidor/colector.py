@@ -364,10 +364,10 @@ class Colector:
             lineas = session.exec(statement).all()
             return [FabricacionSemanalDTO.from_db(linea) for linea in lineas]
 
-    def listar_trazabilidad_fabricacion(self, linea_fabricacion_id: int):
+    def listar_trazabilidad_fabricacion(self, fabricacion_semanal_id: int):
         with DB.crear_sesion() as session:
             statement = select(TrazabilidadFabricacionDB).where(
-                TrazabilidadFabricacionDB.linea_fabricacion_id == linea_fabricacion_id
+                TrazabilidadFabricacionDB.fabricacion_semanal_id == fabricacion_semanal_id
             )
             trazas = session.exec(statement).all()
             palet_ids = {t.palet_id for t in trazas if t.palet_id}
@@ -378,7 +378,7 @@ class Colector:
             return [
                 {
                     "id": t.id,
-                    "linea_fabricacion_id": t.linea_fabricacion_id,
+                    "fabricacion_semanal_id": t.fabricacion_semanal_id,
                     "palet_id": t.palet_id,
                     "palet_codigo": palet_map.get(t.palet_id),
                     "cantidad_fabricada": t.cantidad_fabricada,
@@ -429,15 +429,15 @@ class Colector:
             return resultado
 
     def agregar_trazabilidad_fabricacion(self, data):
-        linea_fabricacion_id = data.get("linea_fabricacion_id")
+        fabricacion_semanal_id = data.get("fabricacion_semanal_id")
         palet_origen_id = data.get("palet_origen_id")
         lote = (data.get("lote") or "").strip()
         volumen = data.get("volumen")
         cantidad_fabricada = data.get("cantidad_fabricada")
         estado = data.get("estado", 0)
 
-        if not linea_fabricacion_id:
-            raise ValueError("linea_fabricacion_id es obligatorio.")
+        if not fabricacion_semanal_id:
+            raise ValueError("fabricacion_semanal_id es obligatorio.")
         if not palet_origen_id:
             raise ValueError("palet_origen_id es obligatorio.")
         if not lote:
@@ -492,7 +492,7 @@ class Colector:
 
             existente = session.exec(
                 select(TrazabilidadFabricacionDB).where(
-                    TrazabilidadFabricacionDB.linea_fabricacion_id == linea_fabricacion_id,
+                    TrazabilidadFabricacionDB.fabricacion_semanal_id == fabricacion_semanal_id,
                     TrazabilidadFabricacionDB.palet_id == palet_objetivo.id,
                 )
             ).first()
@@ -500,7 +500,7 @@ class Colector:
                 raise ValueError("El palet ya esta asociado a esta linea de trazabilidad.")
 
             trazabilidad = TrazabilidadFabricacionDB(
-                linea_fabricacion_id=linea_fabricacion_id,
+                fabricacion_semanal_id=fabricacion_semanal_id,
                 palet_id=palet_objetivo.id,
                 cantidad_fabricada=cantidad_val,
                 estado=estado,
@@ -514,7 +514,7 @@ class Colector:
 
             return {
                 "id": trazabilidad.id,
-                "linea_fabricacion_id": linea_fabricacion_id,
+                "fabricacion_semanal_id": fabricacion_semanal_id,
                 "palet_id": palet_objetivo.id,
                 "palet_codigo": palet_objetivo.codigo,
                 "cantidad_fabricada": trazabilidad.cantidad_fabricada,
@@ -616,7 +616,7 @@ class Colector:
 
                     produccion_id = None
                     if trazas:
-                        linea_ref = session.get(FabricacionSemanalDB, trazas[0].linea_fabricacion_id)
+                        linea_ref = session.get(FabricacionSemanalDB, trazas[0].fabricacion_semanal_id)
                         if linea_ref:
                             produccion_id = linea_ref.pedido_id
 
@@ -654,7 +654,7 @@ class Colector:
                         t.cantidad_fabricada = int(t.cantidad_fabricada or 0) + cantidad_etiquetas
                         session.add(t)
 
-                    lineas_unicas = {t.linea_fabricacion_id for t in trazas}
+                    lineas_unicas = {t.fabricacion_semanal_id for t in trazas}
                     for linea_id in lineas_unicas:
                         linea = session.get(FabricacionSemanalDB, linea_id)
                         if linea:

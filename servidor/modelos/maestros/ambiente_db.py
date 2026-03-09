@@ -8,6 +8,9 @@ class AmbienteDB(SQLModel, table=True):
 
     id: Optional[int] = Field(default=None, primary_key=True)
     fecha: date
-    toma: int
-    temperatura: float
-    humedad: float
+    temperatura_1: float = 0.0
+    humedad_1: float = 0.0
+    temperatura_2: float = 0.0
+    humedad_2: float = 0.0
+    temperatura_3: float = 0.0
+    humedad_3: float = 0.0

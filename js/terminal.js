@@ -36,6 +36,7 @@ document.addEventListener("DOMContentLoaded", function () {
     prepararEventosExpedicion();
     prepararEventosMenuFlejes();
     prepararEventosUbicacion();
+    prepararEventosAmbientes();
 
     // Muestra la sección de tareas al cargar la página
     mostrarSeccion("vista_tareas");
@@ -83,6 +84,9 @@ function mostrarSeccion(id) {
         }
         if (id === "vista_menu_maderas_fleje") {
             cargarEntradasFlejesMenu();
+        }
+        if (id === "vista_ambientes") {
+            cargarFormularioAmbientes();
         }
         // Actualiza las migas de pan
         actualizarMigasPan(id);
@@ -199,6 +203,12 @@ function actualizarMigasPan(mostrarSeccion) {
             nuevaMiga = crearMigaPan("Botas", "vista_menu_botas", false);
             migasPan.appendChild(nuevaMiga);
             nuevaMiga = crearMigaPan("Expediciones", mostrarSeccion, true);
+            migasPan.appendChild(nuevaMiga);
+            break;
+        case "vista_ambientes":
+            nuevaMiga = crearMigaPan("Inicio", "vista_tareas", false);
+            migasPan.appendChild(nuevaMiga);
+            nuevaMiga = crearMigaPan("Ambientes", mostrarSeccion, true);
             migasPan.appendChild(nuevaMiga);
             break;
     }

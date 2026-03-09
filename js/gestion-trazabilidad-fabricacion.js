@@ -7,10 +7,10 @@ function openTrazabilidadFabricacionWin() {
   if (wb) return wb;
 
   const lineasDict = Object.values(DATOS?.fabricacion?.fabricacion_semanal ?? {}).map(
-    ({ id, orden_id, ...resto }) => ({
-      ...resto, id, orden_id,
+    ({ id, pedido_id, ...resto }) => ({
+      ...resto, id, pedido_id,
       value: id,
-      label: `Linea ${id} (orden ${orden_id ?? "?"})`,
+      label: `Linea ${id} (pedido ${pedido_id ?? "?"})`,
     })
   );
 
@@ -48,7 +48,7 @@ function openTrazabilidadFabricacionWin() {
           { title:"ID", field:"id", width:70, hozAlign:"right"},
           {
             title: "Linea",
-            field: "linea_fabricacion_id",
+            field: "fabricacion_semanal_id",
             editor: "list",
             editorParams: {
               values: lineasDict,
