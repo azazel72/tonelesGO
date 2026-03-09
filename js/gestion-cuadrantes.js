@@ -572,10 +572,29 @@ function agregarEventosCuadrantes(wb, configuracion, contenedor) {
     document.querySelector("#contenedor-cuadrante").classList.toggle("mismo-ancho");
   });
 
+  contenedor.querySelector("#u-extender-jueves-semana")?.addEventListener("click", async (event) => {
+    const btn = event.currentTarget;
+    btn.disabled = true;
+    try {
+      const fecha = input_fecha_cuadrantes.value || DATOS?.cuadrante?.fecha_inicio;
+      await wsRequest("extender_jueves_semana_cuadrante", {
+        cuadrante_id: DATOS?.cuadrante?.id,
+        fecha,
+      });
+      if (fecha) {
+        const data = await wsRequest("cargar_cuadrantes", { fecha });
+        mostrar_cuadrantes({ data });
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error al extender lunes: " + (err?.message || err));
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
   input_fecha_cuadrantes.value = obtenerAnteriorDiaSemana().toISOString().split("T")[0];
 }
-
-
 
 async function actualizarDetalleCuadrante(detalles) {
   let respuesta = await wsRequest("actualizar_detalle_cuadrante", detalles);

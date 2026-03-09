@@ -12,7 +12,10 @@ function prepararEventosUbicacion() {
     if (selTipo) selTipo.addEventListener("change", actualizarSelectorOrigenCrearStock);
     if (selMaterial) selMaterial.addEventListener("change", actualizarSelectorOrigenCrearStock);
     if (selUbicacion) selUbicacion.addEventListener("change", actualizarSelectorOrigenCrearStock);
-    if (btnCrear) btnCrear.addEventListener("click", crearPaletDesdeStock);
+    if (btnCrear) {
+        btnCrear.disabled = true;
+        btnCrear.title = "Desactivado temporalmente";
+    }
 }
 
 async function cargarFormularioCrearStock() {

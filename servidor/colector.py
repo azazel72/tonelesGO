@@ -3,19 +3,20 @@ import re
 import logging
 import threading
 from typing import List, get_args
+from sqlmodel import Session
 
 from servidor.herramientas.utilidades import obtener_anterior_dia_semana
 from servidor.herramientas.BcryptHelper import BcryptHelper
 
 from .modelos import ClienteDB, EstadoPedidoDB, EstadoFabricacionSemanalDB, EstadoBotaDB, EstadoTrazabilidadFabricacionDB, EstadoPaletDB
-from .modelos import InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB, RolDB, PuestoTrabajoDB, MaterialDB, DuelaDB, EntradaDB, LineaEntradaDB, PaletDB, ProductoDB, ProductoOperarioDB, ArchivoSubidoDB, AmbienteDB, EntradaFlejeDB, StockDB
+from .modelos import InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB, RolDB, PuestoTrabajoDB, MaterialDB, DuelaDB, EntradaDB, LineaEntradaDB, PaletDB, ProductoDB, ProductoOperarioDB, ArchivoSubidoDB, AmbienteDB, EntradaFlejeDB, StockDB, CubicajeDB
 from .modelos import PedidoDB, TipoProductoDB, FabricacionSemanalDB, TrazabilidadProcesadoDB, TrazabilidadFabricacionDB, TrazabilidadProductoDB, BotaDB, ConsumoDB
 from .modelos import PlanCamionDB, PlanFacturacionDB, PlanMaterialDB, CuadranteDB, CuadranteDetalleDB
 from .persistencia import GenericRepository, DB
 from sqlmodel import select
 from sqlalchemy import extract, func
 from .dominio import PlanificacionEntradasDTO, MaestrosDTO, PlanMaterialDTO, PlanFacturacionDTO, PlanCamionDTO, CuadranteDTO, CuadranteDetalleDTO, FabricacionDTO
-from .dominio import ClienteDTO, EstadoPedidoDTO, EstadoFabricacionSemanalDTO, EstadoBotaDTO, EstadoTrazabilidadFabricacionDTO, EstadoPaletDTO, InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO, RolDTO, PuestoTrabajoDTO, MaterialDTO, DuelaDTO, EntradaDTO, LineaEntradaDTO, PaletDTO, ProductoDTO, ArchivoSubidoDTO, AmbienteDTO, EntradaFlejeDTO, StockDTO, CuadrantesDTO
+from .dominio import ClienteDTO, EstadoPedidoDTO, EstadoFabricacionSemanalDTO, EstadoBotaDTO, EstadoTrazabilidadFabricacionDTO, EstadoPaletDTO, InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO, RolDTO, PuestoTrabajoDTO, MaterialDTO, DuelaDTO, EntradaDTO, LineaEntradaDTO, PaletDTO, ProductoDTO, ArchivoSubidoDTO, AmbienteDTO, EntradaFlejeDTO, StockDTO, CubicajeDTO, CuadrantesDTO
 from .dominio import PedidoDTO, TipoProductoDTO, FabricacionSemanalDTO, TrazabilidadProcesadoDTO, TrazabilidadFabricacionDTO, TrazabilidadProductoDTO, BotaDTO, ConsumoDTO
 from servidor.impresion import ImprimirEtiqueta
 from servidor.conexiones.broadcast import broadcast_error, broadcast_event
@@ -63,6 +64,7 @@ class Colector:
         self.repo_ambientes = GenericRepository(AmbienteDB)
         self.repo_entradas_flejes = GenericRepository(EntradaFlejeDB)
         self.repo_stocks = GenericRepository(StockDB)
+        self.repo_cubicaje = GenericRepository(CubicajeDB)
         self.repo_pedidos = GenericRepository(PedidoDB)
         self.repo_tipos_producto = GenericRepository(TipoProductoDB)
         self.repo_fabricacion_semanal = GenericRepository(FabricacionSemanalDB)
@@ -105,6 +107,7 @@ class Colector:
             ambientes = self.repo_ambientes.list_all(session)
             entradas_flejes = self.repo_entradas_flejes.list_all(session)
             stocks = self.repo_stocks.list_all(session)
+            cubicajes = self.repo_cubicaje.list_all(session)
 
             self.maestros.clientes = {cliente.id: ClienteDTO.from_db(cliente) for cliente in clientes}
             self.maestros.estados_pedidos = {estado.id: EstadoPedidoDTO.from_db(estado) for estado in estados_pedidos}
@@ -128,6 +131,7 @@ class Colector:
             self.maestros.ambientes = {ambiente.id: AmbienteDTO.from_db(ambiente) for ambiente in ambientes}
             self.maestros.entradas_flejes = {entrada.id: EntradaFlejeDTO.from_db(entrada) for entrada in entradas_flejes}
             self.maestros.stocks = {stock.id: StockDTO.from_db(stock) for stock in stocks}
+            self.maestros.cubicaje = {cubicaje.id: CubicajeDTO.from_db(cubicaje) for cubicaje in cubicajes}
 
             #print("Datos maestros cargados:", self.maestros)
             #print("Datos clientes cargados:", self.maestros.clientes)
@@ -428,99 +432,174 @@ class Colector:
                 )
             return resultado
 
-    def agregar_trazabilidad_fabricacion(self, data):
+    def listar_stocks_consumo(self):
+        with DB.crear_sesion() as session:
+            stocks = session.exec(select(StockDB)).all()
+            return [StockDTO.from_db(stock) for stock in stocks]
+
+    def listar_cubicaje(self):
+        with DB.crear_sesion() as session:
+            cubicajes = session.exec(select(CubicajeDB)).all()
+            return [CubicajeDTO.from_db(cubicaje) for cubicaje in cubicajes]
+
+    def obtener_contexto_consumo(self, data):
+        data = data or {}
+        tipo_producto_id = int(data.get("tipo_producto_id") or 0)
+        material_id = int(data.get("material_id") or 0)
+        ubicacion_id = int(data.get("ubicacion_id") or 0)
+
+        with DB.crear_sesion() as session:
+            stmt = select(StockDB)
+            if tipo_producto_id:
+                stmt = stmt.where(StockDB.tipo_producto == tipo_producto_id)
+            if material_id:
+                stmt = stmt.where(StockDB.id_material == material_id)
+            if ubicacion_id:
+                stmt = stmt.where(StockDB.id_instalacion == ubicacion_id)
+
+            stocks_db = session.exec(stmt).all()
+            stocks = []
+            for s in stocks_db:
+                restante = max(float(s.cantidad_stock or 0) - float(s.cantidad_consumida or 0), 0.0)
+                if restante <= 0:
+                    continue
+                stocks.append({
+                    "id": s.id,
+                    "tipo_producto": s.tipo_producto,
+                    "id_material": s.id_material,
+                    "id_instalacion": s.id_instalacion,
+                    "cantidad_stock": float(s.cantidad_stock or 0),
+                    "cantidad_consumida": float(s.cantidad_consumida or 0),
+                    "restante": restante,
+                })
+
+            cubicaje_estandar = 0.0
+            if tipo_producto_id:
+                cubicaje = session.exec(
+                    select(CubicajeDB).where(CubicajeDB.tipo_producto_id == tipo_producto_id)
+                ).first()
+                if cubicaje:
+                    cubicaje_estandar = float(cubicaje.cubicaje_estandar or 0)
+
+            return {
+                "stocks": stocks,
+                "cubicaje_estandar": cubicaje_estandar,
+            }
+
+    def agregar_trazabilidad_fabricacion(self, session: Session, fabricacion_semanal_id: int, palet: PaletDB):
+        existente = session.exec(
+            select(TrazabilidadFabricacionDB).where(
+                TrazabilidadFabricacionDB.fabricacion_semanal_id == fabricacion_semanal_id,
+                TrazabilidadFabricacionDB.palet_id == palet.id,
+            )
+        ).first()
+        if existente:
+            raise ValueError("El palet ya esta asociado a esta linea de trazabilidad.")
+
+        trazabilidad = TrazabilidadFabricacionDB(
+            fabricacion_semanal_id=fabricacion_semanal_id,
+            palet_id=palet.id,
+        )
+        session.add(trazabilidad)
+        session.flush()
+
+        return {
+            "fabricacion_semanal_id": fabricacion_semanal_id,
+            "trazabilidad": trazabilidad,
+            "palet": palet,
+        }
+
+    def agregar_trazabilidad_fabricacion_desde_palet(self, data):
         fabricacion_semanal_id = data.get("fabricacion_semanal_id")
-        palet_origen_id = data.get("palet_origen_id")
-        lote = (data.get("lote") or "").strip()
-        volumen = data.get("volumen")
-        cantidad_fabricada = data.get("cantidad_fabricada")
-        estado = data.get("estado", 0)
+        lote_palet = (data.get("lote_palet") or "").strip()
+        cubicaje = data.get("cubicaje")
 
         if not fabricacion_semanal_id:
             raise ValueError("fabricacion_semanal_id es obligatorio.")
-        if not palet_origen_id:
-            raise ValueError("palet_origen_id es obligatorio.")
-        if not lote:
-            raise ValueError("lote es obligatorio.")
-        if volumen is None or str(volumen).strip() == "":
-            raise ValueError("volumen es obligatorio.")
-
-        cantidad_val = int(cantidad_fabricada) if str(cantidad_fabricada).strip() else 0
-        volumen_val = float(volumen)
-        if volumen_val <= 0:
-            raise ValueError("volumen debe ser mayor que 0.")
+        if not lote_palet:
+            raise ValueError("lote_palet es obligatorio.")
+        if cubicaje is None or str(cubicaje).strip() == "":
+            raise ValueError("cubicaje es obligatorio.")
 
         with DB.crear_sesion() as session:
-            palet_origen = session.get(PaletDB, int(palet_origen_id))
-            if not palet_origen:
-                raise ValueError("palet_origen no encontrado.")
-            if not lote:
-                raise ValueError("lote es obligatorio.")
-            if volumen is None or str(volumen).strip() == "":
-                raise ValueError("volumen es obligatorio.")
-            if volumen_val <= 0:
-                raise ValueError("volumen debe ser mayor que 0.")
-            restante_origen = max(float(palet_origen.cubicaje or 0) - float(palet_origen.consumido or 0), 0.0)
-            if volumen_val > restante_origen:
-                raise ValueError("El volumen supera el restante disponible del palet origen.")
-
-            palet_objetivo = palet_origen
-            # generamos un nuevo palet
-            if not bool(palet_origen.procesado) and not bool(palet_origen.ubicacion_id):
-                contador = self._siguiente_contador_global_palets(session)
-                codigo_nuevo = f"{lote}#{contador:06d}"
-
-                palet = PaletDB(
-                    codigo=codigo_nuevo,
-                    linea_entrada_id=None,
-                    duela_tipo_id=palet_origen.duela_tipo_id,
-                    cubicaje=volumen_val,
-                    consumido=0.0,
-                    estado=palet_origen.estado,
-                    ubicacion_id=palet_origen.ubicacion_id,
-                    procesado=True,
-                )
-                session.add(palet)
-                session.flush()
-                palet_objetivo = palet
-
-                trazabilidad_procesado = TrazabilidadProcesadoDB(
-                    palet_origen_id=palet_origen.id,
-                    palet_destino_id=palet.id,
-                )
-                session.add(trazabilidad_procesado)
-
-            existente = session.exec(
-                select(TrazabilidadFabricacionDB).where(
-                    TrazabilidadFabricacionDB.fabricacion_semanal_id == fabricacion_semanal_id,
-                    TrazabilidadFabricacionDB.palet_id == palet_objetivo.id,
-                )
+            palet = session.exec(
+                select(PaletDB).where(PaletDB.codigo == lote_palet)
             ).first()
-            if existente:
-                raise ValueError("El palet ya esta asociado a esta linea de trazabilidad.")
+            if not palet:
+                raise ValueError("No se encontro palet para lote_palet.")
 
-            trazabilidad = TrazabilidadFabricacionDB(
-                fabricacion_semanal_id=fabricacion_semanal_id,
-                palet_id=palet_objetivo.id,
-                cantidad_fabricada=cantidad_val,
-                estado=estado,
-            )
-            session.add(trazabilidad)
-            palet_origen.consumido = float(palet_origen.consumido or 0) + volumen_val
-            session.add(palet_origen)
+            retorno = self.agregar_trazabilidad_fabricacion(session, fabricacion_semanal_id, palet)
             session.commit()
-            session.refresh(trazabilidad)
-            session.refresh(palet_objetivo)
+            session.refresh(retorno.trazabilidad)
+            return retorno
 
-            return {
-                "id": trazabilidad.id,
-                "fabricacion_semanal_id": fabricacion_semanal_id,
-                "palet_id": palet_objetivo.id,
-                "palet_codigo": palet_objetivo.codigo,
-                "cantidad_fabricada": trazabilidad.cantidad_fabricada,
-                "estado": trazabilidad.estado,
-                "volumen": volumen_val,
-            }
+
+    def agregar_trazabilidad_fabricacion_desde_stock(self, data):
+        fabricacion_semanal_id = data.get("fabricacion_semanal_id")
+        stock_origen_id = data.get("stock_origen_id")
+        lote = (data.get("lote") or "").strip()
+        cubicaje = data.get("cubicaje")
+        paquetes = data.get("paquetes")
+
+        if not fabricacion_semanal_id:
+            raise ValueError("fabricacion_semanal_id es obligatorio.")
+        if not stock_origen_id:
+            raise ValueError("stock_origen_id es obligatorio.")
+        if not lote:
+            raise ValueError("lote es obligatorio.")
+        if cubicaje is None or str(cubicaje).strip() == "":
+            raise ValueError("cubicaje es obligatorio.")
+
+        cubicaje_val = float(cubicaje) * float(paquetes or 1)
+        if cubicaje_val <= 0:
+            raise ValueError("cubicaje debe ser mayor que 0.")
+
+        with DB.crear_sesion() as session:
+            stock = session.get(StockDB, int(stock_origen_id))
+            if not stock:
+                raise ValueError("stock_origen no encontrado.")
+
+            stock.cantidad_consumida = float(stock.cantidad_consumida or 0) + cubicaje_val
+            session.add(stock)
+            session.flush()
+
+            duela = session.exec(
+                select(DuelaDB)
+                .where(DuelaDB.tipo_producto_id == stock.tipo_producto)
+                .where(DuelaDB.material_id == stock.id_material)
+                .order_by(DuelaDB.id)
+            ).first()
+            if not duela:
+                raise ValueError("No existe tipo de duela para el stock seleccionado.")
+
+            ubicacion = session.exec(
+                select(UbicacionDB)
+                .where(UbicacionDB.instalacion_id == stock.id_instalacion)
+                .order_by(UbicacionDB.id)
+            ).first()
+
+            contador = self._siguiente_contador_global_palets(session)
+            codigo_nuevo = f"{lote}#{contador:06d}"
+
+            palet_nuevo = PaletDB(
+                codigo=codigo_nuevo,
+                linea_entrada_id=None,
+                duela_tipo_id=duela.id,
+                cubicaje=cubicaje_val,
+                consumido=0.0,
+                estado=stock.estado_palets,
+                ubicacion_id=ubicacion.id if ubicacion else None,
+                procesado=None,
+            )
+            session.add(palet_nuevo)
+            session.flush()
+            
+            retorno = self.agregar_trazabilidad_fabricacion(session, fabricacion_semanal_id, palet_nuevo)
+            session.commit()
+            session.refresh(stock)
+            session.refresh(palet_nuevo)
+            session.refresh(retorno.trazabilidad)
+            return retorno
 
     def eliminar_trazabilidad_fabricacion(self, data):
         trazabilidad_id = data.get("id")
@@ -847,7 +926,7 @@ class Colector:
                     UbicacionDB.id,
                     UbicacionDB.descripcion,
                     func.count(PaletDB.id).label("total_palets"),
-                    func.coalesce(func.sum(PaletDB.cubicaje), 0).label("total_volumen"),
+                    func.coalesce(func.sum(PaletDB.cubicaje), 0).label("total_cubicaje"),
                     func.coalesce(func.sum(PaletDB.consumido), 0).label("total_consumido"),
                     func.coalesce(func.sum(PaletDB.cubicaje - PaletDB.consumido), 0).label("total_restante"),
                 )
@@ -873,7 +952,7 @@ class Colector:
                         "ubicacion_id": row[2],
                         "ubicacion": row[3] or "Sin ubicación",
                         "total_palets": int(row[4] or 0),
-                        "total_volumen": float(row[5] or 0),
+                        "total_cubicaje": float(row[5] or 0),
                         "total_consumido": float(row[6] or 0),
                         "total_restante": float(row[7] or 0),
                     }
@@ -1078,6 +1157,85 @@ class Colector:
             cuadrante_dto = CuadranteDTO.from_db(cuadrante)
             cuadrante_dto.detalles = [CuadranteDetalleDTO.from_db(det) for det in detalles_actualizados]
             return cuadrante_dto
+
+    def extender_jueves_semana_cuadrante(self, data):
+        cuadrante_id = data.get("cuadrante_id")
+        fecha_origen = data.get("fecha")
+
+        if not cuadrante_id:
+            raise ValueError("cuadrante_id requerido")
+        if not fecha_origen:
+            raise ValueError("fecha requerida (YYYY-MM-DD)")
+
+        fecha_jueves = date.fromisoformat(str(fecha_origen))
+        # Jueves -> Viernes (+1) -> Lunes (+3) -> Martes (+1) -> Miercoles (+1)
+        fechas_destino = [
+            fecha_jueves + timedelta(days=1),
+            fecha_jueves + timedelta(days=4),
+            fecha_jueves + timedelta(days=5),
+            fecha_jueves + timedelta(days=6),
+        ]
+
+        with DB.crear_sesion() as session:
+            cuadrante = self.repo_cuadrantes.get(session, cuadrante_id)
+            if not cuadrante:
+                raise ValueError(f"No existe cuadrante con id {cuadrante_id}")
+
+            detalles = self.repo_cuadrante_detalles.list_by_cuadrante_id(session, cuadrante_id)
+            detalles_jueves = [d for d in detalles if d.fecha == fecha_jueves]
+            if not detalles_jueves:
+                raise ValueError("El jueves indicado no tiene asignaciones en este cuadrante.")
+
+            puestos = self.repo_puestos_trabajo.list_all(session)
+            puesto_batidero_manana_id = None
+            puesto_batidero_tarde_id = None
+            for puesto in puestos:
+                nombre = str(getattr(puesto, "nombre", "")).strip()
+                if nombre == "BATIDERO MAÑANA":
+                    puesto_batidero_manana_id = puesto.id
+                elif nombre == "BATIDERO TARDE":
+                    puesto_batidero_tarde_id = puesto.id
+
+            for indice_destino, fecha_destino in enumerate(fechas_destino):
+                # Borrar previamente todo lo del dia destino para este cuadrante
+                for det in [d for d in detalles if d.fecha == fecha_destino]:
+                    session.delete(det)
+
+                # Insertar copias desde jueves, alternando puestos de batidero
+                nuevos = []
+                for det in detalles_jueves:
+                    puesto_destino_id = det.puesto_id
+                    # Alternancia semanal: Vie(swapped), Lun(normal), Mar(swapped), Mie(normal)
+                    aplicar_swap = (indice_destino % 2 == 0)
+                    if aplicar_swap and puesto_batidero_manana_id and puesto_batidero_tarde_id:
+                        if puesto_destino_id == puesto_batidero_manana_id:
+                            puesto_destino_id = puesto_batidero_tarde_id
+                        elif puesto_destino_id == puesto_batidero_tarde_id:
+                            puesto_destino_id = puesto_batidero_manana_id
+
+                    nuevos.append(
+                        CuadranteDetalleDB(
+                            fecha=fecha_destino,
+                            cuadrante_id=cuadrante_id,
+                            puesto_id=puesto_destino_id,
+                            usuario_id=det.usuario_id,
+                            orden_en_puesto=det.orden_en_puesto,
+                        )
+                    )
+
+                if nuevos:
+                    session.add_all(nuevos)
+
+            try:
+                session.commit()
+            except Exception:
+                session.rollback()
+                raise
+
+            detalles_actualizados = self.repo_cuadrante_detalles.list_by_cuadrante_id(session, cuadrante_id)
+            cuadrante_dto = CuadranteDTO.from_db(cuadrante)
+            cuadrante_dto.detalles = [CuadranteDetalleDTO.from_db(det) for det in detalles_actualizados]
+            return cuadrante_dto
     #endregion
 
     #region Métodos Auxiliares
@@ -1174,6 +1332,10 @@ class Colector:
             repo = self.repo_stocks
             maestro = self.maestros.stocks
             objeto = StockDTO
+        elif tabla == "cubicaje":
+            repo = self.repo_cubicaje
+            maestro = self.maestros.cubicaje
+            objeto = CubicajeDTO
         elif tabla == "pedidos":
             repo = self.repo_pedidos
             maestro = self.fabricacion.pedidos

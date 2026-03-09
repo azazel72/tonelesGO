@@ -3,22 +3,40 @@ function prepararEventosFabricacion() {
     registrarEventosVistaProduccion("vista_consumo");
     registrarEventosVistaProduccion("vista_fabricacion");
 
-    const btnAgregar = document.getElementById("consumo-agregar-trazabilidad");
-    if (btnAgregar) {
-        btnAgregar.addEventListener("click", () => {
-            agregarTrazabilidadFabricacionDesdeUI("vista_consumo");
+    const btnAgregarDesdeStock = document.getElementById("consumo-stock-agregar-trazabilidad");
+    if (btnAgregarDesdeStock) {
+        btnAgregarDesdeStock.addEventListener("click", () => {
+            agregarTrazabilidadFabricacionDesdeStockUI("vista_consumo");
+        });
+    }
+    const btnAgregarDesdePalet = document.getElementById("consumo-palet-agregar-trazabilidad");
+    if (btnAgregarDesdePalet) {
+        btnAgregarDesdePalet.addEventListener("click", () => {
+            agregarTrazabilidadFabricacionDesdePaletUI();
         });
     }
     const selectUbicacionConsumo = document.getElementById("consumo-ubicacion-origen");
     if (selectUbicacionConsumo) {
-        selectUbicacionConsumo.addEventListener("change", () => {
-            actualizarPaletsConsumoEnSelector();
+        selectUbicacionConsumo.addEventListener("change", async () => {
+            await actualizarStockYCubicajeConsumo();
+        });
+    }
+    const selectTipoConsumo = document.getElementById("consumo-tipo-producto");
+    if (selectTipoConsumo) {
+        selectTipoConsumo.addEventListener("change", async () => {
+            await actualizarStockYCubicajeConsumo();
+        });
+    }
+    const selectMaderaConsumo = document.getElementById("consumo-madera");
+    if (selectMaderaConsumo) {
+        selectMaderaConsumo.addEventListener("change", async () => {
+            await actualizarStockYCubicajeConsumo();
         });
     }
     const selectPaletConsumo = document.getElementById("consumo-palet-origen");
     if (selectPaletConsumo) {
         selectPaletConsumo.addEventListener("change", () => {
-            autocompletarCamposConsumoDesdePalet();
+            autocompletarCamposConsumoDesdeStock();
         });
     }
 
@@ -116,7 +134,9 @@ function prepararEventosFabricacion() {
 
 function registrarEventosVistaProduccion(vistaId) {
     const cfg = obtenerConfigVistaProduccion(vistaId);
-    const tbodyOrdenes = document.querySelector(`${cfg.sectionSelector} ${cfg.tablaOrdenesSelector} tbody`);
+    const tbodyOrdenes = cfg.tablaOrdenesSelector
+        ? document.querySelector(`${cfg.sectionSelector} ${cfg.tablaOrdenesSelector} tbody`)
+        : null;
     if (tbodyOrdenes) {
         tbodyOrdenes.addEventListener("click", function (event) {
             const fila = event.target.closest("tr");
@@ -137,6 +157,8 @@ function registrarEventosVistaProduccion(vistaId) {
 
 let lineaFabricacionActualId = null;
 let lineaFabricacionMaterialActualId = null;
+let lineaFabricacionTipoActualId = null;
+let lineaFabricacionTipoBotaActualId = null;
 let ordenFabricacionActualId = null;
 const LIMITE_REACTIVAR_ESTADO = 1400;
 let vistaProduccionActiva = "vista_fabricacion";
@@ -156,15 +178,15 @@ function obtenerConfigVistaProduccion(vistaId = null) {
         return {
             vistaId: "vista_consumo",
             sectionSelector: "#vista_consumo",
-            tablaOrdenesSelector: "#tabla_ordenes_consumo",
-            tablaLineasSelector: "#tabla_contenido_orden_consumo",
-            tituloOrdenSelector: ".orden_consumo_seleccionada",
+            tablaOrdenesSelector: null,
+            tablaLineasSelector: "#tabla_consumo_fabricacion_semanal",
+            tituloOrdenSelector: null,
             modalId: "modalConsumo",
             productoSpanId: "consumo-producto-orden",
             tablaTrazabilidadSelector: "#tabla_trazabilidad_consumo",
             selectPaletOrigenId: "consumo-palet-origen",
             inputLoteId: "consumo-lote",
-            inputVolumenId: "consumo-volumen",
+            inputCubicajeId: "consumo-cubicaje",
         };
     }
     return {
@@ -178,7 +200,7 @@ function obtenerConfigVistaProduccion(vistaId = null) {
         tablaTrazabilidadSelector: "#tabla_trazabilidad_fabricacion",
         selectPaletOrigenId: null,
         inputLoteId: null,
-        inputVolumenId: null,
+        inputCubicajeId: null,
     };
 }
 
@@ -189,11 +211,17 @@ const terminalFabricacion = {
     tipos_producto: null,
     materiales: null,
     duelas: null,
+    instalaciones: null,
     ubicaciones: null,
     palets: null,
+    stocks: null,
+    cubicaje: null,
     usuarios: null,
     puestos_trabajo: null,
-    paletsConsumo: [],
+    pedidos: null,
+    consumos: null,
+    stocksConsumo: [],
+    cubicajeConsumo: [],
 };
 
 async function refrescarMaestrosFabricacion() {
@@ -203,8 +231,11 @@ async function refrescarMaestrosFabricacion() {
         terminalFabricacion.estados_trazabilidad_fabricacion = maestros?.estados_trazabilidad_fabricacion || {};
         terminalFabricacion.materiales = maestros?.materiales || {};
         terminalFabricacion.duelas = maestros?.duelas || {};
+        terminalFabricacion.instalaciones = maestros?.instalaciones || {};
         terminalFabricacion.ubicaciones = maestros?.ubicaciones || {};
         terminalFabricacion.palets = maestros?.palets || {};
+        terminalFabricacion.stocks = maestros?.stocks || {};
+        terminalFabricacion.cubicaje = maestros?.cubicaje || {};
         terminalFabricacion.usuarios = maestros?.usuarios || {};
         terminalFabricacion.puestos_trabajo = maestros?.puestos_trabajo || {};
     } catch (err) {
@@ -228,12 +259,17 @@ async function asegurarDatosFabricacionTerminal() {
         terminalFabricacion.estados_trazabilidad_fabricacion = maestros?.estados_trazabilidad_fabricacion || {};
         terminalFabricacion.materiales = maestros?.materiales || {};
         terminalFabricacion.duelas = maestros?.duelas || {};
+        terminalFabricacion.instalaciones = maestros?.instalaciones || {};
         terminalFabricacion.ubicaciones = maestros?.ubicaciones || {};
         terminalFabricacion.palets = maestros?.palets || {};
+        terminalFabricacion.stocks = maestros?.stocks || {};
+        terminalFabricacion.cubicaje = maestros?.cubicaje || {};
         terminalFabricacion.usuarios = maestros?.usuarios || {};
         terminalFabricacion.puestos_trabajo = maestros?.puestos_trabajo || {};
         const fabricacion = await wsRequest("fabricacion", {});
+        terminalFabricacion.pedidos = fabricacion?.pedidos || {};
         terminalFabricacion.tipos_producto = fabricacion?.tipos_producto || {};
+        terminalFabricacion.consumos = fabricacion?.consumos || {};
     } catch (err) {
         console.error("No se pudieron cargar datos de fabricacion:", err);
         terminalFabricacion.clientes = terminalFabricacion.clientes || {};
@@ -241,11 +277,41 @@ async function asegurarDatosFabricacionTerminal() {
         terminalFabricacion.tipos_producto = terminalFabricacion.tipos_producto || {};
         terminalFabricacion.materiales = terminalFabricacion.materiales || {};
         terminalFabricacion.duelas = terminalFabricacion.duelas || {};
+        terminalFabricacion.instalaciones = terminalFabricacion.instalaciones || {};
         terminalFabricacion.ubicaciones = terminalFabricacion.ubicaciones || {};
         terminalFabricacion.palets = terminalFabricacion.palets || {};
+        terminalFabricacion.stocks = terminalFabricacion.stocks || {};
+        terminalFabricacion.cubicaje = terminalFabricacion.cubicaje || {};
         terminalFabricacion.usuarios = terminalFabricacion.usuarios || {};
         terminalFabricacion.puestos_trabajo = terminalFabricacion.puestos_trabajo || {};
+        terminalFabricacion.pedidos = terminalFabricacion.pedidos || {};
+        terminalFabricacion.consumos = terminalFabricacion.consumos || {};
     }
+}
+
+function resolverTipoDuelaDesdeConsumos(tipoBotaId, materialId = null) {
+    const consumos = Object.values(terminalFabricacion.consumos || {});
+    const duelas = Object.values(terminalFabricacion.duelas || {});
+    const tipos = terminalFabricacion.tipos_producto || {};
+    const botaIdNum = Number(tipoBotaId || 0);
+    const materialIdNum = Number(materialId || 0);
+    if (!botaIdNum) return null;
+
+    const candidatos = consumos
+        .filter((c) => Number(c?.bota_id || 0) === botaIdNum)
+        .map((c) => Number(c?.consumible_id || 0))
+        .filter((id) => {
+            const tp = tipos?.[id];
+            return String(tp?.tipo || "").toUpperCase() === "DUELA";
+        });
+
+    if (!candidatos.length) return null;
+    if (!materialIdNum) return candidatos[0];
+
+    const candidatoPorMaterial = candidatos.find((tipoDuelaId) =>
+        duelas.some((d) => Number(d?.tipo_producto_id || 0) === tipoDuelaId && Number(d?.material_id || 0) === materialIdNum)
+    );
+    return candidatoPorMaterial || candidatos[0];
 }
 
 async function cargarOrdenesFabricacion(opciones = {}) {
@@ -300,9 +366,39 @@ async function cargarOrdenesFabricacion(opciones = {}) {
     }
 }
 
+async function cargarFabricacionSemanalConsumo() {
+    const cfg = obtenerConfigVistaProduccion("vista_consumo");
+    vistaProduccionActiva = cfg.vistaId;
+    const tbody = document.querySelector(`${cfg.tablaLineasSelector} tbody`);
+    if (!tbody) return;
+    try {
+        await asegurarDatosFabricacionTerminal();
+        const fabricacion = (await wsRequest("fabricacion", {})) || {};
+        terminalFabricacion.pedidos = fabricacion?.pedidos || {};
+        terminalFabricacion.tipos_producto = fabricacion?.tipos_producto || {};
+        const lineas = Object.values(fabricacion?.fabricacion_semanal || {})
+            .filter((l) => Number(l?.estado || 0) === 2);
+
+        actualizarTablaLineasFabricacionConsumo(lineas);
+        if (lineas.length === 1 && tbody) {
+            const filaUnica = tbody.querySelector("tr[data-linea-id]");
+            if (filaUnica) {
+                mostrarLotesMateriales(filaUnica, cfg.vistaId);
+            }
+        }
+    } catch (err) {
+        console.error(err);
+        tbody.innerHTML = `<tr><td colspan="7">Error al cargar fabricaciones semanales</td></tr>`;
+    }
+}
+
 async function seleccionarFabricacion(fila, opciones = {}) {
     const cfg = obtenerConfigVistaProduccion(opciones.vistaId);
     vistaProduccionActiva = cfg.vistaId;
+    if (cfg.vistaId === "vista_consumo") {
+        mostrarLotesMateriales(fila, cfg.vistaId);
+        return;
+    }
     const autoAbrirLineaUnica = opciones.autoAbrirLineaUnica === true;
     vista_fabricacion = document.getElementById(cfg.vistaId);
     vista_fabricacion.setAttribute("modo", "contenido_pedido");
@@ -328,15 +424,26 @@ function seleccionarContenidoOrden(fila, vistaId = null) {
         vista_fabricacion = document.getElementById(cfg.vistaId);
         vista_fabricacion.setAttribute("modo", "listado_pedidos");
     } else {
-        mostrarLotesMateriales(fila, cfg.vistaId);
+            mostrarLotesMateriales(fila, cfg.vistaId);
+        }
     }
-}
 
 function mostrarLotesMateriales(fila, vistaId = null) {
     const cfg = obtenerConfigVistaProduccion(vistaId);
     vistaProduccionActiva = cfg.vistaId;
     lineaFabricacionActualId = Number(fila.dataset.lineaId || 0) || null;
     lineaFabricacionMaterialActualId = Number(fila.dataset.materialId || 0) || null;
+    lineaFabricacionTipoBotaActualId = Number(fila.dataset.tipoProductoId || 0) || null;
+    lineaFabricacionTipoActualId = lineaFabricacionTipoBotaActualId;
+    if (cfg.vistaId === "vista_consumo") {
+        const tipoDuela = resolverTipoDuelaDesdeConsumos(lineaFabricacionTipoBotaActualId, lineaFabricacionMaterialActualId);
+        if (tipoDuela) {
+            lineaFabricacionTipoActualId = Number(tipoDuela);
+        }
+    }
+    if (cfg.vistaId === "vista_consumo") {
+        ordenFabricacionActualId = Number(fila.dataset.pedidoId || 0) || null;
+    }
     const tipoId = Number(fila.dataset.tipoProductoId || 0) || null;
     const descripcionProducto =
         (tipoId && terminalFabricacion.tipos_producto?.[tipoId]?.descripcion) ||
@@ -345,13 +452,26 @@ function mostrarLotesMateriales(fila, vistaId = null) {
     const descripcionMaterial =
         (lineaFabricacionMaterialActualId && terminalFabricacion.materiales?.[lineaFabricacionMaterialActualId]?.descripcion) ||
         descripcionProducto;
+    const cantidadFabricar = Number(fila.dataset.cantidadFabricar || 0) || 0;
+    const pedidoDescripcionData = (fila.dataset.pedidoDescripcion || "").trim();
+    const pedidoIdData = Number(fila.dataset.pedidoId || 0) || ordenFabricacionActualId || null;
+    const pedidoDescripcionMapa = (pedidoIdData && terminalFabricacion.pedidos?.[pedidoIdData]?.descripcion) || "";
+    const pedidoDescripcion = (pedidoDescripcionData || pedidoDescripcionMapa || "").trim();
+    const resumenProducto = `Tipo: ${descripcionProducto} | Madera: ${descripcionMaterial} | Cantidad a fabricar: ${cantidadFabricar}`;
     const titulo = document.getElementById(cfg.productoSpanId);
     if (titulo) {
+        titulo.textContent = resumenProducto;
+    }
+    const tituloModalId = cfg.vistaId === "vista_consumo" ? "modalConsumoLabel" : "modalFabricacionLabel";
+    const tituloModal = document.getElementById(tituloModalId);
+    if (tituloModal) {
         if (cfg.vistaId === "vista_consumo") {
-            const tieneMaterial = Boolean(lineaFabricacionMaterialActualId && terminalFabricacion.materiales?.[lineaFabricacionMaterialActualId]?.descripcion);
-            titulo.textContent = tieneMaterial ? `${descripcionProducto} | ${descripcionMaterial}` : descripcionProducto;
+            tituloModal.textContent = pedidoDescripcion || "Consumo";
         } else {
-            titulo.textContent = descripcionProducto;
+            const baseTitulo = "Trazabilidad de fabricacion";
+            tituloModal.textContent = pedidoDescripcion
+                ? `${baseTitulo}: ${pedidoDescripcion}`
+                : baseTitulo;
         }
     }
     if (cfg.vistaId === "vista_fabricacion") {
@@ -361,11 +481,16 @@ function mostrarLotesMateriales(fila, vistaId = null) {
         }
         return;
     }
+    const inputPaquetes = document.getElementById("consumo-paquetes");
+    if (inputPaquetes && (!inputPaquetes.value || Number(inputPaquetes.value) < 1)) {
+        inputPaquetes.value = "1";
+    }
     const modalEl = document.getElementById(cfg.modalId);
-    const modal = new bootstrap.Modal(modalEl);
+    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
     modal.show();
     if (cfg.vistaId === "vista_consumo") {
-        cargarPaletsConsumoEnSelector();
+        sincronizarFiltrosConsumoDesdeLinea();
+        cargarStocksConsumoEnSelector();
     }
     if (typeof setPantalla === "function") {
         setPantalla(cfg.vistaId, { pedido_id: ordenFabricacionActualId, fabricacion_semanal_id: lineaFabricacionActualId });
@@ -375,113 +500,227 @@ function mostrarLotesMateriales(fila, vistaId = null) {
     }
 }
 
-async function cargarPaletsConsumoEnSelector() {
+async function cargarStocksConsumoEnSelector() {
     const selector = document.getElementById("consumo-palet-origen");
     const selectorUbicacion = document.getElementById("consumo-ubicacion-origen");
+    const selectorTipo = document.getElementById("consumo-tipo-producto");
+    const selectorMadera = document.getElementById("consumo-madera");
     if (!selector || !selectorUbicacion) return;
-    selector.innerHTML = `<option value="">Cargando palets...</option>`;
+
+    const valorStockPrevio = selector.value || "";
+    const valorUbicacionPrevio = selectorUbicacion.value || "";
+    const valorTipoPrevio = String(lineaFabricacionTipoActualId || "");
+    const valorMaderaPrevio = String(lineaFabricacionMaterialActualId || "");
+
+    selector.innerHTML = `<option value="">Cargando stocks...</option>`;
     selectorUbicacion.innerHTML = `<option value="">Cargando ubicaciones...</option>`;
+    if (selectorTipo) selectorTipo.innerHTML = `<option value="">Cargando tipos...</option>`;
+    if (selectorMadera) selectorMadera.innerHTML = `<option value="">Cargando maderas...</option>`;
     try {
-        terminalFabricacion.paletsConsumo = (await wsRequest("listar_palets_consumo", {})) || [];
-        console.log("[consumo] palets recibidos:", terminalFabricacion.paletsConsumo);
-        actualizarPaletsConsumoEnSelector();
+        terminalFabricacion.stocksConsumo = (await wsRequest("listar_stocks_consumo", {})) || [];
+        terminalFabricacion.cubicajeConsumo = (await wsRequest("listar_cubicaje", {})) || [];
+        console.log("[consumo] stocks recibidos:", terminalFabricacion.stocksConsumo);
+        poblarFiltrosConsumo(valorTipoPrevio, valorMaderaPrevio);
+        actualizarStocksConsumoEnSelector(valorUbicacionPrevio, valorStockPrevio);
     } catch (err) {
-        console.error("No se pudo cargar el selector de palets de consumo:", err);
-        selector.innerHTML = `<option value="">Error cargando palets</option>`;
+        console.error("No se pudo cargar el selector de stocks de consumo:", err);
+        selector.innerHTML = `<option value="">Error cargando stocks</option>`;
         selectorUbicacion.innerHTML = `<option value="">Error cargando ubicaciones</option>`;
+        if (selectorTipo) selectorTipo.innerHTML = `<option value="">Error cargando tipos</option>`;
+        if (selectorMadera) selectorMadera.innerHTML = `<option value="">Error cargando maderas</option>`;
+        actualizarEstadoCamposConsumoSegunStock();
     }
 }
 
-function actualizarPaletsConsumoEnSelector() {
-    const selectorPalet = document.getElementById("consumo-palet-origen");
+function poblarFiltrosConsumo(valorTipoPrevio = "", valorMaderaPrevio = "") {
+    const selectorTipo = document.getElementById("consumo-tipo-producto");
+    const selectorMadera = document.getElementById("consumo-madera");
+    if (!selectorTipo || !selectorMadera) return;
+
+    const tipos = Object.values(terminalFabricacion.tipos_producto || {})
+        .filter((t) => String(t?.tipo || "").toUpperCase() === "DUELA")
+        .sort((a, b) => String(a.descripcion || "").localeCompare(String(b.descripcion || ""), "es"));
+    const maderas = Object.values(terminalFabricacion.materiales || {})
+        .sort((a, b) => String(a.descripcion || "").localeCompare(String(b.descripcion || ""), "es"));
+
+    selectorTipo.innerHTML = `<option value="">Todos los tipos</option>` + tipos.map((t) =>
+        `<option value="${t.id}">${t.descripcion || t.codigo || t.id}</option>`
+    ).join("");
+    selectorMadera.innerHTML = `<option value="">Todas las maderas</option>` + maderas.map((m) =>
+        `<option value="${m.id}">${m.descripcion || m.id}</option>`
+    ).join("");
+
+    selectorTipo.value = String(valorTipoPrevio || "");
+    selectorMadera.value = String(valorMaderaPrevio || "");
+}
+
+function sincronizarFiltrosConsumoDesdeLinea() {
+    const selectorTipo = document.getElementById("consumo-tipo-producto");
+    const selectorMadera = document.getElementById("consumo-madera");
+    if (selectorTipo) selectorTipo.value = String(lineaFabricacionTipoActualId || "");
+    if (selectorMadera) selectorMadera.value = String(lineaFabricacionMaterialActualId || "");
+}
+
+function actualizarStocksConsumoEnSelector(valorUbicacionPrevio = "", valorStockPrevio = "") {
+    const selectorStock = document.getElementById("consumo-palet-origen");
     const selectorUbicacion = document.getElementById("consumo-ubicacion-origen");
-    if (!selectorPalet || !selectorUbicacion) return;
+    const selectorTipo = document.getElementById("consumo-tipo-producto");
+    const selectorMadera = document.getElementById("consumo-madera");
+    if (!selectorStock || !selectorUbicacion) return;
 
     const ubicacionSeleccionada = selectorUbicacion.value === "" ? null : String(selectorUbicacion.value);
-    const palets = (terminalFabricacion.paletsConsumo || []).filter((p) => {
-        const maestroPalet = terminalFabricacion.palets?.[p.id];
-        const conLineaEntrada = maestroPalet?.linea_entrada_id !== null && typeof maestroPalet?.linea_entrada_id !== "undefined";
-        const pasa = Boolean(p?.procesado);// || conLineaEntrada;
-        console.log( p.codigo,Boolean(p?.procesado),maestroPalet?.linea_entrada_id ?? null);
-        return true;
-        return pasa;
-    });
-    const materialId = lineaFabricacionMaterialActualId;
+    const tipoSeleccionado = selectorTipo?.value ? Number(selectorTipo.value) : null;
+    const maderaSeleccionada = selectorMadera?.value ? Number(selectorMadera.value) : null;
+    const stocks = (terminalFabricacion.stocksConsumo || []);
+    const materialId = maderaSeleccionada || lineaFabricacionMaterialActualId;
+    const tipoId = tipoSeleccionado || lineaFabricacionTipoActualId;
 
-    const opcionesUbicacion = new Map();
-    palets.forEach((p) => {
-        const ubicId = p?.ubicacion_id;
-        if (ubicId === null || typeof ubicId === "undefined" || ubicId === "") return;
-        opcionesUbicacion.set(String(ubicId), p.ubicacion || `Ubicación ${ubicId}`);
+    const opcionesUbicacion = new Map(); // id_instalacion -> nombre
+    stocks.forEach((s) => {
+        const instalacionId = s?.id_instalacion;
+        if (!instalacionId) return;
+        const nombre = terminalFabricacion.instalaciones?.[instalacionId]?.nombre || `Instalación ${instalacionId}`;
+        opcionesUbicacion.set(String(instalacionId), nombre);
     });
     const opcionesUbicacionOrdenadas = Array.from(opcionesUbicacion.entries())
         .sort((a, b) => String(a[1]).localeCompare(String(b[1]), "es"));
 
-    const valorPrevio = selectorUbicacion.value;
     selectorUbicacion.innerHTML = `<option value="">Todas las ubicaciones</option>` + opcionesUbicacionOrdenadas
         .map(([id, nombre]) => `<option value="${id}">${nombre}</option>`)
         .join("");
-    if (valorPrevio && opcionesUbicacion.has(String(valorPrevio))) {
-        selectorUbicacion.value = valorPrevio;
+    if (valorUbicacionPrevio && opcionesUbicacion.has(String(valorUbicacionPrevio))) {
+        selectorUbicacion.value = valorUbicacionPrevio;
     }
 
     const filtroUbicacion = selectorUbicacion.value === "" ? ubicacionSeleccionada : String(selectorUbicacion.value);
-    const filtrados = palets.filter((p) => {
-        const duela = terminalFabricacion.duelas?.[p.duela_tipo_id];
-        const materialDeDuelaId = Number(duela?.material_id || 0);
-        const cumpleUbicacion = !filtroUbicacion || String(p?.ubicacion_id ?? "") === String(filtroUbicacion);
-        const cumpleMaterial = !materialId || materialDeDuelaId === Number(materialId);
-        const pasa = cumpleUbicacion && cumpleMaterial;
-if (p.procesado)         console.log( p.codigo,Boolean(p?.procesado));
-
-        return pasa;
+    const filtrados = stocks.filter((s) => {
+        const restante = Math.max(Number(s?.cantidad_stock || 0) - Number(s?.cantidad_consumida || 0), 0);
+        const cumpleUbicacion = !filtroUbicacion || String(s?.id_instalacion ?? "") === String(filtroUbicacion);
+        const cumpleMaterial = !materialId || Number(s?.id_material || 0) === Number(materialId);
+        const cumpleTipo = !tipoId || Number(s?.tipo_producto || 0) === Number(tipoId);
+        return restante > 0 && cumpleUbicacion && cumpleMaterial && cumpleTipo;
     });
-    console.log("[consumo] palets tras filtro material+ubicacion:", filtrados, { materialId, filtroUbicacion });
+    console.log("[consumo] stocks tras filtro tipo+material+ubicacion:", filtrados, { tipoId, materialId, filtroUbicacion });
 
     if (!filtrados.length) {
-        selectorPalet.innerHTML = `<option value="">Sin palets disponibles</option>`;
+        selectorStock.innerHTML = `<option value="">Sin stocks disponibles</option>`;
+        actualizarEstadoCamposConsumoSegunStock();
         return;
     }
-    selectorPalet.innerHTML = `<option value="">Seleccione palet...</option>` + filtrados.map((p) => {
-        const restante = Number(p.restante || 0).toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 3 });
-        const etiqueta = `${p.codigo} | ${p.ubicacion} | ${p.duela} | restante ${restante}`;
-        return `<option value="${p.id}">${etiqueta}</option>`;
+    selectorStock.innerHTML = `<option value="">Seleccione stock...</option>` + filtrados.map((s) => {
+        const restante = Math.max(Number(s?.cantidad_stock || 0) - Number(s?.cantidad_consumida || 0), 0)
+            .toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 3 });
+        const tipoTxt = terminalFabricacion.tipos_producto?.[s.tipo_producto]?.descripcion || `Tipo ${s.tipo_producto || "-"}`;
+        const maderaTxt = terminalFabricacion.materiales?.[s.id_material]?.descripcion || `Madera ${s.id_material || "-"}`;
+        const ubicTxt = terminalFabricacion.instalaciones?.[s.id_instalacion]?.nombre || `Ubicación ${s.id_instalacion || "-"}`;
+        const etiqueta = `Restante ${restante} | ${tipoTxt} | ${maderaTxt} | ${ubicTxt}`;
+        return `<option value="${s.id}">${etiqueta}</option>`;
     }).join("");
-    autocompletarCamposConsumoDesdePalet();
+    if (valorStockPrevio && filtrados.some((s) => String(s.id) === String(valorStockPrevio))) {
+        selectorStock.value = String(valorStockPrevio);
+    } else if (filtrados.length > 0) {
+        selectorStock.value = String(filtrados[0].id);
+    }
+    autocompletarCamposConsumoDesdeStock();
 }
 
-function autocompletarCamposConsumoDesdePalet() {
-    const selectPalet = document.getElementById("consumo-palet-origen");
+async function actualizarStockYCubicajeConsumo() {
+    const selectorStock = document.getElementById("consumo-palet-origen");
+    const selectorUbicacion = document.getElementById("consumo-ubicacion-origen");
+    const selectorTipo = document.getElementById("consumo-tipo-producto");
+    const selectorMadera = document.getElementById("consumo-madera");
+    if (!selectorStock || !selectorUbicacion) return;
+
+    const valorStockPrevio = selectorStock.value || "";
+    const filtroUbicacion = selectorUbicacion.value === "" ? null : String(selectorUbicacion.value);
+    const tipoId = selectorTipo?.value ? Number(selectorTipo.value) : null;
+    const materialId = selectorMadera?.value ? Number(selectorMadera.value) : null;
+    let stocks = [];
+    try {
+        const ctx = await wsRequest("obtener_contexto_consumo", {
+            tipo_producto_id: tipoId || null,
+            material_id: materialId || null,
+            ubicacion_id: filtroUbicacion ? Number(filtroUbicacion) : null,
+        });
+        stocks = Array.isArray(ctx?.stocks) ? ctx.stocks : [];
+        terminalFabricacion.stocksConsumo = stocks;
+        const tipoCubicaje = Number(tipoId || lineaFabricacionTipoActualId || 0);
+        terminalFabricacion.cubicajeConsumo = tipoCubicaje
+            ? [{ tipo_producto_id: tipoCubicaje, cubicaje_estandar: Number(ctx?.cubicaje_estandar || 0) }]
+            : [];
+    } catch (err) {
+        console.error("No se pudo obtener contexto de consumo:", err);
+        selectorStock.innerHTML = `<option value="">Error cargando stocks</option>`;
+        actualizarEstadoCamposConsumoSegunStock();
+        return;
+    }
+    const filtrados = stocks;
+
+    if (!filtrados.length) {
+        selectorStock.innerHTML = `<option value="">Sin stocks disponibles</option>`;
+        actualizarEstadoCamposConsumoSegunStock();
+        return;
+    }
+
+    selectorStock.innerHTML = `<option value="">Seleccione stock...</option>` + filtrados.map((s) => {
+        const restante = Math.max(Number(s?.cantidad_stock || 0) - Number(s?.cantidad_consumida || 0), 0)
+            .toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 3 });
+        const tipoTxt = terminalFabricacion.tipos_producto?.[s.tipo_producto]?.descripcion || `Tipo ${s.tipo_producto || "-"}`;
+        const maderaTxt = terminalFabricacion.materiales?.[s.id_material]?.descripcion || `Madera ${s.id_material || "-"}`;
+        const ubicTxt = terminalFabricacion.instalaciones?.[s.id_instalacion]?.nombre || `Ubicación ${s.id_instalacion || "-"}`;
+        const etiqueta = `Restante ${restante} | ${tipoTxt} | ${maderaTxt} | ${ubicTxt}`;
+        return `<option value="${s.id}">${etiqueta}</option>`;
+    }).join("");
+
+    if (valorStockPrevio && filtrados.some((s) => String(s.id) === String(valorStockPrevio))) {
+        selectorStock.value = String(valorStockPrevio);
+    } else {
+        selectorStock.value = String(filtrados[0].id);
+    }
+    autocompletarCamposConsumoDesdeStock();
+}
+
+function obtenerCubicajeInicialConsumo(tipoProductoId) {
+    const lista = Array.isArray(terminalFabricacion.cubicajeConsumo) ? terminalFabricacion.cubicajeConsumo : [];
+    const enLista = lista.find((c) => Number(c?.tipo_producto_id || 0) === Number(tipoProductoId));
+    if (enLista) return Number(enLista.cubicaje_estandar || 0);
+    const mapa = terminalFabricacion.cubicaje || {};
+    const item = Object.values(mapa).find((c) => Number(c?.tipo_producto_id || 0) === Number(tipoProductoId));
+    return Number(item?.cubicaje_estandar || 0);
+}
+
+function actualizarEstadoCamposConsumoSegunStock() {
+    const selectStock = document.getElementById("consumo-palet-origen");
     const inputLote = document.getElementById("consumo-lote");
-    const inputVolumen = document.getElementById("consumo-volumen");
-    if (!selectPalet || !inputLote || !inputVolumen) return;
-
-    const paletId = Number(selectPalet.value || 0);
-    if (!paletId) {
-        inputLote.value = "";
-        inputVolumen.value = "";
-        return;
+    const inputCubicaje = document.getElementById("consumo-cubicaje");
+    const inputPaquetes = document.getElementById("consumo-paquetes");
+    const hayStock = Boolean(Number(selectStock?.value || 0));
+    if (inputLote) inputLote.disabled = !hayStock;
+    if (inputCubicaje) inputCubicaje.disabled = !hayStock;
+    if (inputPaquetes) inputPaquetes.disabled = !hayStock;
+    if (!hayStock) {
+        if (inputLote) inputLote.value = "";
+        if (inputPaquetes) inputPaquetes.value = "1";
+        if (inputCubicaje) inputCubicaje.value = "";
+    } else if (inputPaquetes && (!inputPaquetes.value || Number(inputPaquetes.value) < 1)) {
+        inputPaquetes.value = "1";
     }
-    const palet = (terminalFabricacion.paletsConsumo || []).find((p) => Number(p.id) === paletId);
-    if (!palet) {
-        inputLote.value = "";
-        inputVolumen.value = "";
-        return;
-    }
+}
 
-    const codigo = String(palet.codigo || "");
-    const esPaletDirecto = Boolean(palet.procesado) || codigo.includes("#");
-    if (!esPaletDirecto) {
-        inputLote.value = "";
-        inputVolumen.value = "";
-        return;
-    }
+function autocompletarCamposConsumoDesdeStock() {
+    const selectStock = document.getElementById("consumo-palet-origen");
+    const inputLote = document.getElementById("consumo-lote");
+    const inputCubicaje = document.getElementById("consumo-cubicaje");
+    const selectorTipo = document.getElementById("consumo-tipo-producto");
+    if (!selectStock || !inputLote || !inputCubicaje) return;
 
-    const lote = codigo.includes("#") ? codigo.split("#")[0] : codigo;
-    const restante = Number(palet.restante || 0);
-    if (lote) inputLote.value = lote;
-    if (Number.isFinite(restante) && restante > 0) {
-        inputVolumen.value = String(restante);
+    actualizarEstadoCamposConsumoSegunStock();
+    const stockId = Number(selectStock.value || 0);
+    if (!stockId) return;
+    const tipoSeleccionado = selectorTipo?.value ? Number(selectorTipo.value) : lineaFabricacionTipoActualId;
+    const cubicajeInicial = obtenerCubicajeInicialConsumo(tipoSeleccionado);
+    if (Number.isFinite(cubicajeInicial) && cubicajeInicial >= 0) {
+        inputCubicaje.value = String(cubicajeInicial);
     }
 }
 
@@ -525,6 +764,9 @@ function actualizarTablaLineasFabricacion(lineas, vistaId = null) {
         tr.dataset.lineaId = l.id ?? "";
         tr.dataset.tipoProductoId = l.tipo_producto_id ?? "";
         tr.dataset.materialId = l.material_id ?? "";
+        tr.dataset.pedidoId = l.pedido_id ?? "";
+        tr.dataset.cantidadFabricar = l.cantidad ?? "";
+        tr.dataset.pedidoDescripcion = (terminalFabricacion.pedidos?.[l.pedido_id]?.descripcion || "").trim();
         const tipo =
             terminalFabricacion.tipos_producto?.[l.tipo_producto_id]?.descripcion ||
             (typeof l.tipo_producto_id !== "undefined" ? String(l.tipo_producto_id) : "");
@@ -533,6 +775,49 @@ function actualizarTablaLineasFabricacion(lineas, vistaId = null) {
         const falta = Math.max(0, cantidad - fabricada);
         tr.innerHTML = `
       <td>${tipo}</td>
+      <td>${cantidad}</td>
+      <td>${fabricada}</td>
+      <td>${falta}</td>
+    `;
+        tbody.appendChild(tr);
+    });
+}
+
+function actualizarTablaLineasFabricacionConsumo(lineas) {
+    const cfg = obtenerConfigVistaProduccion("vista_consumo");
+    const tbody = document.querySelector(`${cfg.tablaLineasSelector} tbody`);
+    if (!tbody) return;
+    tbody.innerHTML = "";
+    if (!lineas || !lineas.length) {
+        const tr = document.createElement("tr");
+        const td = document.createElement("td");
+        td.colSpan = 7;
+        td.textContent = "Sin líneas en estado Producción";
+        tr.appendChild(td);
+        tbody.appendChild(tr);
+        return;
+    }
+    lineas.forEach((l) => {
+        const tr = document.createElement("tr");
+        tr.dataset.lineaId = l.id ?? "";
+        tr.dataset.tipoProductoId = l.tipo_producto_id ?? "";
+        tr.dataset.materialId = l.material_id ?? "";
+        tr.dataset.pedidoId = l.pedido_id ?? "";
+        tr.dataset.cantidadFabricar = l.cantidad ?? "";
+        const pedido = terminalFabricacion.pedidos?.[l.pedido_id] || null;
+        const pedidoTxt = (pedido?.descripcion || `Pedido ${l.pedido_id || "-"}`).trim();
+        tr.dataset.pedidoDescripcion = pedidoTxt;
+        const fechaInicio = formatearFechaEuropea(l.fecha_inicio);
+        const tipo = terminalFabricacion.tipos_producto?.[l.tipo_producto_id]?.descripcion || "-";
+        const material = terminalFabricacion.materiales?.[l.material_id]?.descripcion || "-";
+        const cantidad = Number(l.cantidad) || 0;
+        const fabricada = Number(l.cantidad_fabricada) || 0;
+        const falta = Math.max(0, cantidad - fabricada);
+        tr.innerHTML = `
+      <td>${pedidoTxt}</td>
+      <td>${fechaInicio || "-"}</td>
+      <td>${tipo}</td>
+      <td>${material}</td>
       <td>${cantidad}</td>
       <td>${fabricada}</td>
       <td>${falta}</td>
@@ -563,7 +848,7 @@ async function cargarTrazabilidadFabricacion(lineaId, vistaId = "vista_consumo")
         if (!trazas.length) {
             const tr = document.createElement("tr");
             const td = document.createElement("td");
-            td.colSpan = 3;
+            td.colSpan = 4;
             td.textContent = "Sin registros";
             tr.appendChild(td);
             tbody.appendChild(tr);
@@ -572,6 +857,13 @@ async function cargarTrazabilidadFabricacion(lineaId, vistaId = "vista_consumo")
         trazas.forEach((t) => {
             const tr = document.createElement("tr");
             const estado = terminalFabricacion.estados_trazabilidad_fabricacion?.[t.estado]?.descripcion || (t.estado ?? "");
+            const palet = terminalFabricacion.palets?.[t.palet_id] || null;
+            const restante = palet
+                ? Number(palet.restante)
+                : null;
+            const restanteTxt = Number.isFinite(restante)
+                ? Number(restante).toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 3 })
+                : "";
             tr.dataset.trazabilidadId = t.id ?? "";
             tr.dataset.estado = t.estado ?? 0;
             tr.dataset.cantidad = t.cantidad_fabricada ?? 0;
@@ -595,6 +887,7 @@ async function cargarTrazabilidadFabricacion(lineaId, vistaId = "vista_consumo")
             }
             tr.innerHTML = `
         <td>${t.palet_codigo || t.palet_id || ""}</td>
+        <td>${restanteTxt}</td>
         <td>${t.cantidad_fabricada ?? ""}</td>
         <td class="text-center">
           ${botonHtml}
@@ -604,44 +897,77 @@ async function cargarTrazabilidadFabricacion(lineaId, vistaId = "vista_consumo")
         });
     } catch (err) {
         console.error(err);
-        tbody.innerHTML = `<tr><td colspan="3">Error al cargar trazabilidad</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="4">Error al cargar trazabilidad</td></tr>`;
     }
 }
 
-async function agregarTrazabilidadFabricacionDesdeUI(_vistaId = "vista_consumo") {
+async function agregarTrazabilidadFabricacionDesdeStockUI(_vistaId = "vista_consumo") {
     const cfg = obtenerConfigVistaProduccion("vista_consumo");
     const selectPaletOrigen = document.getElementById(cfg.selectPaletOrigenId);
     const loteInput = document.getElementById(cfg.inputLoteId);
-    const volumenInput = document.getElementById(cfg.inputVolumenId);
+    const cubicajeInput = document.getElementById(cfg.inputCubicajeId);
+    const paquetesInput = document.getElementById("consumo-paquetes");
     const paletOrigenId = Number(selectPaletOrigen?.value || 0);
     const lote = (loteInput?.value || "").trim();
-    const volumen = Number.parseFloat((volumenInput?.value || "").toString().replace(",", "."));
-    const cantidad = 0;
+    const cubicaje = Number.parseFloat((cubicajeInput?.value || "").toString().replace(",", "."));
+    const paquetes = Number.parseInt((paquetesInput?.value || "1").toString(), 10) || 1;
     if (!lineaFabricacionActualId) {
         alert("Seleccione una linea de fabricacion.");
         return;
     }
-    if (!paletOrigenId || !lote || !Number.isFinite(volumen) || volumen <= 0) {
-        alert("Debes completar palet origen, lote y volumen.");
+    if (!paletOrigenId || !lote || !Number.isFinite(cubicaje) || cubicaje <= 0) {
+        alert("Debes completar stock origen, cubicaje, paquetes y lote.");
         return;
     }
 
     try {
-        await wsRequest("agregar_trazabilidad_fabricacion", {
+        await wsRequest("agregar_trazabilidad_fabricacion_desde_stock", {
             fabricacion_semanal_id: lineaFabricacionActualId,
-            palet_origen_id: paletOrigenId,
+            stock_origen_id: paletOrigenId,
             lote,
-            volumen,
-            cantidad_fabricada: cantidad,
+            cubicaje,
+            paquetes,
         });
         if (loteInput) loteInput.value = "";
-        if (volumenInput) volumenInput.value = "";
+        if (cubicajeInput) cubicajeInput.value = "";
+        if (paquetesInput) paquetesInput.value = "1";
         if (selectPaletOrigen) selectPaletOrigen.value = "";
-        cargarPaletsConsumoEnSelector();
+        cargarStocksConsumoEnSelector();
         cargarTrazabilidadFabricacion(lineaFabricacionActualId, "vista_consumo");
     } catch (err) {
         console.error(err);
         alert("Error al agregar trazabilidad.");
+    }
+}
+
+async function agregarTrazabilidadFabricacionDesdePaletUI() {
+    const lotePaletInput = document.getElementById("consumo-palet-lote");
+    const cubicajeInput = document.getElementById("consumo-palet-cubicaje");
+    const lote_palet = (lotePaletInput?.value || "").trim();
+    const cubicaje = Number.parseFloat((cubicajeInput?.value || "").toString().replace(",", "."));
+
+    if (!lineaFabricacionActualId) {
+        alert("Seleccione una linea de fabricacion.");
+        return;
+    }
+    if (!lote_palet || !Number.isFinite(cubicaje) || cubicaje <= 0) {
+        alert("Debes completar lote palet y cubicaje.");
+        return;
+    }
+
+    try {
+        await wsRequest("agregar_trazabilidad_fabricacion_desde_palet", {
+            fabricacion_semanal_id: lineaFabricacionActualId,
+            lote_palet,
+            cubicaje,
+        });
+        if (lotePaletInput) lotePaletInput.value = "";
+        if (cubicajeInput) cubicajeInput.value = "";
+        cargarTrazabilidadFabricacion(lineaFabricacionActualId, "vista_consumo");
+        cargarTrazabilidadFabricacion(lineaFabricacionActualId, "vista_fabricacion");
+    } catch (err) {
+        console.error(err);
+        alert("Error al agregar consumo desde palet.");
     }
 }
 
@@ -654,7 +980,7 @@ async function abrirModalOperarioFabricacion() {
     }
     await asegurarDatosFabricacionTerminal();
     await cargarOperariosEnModal();
-    const modal = new bootstrap.Modal(modalEl);
+    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
     modal.show();
     ajustarZIndexModal(modalEl);
 }
@@ -804,7 +1130,7 @@ async function abrirModalFabricarBota() {
 
     const modalEl = document.getElementById("modalFabricarBota");
     if (!modalEl) return;
-    const modal = new bootstrap.Modal(modalEl);
+    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
     modal.show();
     ajustarZIndexModal(modalEl);
 }
@@ -866,8 +1192,8 @@ async function imprimirEtiquetaFabricarBotaDesdeUI() {
         cargarTrazabilidadFabricacion(lineaFabricacionActualId, "vista_consumo");
         if (ordenFabricacionActualId) {
             cargarLineasFabricacion(ordenFabricacionActualId, { vistaId: "vista_fabricacion" });
-            cargarLineasFabricacion(ordenFabricacionActualId, { vistaId: "vista_consumo" });
         }
+        cargarFabricacionSemanalConsumo();
     } catch (err) {
         console.error("[fabricar-bota] error en imprimir_etiqueta_fabricacion", err);
         alert("Error al imprimir etiqueta.");
@@ -1105,8 +1431,8 @@ async function imprimirEtiquetaFabricacion(operariosIds = [], cantidadEtiquetas 
         cargarTrazabilidadFabricacion(lineaFabricacionActualId, "vista_consumo");
         if (ordenFabricacionActualId) {
             cargarLineasFabricacion(ordenFabricacionActualId, { vistaId: "vista_fabricacion" });
-            cargarLineasFabricacion(ordenFabricacionActualId, { vistaId: "vista_consumo" });
         }
+        cargarFabricacionSemanalConsumo();
     } catch (err) {
         console.error(err);
         alert("Error al imprimir etiqueta.");
@@ -1115,10 +1441,9 @@ async function imprimirEtiquetaFabricacion(operariosIds = [], cantidadEtiquetas 
 
 
 function refrescarFabricacionDesdeServidor(_data = {}) {
-    cargarOrdenesFabricacion({ vistaId: "vista_consumo" });
+    cargarFabricacionSemanalConsumo();
     cargarOrdenesFabricacion({ vistaId: "vista_fabricacion" });
     if (ordenFabricacionActualId) {
-        cargarLineasFabricacion(ordenFabricacionActualId, { vistaId: "vista_consumo" });
         cargarLineasFabricacion(ordenFabricacionActualId, { vistaId: "vista_fabricacion" });
     }
     if (lineaFabricacionActualId) {
@@ -1126,4 +1451,3 @@ function refrescarFabricacionDesdeServidor(_data = {}) {
         cargarTrazabilidadFabricacion(lineaFabricacionActualId, "vista_fabricacion");
     }
 }
-

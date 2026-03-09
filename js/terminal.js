@@ -73,7 +73,7 @@ function mostrarSeccion(id) {
         if (id === "vista_consumo") {
             const activarAutoAccesoConsumo = contextoNavegacion.fabricacionOrigen === "palets" && contextoNavegacion.autoAccesoConsumo;
             contextoNavegacion.autoAccesoConsumo = false;
-            cargarOrdenesFabricacion({ vistaId: "vista_consumo", autoAccesoConsumo: activarAutoAccesoConsumo });
+            cargarFabricacionSemanalConsumo({ autoAccesoConsumo: activarAutoAccesoConsumo });
         }
         if (id === "vista_fabricacion") {
             contextoNavegacion.autoAccesoConsumo = false;

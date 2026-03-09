@@ -29,6 +29,7 @@ const ACCIONES_PERMISO_GESTION = {
     "ver-palets": [],
     "ver-stocks": [],
     "ver-productos": [],
+    "ver-cubicaje": [],
     "ver-archivos-subidos": [],
     "ver-ambientes": [],
     "cerrar-maestros": [],

@@ -207,7 +207,7 @@
                 <i class="bi bi-bezier2 fs-2" aria-hidden="true"></i>
                 <span>Baja Procesado</span>
             </button>
-            <button class="boton verde boton-con-icono" mostrar="vista_ubicacion" data-contexto-ubicacion="maderas_madera">
+            <button class="boton verde boton-con-icono" mostrar="vista_ubicacion" data-contexto-ubicacion="maderas_madera" disabled>
                 <i class="bi bi-plus-square fs-2" aria-hidden="true"></i>
                 <span>Crear a partir de Stock</span>
             </button>
@@ -469,40 +469,17 @@
             </form>
         </section>
 
-        <section id="vista_consumo" class="flex-fill" modo="listado_pedidos">
+        <section id="vista_consumo" class="flex-fill" modo="listado_fabricacion_semanal">
             <div class="table-responsive">
-                <table id="tabla_ordenes_consumo" class="table table-striped table-bordered">
+                <table id="tabla_consumo_fabricacion_semanal" class="table table-striped table-bordered">
                     <thead class="table-dark">
                         <tr>
-                            <th colspan="3">Ordenes de fabricación</th>
+                            <th colspan="7">Fabricación semanal en producción</th>
                         </tr>
                         <tr>
-                            <th scope="col">Nº de Orden</th>
-                            <th scope="col">Fecha</th>
-                            <th scope="col">Cliente</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>4500720598</td>
-                            <td>31/07/2025</td>
-                            <td>Irish Distillers</td>
-                        </tr>
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <th colspan="3">Ordenes de fabricación</th>
-                        </tr>
-                    </tfoot>
-                </table>
-
-                <table id="tabla_contenido_orden_consumo" class="table table-striped table-bordered">
-                    <thead class="table-dark">
-                        <tr>
-                            <th colspan="4"><span class="orden_consumo_seleccionada">Orden 4500720598, 30/07/2025,
-                                    Irish Distillers</span></th>
-                        </tr>
-                        <tr>
+                            <th scope="col">Pedido</th>
+                            <th scope="col">Fecha inicio</th>
+                            <th scope="col">Tipo</th>
                             <th scope="col">Material</th>
                             <th scope="col">Cant.</th>
                             <th scope="col">Fab.</th>
@@ -511,15 +488,12 @@
                     </thead>
                     <tbody>
                         <tr>
-                            <td>Malaga PX Butts BM</td>
-                            <td>45</td>
-                            <td>0</td>
-                            <td>45</td>
+                            <td colspan="7">Cargando fabricaciones semanales...</td>
                         </tr>
                     </tbody>
                     <tfoot>
                         <tr>
-                            <td colspan="4">Volver a listado de órdenes</td>
+                            <th colspan="7">Fabricación semanal en producción</th>
                         </tr>
                     </tfoot>
                 </table>
@@ -541,6 +515,7 @@
                                     <thead class="table-light">
                                         <tr>
                                             <th scope="col">Palet</th>
+                                            <th scope="col">Restante</th>
                                             <th scope="col">Cantidad</th>
                                             <th scope="col">Estado</th>
                                         </tr>
@@ -550,37 +525,117 @@
                                 </table>
 
                                 <div class="modal-footer flex-column align-items-stretch gap-2">
-                                    <div class="row g-2">
-                                        <div class="col-12">
-                                            <label class="form-label mb-1" for="consumo-ubicacion-origen">Ubicación</label>
-                                            <select class="form-select" id="consumo-ubicacion-origen">
-                                                <option value="">Todas las ubicaciones</option>
-                                            </select>
+                                    <ul class="nav nav-pills mb-2" id="consumo-panel-tabs" role="tablist">
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link active" id="consumo-tab-stock" data-bs-toggle="pill" data-bs-target="#consumo-panel-stock" type="button" role="tab">Desde stock</button>
+                                        </li>
+                                        <li class="nav-item" role="presentation">
+                                            <button class="nav-link" id="consumo-tab-palet" data-bs-toggle="pill" data-bs-target="#consumo-panel-palet" type="button" role="tab">Desde palet</button>
+                                        </li>
+                                    </ul>
+
+                                    <div class="tab-content">
+                                        <div class="tab-pane fade show active" id="consumo-panel-stock" role="tabpanel">
+                                            <div class="row g-2">
+                                                <div class="col-12 row g-2 align-items-center">
+                                                    <div class="col-4">
+                                                        <label class="form-label mb-0" for="consumo-tipo-producto">Duela</label>
+                                                    </div>
+                                                    <div class="col-8">
+                                                        <select class="form-select" id="consumo-tipo-producto">
+                                                            <option value="">Seleccione tipo...</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12 row g-2 align-items-center">
+                                                    <div class="col-4">
+                                                        <label class="form-label mb-0" for="consumo-madera">Madera</label>
+                                                    </div>
+                                                    <div class="col-8">
+                                                        <select class="form-select" id="consumo-madera">
+                                                            <option value="">Seleccione madera...</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12 row g-2 align-items-center">
+                                                    <div class="col-4">
+                                                        <label class="form-label mb-0" for="consumo-ubicacion-origen">Ubicacion</label>
+                                                    </div>
+                                                    <div class="col-8">
+                                                        <select class="form-select" id="consumo-ubicacion-origen">
+                                                            <option value="">Todas las ubicaciones</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12 row g-2 align-items-center">
+                                                    <div class="col-4">
+                                                        <label class="form-label mb-0" for="consumo-palet-origen">Stock origen</label>
+                                                    </div>
+                                                    <div class="col-8">
+                                                        <select class="form-select" id="consumo-palet-origen">
+                                                            <option value="">Seleccione stock...</option>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12 row g-2 align-items-center">
+                                                    <div class="col-4">
+                                                        <label class="form-label mb-0" for="consumo-cubicaje">Cubicaje</label>
+                                                    </div>
+                                                    <div class="col-8">
+                                                        <input type="number" step="0.001" min="0" class="form-control" id="consumo-cubicaje" placeholder="0" disabled>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12 row g-2 align-items-center">
+                                                    <div class="col-4">
+                                                        <label class="form-label mb-0" for="consumo-paquetes">Paquetes</label>
+                                                    </div>
+                                                    <div class="col-8">
+                                                        <input type="number" step="1" min="1" class="form-control" id="consumo-paquetes" placeholder="1" value="1" disabled>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12 row g-2 align-items-center">
+                                                    <div class="col-4">
+                                                        <label class="form-label mb-0" for="consumo-lote">Lote</label>
+                                                    </div>
+                                                    <div class="col-8">
+                                                        <input type="text" class="form-control" id="consumo-lote" placeholder="Lote" disabled>
+                                                    </div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <button class="btn btn-outline-primary w-100" type="button" id="consumo-stock-agregar-trazabilidad">
+                                                        <i class="bi bi-plus-lg"></i> Agregar consumo
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
-                                        <div class="col-12">
-                                            <label class="form-label mb-1" for="consumo-palet-origen">Palet origen</label>
-                                            <select class="form-select" id="consumo-palet-origen">
-                                                <option value="">Seleccione palet...</option>
-                                            </select>
-                                        </div>
-                                        <div class="col-7">
-                                            <label class="form-label mb-1" for="consumo-lote">Lote</label>
-                                            <input type="text" class="form-control" id="consumo-lote" placeholder="Lote">
-                                        </div>
-                                        <div class="col-5">
-                                            <label class="form-label mb-1" for="consumo-volumen">Volumen</label>
-                                            <input type="number" step="0.001" min="0" class="form-control" id="consumo-volumen" placeholder="0">
-                                        </div>
-                                        <div class="col-12">
-                                            <button class="btn btn-outline-primary w-100" type="button" id="consumo-agregar-trazabilidad">
-                                                <i class="bi bi-plus-lg"></i> Agregar consumo
-                                            </button>
+
+                                        <div class="tab-pane fade" id="consumo-panel-palet" role="tabpanel">
+                                            <div class="row g-2">
+                                                <div class="col-12 row g-2 align-items-center">
+                                                    <div class="col-4">
+                                                        <label class="form-label mb-0" for="consumo-palet-lote">Lote palet</label>
+                                                    </div>
+                                                    <div class="col-8">
+                                                        <input type="text" class="form-control" id="consumo-palet-lote" placeholder="Lote palet">
+                                                    </div>
+                                                </div>
+                                                <div class="col-12 row g-2 align-items-center">
+                                                    <div class="col-4">
+                                                        <label class="form-label mb-0" for="consumo-palet-cubicaje">Cubicaje</label>
+                                                    </div>
+                                                    <div class="col-8">
+                                                        <input type="number" step="0.001" min="0" class="form-control" id="consumo-palet-cubicaje" placeholder="0">
+                                                    </div>
+                                                </div>
+                                                <div class="col-12">
+                                                    <button class="btn btn-outline-primary w-100" type="button" id="consumo-palet-agregar-trazabilidad">
+                                                        <i class="bi bi-plus-lg"></i> Agregar consumo
+                                                    </button>
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
 
-                                    <div class="d-flex justify-content-end gap-2">
-                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
-                                    </div>
                                 </div>
 
                             </div>
@@ -665,6 +720,7 @@
                                     <thead class="table-light">
                                         <tr>
                                             <th scope="col">Palet</th>
+                                            <th scope="col">Restante</th>
                                             <th scope="col">Cantidad</th>
                                             <th scope="col">Estado</th>
                                         </tr>

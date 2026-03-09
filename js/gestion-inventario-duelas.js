@@ -27,7 +27,7 @@ function openInventarioDuelasWin() {
   cuerpo.innerHTML = `
     <h6 class="mt-1">Duelas activas por ubicación (agrupado por duela)</h6>
     <table class="table table-sm table-striped" id="tabla-informe-palets-duela">
-      <thead><tr><th>Ubicación</th><th class="text-end">Total palets</th><th class="text-end">Volumen</th><th class="text-end">Consumido</th><th class="text-end">Restante</th></tr></thead>
+      <thead><tr><th>Ubicación</th><th class="text-end">Total palets</th><th class="text-end">Cubicaje</th><th class="text-end">Consumido</th><th class="text-end">Restante</th></tr></thead>
       <tbody></tbody>
     </table>
   `;
@@ -73,7 +73,7 @@ async function cargarInformeMaterial(contenedor, agrupacion = "duela") {
 
     for (const [clave, items] of grupos.entries()) {
       const sumPalets = items.reduce((acc, x) => acc + Number(x.total_palets || 0), 0);
-      const sumVolumen = items.reduce((acc, x) => acc + Number(x.total_volumen || 0), 0);
+      const sumCubicaje = items.reduce((acc, x) => acc + Number(x.total_cubicaje || 0), 0);
       const sumConsumido = items.reduce((acc, x) => acc + Number(x.total_consumido || 0), 0);
       const sumRestante = items.reduce((acc, x) => acc + Number(x.total_restante || 0), 0);
 
@@ -81,7 +81,7 @@ async function cargarInformeMaterial(contenedor, agrupacion = "duela") {
         <tr class="table-secondary">
           <td><strong>${clave}</strong></td>
           <td class="text-end"><strong>${sumPalets.toLocaleString("es-ES")}</strong></td>
-          <td class="text-end"><strong>${sumVolumen.toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 3 })}</strong></td>
+          <td class="text-end"><strong>${sumCubicaje.toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 3 })}</strong></td>
           <td class="text-end"><strong>${sumConsumido.toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 3 })}</strong></td>
           <td class="text-end"><strong>${sumRestante.toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 3 })}</strong></td>
         </tr>
@@ -92,7 +92,7 @@ async function cargarInformeMaterial(contenedor, agrupacion = "duela") {
           <tr>
             <td>${agruparPorDuela ? (r.ubicacion ?? "Sin ubicación") : (r.duela ?? "Sin tipo")}</td>
             <td class="text-end">${Number(r.total_palets || 0).toLocaleString("es-ES")}</td>
-            <td class="text-end">${Number(r.total_volumen || 0).toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 3 })}</td>
+            <td class="text-end">${Number(r.total_cubicaje || 0).toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 3 })}</td>
             <td class="text-end">${Number(r.total_consumido || 0).toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 3 })}</td>
             <td class="text-end">${Number(r.total_restante || 0).toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 3 })}</td>
           </tr>

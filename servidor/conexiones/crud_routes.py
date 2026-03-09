@@ -145,7 +145,8 @@ class CrudRoutes:
                         safe_data = jsonable_encoder(rm)
                         await ws.send_json(safe_data)
                         if msg.action in {
-                            "agregar_trazabilidad_fabricacion",
+                            "agregar_trazabilidad_fabricacion_desde_stock",
+                            "agregar_trazabilidad_fabricacion_desde_palet",
                             "actualizar_estado_trazabilidad_fabricacion",
                             "eliminar_trazabilidad_fabricacion",
                             "imprimir_etiqueta_fabricacion",

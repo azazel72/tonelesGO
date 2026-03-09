@@ -8,3 +8,5 @@ SOURCE ./DDL/004_v0_4_stocks.sql;
 SOURCE ./DDL/005_v0_4_productos_operarios_codigo_batidero.sql;
 SOURCE ./DDL/006_v0_4_trazabilidad_fabricacion_fabricacion_semanal_id.sql;
 SOURCE ./DDL/007_v0_4_ambientes_3_tomas_en_columnas.sql;
+SOURCE ./DDL/008_v0_4_cubicaje_duelas.sql;
+SOURCE ./DDL/009_v0_4_cubicaje_id_autonumerico.sql;

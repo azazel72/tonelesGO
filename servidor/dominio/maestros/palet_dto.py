@@ -10,11 +10,12 @@ class PaletDTO(BaseModel):
     duela_tipo_id: int | None = None
     cubicaje: float = 0.0
     consumido: float = 0.0
+    restante: float = 0.0
     estado: int | None = None
     ubicacion_id: int | None = None
     procesado: bool = False
 
-    @field_validator("cubicaje", "consumido", mode="before")
+    @field_validator("cubicaje", "consumido", "restante", mode="before")
     @classmethod
     def normalizar_decimal_vacio(cls, value):
         if value in ("", None):
@@ -29,6 +30,7 @@ class PaletDTO(BaseModel):
             duela_tipo_id=palet_db.duela_tipo_id,
             cubicaje=palet_db.cubicaje,
             consumido=palet_db.consumido,
+            restante=max(float(palet_db.cubicaje or 0) - float(palet_db.consumido or 0), 0.0),
             estado=palet_db.estado,
             ubicacion_id=palet_db.ubicacion_id,
             procesado=palet_db.procesado,
