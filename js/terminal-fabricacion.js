@@ -1,12 +1,12 @@
 function prepararEventosFabricacion() {
     console.log("[fabricar-bota] prepararEventosFabricacion iniciado");
-    registrarEventosVistaProduccion("vista_consumo");
-    registrarEventosVistaProduccion("vista_fabricacion");
+    registrarEventosVistaProduccion("vista_consumo_semanal");
+    registrarEventosVistaProduccion("vista_fabricacion_semanal");
 
-    const btnAgregarDesdeStock = document.getElementById("consumo-stock-agregar-trazabilidad");
-    if (btnAgregarDesdeStock) {
-        btnAgregarDesdeStock.addEventListener("click", () => {
-            agregarTrazabilidadFabricacionDesdeStockUI("vista_consumo");
+    const btnAgregarDesdePaletStock = document.getElementById("consumo-stock-agregar-trazabilidad");
+    if (btnAgregarDesdePaletStock) {
+        btnAgregarDesdePaletStock.addEventListener("click", () => {
+            agregarTrazabilidadFabricacionDesdePaletStockUI("vista_consumo");
         });
     }
     const btnAgregarDesdePalet = document.getElementById("consumo-palet-agregar-trazabilidad");
@@ -18,25 +18,25 @@ function prepararEventosFabricacion() {
     const selectUbicacionConsumo = document.getElementById("consumo-ubicacion-origen");
     if (selectUbicacionConsumo) {
         selectUbicacionConsumo.addEventListener("change", async () => {
-            await actualizarStockYCubicajeConsumo();
+            await actualizarPaletsConsumoYCubicaje();
         });
     }
     const selectTipoConsumo = document.getElementById("consumo-tipo-producto");
     if (selectTipoConsumo) {
         selectTipoConsumo.addEventListener("change", async () => {
-            await actualizarStockYCubicajeConsumo();
+            await actualizarPaletsConsumoYCubicaje();
         });
     }
     const selectMaderaConsumo = document.getElementById("consumo-madera");
     if (selectMaderaConsumo) {
         selectMaderaConsumo.addEventListener("change", async () => {
-            await actualizarStockYCubicajeConsumo();
+            await actualizarPaletsConsumoYCubicaje();
         });
     }
     const selectPaletConsumo = document.getElementById("consumo-palet-origen");
     if (selectPaletConsumo) {
         selectPaletConsumo.addEventListener("change", () => {
-            autocompletarCamposConsumoDesdeStock();
+            autocompletarCamposConsumoDesdePalet();
         });
     }
 
@@ -49,6 +49,15 @@ function prepararEventosFabricacion() {
         btnImprimirFabricarBota.addEventListener("click", async () => {
             console.log("[fabricar-bota] click en boton imprimir (listener js)");
             await imprimirEtiquetaFabricarBotaDesdeUI();
+        });
+    }
+
+    const btnVolverFabricacionSemanal = document.getElementById("botas-volver-fabricacion-semanal");
+    if (btnVolverFabricacionSemanal) {
+        btnVolverFabricacionSemanal.addEventListener("click", () => {
+            if (typeof mostrarSeccion === "function") {
+                mostrarSeccion("vista_fabricacion_semanal");
+            }
         });
     }
 
@@ -90,7 +99,7 @@ function prepararEventosFabricacion() {
         });
     }
 
-    const tablaTrazFabricacion = document.querySelector("#tabla_trazabilidad_fabricacion tbody");
+    const tablaTrazFabricacion = document.querySelector("#tabla_trazabilidad_botas tbody");
     if (tablaTrazFabricacion) {
         tablaTrazFabricacion.addEventListener("click", async (event) => {
             const btn = event.target.closest("[data-action='trazabilidad-fabricacion-reactivar'], [data-action='trazabilidad-fabricacion-toggle']");
@@ -145,7 +154,9 @@ function registrarEventosVistaProduccion(vistaId) {
         });
     }
 
-    const tablaLineas = document.querySelector(`${cfg.sectionSelector} ${cfg.tablaLineasSelector}`);
+    const tablaLineas = cfg.tablaLineasSelector
+        ? document.querySelector(`${cfg.sectionSelector} ${cfg.tablaLineasSelector}`)
+        : null;
     if (tablaLineas) {
         tablaLineas.addEventListener("click", function (event) {
             const fila = event.target.closest("tr");
@@ -161,43 +172,89 @@ let lineaFabricacionTipoActualId = null;
 let lineaFabricacionTipoBotaActualId = null;
 let ordenFabricacionActualId = null;
 const LIMITE_REACTIVAR_ESTADO = 1400;
-let vistaProduccionActiva = "vista_fabricacion";
+let vistaProduccionActiva = "vista_fabricacion_semanal";
 let trazabilidadesActivasFabricarBota = [];
 
 function obtenerVistaProduccionActiva(vistaId = null) {
-    if (vistaId === "vista_consumo" || vistaId === "vista_fabricacion") return vistaId;
-    if (typeof pantallaActual !== "undefined" && (pantallaActual === "vista_consumo" || pantallaActual === "vista_fabricacion")) {
+    if (vistaId === "vista_consumo" || vistaId === "vista_fabricacion" || vistaId === "vista_consumo_semanal" || vistaId === "vista_fabricacion_semanal") return vistaId;
+    if (
+        typeof pantallaActual !== "undefined"
+        && (
+            pantallaActual === "vista_consumo"
+            || pantallaActual === "vista_fabricacion"
+            || pantallaActual === "vista_consumo_semanal"
+            || pantallaActual === "vista_fabricacion_semanal"
+        )
+    ) {
         return pantallaActual;
     }
-    return vistaProduccionActiva || "vista_fabricacion";
+    return vistaProduccionActiva || "vista_fabricacion_semanal";
 }
 
 function obtenerConfigVistaProduccion(vistaId = null) {
     const vista = obtenerVistaProduccionActiva(vistaId);
+    if (vista === "vista_consumo_semanal") {
+        return {
+            vistaId: "vista_consumo_semanal",
+            sectionSelector: "#vista_consumo_semanal",
+            tablaOrdenesSelector: null,
+            tablaLineasSelector: "#tabla_consumo_fabricacion_semanal",
+            tituloOrdenSelector: null,
+            modalId: null,
+            detalleVistaId: "vista_consumo",
+            productoSpanId: null,
+            tituloPanelId: null,
+            tablaTrazabilidadSelector: null,
+            selectPaletOrigenId: null,
+            inputLoteId: null,
+            inputCubicajeId: null,
+        };
+    }
     if (vista === "vista_consumo") {
         return {
             vistaId: "vista_consumo",
             sectionSelector: "#vista_consumo",
             tablaOrdenesSelector: null,
-            tablaLineasSelector: "#tabla_consumo_fabricacion_semanal",
+            tablaLineasSelector: null,
             tituloOrdenSelector: null,
-            modalId: "modalConsumo",
+            modalId: null,
+            detalleVistaId: "vista_consumo",
             productoSpanId: "consumo-producto-orden",
+            tituloPanelId: "modalConsumoLabel",
             tablaTrazabilidadSelector: "#tabla_trazabilidad_consumo",
             selectPaletOrigenId: "consumo-palet-origen",
             inputLoteId: "consumo-lote",
             inputCubicajeId: "consumo-cubicaje",
         };
     }
+    if (vista === "vista_fabricacion_semanal") {
+        return {
+            vistaId: "vista_fabricacion_semanal",
+            sectionSelector: "#vista_fabricacion_semanal",
+            tablaLineasSelector: "#tabla_fabricacion_semanal",
+            tablaOrdenesSelector: null,
+            tituloOrdenSelector: null,
+            modalId: null,
+            detalleVistaId: "vista_fabricacion",
+            productoSpanId: null,
+            tituloPanelId: null,
+            tablaTrazabilidadSelector: null,
+            selectPaletOrigenId: null,
+            inputLoteId: null,
+            inputCubicajeId: null,
+        };
+    }
     return {
         vistaId: "vista_fabricacion",
         sectionSelector: "#vista_fabricacion",
-        tablaOrdenesSelector: "#tabla_pedidos",
-        tablaLineasSelector: "#tabla_fabricacion_semanal",
-        tituloOrdenSelector: ".pedido_seleccionado",
-        modalId: "modalFabricacion",
-        productoSpanId: "fabricacion-producto-orden",
-        tablaTrazabilidadSelector: "#tabla_trazabilidad_fabricacion",
+        tablaLineasSelector: null,
+        tablaOrdenesSelector: null,
+        tituloOrdenSelector: null,
+        modalId: null,
+        detalleVistaId: "vista_fabricacion",
+        productoSpanId: "botas-producto-orden",
+        tituloPanelId: "botas-panel-titulo",
+        tablaTrazabilidadSelector: "#tabla_trazabilidad_botas",
         selectPaletOrigenId: null,
         inputLoteId: null,
         inputCubicajeId: null,
@@ -214,13 +271,12 @@ const terminalFabricacion = {
     instalaciones: null,
     ubicaciones: null,
     palets: null,
-    stocks: null,
     cubicaje: null,
     usuarios: null,
     puestos_trabajo: null,
     pedidos: null,
     consumos: null,
-    stocksConsumo: [],
+    paletsConsumo: [],
     cubicajeConsumo: [],
 };
 
@@ -234,7 +290,6 @@ async function refrescarMaestrosFabricacion() {
         terminalFabricacion.instalaciones = maestros?.instalaciones || {};
         terminalFabricacion.ubicaciones = maestros?.ubicaciones || {};
         terminalFabricacion.palets = maestros?.palets || {};
-        terminalFabricacion.stocks = maestros?.stocks || {};
         terminalFabricacion.cubicaje = maestros?.cubicaje || {};
         terminalFabricacion.usuarios = maestros?.usuarios || {};
         terminalFabricacion.puestos_trabajo = maestros?.puestos_trabajo || {};
@@ -262,7 +317,6 @@ async function asegurarDatosFabricacionTerminal() {
         terminalFabricacion.instalaciones = maestros?.instalaciones || {};
         terminalFabricacion.ubicaciones = maestros?.ubicaciones || {};
         terminalFabricacion.palets = maestros?.palets || {};
-        terminalFabricacion.stocks = maestros?.stocks || {};
         terminalFabricacion.cubicaje = maestros?.cubicaje || {};
         terminalFabricacion.usuarios = maestros?.usuarios || {};
         terminalFabricacion.puestos_trabajo = maestros?.puestos_trabajo || {};
@@ -280,7 +334,7 @@ async function asegurarDatosFabricacionTerminal() {
         terminalFabricacion.instalaciones = terminalFabricacion.instalaciones || {};
         terminalFabricacion.ubicaciones = terminalFabricacion.ubicaciones || {};
         terminalFabricacion.palets = terminalFabricacion.palets || {};
-        terminalFabricacion.stocks = terminalFabricacion.stocks || {};
+        terminalFabricacion.paletsConsumo = terminalFabricacion.paletsConsumo || [];
         terminalFabricacion.cubicaje = terminalFabricacion.cubicaje || {};
         terminalFabricacion.usuarios = terminalFabricacion.usuarios || {};
         terminalFabricacion.puestos_trabajo = terminalFabricacion.puestos_trabajo || {};
@@ -315,60 +369,13 @@ function resolverTipoDuelaDesdeConsumos(tipoBotaId, materialId = null) {
 }
 
 async function cargarOrdenesFabricacion(opciones = {}) {
-    const cfg = obtenerConfigVistaProduccion(opciones.vistaId);
-    vistaProduccionActiva = cfg.vistaId;
-    const autoAccesoConsumo = opciones.autoAccesoConsumo === true;
-    const tbody = document.querySelector(`${cfg.tablaOrdenesSelector} tbody`);
-    if (!tbody) return;
-    try {
-        await asegurarDatosFabricacionTerminal();
-        const añoActual = new Date().getFullYear();
-        const ordenes = (await wsRequest("listar_pedidos", { "año": añoActual })) || [];
-
-        tbody.innerHTML = "";
-        if (!ordenes.length) {
-            const tr = document.createElement("tr");
-            const td = document.createElement("td");
-            td.colSpan = 3;
-            td.textContent = "No hay pedidos";
-            tr.appendChild(td);
-            tbody.appendChild(tr);
-            actualizarTablaLineasFabricacion([], cfg.vistaId);
-            return;
-        }
-
-        ordenes.forEach((o) => {
-            const tr = document.createElement("tr");
-            tr.dataset.ordenId = o.id;
-            const tipoProducto = terminalFabricacion.tipos_producto?.[o.tipo_producto_id]?.descripcion || "";
-            const material = terminalFabricacion.materiales?.[o.material_id]?.descripcion || "";
-            const cantidad = Number.parseInt(String(o.cantidad ?? ""), 10);
-            tr.dataset.tipoProducto = tipoProducto;
-            tr.dataset.material = material;
-            tr.dataset.cantidad = Number.isFinite(cantidad) ? String(cantidad) : "";
-            tr.innerHTML = `
-        <td>${tipoProducto || "-"}</td>
-        <td>${material || "-"}</td>
-        <td>${Number.isFinite(cantidad) ? cantidad : 0}</td>
-      `;
-            tbody.appendChild(tr);
-        });
-
-        if (autoAccesoConsumo && ordenes.length === 1) {
-            const filaUnica = tbody.querySelector("tr[data-orden-id]");
-            if (filaUnica) {
-                await seleccionarFabricacion(filaUnica, { autoAbrirLineaUnica: true, vistaId: cfg.vistaId });
-            }
-        }
-    } catch (err) {
-        console.error(err);
-        tbody.innerHTML = `<tr><td colspan="3">Error al cargar pedidos</td></tr>`;
-    }
+    return cargarFabricacionSemanalActivaFabricacion(opciones);
 }
 
-async function cargarFabricacionSemanalConsumo() {
-    const cfg = obtenerConfigVistaProduccion("vista_consumo");
+async function cargarFabricacionSemanalActivaFabricacion(opciones = {}) {
+    const cfg = obtenerConfigVistaProduccion(opciones.vistaId);
     vistaProduccionActiva = cfg.vistaId;
+    const autoAbrirLineaUnica = opciones.autoAbrirLineaUnica !== false;
     const tbody = document.querySelector(`${cfg.tablaLineasSelector} tbody`);
     if (!tbody) return;
     try {
@@ -379,8 +386,61 @@ async function cargarFabricacionSemanalConsumo() {
         const lineas = Object.values(fabricacion?.fabricacion_semanal || {})
             .filter((l) => Number(l?.estado || 0) === 2);
 
-        actualizarTablaLineasFabricacionConsumo(lineas);
-        if (lineas.length === 1 && tbody) {
+        tbody.innerHTML = "";
+        if (!lineas.length) {
+            const tr = document.createElement("tr");
+            const td = document.createElement("td");
+            td.colSpan = 7;
+            td.textContent = "No hay fabricacion semanal activa";
+            tr.appendChild(td);
+            tbody.appendChild(tr);
+            return;
+        }
+
+        actualizarTablaLineasFabricacionConsumo(lineas, cfg.vistaId);
+
+        if (autoAbrirLineaUnica && lineas.length === 1) {
+            const filaUnica = tbody.querySelector("tr[data-linea-id]");
+            if (filaUnica) {
+                mostrarLotesMateriales(filaUnica, cfg.vistaId);
+            }
+        }
+    } catch (err) {
+        console.error(err);
+        tbody.innerHTML = `<tr><td colspan="7">Error al cargar fabricacion semanal activa</td></tr>`;
+    }
+}
+
+function seleccionarFabricacion(fila, opciones = {}) {
+    const cfg = obtenerConfigVistaProduccion(opciones.vistaId);
+    if (!fila) return;
+    mostrarLotesMateriales(fila, cfg.vistaId);
+}
+
+function seleccionarContenidoOrden(fila, vistaId = null) {
+    const cfg = obtenerConfigVistaProduccion(vistaId);
+    if (!fila || fila.closest("thead") || fila.closest("tfoot")) return;
+    mostrarLotesMateriales(fila, cfg.vistaId);
+}
+
+async function cargarFabricacionSemanalConsumo(opciones = {}) {
+    const cfg = obtenerConfigVistaProduccion("vista_consumo_semanal");
+    vistaProduccionActiva = cfg.vistaId;
+    const vista = document.getElementById(cfg.vistaId);
+    if (vista) vista.setAttribute("modo", "listado_fabricacion_semanal");
+    const autoAbrirLineaUnica = opciones.autoAbrirLineaUnica !== false;
+    const tbody = document.querySelector(`${cfg.tablaLineasSelector} tbody`);
+    if (!tbody) return;
+    try {
+        await asegurarDatosFabricacionTerminal();
+        const fabricacion = (await wsRequest("fabricacion", {})) || {};
+        terminalFabricacion.pedidos = fabricacion?.pedidos || {};
+        terminalFabricacion.tipos_producto = fabricacion?.tipos_producto || {};
+        const lineas = Object.values(fabricacion?.fabricacion_semanal || {})
+            .filter((l) => Number(l?.estado || 0) === 2);
+
+        actualizarTablaLineasFabricacionConsumo(lineas, cfg.vistaId);
+        if (autoAbrirLineaUnica && lineas.length === 1 && tbody) {
             const filaUnica = tbody.querySelector("tr[data-linea-id]");
             if (filaUnica) {
                 mostrarLotesMateriales(filaUnica, cfg.vistaId);
@@ -391,42 +451,6 @@ async function cargarFabricacionSemanalConsumo() {
         tbody.innerHTML = `<tr><td colspan="7">Error al cargar fabricaciones semanales</td></tr>`;
     }
 }
-
-async function seleccionarFabricacion(fila, opciones = {}) {
-    const cfg = obtenerConfigVistaProduccion(opciones.vistaId);
-    vistaProduccionActiva = cfg.vistaId;
-    if (cfg.vistaId === "vista_consumo") {
-        mostrarLotesMateriales(fila, cfg.vistaId);
-        return;
-    }
-    const autoAbrirLineaUnica = opciones.autoAbrirLineaUnica === true;
-    vista_fabricacion = document.getElementById(cfg.vistaId);
-    vista_fabricacion.setAttribute("modo", "contenido_pedido");
-
-    const pedidoId = Number(fila.dataset.ordenId);
-    const tipoProducto = fila.dataset.tipoProducto || fila.children?.[0]?.textContent || "-";
-    const material = fila.dataset.material || fila.children?.[1]?.textContent || "-";
-    const cantidad = fila.dataset.cantidad || fila.children?.[2]?.textContent || "0";
-    const titulo = `Pedido ${pedidoId}: ${tipoProducto} | ${material} | Cantidad ${cantidad}`;
-    const tituloOrden = document.querySelector(cfg.tituloOrdenSelector);
-    if (tituloOrden) tituloOrden.textContent = titulo;
-
-    ordenFabricacionActualId = pedidoId;
-    if (typeof setPantalla === "function") {
-        setPantalla(cfg.vistaId, { pedido_id: pedidoId });
-    }
-    await cargarLineasFabricacion(pedidoId, { autoAbrirLineaUnica, vistaId: cfg.vistaId });
-}
-
-function seleccionarContenidoOrden(fila, vistaId = null) {
-    const cfg = obtenerConfigVistaProduccion(vistaId);
-    if (fila.closest("tfoot")) {
-        vista_fabricacion = document.getElementById(cfg.vistaId);
-        vista_fabricacion.setAttribute("modo", "listado_pedidos");
-    } else {
-            mostrarLotesMateriales(fila, cfg.vistaId);
-        }
-    }
 
 function mostrarLotesMateriales(fila, vistaId = null) {
     const cfg = obtenerConfigVistaProduccion(vistaId);
@@ -458,39 +482,42 @@ function mostrarLotesMateriales(fila, vistaId = null) {
     const pedidoDescripcionMapa = (pedidoIdData && terminalFabricacion.pedidos?.[pedidoIdData]?.descripcion) || "";
     const pedidoDescripcion = (pedidoDescripcionData || pedidoDescripcionMapa || "").trim();
     const resumenProducto = `Tipo: ${descripcionProducto} | Madera: ${descripcionMaterial} | Cantidad a fabricar: ${cantidadFabricar}`;
-    const titulo = document.getElementById(cfg.productoSpanId);
+    const titulo = cfg.productoSpanId ? document.getElementById(cfg.productoSpanId) : null;
     if (titulo) {
         titulo.textContent = resumenProducto;
     }
-    const tituloModalId = cfg.vistaId === "vista_consumo" ? "modalConsumoLabel" : "modalFabricacionLabel";
-    const tituloModal = document.getElementById(tituloModalId);
-    if (tituloModal) {
-        if (cfg.vistaId === "vista_consumo") {
-            tituloModal.textContent = pedidoDescripcion || "Consumo";
-        } else {
-            const baseTitulo = "Trazabilidad de fabricacion";
-            tituloModal.textContent = pedidoDescripcion
-                ? `${baseTitulo}: ${pedidoDescripcion}`
-                : baseTitulo;
-        }
+    const tituloPanel = cfg.tituloPanelId ? document.getElementById(cfg.tituloPanelId) : null;
+    if (tituloPanel) {
+        const baseTitulo = cfg.vistaId === "vista_consumo" ? "Consumo" : "Fabricar bota";
+        tituloPanel.textContent = pedidoDescripcion
+            ? `${baseTitulo}: ${pedidoDescripcion}`
+            : baseTitulo;
     }
-    if (cfg.vistaId === "vista_fabricacion") {
-        abrirModalFabricarBota();
-        if (typeof setPantalla === "function") {
-            setPantalla(cfg.vistaId, { pedido_id: ordenFabricacionActualId, fabricacion_semanal_id: lineaFabricacionActualId });
+    if (cfg.vistaId === "vista_consumo_semanal" || cfg.vistaId === "vista_fabricacion_semanal") {
+        if (typeof mostrarSeccion === "function") {
+            mostrarSeccion(cfg.detalleVistaId);
         }
+        setTimeout(() => mostrarLotesMateriales(fila, cfg.detalleVistaId), 0);
         return;
     }
+    const vista = document.getElementById(cfg.vistaId);
+    if (vista && cfg.vistaId === "vista_consumo") vista.setAttribute("modo", "contenido_pedido");
     const inputPaquetes = document.getElementById("consumo-paquetes");
     if (inputPaquetes && (!inputPaquetes.value || Number(inputPaquetes.value) < 1)) {
         inputPaquetes.value = "1";
     }
-    const modalEl = document.getElementById(cfg.modalId);
-    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-    modal.show();
     if (cfg.vistaId === "vista_consumo") {
         sincronizarFiltrosConsumoDesdeLinea();
-        cargarStocksConsumoEnSelector();
+        cargarPaletsConsumoEnSelector();
+    }
+    if (cfg.vistaId === "vista_fabricacion") {
+        const inputCantidad = document.getElementById("fabricar-bota-cantidad-etiquetas");
+        if (inputCantidad && (!inputCantidad.value || Number(inputCantidad.value) < 1)) {
+            inputCantidad.value = "1";
+        }
+        cargarLotesMaderaFabricarBota();
+        cargarOperariosFondadoEnSelector();
+        cargarCodigosBatideroEnSelector();
     }
     if (typeof setPantalla === "function") {
         setPantalla(cfg.vistaId, { pedido_id: ordenFabricacionActualId, fabricacion_semanal_id: lineaFabricacionActualId });
@@ -500,7 +527,7 @@ function mostrarLotesMateriales(fila, vistaId = null) {
     }
 }
 
-async function cargarStocksConsumoEnSelector() {
+async function cargarPaletsConsumoEnSelector() {
     const selector = document.getElementById("consumo-palet-origen");
     const selectorUbicacion = document.getElementById("consumo-ubicacion-origen");
     const selectorTipo = document.getElementById("consumo-tipo-producto");
@@ -512,23 +539,23 @@ async function cargarStocksConsumoEnSelector() {
     const valorTipoPrevio = String(lineaFabricacionTipoActualId || "");
     const valorMaderaPrevio = String(lineaFabricacionMaterialActualId || "");
 
-    selector.innerHTML = `<option value="">Cargando stocks...</option>`;
+    selector.innerHTML = `<option value="">Cargando palets...</option>`;
     selectorUbicacion.innerHTML = `<option value="">Cargando ubicaciones...</option>`;
     if (selectorTipo) selectorTipo.innerHTML = `<option value="">Cargando tipos...</option>`;
     if (selectorMadera) selectorMadera.innerHTML = `<option value="">Cargando maderas...</option>`;
     try {
-        terminalFabricacion.stocksConsumo = (await wsRequest("listar_stocks_consumo", {})) || [];
+        terminalFabricacion.paletsConsumo = (await wsRequest("listar_palets_consumo", {})) || [];
         terminalFabricacion.cubicajeConsumo = (await wsRequest("listar_cubicaje", {})) || [];
-        console.log("[consumo] stocks recibidos:", terminalFabricacion.stocksConsumo);
+        console.log("[consumo] palets recibidos:", terminalFabricacion.paletsConsumo);
         poblarFiltrosConsumo(valorTipoPrevio, valorMaderaPrevio);
-        actualizarStocksConsumoEnSelector(valorUbicacionPrevio, valorStockPrevio);
+        actualizarPaletsConsumoEnSelector(valorUbicacionPrevio, valorStockPrevio);
     } catch (err) {
-        console.error("No se pudo cargar el selector de stocks de consumo:", err);
-        selector.innerHTML = `<option value="">Error cargando stocks</option>`;
+        console.error("No se pudo cargar el selector de palets de consumo:", err);
+        selector.innerHTML = `<option value="">Error cargando palets</option>`;
         selectorUbicacion.innerHTML = `<option value="">Error cargando ubicaciones</option>`;
         if (selectorTipo) selectorTipo.innerHTML = `<option value="">Error cargando tipos</option>`;
         if (selectorMadera) selectorMadera.innerHTML = `<option value="">Error cargando maderas</option>`;
-        actualizarEstadoCamposConsumoSegunStock();
+        actualizarEstadoCamposConsumoSegunPalet();
     }
 }
 
@@ -561,7 +588,7 @@ function sincronizarFiltrosConsumoDesdeLinea() {
     if (selectorMadera) selectorMadera.value = String(lineaFabricacionMaterialActualId || "");
 }
 
-function actualizarStocksConsumoEnSelector(valorUbicacionPrevio = "", valorStockPrevio = "") {
+function actualizarPaletsConsumoEnSelector(valorUbicacionPrevio = "", valorStockPrevio = "") {
     const selectorStock = document.getElementById("consumo-palet-origen");
     const selectorUbicacion = document.getElementById("consumo-ubicacion-origen");
     const selectorTipo = document.getElementById("consumo-tipo-producto");
@@ -571,12 +598,12 @@ function actualizarStocksConsumoEnSelector(valorUbicacionPrevio = "", valorStock
     const ubicacionSeleccionada = selectorUbicacion.value === "" ? null : String(selectorUbicacion.value);
     const tipoSeleccionado = selectorTipo?.value ? Number(selectorTipo.value) : null;
     const maderaSeleccionada = selectorMadera?.value ? Number(selectorMadera.value) : null;
-    const stocks = (terminalFabricacion.stocksConsumo || []);
+    const palets = (terminalFabricacion.paletsConsumo || []);
     const materialId = maderaSeleccionada || lineaFabricacionMaterialActualId;
     const tipoId = tipoSeleccionado || lineaFabricacionTipoActualId;
 
     const opcionesUbicacion = new Map(); // id_instalacion -> nombre
-    stocks.forEach((s) => {
+    palets.forEach((s) => {
         const instalacionId = s?.id_instalacion;
         if (!instalacionId) return;
         const nombre = terminalFabricacion.instalaciones?.[instalacionId]?.nombre || `Instalación ${instalacionId}`;
@@ -593,27 +620,27 @@ function actualizarStocksConsumoEnSelector(valorUbicacionPrevio = "", valorStock
     }
 
     const filtroUbicacion = selectorUbicacion.value === "" ? ubicacionSeleccionada : String(selectorUbicacion.value);
-    const filtrados = stocks.filter((s) => {
+    const filtrados = palets.filter((s) => {
         const restante = Math.max(Number(s?.cantidad_stock || 0) - Number(s?.cantidad_consumida || 0), 0);
         const cumpleUbicacion = !filtroUbicacion || String(s?.id_instalacion ?? "") === String(filtroUbicacion);
         const cumpleMaterial = !materialId || Number(s?.id_material || 0) === Number(materialId);
         const cumpleTipo = !tipoId || Number(s?.tipo_producto || 0) === Number(tipoId);
         return restante > 0 && cumpleUbicacion && cumpleMaterial && cumpleTipo;
     });
-    console.log("[consumo] stocks tras filtro tipo+material+ubicacion:", filtrados, { tipoId, materialId, filtroUbicacion });
+    console.log("[consumo] palets tras filtro tipo+material+ubicacion:", filtrados, { tipoId, materialId, filtroUbicacion });
 
     if (!filtrados.length) {
-        selectorStock.innerHTML = `<option value="">Sin stocks disponibles</option>`;
-        actualizarEstadoCamposConsumoSegunStock();
+        selectorStock.innerHTML = `<option value="">Sin palets disponibles</option>`;
+        actualizarEstadoCamposConsumoSegunPalet();
         return;
     }
-    selectorStock.innerHTML = `<option value="">Seleccione stock...</option>` + filtrados.map((s) => {
+    selectorStock.innerHTML = `<option value="">Seleccione palet...</option>` + filtrados.map((s) => {
         const restante = Math.max(Number(s?.cantidad_stock || 0) - Number(s?.cantidad_consumida || 0), 0)
             .toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 3 });
         const tipoTxt = terminalFabricacion.tipos_producto?.[s.tipo_producto]?.descripcion || `Tipo ${s.tipo_producto || "-"}`;
         const maderaTxt = terminalFabricacion.materiales?.[s.id_material]?.descripcion || `Madera ${s.id_material || "-"}`;
         const ubicTxt = terminalFabricacion.instalaciones?.[s.id_instalacion]?.nombre || `Ubicación ${s.id_instalacion || "-"}`;
-        const etiqueta = `Restante ${restante} | ${tipoTxt} | ${maderaTxt} | ${ubicTxt}`;
+        const etiqueta = `${s.codigo || s.id} | Restante ${restante} | ${tipoTxt} | ${maderaTxt} | ${ubicTxt}`;
         return `<option value="${s.id}">${etiqueta}</option>`;
     }).join("");
     if (valorStockPrevio && filtrados.some((s) => String(s.id) === String(valorStockPrevio))) {
@@ -621,10 +648,10 @@ function actualizarStocksConsumoEnSelector(valorUbicacionPrevio = "", valorStock
     } else if (filtrados.length > 0) {
         selectorStock.value = String(filtrados[0].id);
     }
-    autocompletarCamposConsumoDesdeStock();
+    autocompletarCamposConsumoDesdePalet();
 }
 
-async function actualizarStockYCubicajeConsumo() {
+async function actualizarPaletsConsumoYCubicaje() {
     const selectorStock = document.getElementById("consumo-palet-origen");
     const selectorUbicacion = document.getElementById("consumo-ubicacion-origen");
     const selectorTipo = document.getElementById("consumo-tipo-producto");
@@ -635,40 +662,40 @@ async function actualizarStockYCubicajeConsumo() {
     const filtroUbicacion = selectorUbicacion.value === "" ? null : String(selectorUbicacion.value);
     const tipoId = selectorTipo?.value ? Number(selectorTipo.value) : null;
     const materialId = selectorMadera?.value ? Number(selectorMadera.value) : null;
-    let stocks = [];
+    let palets = [];
     try {
         const ctx = await wsRequest("obtener_contexto_consumo", {
             tipo_producto_id: tipoId || null,
             material_id: materialId || null,
             ubicacion_id: filtroUbicacion ? Number(filtroUbicacion) : null,
         });
-        stocks = Array.isArray(ctx?.stocks) ? ctx.stocks : [];
-        terminalFabricacion.stocksConsumo = stocks;
+        palets = Array.isArray(ctx?.palets) ? ctx.palets : [];
+        terminalFabricacion.paletsConsumo = palets;
         const tipoCubicaje = Number(tipoId || lineaFabricacionTipoActualId || 0);
         terminalFabricacion.cubicajeConsumo = tipoCubicaje
             ? [{ tipo_producto_id: tipoCubicaje, cubicaje_estandar: Number(ctx?.cubicaje_estandar || 0) }]
             : [];
     } catch (err) {
         console.error("No se pudo obtener contexto de consumo:", err);
-        selectorStock.innerHTML = `<option value="">Error cargando stocks</option>`;
-        actualizarEstadoCamposConsumoSegunStock();
+        selectorStock.innerHTML = `<option value="">Error cargando palets</option>`;
+        actualizarEstadoCamposConsumoSegunPalet();
         return;
     }
-    const filtrados = stocks;
+    const filtrados = palets;
 
     if (!filtrados.length) {
-        selectorStock.innerHTML = `<option value="">Sin stocks disponibles</option>`;
-        actualizarEstadoCamposConsumoSegunStock();
+        selectorStock.innerHTML = `<option value="">Sin palets disponibles</option>`;
+        actualizarEstadoCamposConsumoSegunPalet();
         return;
     }
 
-    selectorStock.innerHTML = `<option value="">Seleccione stock...</option>` + filtrados.map((s) => {
+    selectorStock.innerHTML = `<option value="">Seleccione palet...</option>` + filtrados.map((s) => {
         const restante = Math.max(Number(s?.cantidad_stock || 0) - Number(s?.cantidad_consumida || 0), 0)
             .toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 3 });
         const tipoTxt = terminalFabricacion.tipos_producto?.[s.tipo_producto]?.descripcion || `Tipo ${s.tipo_producto || "-"}`;
         const maderaTxt = terminalFabricacion.materiales?.[s.id_material]?.descripcion || `Madera ${s.id_material || "-"}`;
         const ubicTxt = terminalFabricacion.instalaciones?.[s.id_instalacion]?.nombre || `Ubicación ${s.id_instalacion || "-"}`;
-        const etiqueta = `Restante ${restante} | ${tipoTxt} | ${maderaTxt} | ${ubicTxt}`;
+        const etiqueta = `${s.codigo || s.id} | Restante ${restante} | ${tipoTxt} | ${maderaTxt} | ${ubicTxt}`;
         return `<option value="${s.id}">${etiqueta}</option>`;
     }).join("");
 
@@ -677,7 +704,7 @@ async function actualizarStockYCubicajeConsumo() {
     } else {
         selectorStock.value = String(filtrados[0].id);
     }
-    autocompletarCamposConsumoDesdeStock();
+    autocompletarCamposConsumoDesdePalet();
 }
 
 function obtenerCubicajeInicialConsumo(tipoProductoId) {
@@ -689,7 +716,7 @@ function obtenerCubicajeInicialConsumo(tipoProductoId) {
     return Number(item?.cubicaje_estandar || 0);
 }
 
-function actualizarEstadoCamposConsumoSegunStock() {
+function actualizarEstadoCamposConsumoSegunPalet() {
     const selectStock = document.getElementById("consumo-palet-origen");
     const inputLote = document.getElementById("consumo-lote");
     const inputCubicaje = document.getElementById("consumo-cubicaje");
@@ -707,14 +734,14 @@ function actualizarEstadoCamposConsumoSegunStock() {
     }
 }
 
-function autocompletarCamposConsumoDesdeStock() {
+function autocompletarCamposConsumoDesdePalet() {
     const selectStock = document.getElementById("consumo-palet-origen");
     const inputLote = document.getElementById("consumo-lote");
     const inputCubicaje = document.getElementById("consumo-cubicaje");
     const selectorTipo = document.getElementById("consumo-tipo-producto");
     if (!selectStock || !inputLote || !inputCubicaje) return;
 
-    actualizarEstadoCamposConsumoSegunStock();
+    actualizarEstadoCamposConsumoSegunPalet();
     const stockId = Number(selectStock.value || 0);
     if (!stockId) return;
     const tipoSeleccionado = selectorTipo?.value ? Number(selectorTipo.value) : lineaFabricacionTipoActualId;
@@ -783,8 +810,8 @@ function actualizarTablaLineasFabricacion(lineas, vistaId = null) {
     });
 }
 
-function actualizarTablaLineasFabricacionConsumo(lineas) {
-    const cfg = obtenerConfigVistaProduccion("vista_consumo");
+function actualizarTablaLineasFabricacionConsumo(lineas, vistaId = "vista_consumo") {
+    const cfg = obtenerConfigVistaProduccion(vistaId);
     const tbody = document.querySelector(`${cfg.tablaLineasSelector} tbody`);
     if (!tbody) return;
     tbody.innerHTML = "";
@@ -858,9 +885,15 @@ async function cargarTrazabilidadFabricacion(lineaId, vistaId = "vista_consumo")
             const tr = document.createElement("tr");
             const estado = terminalFabricacion.estados_trazabilidad_fabricacion?.[t.estado]?.descripcion || (t.estado ?? "");
             const palet = terminalFabricacion.palets?.[t.palet_id] || null;
-            const restante = palet
-                ? Number(palet.restante)
-                : null;
+            const cubicajePalet = Number.isFinite(Number(t?.palet_cubicaje))
+                ? Number(t.palet_cubicaje)
+                : (palet ? Number(palet.cubicaje) : null);
+            const consumidoPalet = Number.isFinite(Number(t?.palet_consumido))
+                ? Number(t.palet_consumido)
+                : (palet ? Number(palet.consumido) : null);
+            const restante = Number.isFinite(cubicajePalet) && Number.isFinite(consumidoPalet)
+                ? (cubicajePalet - consumidoPalet)
+                : (palet ? Number(palet.restante) : null);
             const restanteTxt = Number.isFinite(restante)
                 ? Number(restante).toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 3 })
                 : "";
@@ -901,7 +934,7 @@ async function cargarTrazabilidadFabricacion(lineaId, vistaId = "vista_consumo")
     }
 }
 
-async function agregarTrazabilidadFabricacionDesdeStockUI(_vistaId = "vista_consumo") {
+async function agregarTrazabilidadFabricacionDesdePaletStockUI(_vistaId = "vista_consumo") {
     const cfg = obtenerConfigVistaProduccion("vista_consumo");
     const selectPaletOrigen = document.getElementById(cfg.selectPaletOrigenId);
     const loteInput = document.getElementById(cfg.inputLoteId);
@@ -916,14 +949,14 @@ async function agregarTrazabilidadFabricacionDesdeStockUI(_vistaId = "vista_cons
         return;
     }
     if (!paletOrigenId || !lote || !Number.isFinite(cubicaje) || cubicaje <= 0) {
-        alert("Debes completar stock origen, cubicaje, paquetes y lote.");
+        alert("Debes completar palet origen, cubicaje, paquetes y lote.");
         return;
     }
 
     try {
-        await wsRequest("agregar_trazabilidad_fabricacion_desde_stock", {
+        await wsRequest("agregar_trazabilidad_fabricacion_desde_palet_stock", {
             fabricacion_semanal_id: lineaFabricacionActualId,
-            stock_origen_id: paletOrigenId,
+            palet_origen_id: paletOrigenId,
             lote,
             cubicaje,
             paquetes,
@@ -932,11 +965,13 @@ async function agregarTrazabilidadFabricacionDesdeStockUI(_vistaId = "vista_cons
         if (cubicajeInput) cubicajeInput.value = "";
         if (paquetesInput) paquetesInput.value = "1";
         if (selectPaletOrigen) selectPaletOrigen.value = "";
-        cargarStocksConsumoEnSelector();
+        cargarPaletsConsumoEnSelector();
         cargarTrazabilidadFabricacion(lineaFabricacionActualId, "vista_consumo");
+        sincronizarBackdropModales();
     } catch (err) {
         console.error(err);
         alert("Error al agregar trazabilidad.");
+        sincronizarBackdropModales();
     }
 }
 
@@ -965,9 +1000,11 @@ async function agregarTrazabilidadFabricacionDesdePaletUI() {
         if (cubicajeInput) cubicajeInput.value = "";
         cargarTrazabilidadFabricacion(lineaFabricacionActualId, "vista_consumo");
         cargarTrazabilidadFabricacion(lineaFabricacionActualId, "vista_fabricacion");
+        sincronizarBackdropModales();
     } catch (err) {
         console.error(err);
         alert("Error al agregar consumo desde palet.");
+        sincronizarBackdropModales();
     }
 }
 
@@ -1000,6 +1037,25 @@ function cargarCodigosBatideroEnSelector() {
     selector.innerHTML = options.join("");
 }
 
+function obtenerLoteDesdeCodigoPalet(codigoPalet) {
+    return String(codigoPalet || "").split("#", 1)[0].trim();
+}
+
+function sincronizarBackdropModales() {
+    const modalesAbiertos = document.querySelectorAll(".modal.show").length;
+    const backdrops = Array.from(document.querySelectorAll(".modal-backdrop"));
+    if (modalesAbiertos <= 0) {
+        backdrops.forEach((el) => el.remove());
+        document.body.classList.remove("modal-open");
+        document.body.style.removeProperty("padding-right");
+        document.body.style.removeProperty("overflow");
+        return;
+    }
+    if (backdrops.length > modalesAbiertos) {
+        backdrops.slice(0, backdrops.length - modalesAbiertos).forEach((el) => el.remove());
+    }
+}
+
 async function cargarLotesMaderaFabricarBota() {
     const selector = document.getElementById("fabricar-bota-lote-madera");
     if (!selector) return;
@@ -1016,40 +1072,24 @@ async function cargarLotesMaderaFabricarBota() {
             selector.innerHTML = `<option value="">Sin lotes activos (estado 0)</option>`;
             return;
         }
-        selector.innerHTML = `<option value="">Seleccione lote de madera...</option>` + trazabilidadesActivasFabricarBota.map((t) => {
-            const palet = t.palet_codigo || t.palet_id || "";
-            const cantidad = Number(t.cantidad_fabricada || 0);
-            const estado = Number(t.estado || 0);
-            return `<option value="${t.id}">${palet} | Cantidad ${cantidad} | Estado ${estado}</option>`;
-        }).join("");
+        const lotes = new Map();
+        trazabilidadesActivasFabricarBota.forEach((t) => {
+            const codigoPalet = t.palet_codigo || t.palet_id || "";
+            const lote = obtenerLoteDesdeCodigoPalet(codigoPalet) || String(codigoPalet || "");
+            if (!lotes.has(lote)) {
+                lotes.set(lote, { lote, palets: 0, cantidad: 0 });
+            }
+            const item = lotes.get(lote);
+            item.palets += 1;
+            item.cantidad += Number(t.cantidad_fabricada || 0);
+        });
+        selector.innerHTML = `<option value="">Seleccione lote de madera...</option>` + Array.from(lotes.values())
+            .sort((a, b) => String(a.lote).localeCompare(String(b.lote), "es"))
+            .map((item) => `<option value="${item.lote}">${item.lote} | Palets ${item.palets} | Cantidad ${item.cantidad}</option>`)
+            .join("");
     } catch (err) {
         console.error("No se pudieron cargar lotes de madera para fabricar bota:", err);
         selector.innerHTML = `<option value="">Error cargando lotes</option>`;
-    }
-}
-
-async function cargarLotesFlejeFabricarBota() {
-    const selector = document.getElementById("fabricar-bota-lote-fleje");
-    if (!selector) return;
-    selector.innerHTML = `<option value="">Cargando lotes de fleje...</option>`;
-    try {
-        const resp = (await wsRequest("inventario_flejes", {})) || {};
-        const items = (resp.inventario_flejes || [])
-            .filter((f) => Number(f.estado || 0) < 2)
-            .filter((f) => Number(f.restante || 0) > 0);
-        if (!items.length) {
-            selector.innerHTML = `<option value="">Sin flejes disponibles</option>`;
-            return;
-        }
-        selector.innerHTML = `<option value="">Seleccione lote de fleje...</option>` + items.map((f) => {
-            const restante = Number(f.restante || 0).toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 2 });
-            const lote = f.lote || `Entrada ${f.id}`;
-            const tipo = f.tipo_producto_descripcion || f.tipo_producto_tipo || "FLEJE";
-            return `<option value="${f.id}">${lote} | ${tipo} | restante ${restante} kg</option>`;
-        }).join("");
-    } catch (err) {
-        console.error("No se pudieron cargar lotes de fleje:", err);
-        selector.innerHTML = `<option value="">Error cargando flejes</option>`;
     }
 }
 
@@ -1100,41 +1140,6 @@ async function cargarOperariosFondadoEnSelector() {
     }
 }
 
-async function abrirModalFabricarBota() {
-    console.log("[fabricar-bota] abrirModalFabricarBota lineaFabricacionActualId:", lineaFabricacionActualId);
-    if (!lineaFabricacionActualId) {
-        alert("Seleccione una linea de fabricacion.");
-        return;
-    }
-    const productoOrigen = document.getElementById("fabricacion-producto-orden");
-    const productoDestino = document.getElementById("fabricar-bota-producto");
-    if (productoDestino) {
-        productoDestino.textContent = productoOrigen?.textContent || "Producto";
-    }
-    const inputCantidad = document.getElementById("fabricar-bota-cantidad-etiquetas");
-    if (inputCantidad && (!inputCantidad.value || Number(inputCantidad.value) < 1)) {
-        inputCantidad.value = "1";
-    }
-    await Promise.all([
-        cargarLotesMaderaFabricarBota(),
-        cargarLotesFlejeFabricarBota(),
-        cargarOperariosFondadoEnSelector(),
-    ]);
-    console.log("[fabricar-bota] datos cargados para modal", {
-        lotesMadera: trazabilidadesActivasFabricarBota.length,
-        loteMaderaSeleccionado: document.getElementById("fabricar-bota-lote-madera")?.value || "",
-        loteFlejeSeleccionado: document.getElementById("fabricar-bota-lote-fleje")?.value || "",
-        operarioSeleccionado: document.getElementById("fabricar-bota-operario-fondado")?.value || "",
-    });
-    cargarCodigosBatideroEnSelector();
-
-    const modalEl = document.getElementById("modalFabricarBota");
-    if (!modalEl) return;
-    const modal = bootstrap.Modal.getOrCreateInstance(modalEl);
-    modal.show();
-    ajustarZIndexModal(modalEl);
-}
-
 async function imprimirEtiquetaFabricarBotaDesdeUI() {
     console.log("[fabricar-bota] imprimirEtiquetaFabricarBotaDesdeUI inicio");
     if (!lineaFabricacionActualId) {
@@ -1142,58 +1147,54 @@ async function imprimirEtiquetaFabricarBotaDesdeUI() {
         alert("Seleccione una linea de fabricacion.");
         return;
     }
-    const trazabilidadId = Number(document.getElementById("fabricar-bota-lote-madera")?.value || 0);
-    const loteFlejeId = Number(document.getElementById("fabricar-bota-lote-fleje")?.value || 0);
+    const loteMadera = String(document.getElementById("fabricar-bota-lote-madera")?.value || "").trim();
     const batidero = Number(document.getElementById("fabricar-bota-batidero")?.value || 0);
     const operarioFondadoId = Number(document.getElementById("fabricar-bota-operario-fondado")?.value || 0);
     const cantidad = Math.max(1, Number.parseInt(document.getElementById("fabricar-bota-cantidad-etiquetas")?.value || "1", 10) || 1);
     console.log("[fabricar-bota] valores formulario", {
         lineaFabricacionActualId,
-        trazabilidadId,
-        loteFlejeId,
+        loteMadera,
         batidero,
         operarioFondadoId,
         cantidad,
     });
 
-    if (!trazabilidadId || !loteFlejeId || !batidero || !operarioFondadoId) {
+    if (!loteMadera || !batidero || !operarioFondadoId) {
         console.log("[fabricar-bota] bloqueado: faltan campos obligatorios");
-        alert("Debes completar lote de madera, lote de fleje, batidero y operario de fondado.");
+        alert("Debes completar lote de madera, batidero y operario de fondado.");
         return;
     }
 
-    const traza = trazabilidadesActivasFabricarBota.find((t) => Number(t.id) === trazabilidadId);
-    if (!traza) {
-        console.log("[fabricar-bota] bloqueado: trazabilidad no encontrada en activas", {
-            trazabilidadId,
-            activas: trazabilidadesActivasFabricarBota.map((t) => t.id),
+    const trazasLote = trazabilidadesActivasFabricarBota.filter((t) => {
+        const codigoPalet = t.palet_codigo || t.palet_id || "";
+        return obtenerLoteDesdeCodigoPalet(codigoPalet) === loteMadera;
+    });
+    if (!trazasLote.length) {
+        console.log("[fabricar-bota] bloqueado: lote no encontrado en activas", {
+            loteMadera,
+            activas: trazabilidadesActivasFabricarBota.map((t) => t.palet_codigo || t.palet_id),
         });
         alert("El lote de madera seleccionado no esta disponible.");
         return;
     }
-    const paletCodigo = traza.palet_codigo || traza.palet_id || "";
     try {
+        const trazabilidadIds = trazasLote.map((t) => Number(t.id)).filter(Boolean);
+        const paletCodigos = trazasLote.map((t) => t.palet_codigo || t.palet_id || "").filter(Boolean);
         const payload = {
-            trazabilidad_ids: [trazabilidadId],
-            palet_codigos: paletCodigo ? [paletCodigo] : [],
+            trazabilidad_ids: trazabilidadIds,
+            palet_codigos: paletCodigos,
             tipo: "BOTA",
             operarios_ids: [operarioFondadoId],
             batidero,
-            lote_fleje_id: loteFlejeId,
             cantidad_etiquetas: cantidad,
         };
         console.log("[fabricar-bota] enviando wsRequest imprimir_etiqueta_fabricacion", payload);
         const resp = await wsRequest("imprimir_etiqueta_fabricacion", payload);
         console.log("[fabricar-bota] respuesta wsRequest imprimir_etiqueta_fabricacion", resp);
-        const modalEl = document.getElementById("modalFabricarBota");
-        const modal = modalEl ? bootstrap.Modal.getInstance(modalEl) : null;
-        if (modal) modal.hide();
         cargarTrazabilidadFabricacion(lineaFabricacionActualId, "vista_fabricacion");
         cargarTrazabilidadFabricacion(lineaFabricacionActualId, "vista_consumo");
-        if (ordenFabricacionActualId) {
-            cargarLineasFabricacion(ordenFabricacionActualId, { vistaId: "vista_fabricacion" });
-        }
-        cargarFabricacionSemanalConsumo();
+        cargarFabricacionSemanalActivaFabricacion({ vistaId: "vista_fabricacion_semanal", autoAbrirLineaUnica: false });
+        cargarFabricacionSemanalConsumo({ autoAbrirLineaUnica: false });
     } catch (err) {
         console.error("[fabricar-bota] error en imprimir_etiqueta_fabricacion", err);
         alert("Error al imprimir etiqueta.");
@@ -1429,10 +1430,9 @@ async function imprimirEtiquetaFabricacion(operariosIds = [], cantidadEtiquetas 
         });
         console.log("Etiqueta creada:", resp);
         cargarTrazabilidadFabricacion(lineaFabricacionActualId, "vista_consumo");
-        if (ordenFabricacionActualId) {
-            cargarLineasFabricacion(ordenFabricacionActualId, { vistaId: "vista_fabricacion" });
-        }
-        cargarFabricacionSemanalConsumo();
+        cargarTrazabilidadFabricacion(lineaFabricacionActualId, "vista_fabricacion");
+        cargarFabricacionSemanalActivaFabricacion({ vistaId: "vista_fabricacion_semanal", autoAbrirLineaUnica: false });
+        cargarFabricacionSemanalConsumo({ autoAbrirLineaUnica: false });
     } catch (err) {
         console.error(err);
         alert("Error al imprimir etiqueta.");
@@ -1441,13 +1441,13 @@ async function imprimirEtiquetaFabricacion(operariosIds = [], cantidadEtiquetas 
 
 
 function refrescarFabricacionDesdeServidor(_data = {}) {
-    cargarFabricacionSemanalConsumo();
-    cargarOrdenesFabricacion({ vistaId: "vista_fabricacion" });
-    if (ordenFabricacionActualId) {
-        cargarLineasFabricacion(ordenFabricacionActualId, { vistaId: "vista_fabricacion" });
-    }
+    cargarFabricacionSemanalConsumo({ autoAbrirLineaUnica: false });
+    cargarFabricacionSemanalActivaFabricacion({ vistaId: "vista_fabricacion_semanal", autoAbrirLineaUnica: false });
     if (lineaFabricacionActualId) {
         cargarTrazabilidadFabricacion(lineaFabricacionActualId, "vista_consumo");
         cargarTrazabilidadFabricacion(lineaFabricacionActualId, "vista_fabricacion");
+        if (typeof pantallaActual !== "undefined" && pantallaActual === "vista_fabricacion") {
+            cargarLotesMaderaFabricarBota();
+        }
     }
 }

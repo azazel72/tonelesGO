@@ -108,6 +108,20 @@ function openPaletsWin() {
             cssClass: "filtrable",
             formatter: cell => DATOS?.maestros?.duelas?.[cell.getValue()]?.descripcion ?? cell.getValue(),
           },
+          {
+            title: "Tipo producto",
+            field: "tipo_producto_id",
+            editable: false,
+            cssClass: "filtrable",
+            formatter: cell => DATOS?.fabricacion?.tipos_producto?.[cell.getValue()]?.descripcion ?? cell.getValue(),
+          },
+          {
+            title: "Material",
+            field: "material_id",
+            editable: false,
+            cssClass: "filtrable",
+            formatter: cell => DATOS?.maestros?.materiales?.[cell.getValue()]?.descripcion ?? cell.getValue(),
+          },
           { title:"Cubicaje", field:"cubicaje", editor:"number", editable: tablaEditable, cssClass: "filtrable", hozAlign:"right" },
           { title:"Consumido", field:"consumido", editor:"number", editable: tablaEditable, cssClass: "filtrable", hozAlign:"right" },
           {

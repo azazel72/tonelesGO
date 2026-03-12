@@ -1,5 +1,5 @@
 (function () {
-  const KEY = "paezlobato.auth.token";
+  const KEY = "paezlobato.auth.token.v2";
 
   function getToken() {
     return localStorage.getItem(KEY);
@@ -21,4 +21,3 @@
     clearToken,
   };
 })();
-

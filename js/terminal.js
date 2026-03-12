@@ -70,14 +70,14 @@ function mostrarSeccion(id) {
         if (id === "vista_recepcion") {
             cargarEntradasRecepcion();
         }
-        if (id === "vista_consumo") {
+        if (id === "vista_consumo_semanal") {
             const activarAutoAccesoConsumo = contextoNavegacion.fabricacionOrigen === "palets" && contextoNavegacion.autoAccesoConsumo;
             contextoNavegacion.autoAccesoConsumo = false;
             cargarFabricacionSemanalConsumo({ autoAccesoConsumo: activarAutoAccesoConsumo });
         }
-        if (id === "vista_fabricacion") {
+        if (id === "vista_fabricacion_semanal") {
             contextoNavegacion.autoAccesoConsumo = false;
-            cargarOrdenesFabricacion({ vistaId: "vista_fabricacion", autoAccesoConsumo: false });
+            cargarFabricacionSemanalActivaFabricacion({ vistaId: "vista_fabricacion_semanal" });
         }
         if (id === "vista_ubicacion") {
             cargarFormularioCrearStock();
@@ -175,6 +175,20 @@ function actualizarMigasPan(mostrarSeccion) {
             }
             migasPan.appendChild(nuevaMiga);
             break;
+        case "vista_consumo_semanal":
+            nuevaMiga = crearMigaPan("Inicio", "vista_tareas", false);
+            migasPan.appendChild(nuevaMiga);
+            nuevaMiga = crearMigaPan("Maderas", "vista_menu_maderas", false);
+            migasPan.appendChild(nuevaMiga);
+            if (contextoNavegacion.consumoOrigen === "maderas_fleje") {
+                nuevaMiga = crearMigaPan("Fleje", "vista_menu_maderas_fleje", false);
+            } else {
+                nuevaMiga = crearMigaPan("Madera", "vista_menu_maderas_madera", false);
+            }
+            migasPan.appendChild(nuevaMiga);
+            nuevaMiga = crearMigaPan("Fabricación semanal", mostrarSeccion, true);
+            migasPan.appendChild(nuevaMiga);
+            break;
         case "vista_consumo":
             nuevaMiga = crearMigaPan("Inicio", "vista_tareas", false);
             migasPan.appendChild(nuevaMiga);
@@ -186,7 +200,17 @@ function actualizarMigasPan(mostrarSeccion) {
                 nuevaMiga = crearMigaPan("Madera", "vista_menu_maderas_madera", false);
             }
             migasPan.appendChild(nuevaMiga);
+            nuevaMiga = crearMigaPan("Fabricación semanal", "vista_consumo_semanal", false);
+            migasPan.appendChild(nuevaMiga);
             nuevaMiga = crearMigaPan("Consumo", mostrarSeccion, true);
+            migasPan.appendChild(nuevaMiga);
+            break;
+        case "vista_fabricacion_semanal":
+            nuevaMiga = crearMigaPan("Inicio", "vista_tareas", false);
+            migasPan.appendChild(nuevaMiga);
+            nuevaMiga = crearMigaPan("Botas", "vista_menu_botas", false);
+            migasPan.appendChild(nuevaMiga);
+            nuevaMiga = crearMigaPan("Fabricación semanal", mostrarSeccion, true);
             migasPan.appendChild(nuevaMiga);
             break;
         case "vista_fabricacion":
@@ -194,7 +218,9 @@ function actualizarMigasPan(mostrarSeccion) {
             migasPan.appendChild(nuevaMiga);
             nuevaMiga = crearMigaPan("Botas", "vista_menu_botas", false);
             migasPan.appendChild(nuevaMiga);
-            nuevaMiga = crearMigaPan("Fabricación", mostrarSeccion, true);
+            nuevaMiga = crearMigaPan("Fabricación semanal", "vista_fabricacion_semanal", false);
+            migasPan.appendChild(nuevaMiga);
+            nuevaMiga = crearMigaPan("Fabricar bota", mostrarSeccion, true);
             migasPan.appendChild(nuevaMiga);
             break;
         case "vista_expedicion":
@@ -343,7 +369,12 @@ var ACCIONES = {
     },
     "login": console.log,
     "fabricacion_actualizar": (msg) => {
-        if (pantallaActual === "vista_fabricacion" || pantallaActual === "vista_consumo") {
+        if (
+            pantallaActual === "vista_fabricacion"
+            || pantallaActual === "vista_consumo"
+            || pantallaActual === "vista_fabricacion_semanal"
+            || pantallaActual === "vista_consumo_semanal"
+        ) {
             if (msg?.data?.refetch_maestros) {
                 refrescarMaestrosFabricacion?.();
             }

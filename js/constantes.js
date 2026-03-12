@@ -1,5 +1,5 @@
 const wsScheme = location.protocol === "https:" ? "wss" : "ws";
-const puertoWs = 5000;
+const puertoWs = 5001;
 const wsUrl = `${wsScheme}://${location.hostname}:${puertoWs}/ws`;
 
 const MESES = [

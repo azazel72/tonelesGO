@@ -5,7 +5,6 @@ from .maestros import InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO, Ro
 from .maestros import MaterialDTO, DuelaDTO, EntradaDTO, LineaEntradaDTO, PaletDTO, ProductoDTO, ProductoOperarioDTO, ArchivoSubidoDTO
 from .maestros import AmbienteDTO
 from .maestros import EntradaFlejeDTO
-from .maestros import StockDTO
 from .maestros import CubicajeDTO
 from .cuadrantes import CuadranteDTO, CuadranteDetalleDTO
 from .fabricacion import PedidoDTO, TipoProductoDTO, FabricacionSemanalDTO, TrazabilidadProcesadoDTO
@@ -39,7 +38,6 @@ __all__ = [
     "ArchivoSubidoDTO",
     "AmbienteDTO",
     "EntradaFlejeDTO",
-    "StockDTO",
     "CubicajeDTO",
     "CuadrantesDTO",
     "CuadranteDTO",

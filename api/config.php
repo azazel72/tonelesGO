@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 
-const DB_DSN  = 'mysql:host=localhost;dbname=paezlobato;charset=utf8mb4';
+const DB_DSN  = 'mysql:host=localhost;dbname=antoniopaezlobato;charset=utf8mb4';
 const DB_USER = 'paezlobato';
 const DB_PASS = 'paezlobato';
 

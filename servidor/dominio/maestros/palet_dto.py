@@ -8,6 +8,8 @@ class PaletDTO(BaseModel):
     codigo: str
     linea_entrada_id: int | None = None
     duela_tipo_id: int | None = None
+    tipo_producto_id: int | None = None
+    material_id: int | None = None
     cubicaje: float = 0.0
     consumido: float = 0.0
     restante: float = 0.0
@@ -28,9 +30,11 @@ class PaletDTO(BaseModel):
             codigo=palet_db.codigo,
             linea_entrada_id=palet_db.linea_entrada_id,
             duela_tipo_id=palet_db.duela_tipo_id,
+            tipo_producto_id=palet_db.tipo_producto_id,
+            material_id=palet_db.material_id,
             cubicaje=palet_db.cubicaje,
             consumido=palet_db.consumido,
-            restante=max(float(palet_db.cubicaje or 0) - float(palet_db.consumido or 0), 0.0),
+            restante=float(palet_db.cubicaje or 0) - float(palet_db.consumido or 0),
             estado=palet_db.estado,
             ubicacion_id=palet_db.ubicacion_id,
             procesado=palet_db.procesado,
@@ -42,6 +46,8 @@ class PaletDTO(BaseModel):
             codigo=self.codigo,
             linea_entrada_id=self.linea_entrada_id,
             duela_tipo_id=self.duela_tipo_id,
+            tipo_producto_id=self.tipo_producto_id,
+            material_id=self.material_id,
             cubicaje=self.cubicaje,
             consumido=self.consumido,
             estado=self.estado,

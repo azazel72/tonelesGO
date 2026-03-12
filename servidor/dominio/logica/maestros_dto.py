@@ -23,7 +23,6 @@ from servidor.dominio.maestros.producto_dto import ProductoDTO
 from servidor.dominio.maestros.archivo_subido_dto import ArchivoSubidoDTO
 from servidor.dominio.maestros.ambiente_dto import AmbienteDTO
 from servidor.dominio.maestros.entrada_fleje_dto import EntradaFlejeDTO
-from servidor.dominio.maestros.stock_dto import StockDTO
 from servidor.dominio.maestros.cubicaje_dto import CubicajeDTO
 
 
@@ -49,7 +48,6 @@ class MaestrosDTO(BaseModel):
     archivos_subidos: Optional[Dict[int, "ArchivoSubidoDTO"]] = {}
     ambientes: Optional[Dict[int, "AmbienteDTO"]] = {}
     entradas_flejes: Optional[Dict[int, "EntradaFlejeDTO"]] = {}
-    stocks: Optional[Dict[int, "StockDTO"]] = {}
     cubicaje: Optional[Dict[int, "CubicajeDTO"]] = {}
 
     def buscar_usuario_por_username(self, username: str) -> UsuarioDTO | None:

@@ -248,7 +248,6 @@ function cerrarVentanasMaestros() {
     "lineas_entrada",
     "entradas_flejes",
     "palets",
-    "stocks",
     "productos",
     "archivos_subidos",
     "ambientes",
@@ -334,6 +333,14 @@ function agregarEventosTabla(wb, tabla, cabecera, configuracion) {
         } finally {
           tabla.__suppressCellEdited = false;
         }
+      }
+    }
+    if (resultado?.valores && typeof resultado.valores === "object") {
+      tabla.__suppressCellEdited = true;
+      try {
+        await cell.getRow().update(resultado.valores);
+      } finally {
+        tabla.__suppressCellEdited = false;
       }
     }
 

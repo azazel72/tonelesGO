@@ -1,28 +1,50 @@
 #vista_fabricacion,
-#vista_consumo {
+#vista_fabricacion_semanal,
+#vista_consumo,
+#vista_consumo_semanal {
     /*justify-content: space-evenly;*/
     padding: 20px;
     box-sizing: border-box;
 }
 
-#vista_consumo[modo="listado_pedidos"] table#tabla_contenido_orden_consumo{
-    display: none;
+#panelConsumo {
+    border: 1px solid #d8dee6;
+    border-radius: 0.75rem;
+    background: #fff;
+    padding: 1rem;
 }
 
-#vista_consumo[modo="contenido_pedido"] table#tabla_ordenes_consumo{
-    display: none;
+#panelBotas {
+    border: 1px solid #d8dee6;
+    border-radius: 0.75rem;
+    background: #fff;
+    padding: 1rem;
 }
 
-#vista_fabricacion[modo="listado_pedidos"] table#tabla_fabricacion_semanal{
-    display: none;
+#panelConsumo .table-responsive {
+    max-height: 50vh;
+    overflow: auto;
 }
 
-#vista_fabricacion[modo="contenido_pedido"] table#tabla_pedidos{
-    display: none;
+#panelBotas .table-responsive {
+    max-height: 50vh;
+    overflow: auto;
+}
+
+.panel-consumo-footer {
+    margin-top: 1rem;
+}
+
+#vista_fabricacion_semanal .table-responsive,
+#vista_consumo_semanal .table-responsive,
+#vista_fabricacion .table-responsive,
+#vista_consumo .table-responsive {
+    max-height: 50vh;
+    overflow: auto;
 }
 
 #tabla_trazabilidad_consumo tbody tr.trazabilidad-inactiva *,
-#tabla_trazabilidad_fabricacion tbody tr.trazabilidad-inactiva * {
+#tabla_trazabilidad_botas tbody tr.trazabilidad-inactiva * {
     background-color: #f8d7da;
 }
 
