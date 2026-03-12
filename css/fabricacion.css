@@ -31,6 +31,36 @@
     overflow: auto;
 }
 
+.panel-botas-trazas {
+    margin-bottom: 1rem;
+    border: 1px solid #d8dee6;
+    border-radius: 0.85rem;
+    background: #f8fafc;
+    overflow: hidden;
+}
+
+.panel-botas-trazas summary {
+    padding: 0.85rem 1rem;
+    cursor: pointer;
+    font-weight: 600;
+    color: #18212f;
+    list-style: none;
+}
+
+.panel-botas-trazas summary::-webkit-details-marker {
+    display: none;
+}
+
+.panel-botas-trazas[open] summary {
+    border-bottom: 1px solid #d8dee6;
+    background: #eef2f7;
+}
+
+.panel-botas-trazas .table-responsive {
+    margin: 0;
+    padding: 0.75rem;
+}
+
 .panel-consumo-footer {
     margin-top: 1rem;
 }

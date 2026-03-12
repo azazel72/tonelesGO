@@ -79,6 +79,92 @@ function crearTituloClonableDia(dia, fecha) {
   `;
 }
 
+function crearContenidoPillCuadrante(nombre) {
+  const indicador = document.createElement("span");
+  indicador.className = "usuario-pill-faltas-dot";
+  indicador.hidden = true;
+
+  const wrapper = document.createElement("div");
+  wrapper.className = "usuario-pill-contenido";
+
+  const avisos = document.createElement("div");
+  avisos.className = "usuario-pill-avisos";
+  ["J", "V", "L", "M", "X"].forEach((letra) => {
+    const marca = document.createElement("span");
+    marca.textContent = letra;
+    avisos.appendChild(marca);
+  });
+
+  const texto = document.createElement("div");
+  texto.className = "usuario-pill-texto";
+  texto.textContent = nombre;
+
+  wrapper.append(indicador, avisos, texto);
+  return wrapper;
+}
+
+function obtenerDiasCuadranteActivos() {
+  const fechaInicio = DATOS.cuadrante?.fecha_inicio;
+  if (!fechaInicio) return [];
+  return [
+    { letra: "J", fecha: sumarDiasYYYYMMDD(fechaInicio, 0) },
+    { letra: "V", fecha: sumarDiasYYYYMMDD(fechaInicio, 1) },
+    { letra: "L", fecha: sumarDiasYYYYMMDD(fechaInicio, 4) },
+    { letra: "M", fecha: sumarDiasYYYYMMDD(fechaInicio, 5) },
+    { letra: "X", fecha: sumarDiasYYYYMMDD(fechaInicio, 6) },
+  ];
+}
+
+function obtenerAsignacionesUsuarioPorDia(tabla, usuarioId) {
+  const estado = {};
+  const dias = obtenerDiasCuadranteActivos();
+  dias.forEach((dia) => {
+    estado[dia.fecha] = false;
+  });
+  if (!tabla) return estado;
+
+  (tabla.getRows() || []).forEach((row) => {
+    const data = row.getData() || {};
+    dias.forEach((dia) => {
+      const valores = data[dia.fecha] || [];
+      if (valores.some((detalle) => String(detalle.usuario_id) === String(usuarioId))) {
+        estado[dia.fecha] = true;
+      }
+    });
+  });
+  return estado;
+}
+
+function actualizarIndicadoresFaltasCuadrante() {
+  const registro = windowsRegistry.get("cuadrantes");
+  const tabla = registro?.table;
+  const contenedor = registro?.wb?.body?.querySelector?.("#contenedor-cuadrante") || document.querySelector("#contenedor-cuadrante");
+  const dias = obtenerDiasCuadranteActivos();
+  if (!contenedor || !dias.length) return;
+
+  contenedor.querySelectorAll(".usuario-pill").forEach((pill) => {
+    const usuarioId = pill.dataset.usuarioId;
+    const avisos = pill.querySelector(".usuario-pill-avisos");
+    const indicador = pill.querySelector(".usuario-pill-faltas-dot");
+    if (!usuarioId || !avisos || !indicador) return;
+
+    const asignaciones = obtenerAsignacionesUsuarioPorDia(tabla, usuarioId);
+    let faltaAlgunDia = false;
+
+    Array.from(avisos.children).forEach((marca, index) => {
+      const dia = dias[index];
+      if (!dia) return;
+      const asignado = Boolean(asignaciones[dia.fecha]);
+      marca.classList.toggle("falta-dia", !asignado);
+      marca.classList.toggle("cubre-dia", asignado);
+      if (!asignado) faltaAlgunDia = true;
+    });
+
+    pill.classList.toggle("usuario-pill-con-faltas", faltaAlgunDia);
+    indicador.hidden = !faltaAlgunDia;
+  });
+}
+
 function formatterColumnasCuadrante(cell, formatterParams, onRendered) {
   
   onRendered(function() {
@@ -101,10 +187,11 @@ function formatterColumnasCuadrante(cell, formatterParams, onRendered) {
         {
           class: "usuario-pill badge m-1 p-2",
           draggable: "true",
-          content: detalle.empleado?.nombre ?? "Usuario no encontrado",
           style: getPillColorByIndex(detalle.usuario_id),
         }
       );
+      pill.dataset.usuarioId = String(detalle.usuario_id);
+      pill.appendChild(crearContenidoPillCuadrante(detalle.empleado?.nombre ?? "Usuario no encontrado"));
       // info para el drag
       pill.dataset.detalle = JSON.stringify(detalle);
 
@@ -142,6 +229,8 @@ function formatterColumnasCuadrante(cell, formatterParams, onRendered) {
         manejarDropEnCelda(e, cell);
       });
     }
+
+    actualizarIndicadoresFaltasCuadrante();
   });
  
   return "";
@@ -484,6 +573,7 @@ function abrirModalClonadoCuadrantes(tabla, fieldOrigen = null, fieldDestino = n
           return;
         }
         mostrar_cuadrantes({ data });
+        actualizarIndicadoresFaltasCuadrante();
         bootstrap.Modal.getOrCreateInstance(modalEl).hide();
       })
       .catch((err) => {
@@ -509,10 +599,11 @@ function completarEmpleadosCuadrantes(key, listaUsuarios, usuarios, configuracio
         { value: element.id,
           class: "usuario-pill badge m-1 p-2",
           draggable: "true",
-          content: element.nombre,
           style: getPillColorByIndex(element.id),
         }
       );
+      pill.dataset.usuarioId = String(element.id);
+      pill.appendChild(crearContenidoPillCuadrante(element.nombre));
       pill.dataset.detalle = JSON.stringify({ empleado: element, usuario_id: element.id });
       listaUsuarios.appendChild(pill);
     }
@@ -547,8 +638,10 @@ function completarEmpleadosCuadrantes(key, listaUsuarios, usuarios, configuracio
     const nuevosValores = valores.filter(p => String(p.id) !== String(respuesta.id));
     console.log(nuevosValores);
     rowOrigen.update({ [detalle.fecha]: nuevosValores });
+    actualizarIndicadoresFaltasCuadrante();
   });
 
+  actualizarIndicadoresFaltasCuadrante();
 }
 
 function agregarEventosCuadrantes(wb, configuracion, contenedor) {
@@ -572,6 +665,10 @@ function agregarEventosCuadrantes(wb, configuracion, contenedor) {
     document.querySelector("#contenedor-cuadrante").classList.toggle("mismo-ancho");
   });
 
+  contenedor.querySelector("#u-ver-faltas-input").addEventListener("change", async () => {
+    document.querySelector("#contenedor-cuadrante").classList.toggle("ver-faltas");
+  });
+
   contenedor.querySelector("#u-extender-jueves-semana")?.addEventListener("click", async (event) => {
     const btn = event.currentTarget;
     btn.disabled = true;
@@ -584,6 +681,7 @@ function agregarEventosCuadrantes(wb, configuracion, contenedor) {
       if (fecha) {
         const data = await wsRequest("cargar_cuadrantes", { fecha });
         mostrar_cuadrantes({ data });
+        actualizarIndicadoresFaltasCuadrante();
       }
     } catch (err) {
       console.error(err);
@@ -594,6 +692,7 @@ function agregarEventosCuadrantes(wb, configuracion, contenedor) {
   });
 
   input_fecha_cuadrantes.value = obtenerAnteriorDiaSemana().toISOString().split("T")[0];
+  actualizarIndicadoresFaltasCuadrante();
 }
 
 async function actualizarDetalleCuadrante(detalles) {
