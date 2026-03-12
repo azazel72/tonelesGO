@@ -153,12 +153,16 @@ class CrudRoutes:
                         }:
                             await broadcast_pantalla("vista_fabricacion", {"tabla": "trazabilidad_fabricacion"})
                             await broadcast_pantalla("vista_consumo", {"tabla": "trazabilidad_fabricacion"})
+                            await broadcast_pantalla("vista_fabricacion_semanal", {"tabla": "trazabilidad_fabricacion"})
+                            await broadcast_pantalla("vista_consumo_semanal", {"tabla": "trazabilidad_fabricacion"})
                             await broadcast_pantalla("gestion_fabricacion", {"tabla": "trazabilidad_fabricacion"})
                         elif msg.action in {"modificar_maestro", "insertar_maestro", "eliminar_maestro"}:
                             tabla = (msg.data or {}).get("tabla")
                             if tabla in {"pedidos", "tipos_producto", "fabricacion_semanal", "trazabilidad_fabricacion", "botas", "consumos"}:
                                 await broadcast_pantalla("vista_fabricacion", {"tabla": tabla})
                                 await broadcast_pantalla("vista_consumo", {"tabla": tabla})
+                                await broadcast_pantalla("vista_fabricacion_semanal", {"tabla": tabla})
+                                await broadcast_pantalla("vista_consumo_semanal", {"tabla": tabla})
                                 await broadcast_pantalla("gestion_fabricacion", {"tabla": tabla})
                             elif tabla in {
                                 "puestos_trabajo",
@@ -173,6 +177,8 @@ class CrudRoutes:
                             }:
                                 await broadcast_pantalla("vista_fabricacion", {"tabla": tabla, "refetch_maestros": True})
                                 await broadcast_pantalla("vista_consumo", {"tabla": tabla, "refetch_maestros": True})
+                                await broadcast_pantalla("vista_fabricacion_semanal", {"tabla": tabla, "refetch_maestros": True})
+                                await broadcast_pantalla("vista_consumo_semanal", {"tabla": tabla, "refetch_maestros": True})
                                 await broadcast_pantalla("gestion_fabricacion", {"tabla": tabla, "refetch_maestros": True})
                     else:
                         await ws.send_json(ResponseMessage.fail(msg.action, "no_result", msg.request_id).model_dump())

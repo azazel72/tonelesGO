@@ -64,7 +64,7 @@
                                 Recepción
                             </button>
                             <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_consumo_semanal" data-origen-fabricacion="maderas_fleje"
-                                data-contexto-consumo="maderas_fleje" data-bs-dismiss="offcanvas">
+                                data-contexto-consumo="maderas_fleje" data-acceso-directo-consumo="1" data-bs-dismiss="offcanvas">
                                 Consumo
                             </button>
                         </div>
@@ -76,7 +76,7 @@
                                 Recepción
                             </button>
                             <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_consumo_semanal" data-origen-fabricacion="maderas_madera"
-                                data-contexto-consumo="maderas_madera" data-bs-dismiss="offcanvas">
+                                data-contexto-consumo="maderas_madera" data-acceso-directo-consumo="1" data-bs-dismiss="offcanvas">
                                 Consumo
                             </button>
                             <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_menu_movimientos"
@@ -91,7 +91,7 @@
                                 Menú Botas
                             </button>
                             <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_fabricacion_semanal" data-origen-fabricacion="botas"
-                                data-bs-dismiss="offcanvas">
+                                data-acceso-directo-fabricacion="1" data-bs-dismiss="offcanvas">
                                 Fabricación
                             </button>
                             <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_ubicacion" data-contexto-ubicacion="botas" disabled>
@@ -183,7 +183,7 @@
                 <img class="boton-icono" src="./imagenes/iconos/camion_palet.png" alt="Recepción">
                 <span>Recepción</span>
             </button>
-            <button class="boton verde boton-con-icono" mostrar="vista_consumo_semanal" data-origen-fabricacion="maderas_madera" data-contexto-consumo="maderas_madera">
+            <button class="boton verde boton-con-icono" mostrar="vista_consumo_semanal" data-origen-fabricacion="maderas_madera" data-contexto-consumo="maderas_madera" data-acceso-directo-consumo="1">
                 <img class="boton-icono" src="./imagenes/iconos/palet.png" alt="Consumo">
                 <span>Consumo</span>
             </button>
@@ -217,7 +217,7 @@
         </section>
 
         <section id="vista_menu_botas" class="flex-fill menu-secundario">
-            <button class="boton verde boton-con-icono" mostrar="vista_fabricacion_semanal" data-origen-fabricacion="botas">
+            <button class="boton verde boton-con-icono" mostrar="vista_fabricacion_semanal" data-origen-fabricacion="botas" data-acceso-directo-fabricacion="1">
                 <img class="boton-icono" src="./imagenes/iconos/tonel.png" alt="Fabricación">
                 <span>Fabricación</span>
             </button>
@@ -470,33 +470,14 @@
         </section>
 
         <section id="vista_consumo_semanal" class="flex-fill" modo="listado_fabricacion_semanal">
-            <div class="table-responsive">
-                <table id="tabla_consumo_fabricacion_semanal" class="table table-striped table-bordered">
-                    <thead class="table-dark">
-                        <tr>
-                            <th colspan="7">Fabricación semanal en producción</th>
-                        </tr>
-                        <tr>
-                            <th scope="col">Pedido</th>
-                            <th scope="col">Fecha inicio</th>
-                            <th scope="col">Tipo</th>
-                            <th scope="col">Material</th>
-                            <th scope="col">Cant.</th>
-                            <th scope="col">Fab.</th>
-                            <th scope="col">Falta</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td colspan="7">Cargando fabricaciones semanales...</td>
-                        </tr>
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <th colspan="7">Fabricación semanal en producción</th>
-                        </tr>
-                    </tfoot>
-                </table>
+            <div class="produccion-cards">
+                <div class="produccion-cards-header">
+                    <h5 class="mb-0">Fabricación semanal [Consumo]</h5>
+                    <div class="small text-muted">Pulsa una línea para entrar al consumo.</div>
+                </div>
+                <div id="lista_consumo_fabricacion_semanal" class="produccion-cards-list" aria-live="polite">
+                    <div class="produccion-card-empty">Cargando fabricaciones semanales...</div>
+                </div>
             </div>
         </section>
 
@@ -635,34 +616,14 @@
         </section>
 
         <section id="vista_fabricacion_semanal" class="flex-fill" modo="listado_fabricacion_semanal">
-            <div class="table-responsive">
-                <table id="tabla_fabricacion_semanal" class="table table-striped table-bordered">
-                    <thead class="table-dark">
-                        <tr>
-                            <th colspan="7">Fabricacion semanal activa</th>
-                        </tr>
-                        <tr>
-                            <th scope="col">Pedido</th>
-                            <th scope="col">Fecha</th>
-                            <th scope="col">Tipo</th>
-                            <th scope="col">Material</th>
-                            <th scope="col">Cant.</th>
-                            <th scope="col">Fab.</th>
-                            <th scope="col">Falta</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Pedido</td>
-                            <td>31/07/2025</td>
-                            <td>Tipo</td>
-                            <td>Malaga PX Butts BM</td>
-                            <td>45</td>
-                            <td>0</td>
-                            <td>45</td>
-                        </tr>
-                    </tbody>
-                </table>
+            <div class="fabricacion-cards">
+                <div class="fabricacion-cards-header">
+                    <h5 class="mb-0">Fabricación semanal [Producción]</h5>
+                    <div class="small text-muted">Pulsa una línea para entrar a fabricar botas.</div>
+                </div>
+                <div id="lista_fabricacion_semanal_botas" class="fabricacion-cards-list" aria-live="polite">
+                    <div class="fabricacion-card-empty">Cargando fabricación semanal activa...</div>
+                </div>
             </div>
         </section>
 
@@ -673,9 +634,6 @@
                         <h5 class="mb-1" id="botas-panel-titulo">Fabricar bota</h5>
                         <div class="small fw-semibold" id="botas-producto-orden">Producto</div>
                     </div>
-                    <button type="button" class="btn btn-outline-secondary" id="botas-volver-fabricacion-semanal">
-                        <i class="bi bi-arrow-left"></i> Volver
-                    </button>
                 </div>
 
                 <div class="table-responsive">
@@ -902,8 +860,7 @@
     </main>
 
     <footer class="bg-light py-1 text-center">
-        <p class="mb-0">GO Ingenieria &copy; 2025</p>
-        <p class="mb-0">Desarrollado por <a href="#" target="_blank">Servitek Ibérica</a></p>
+        <p class="mb-0 small text-muted">Versión v2.01</p>
     </footer>
 
     <div id="login-overlay"class="overlay d-none">

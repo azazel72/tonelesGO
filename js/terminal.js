@@ -17,6 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 contextoNavegacion.ubicacionOrigen = boton.dataset.contextoUbicacion;
             }
             contextoNavegacion.autoAccesoConsumo = boton.dataset.accesoDirectoConsumo === "1";
+            contextoNavegacion.autoAccesoFabricacion = boton.dataset.accesoDirectoFabricacion === "1";
             mostrarSeccion(boton.getAttribute("mostrar"));
         });
     });
@@ -52,6 +53,7 @@ const contextoNavegacion = {
     consumoOrigen: "maderas_madera",
     ubicacionOrigen: "botas",
     autoAccesoConsumo: false,
+    autoAccesoFabricacion: false,
 };
 
 function mostrarSeccion(id) {
@@ -71,13 +73,15 @@ function mostrarSeccion(id) {
             cargarEntradasRecepcion();
         }
         if (id === "vista_consumo_semanal") {
-            const activarAutoAccesoConsumo = contextoNavegacion.fabricacionOrigen === "palets" && contextoNavegacion.autoAccesoConsumo;
+            const activarAutoAccesoConsumo = contextoNavegacion.autoAccesoConsumo === true;
             contextoNavegacion.autoAccesoConsumo = false;
-            cargarFabricacionSemanalConsumo({ autoAccesoConsumo: activarAutoAccesoConsumo });
+            cargarFabricacionSemanalConsumo({ autoAbrirLineaUnica: activarAutoAccesoConsumo });
         }
         if (id === "vista_fabricacion_semanal") {
             contextoNavegacion.autoAccesoConsumo = false;
-            cargarFabricacionSemanalActivaFabricacion({ vistaId: "vista_fabricacion_semanal" });
+            const activarAutoAccesoFabricacion = contextoNavegacion.autoAccesoFabricacion === true;
+            contextoNavegacion.autoAccesoFabricacion = false;
+            cargarFabricacionSemanalActivaFabricacion({ vistaId: "vista_fabricacion_semanal", autoAbrirLineaUnica: activarAutoAccesoFabricacion });
         }
         if (id === "vista_ubicacion") {
             cargarFormularioCrearStock();

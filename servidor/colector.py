@@ -1,6 +1,7 @@
 from datetime import date, timedelta
 import re
 import logging
+import sys
 import threading
 from typing import List, get_args
 from sqlmodel import Session
@@ -78,6 +79,66 @@ class Colector:
 
         self.repo_cuadrantes = GenericRepository(CuadranteDB)
         self.repo_cuadrante_detalles = GenericRepository(CuadranteDetalleDB)
+
+    def _descripcion_tipo_producto(self, tipo_producto_id: int | None) -> str:
+        if not tipo_producto_id:
+            return "-"
+        tipo = self.fabricacion.tipos_producto.get(int(tipo_producto_id))
+        if not tipo:
+            return str(tipo_producto_id)
+        return tipo.descripcion or tipo.codigo or str(tipo_producto_id)
+
+    def _descripcion_producto(self, producto_id: int | None) -> str:
+        if not producto_id:
+            return "-"
+        producto = self.maestros.productos.get(int(producto_id))
+        if not producto:
+            return str(producto_id)
+        return producto.codigo or str(producto_id)
+
+    def _descripcion_material(self, material_id: int | None) -> str:
+        if not material_id:
+            return "-"
+        material = self.maestros.materiales.get(int(material_id))
+        if not material:
+            return str(material_id)
+        return material.descripcion or str(material_id)
+
+    def _log_receta_bota(self, bota: "BotaDTO") -> None:
+        tipo_bota_id = int(bota.tipo_producto_id or 0)
+        consumos = [
+            consumo for consumo in self.fabricacion.consumos.values()
+            if int(consumo.bota_id or 0) == tipo_bota_id
+        ]
+
+        receta = {
+            "id": bota.id,
+            "codigo": bota.codigo,
+            "tipo_producto": self._descripcion_tipo_producto(bota.tipo_producto_id),
+            "material": self._descripcion_material(bota.material_id),
+            "vaso": self._descripcion_producto(bota.vaso_producto_id),
+            "fondo": self._descripcion_producto(bota.fondo_producto_id),
+            "tapa": self._descripcion_producto(bota.tapa_producto_id),
+            "flejes": [
+                self._descripcion_producto(bota.fleje_1_id),
+                self._descripcion_producto(bota.fleje_2_id),
+                self._descripcion_producto(bota.fleje_3_id),
+                self._descripcion_producto(bota.fleje_4_id),
+                self._descripcion_producto(bota.fleje_5_id),
+            ],
+        }
+
+        detalle_consumos = [
+            {
+                "id": consumo.id,
+                "consumible_id": consumo.consumible_id,
+                "consumible": self._descripcion_tipo_producto(consumo.consumible_id),
+                "consumo": consumo.consumo,
+            }
+            for consumo in consumos
+        ]
+
+        logger.info("Bota creada. Receta=%s Consumos=%s", receta, detalle_consumos)
 
     #region Métodos Maestros
 
@@ -277,6 +338,8 @@ class Colector:
             maestro[new.id] = objeto_DTO
 
             logger.info(f"Insertado ID {new.id} en la tabla {tabla}")
+            if tabla == "botas":
+                self._log_receta_bota(objeto_DTO)
 
             if tabla == "usuarios":
                 return objeto_DTO.model_copy(update={"clave": ""})
@@ -695,7 +758,8 @@ class Colector:
 
     def imprimir_etiqueta_fabricacion(self, data, ws=None):
         trazabilidad_ids = data.get("trazabilidad_ids") or []
-        palet_codigos = data.get("palet_codigos") or []
+        fabricacion_semanal_id = data.get("fabricacion_semanal_id")
+        lotes = data.get("lotes") or []
         tipo = data.get("tipo") or "BOTA"
         cantidad_etiquetas = int(data.get("cantidad_etiquetas") or 1)
         operarios_ids_input = data.get("operarios_ids") or []
@@ -720,7 +784,16 @@ class Colector:
             else:
                 operarios_ids_codigo = [batidero_id]
 
-        if not trazabilidad_ids:
+        if tipo == "BOTA":
+            if not fabricacion_semanal_id:
+                raise ValueError("fabricacion_semanal_id es obligatorio.")
+            if not isinstance(lotes, list) or not lotes or not self._normalizar_lote_traza(lotes[0]):
+                raise ValueError("Debe seleccionar al menos un lote.")
+            if batidero_id is None:
+                raise ValueError("batidero es obligatorio para fabricar botas.")
+            if not operarios_ids_producto:
+                raise ValueError("Debe indicar al menos un operario para fabricar botas.")
+        elif not trazabilidad_ids:
             raise ValueError("No hay trazabilidades activas.")
         if cantidad_etiquetas < 1:
             raise ValueError("cantidad_etiquetas debe ser mayor o igual a 1.")
@@ -733,35 +806,58 @@ class Colector:
                             select(UsuarioDB.id).where(UsuarioDB.id.in_(operarios_ids_producto))
                         ).all())
                         operarios_ids_producto = [op for op in operarios_ids_producto if op in ids_existentes]
+                    if tipo == "BOTA" and not operarios_ids_producto:
+                        raise ValueError("No hay operarios validos para fabricar botas.")
 
-                    trazas = session.exec(
-                        select(TrazabilidadFabricacionDB).where(
-                            TrazabilidadFabricacionDB.id.in_(trazabilidad_ids)
-                        )
-                    ).all()
-
-                    if not trazas:
-                        raise ValueError("Trazabilidades no encontradas.")
-
-                    for t in trazas:
-                        if t.estado != 0:
-                            raise ValueError("Hay trazabilidades no activas.")
-
-                    if not palet_codigos:
-                        palet_ids = [t.palet_id for t in trazas]
-                        palets = session.exec(select(PaletDB).where(PaletDB.id.in_(palet_ids))).all()
-                        palet_map = {p.id: p.codigo for p in palets}
-                        palet_codigos = [palet_map.get(t.palet_id, "") for t in trazas]
-
-                    produccion_id = None
+                    trazas = []
+                    palet_codigos = []
                     linea_ref = None
-                    if trazas:
-                        linea_ref = session.get(FabricacionSemanalDB, trazas[0].fabricacion_semanal_id)
-                        if linea_ref:
-                            produccion_id = linea_ref.pedido_id
+                    produccion_id = None
+                    trazas_palets_lote = []
+
+                    if tipo == "BOTA":
+                        linea_ref = session.get(FabricacionSemanalDB, int(fabricacion_semanal_id))
+                        if not linea_ref:
+                            raise ValueError("Linea de fabricacion no encontrada.")
+                        produccion_id = linea_ref.pedido_id
+                        _lote_normalizado, trazas_palets_lote = self._obtener_trazas_palets_por_lote(
+                            session,
+                            int(fabricacion_semanal_id),
+                            lotes[0],
+                        )
+                        trazas = [traza for traza, _palet in trazas_palets_lote]
+                        palet_codigos = [palet.codigo for _traza, palet in trazas_palets_lote if palet.codigo]
+                    else:
+                        trazas = session.exec(
+                            select(TrazabilidadFabricacionDB).where(
+                                TrazabilidadFabricacionDB.id.in_(trazabilidad_ids)
+                            )
+                        ).all()
+
+                        if not trazas:
+                            raise ValueError("Trazabilidades no encontradas.")
+
+                        for t in trazas:
+                            if t.estado != 0:
+                                raise ValueError("Hay trazabilidades no activas.")
+
+                        if not palet_codigos:
+                            palet_ids = [t.palet_id for t in trazas]
+                            palets = session.exec(select(PaletDB).where(PaletDB.id.in_(palet_ids))).all()
+                            palet_map = {p.id: p.codigo for p in palets}
+                            palet_codigos = [palet_map.get(t.palet_id, "") for t in trazas]
+
+                        if trazas:
+                            linea_ref = session.get(FabricacionSemanalDB, trazas[0].fabricacion_semanal_id)
+                            if linea_ref:
+                                produccion_id = linea_ref.pedido_id
 
                     codigos_generados = []
                     ultimo_producto_id = None
+                    consumo_duela = None
+                    consumos_fleje = []
+                    if tipo == "BOTA" and linea_ref:
+                        consumo_duela, consumos_fleje = self._obtener_receta_bota(session, linea_ref.tipo_producto_id)
 
                     for _ in range(cantidad_etiquetas):
                         codigo = self._generar_codigo_producto(session, trazas, palet_codigos, operarios_ids_codigo)
@@ -778,6 +874,20 @@ class Colector:
                         session.refresh(producto)
                         ultimo_producto_id = producto.id
 
+                        trazas_producto = list(trazas)
+                        if tipo == "BOTA" and linea_ref:
+                            trazas_producto = self._consumir_duela_bota_desde_trazas(
+                                session,
+                                trazas_palets_lote,
+                                float(consumo_duela.consumo or 0),
+                            )
+                            for consumo_fleje in consumos_fleje:
+                                self._consumir_flejes_seleccionados(
+                                    session,
+                                    int(consumo_fleje.consumible_id),
+                                    float(consumo_fleje.consumo or 0),
+                                )
+
                         for operario_id in operarios_ids_producto:
                             session.add(
                                 ProductoOperarioDB(
@@ -787,50 +897,16 @@ class Colector:
                                 )
                             )
 
-                        for t in trazas:
+                        for t in trazas_producto:
                             session.add(TrazabilidadProductoDB(trazabilidad_fabricacion_id=t.id, producto_id=producto.id))
-
-                    if tipo == "BOTA" and linea_ref:
-                        consumos_bota = session.exec(
-                            select(ConsumoDB).where(ConsumoDB.bota_id == linea_ref.tipo_producto_id)
-                        ).all()
-                        consumible_ids = {c.consumible_id for c in consumos_bota if c.consumible_id}
-                        tipos_consumibles = {}
-                        if consumible_ids:
-                            tipos_db = session.exec(
-                                select(TipoProductoDB).where(TipoProductoDB.id.in_(consumible_ids))
-                            ).all()
-                            tipos_consumibles = {tp.id: str(tp.tipo or "").upper() for tp in tipos_db}
-
-                        palet_ids_lote = [t.palet_id for t in trazas if t.palet_id]
-                        palets_lote = []
-                        if palet_ids_lote:
-                            palets_lote = session.exec(
-                                select(PaletDB)
-                                .where(PaletDB.id.in_(palet_ids_lote))
-                                .order_by(PaletDB.codigo, PaletDB.id)
-                            ).all()
-
-                        for consumo in consumos_bota:
-                            consumo_total = float(consumo.consumo or 0) * float(cantidad_etiquetas or 0)
-                            if consumo_total == 0:
-                                continue
-                            tipo_consumible = tipos_consumibles.get(consumo.consumible_id, "")
-                            if tipo_consumible == "DUELA":
-                                self._consumir_palets_en_orden(session, palets_lote, consumo_total)
-                            elif tipo_consumible == "FLEJE":
-                                self._consumir_flejes_seleccionados(session, int(consumo.consumible_id), consumo_total)
-
-                    for t in trazas:
-                        t.cantidad_fabricada = int(t.cantidad_fabricada or 0) + cantidad_etiquetas
-                        session.add(t)
-
-                    lineas_unicas = {t.fabricacion_semanal_id for t in trazas}
-                    for linea_id in lineas_unicas:
-                        linea = session.get(FabricacionSemanalDB, linea_id)
-                        if linea:
-                            linea.cantidad_fabricada = int(linea.cantidad_fabricada or 0) + cantidad_etiquetas
-                            session.add(linea)
+                    if linea_ref:
+                        linea_ref.cantidad_fabricada = int(linea_ref.cantidad_fabricada or 0) + cantidad_etiquetas
+                        session.add(linea_ref)
+                        if linea_ref.pedido_id:
+                            pedido = session.get(PedidoDB, int(linea_ref.pedido_id))
+                            if pedido:
+                                pedido.cantidad_fabricada = int(pedido.cantidad_fabricada or 0) + cantidad_etiquetas
+                                session.add(pedido)
             except Exception as exc:
                 session.rollback()
                 logger.error("Error al crear etiqueta: %s", exc)
@@ -928,6 +1004,114 @@ class Colector:
             normalizados.append(op_id)
         return normalizados
 
+    def _normalizar_lote_traza(self, lote: str | None) -> str:
+        return str(lote or "").strip()[:8]
+
+    def _obtener_trazas_palets_por_lote(self, session, fabricacion_semanal_id: int, lote: str):
+        lote_normalizado = self._normalizar_lote_traza(lote)
+        if not lote_normalizado:
+            raise ValueError("No se pudo determinar el lote seleccionado.")
+
+        trazas = session.exec(
+            select(TrazabilidadFabricacionDB)
+            .where(TrazabilidadFabricacionDB.fabricacion_semanal_id == fabricacion_semanal_id)
+            .where(TrazabilidadFabricacionDB.estado == 0)
+            .order_by(TrazabilidadFabricacionDB.id)
+        ).all()
+        if not trazas:
+            raise ValueError("No hay trazabilidades activas para la linea seleccionada.")
+
+        palet_ids = [t.palet_id for t in trazas if t.palet_id]
+        palets = session.exec(
+            select(PaletDB)
+            .where(PaletDB.id.in_(palet_ids))
+            .order_by(PaletDB.codigo, PaletDB.id)
+        ).all() if palet_ids else []
+        palets_por_id = {p.id: p for p in palets}
+
+        resultado = []
+        for traza in trazas:
+            palet = palets_por_id.get(traza.palet_id)
+            if not palet:
+                continue
+            if self._extraer_prefijo_lote(palet.codigo) != lote_normalizado:
+                continue
+            resultado.append((traza, palet))
+
+        if not resultado:
+            raise ValueError("No hay palets en trazabilidad para el lote seleccionado.")
+
+        resultado.sort(key=lambda item: ((item[1].codigo or ""), int(item[1].id or 0), int(item[0].id or 0)))
+        return lote_normalizado, resultado
+
+    def _obtener_receta_bota(self, session, tipo_producto_id: int):
+        consumos = session.exec(
+            select(ConsumoDB).where(ConsumoDB.bota_id == tipo_producto_id)
+        ).all()
+        if not consumos:
+            raise ValueError("La bota no tiene receta de consumos.")
+
+        consumible_ids = {c.consumible_id for c in consumos if c.consumible_id}
+        tipos_db = session.exec(
+            select(TipoProductoDB).where(TipoProductoDB.id.in_(consumible_ids))
+        ).all() if consumible_ids else []
+        tipos_por_id = {tp.id: str(tp.tipo or "").upper() for tp in tipos_db}
+
+        consumos_duela = [c for c in consumos if tipos_por_id.get(c.consumible_id) == "DUELA"]
+        consumos_fleje = [c for c in consumos if tipos_por_id.get(c.consumible_id) == "FLEJE"]
+
+        # if len(consumos_duela) != 1:
+        #     raise ValueError("La receta de la bota debe tener exactamente una duela.")
+        # if len(consumos_fleje) != 2:
+        #     raise ValueError("La receta de la bota debe tener exactamente dos flejes.")
+
+        return consumos_duela[0], consumos_fleje
+
+    def _consumir_duela_bota_desde_trazas(self, session, trazas_palets, consumo_unitario: float):
+        if not trazas_palets:
+            raise ValueError("No hay trazas de lote para consumir duela.")
+
+        pendiente = float(consumo_unitario or 0)
+        trazas_usadas = []
+        ultima_traza = None
+        ultimo_palet = None
+
+        for traza, palet in trazas_palets:
+            ultima_traza = traza
+            ultimo_palet = palet
+            if pendiente <= 0:
+                break
+
+            restante = float(palet.cubicaje or 0) - float(palet.consumido or 0)
+            if restante <= 0:
+                continue
+
+            traza.cantidad_fabricada = int(traza.cantidad_fabricada or 0) + 1
+            session.add(traza)
+            trazas_usadas.append(traza)
+
+            delta = min(restante, pendiente)
+            palet.consumido = float(palet.consumido or 0) + delta
+            if float(palet.consumido or 0) >= float(palet.cubicaje or 0):
+                palet.estado = 2
+            session.add(palet)
+
+            pendiente -= delta
+
+        if pendiente > 0:
+            if ultima_traza is None or ultimo_palet is None:
+                raise ValueError("No se pudo determinar el ultimo palet del lote.")
+            if not trazas_usadas or trazas_usadas[-1].id != ultima_traza.id:
+                ultima_traza.cantidad_fabricada = int(ultima_traza.cantidad_fabricada or 0) + 1
+                session.add(ultima_traza)
+                trazas_usadas.append(ultima_traza)
+            ultimo_palet.consumido = float(ultimo_palet.consumido or 0) + pendiente
+            if float(ultimo_palet.consumido or 0) >= float(ultimo_palet.cubicaje or 0):
+                ultimo_palet.estado = 2
+            session.add(ultimo_palet)
+
+        return trazas_usadas
+
     def _consumir_palets_en_orden(self, session, palets: list[PaletDB], consumo_total: float):
         if not palets:
             raise ValueError("No hay palets disponibles para aplicar el consumo.")
@@ -940,7 +1124,7 @@ class Colector:
             disponible = float(palet.cubicaje or 0) - float(palet.consumido or 0)
             delta = pendiente if es_ultimo else min(max(disponible, 0.0), pendiente)
             palet.consumido = float(palet.consumido or 0) + delta
-            if float(palet.consumido or 0) >= float(palet.cubicaje or 0):
+            if not es_ultimo and float(palet.consumido or 0) >= float(palet.cubicaje or 0):
                 palet.estado = 2
             session.add(palet)
             pendiente -= delta
@@ -965,7 +1149,7 @@ class Colector:
             delta = pendiente if es_ultima else min(max(disponible, 0.0), pendiente)
             entrada.consumido = float(entrada.consumido or 0) + delta
             entrada.restante = float(entrada.peso or 0) - float(entrada.consumido or 0)
-            if float(entrada.consumido or 0) >= float(entrada.peso or 0):
+            if not es_ultima and float(entrada.consumido or 0) >= float(entrada.peso or 0):
                 entrada.estado = 2
             session.add(entrada)
 
@@ -976,7 +1160,7 @@ class Colector:
             return ""
         # Para los codigos de palet tipo "lote#000001" tomamos solo la parte lote.
         texto = str(palet_codigo).split("#", 1)[0]
-        return texto[:5]
+        return texto[:8]
 
     def _formatear_operarios(self, operarios_ids: list[int]) -> str:
         op1 = operarios_ids[0] if len(operarios_ids) > 0 else None

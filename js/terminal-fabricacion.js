@@ -52,15 +52,6 @@ function prepararEventosFabricacion() {
         });
     }
 
-    const btnVolverFabricacionSemanal = document.getElementById("botas-volver-fabricacion-semanal");
-    if (btnVolverFabricacionSemanal) {
-        btnVolverFabricacionSemanal.addEventListener("click", () => {
-            if (typeof mostrarSeccion === "function") {
-                mostrarSeccion("vista_fabricacion_semanal");
-            }
-        });
-    }
-
     const btnConfirmar = document.getElementById("fabricacion-confirmar-impresion");
     if (btnConfirmar) {
         btnConfirmar.addEventListener("click", async () => {
@@ -159,7 +150,7 @@ function registrarEventosVistaProduccion(vistaId) {
         : null;
     if (tablaLineas) {
         tablaLineas.addEventListener("click", function (event) {
-            const fila = event.target.closest("tr");
+            const fila = event.target.closest("[data-linea-id]");
             if (!fila) return;
             seleccionarContenidoOrden(fila, vistaId);
         });
@@ -198,7 +189,7 @@ function obtenerConfigVistaProduccion(vistaId = null) {
             vistaId: "vista_consumo_semanal",
             sectionSelector: "#vista_consumo_semanal",
             tablaOrdenesSelector: null,
-            tablaLineasSelector: "#tabla_consumo_fabricacion_semanal",
+            tablaLineasSelector: "#lista_consumo_fabricacion_semanal",
             tituloOrdenSelector: null,
             modalId: null,
             detalleVistaId: "vista_consumo",
@@ -231,7 +222,7 @@ function obtenerConfigVistaProduccion(vistaId = null) {
         return {
             vistaId: "vista_fabricacion_semanal",
             sectionSelector: "#vista_fabricacion_semanal",
-            tablaLineasSelector: "#tabla_fabricacion_semanal",
+            tablaLineasSelector: "#lista_fabricacion_semanal_botas",
             tablaOrdenesSelector: null,
             tituloOrdenSelector: null,
             modalId: null,
@@ -376,8 +367,8 @@ async function cargarFabricacionSemanalActivaFabricacion(opciones = {}) {
     const cfg = obtenerConfigVistaProduccion(opciones.vistaId);
     vistaProduccionActiva = cfg.vistaId;
     const autoAbrirLineaUnica = opciones.autoAbrirLineaUnica !== false;
-    const tbody = document.querySelector(`${cfg.tablaLineasSelector} tbody`);
-    if (!tbody) return;
+    const contenedor = document.querySelector(cfg.tablaLineasSelector);
+    if (!contenedor) return;
     try {
         await asegurarDatosFabricacionTerminal();
         const fabricacion = (await wsRequest("fabricacion", {})) || {};
@@ -386,28 +377,22 @@ async function cargarFabricacionSemanalActivaFabricacion(opciones = {}) {
         const lineas = Object.values(fabricacion?.fabricacion_semanal || {})
             .filter((l) => Number(l?.estado || 0) === 2);
 
-        tbody.innerHTML = "";
         if (!lineas.length) {
-            const tr = document.createElement("tr");
-            const td = document.createElement("td");
-            td.colSpan = 7;
-            td.textContent = "No hay fabricacion semanal activa";
-            tr.appendChild(td);
-            tbody.appendChild(tr);
+            contenedor.innerHTML = `<div class="fabricacion-card-empty">No hay fabricacion semanal activa</div>`;
             return;
         }
 
-        actualizarTablaLineasFabricacionConsumo(lineas, cfg.vistaId);
+        actualizarCardsFabricacionSemanalBotas(lineas);
 
         if (autoAbrirLineaUnica && lineas.length === 1) {
-            const filaUnica = tbody.querySelector("tr[data-linea-id]");
+            const filaUnica = contenedor.querySelector("[data-linea-id]");
             if (filaUnica) {
-                mostrarLotesMateriales(filaUnica, cfg.vistaId);
+                mostrarLotesMateriales(filaUnica, "vista_fabricacion_semanal");
             }
         }
     } catch (err) {
         console.error(err);
-        tbody.innerHTML = `<tr><td colspan="7">Error al cargar fabricacion semanal activa</td></tr>`;
+        contenedor.innerHTML = `<div class="fabricacion-card-empty">Error al cargar fabricacion semanal activa</div>`;
     }
 }
 
@@ -429,8 +414,8 @@ async function cargarFabricacionSemanalConsumo(opciones = {}) {
     const vista = document.getElementById(cfg.vistaId);
     if (vista) vista.setAttribute("modo", "listado_fabricacion_semanal");
     const autoAbrirLineaUnica = opciones.autoAbrirLineaUnica !== false;
-    const tbody = document.querySelector(`${cfg.tablaLineasSelector} tbody`);
-    if (!tbody) return;
+    const contenedor = document.querySelector(cfg.tablaLineasSelector);
+    if (!contenedor) return;
     try {
         await asegurarDatosFabricacionTerminal();
         const fabricacion = (await wsRequest("fabricacion", {})) || {};
@@ -439,16 +424,16 @@ async function cargarFabricacionSemanalConsumo(opciones = {}) {
         const lineas = Object.values(fabricacion?.fabricacion_semanal || {})
             .filter((l) => Number(l?.estado || 0) === 2);
 
-        actualizarTablaLineasFabricacionConsumo(lineas, cfg.vistaId);
-        if (autoAbrirLineaUnica && lineas.length === 1 && tbody) {
-            const filaUnica = tbody.querySelector("tr[data-linea-id]");
+        actualizarCardsFabricacionSemanalConsumo(lineas);
+        if (autoAbrirLineaUnica && lineas.length === 1) {
+            const filaUnica = contenedor.querySelector("[data-linea-id]");
             if (filaUnica) {
                 mostrarLotesMateriales(filaUnica, cfg.vistaId);
             }
         }
     } catch (err) {
         console.error(err);
-        tbody.innerHTML = `<tr><td colspan="7">Error al cargar fabricaciones semanales</td></tr>`;
+        contenedor.innerHTML = `<div class="produccion-card-empty">Error al cargar fabricaciones semanales</div>`;
     }
 }
 
@@ -810,46 +795,140 @@ function actualizarTablaLineasFabricacion(lineas, vistaId = null) {
     });
 }
 
-function actualizarTablaLineasFabricacionConsumo(lineas, vistaId = "vista_consumo") {
-    const cfg = obtenerConfigVistaProduccion(vistaId);
-    const tbody = document.querySelector(`${cfg.tablaLineasSelector} tbody`);
-    if (!tbody) return;
-    tbody.innerHTML = "";
+function actualizarCardsFabricacionSemanalConsumo(lineas) {
+    const contenedor = document.querySelector("#lista_consumo_fabricacion_semanal");
+    if (!contenedor) return;
+    contenedor.innerHTML = "";
     if (!lineas || !lineas.length) {
-        const tr = document.createElement("tr");
-        const td = document.createElement("td");
-        td.colSpan = 7;
-        td.textContent = "Sin líneas en estado Producción";
-        tr.appendChild(td);
-        tbody.appendChild(tr);
+        contenedor.innerHTML = `<div class="produccion-card-empty">Sin líneas en estado Producción</div>`;
         return;
     }
-    lineas.forEach((l) => {
-        const tr = document.createElement("tr");
-        tr.dataset.lineaId = l.id ?? "";
-        tr.dataset.tipoProductoId = l.tipo_producto_id ?? "";
-        tr.dataset.materialId = l.material_id ?? "";
-        tr.dataset.pedidoId = l.pedido_id ?? "";
-        tr.dataset.cantidadFabricar = l.cantidad ?? "";
-        const pedido = terminalFabricacion.pedidos?.[l.pedido_id] || null;
-        const pedidoTxt = (pedido?.descripcion || `Pedido ${l.pedido_id || "-"}`).trim();
-        tr.dataset.pedidoDescripcion = pedidoTxt;
-        const fechaInicio = formatearFechaEuropea(l.fecha_inicio);
-        const tipo = terminalFabricacion.tipos_producto?.[l.tipo_producto_id]?.descripcion || "-";
-        const material = terminalFabricacion.materiales?.[l.material_id]?.descripcion || "-";
-        const cantidad = Number(l.cantidad) || 0;
-        const fabricada = Number(l.cantidad_fabricada) || 0;
+    lineas.forEach((linea) => {
+        const card = document.createElement("article");
+        card.className = "produccion-card";
+        card.dataset.lineaId = linea.id ?? "";
+        card.dataset.tipoProductoId = linea.tipo_producto_id ?? "";
+        card.dataset.materialId = linea.material_id ?? "";
+        card.dataset.pedidoId = linea.pedido_id ?? "";
+        card.dataset.cantidadFabricar = linea.cantidad ?? "";
+
+        const pedido = terminalFabricacion.pedidos?.[linea.pedido_id] || null;
+        const pedidoDescripcion = (pedido?.descripcion || `Pedido ${linea.pedido_id || "-"}`).trim();
+        card.dataset.pedidoDescripcion = pedidoDescripcion;
+
+        const fechaInicio = formatearFechaEuropea(linea.fecha_inicio);
+        const tipo = terminalFabricacion.tipos_producto?.[linea.tipo_producto_id]?.descripcion || "-";
+        const material = terminalFabricacion.materiales?.[linea.material_id]?.descripcion || "-";
+        const cantidad = Number(linea.cantidad) || 0;
+        const fabricada = Number(linea.cantidad_fabricada) || 0;
         const falta = Math.max(0, cantidad - fabricada);
-        tr.innerHTML = `
-      <td>${pedidoTxt}</td>
-      <td>${fechaInicio || "-"}</td>
-      <td>${tipo}</td>
-      <td>${material}</td>
-      <td>${cantidad}</td>
-      <td>${fabricada}</td>
-      <td>${falta}</td>
+        const pedidoCantidad = Number(pedido?.cantidad) || 0;
+        const pedidoFabricada = Number(pedido?.cantidad_fabricada) || 0;
+
+        card.innerHTML = `
+      <div class="produccion-card-title">
+        <div>
+          <h6>${pedidoDescripcion}</h6>
+        </div>
+        <span class="produccion-card-date">${fechaInicio || "-"}</span>
+      </div>
+      <div class="produccion-card-grid">
+        <div class="produccion-card-field">
+          <span class="produccion-card-label">Tipo</span>
+          <span class="produccion-card-value">${tipo}</span>
+        </div>
+        <div class="produccion-card-field">
+          <span class="produccion-card-label">Material</span>
+          <span class="produccion-card-value">${material}</span>
+        </div>
+        <div class="produccion-card-field">
+          <span class="produccion-card-label">Cantidad</span>
+          <span class="produccion-card-value">${cantidad}</span>
+        </div>
+        <div class="produccion-card-field">
+          <span class="produccion-card-label">Fabricada</span>
+          <span class="produccion-card-value">${fabricada}</span>
+        </div>
+        <div class="produccion-card-field">
+          <span class="produccion-card-label">Falta</span>
+          <span class="produccion-card-value">${falta}</span>
+        </div>
+        <div class="produccion-card-field">
+          <span class="produccion-card-label">Pedido</span>
+          <span class="produccion-card-value">${pedidoFabricada} / ${pedidoCantidad}</span>
+        </div>
+      </div>
     `;
-        tbody.appendChild(tr);
+        contenedor.appendChild(card);
+    });
+}
+
+function actualizarCardsFabricacionSemanalBotas(lineas) {
+    const contenedor = document.querySelector("#lista_fabricacion_semanal_botas");
+    if (!contenedor) return;
+    contenedor.innerHTML = "";
+    if (!lineas || !lineas.length) {
+        contenedor.innerHTML = `<div class="fabricacion-card-empty">Sin líneas en estado Producción</div>`;
+        return;
+    }
+
+    lineas.forEach((linea) => {
+        const card = document.createElement("article");
+        card.className = "fabricacion-card";
+        card.dataset.lineaId = linea.id ?? "";
+        card.dataset.tipoProductoId = linea.tipo_producto_id ?? "";
+        card.dataset.materialId = linea.material_id ?? "";
+        card.dataset.pedidoId = linea.pedido_id ?? "";
+        card.dataset.cantidadFabricar = linea.cantidad ?? "";
+
+        const pedido = terminalFabricacion.pedidos?.[linea.pedido_id] || null;
+        const pedidoDescripcion = (pedido?.descripcion || `Pedido ${linea.pedido_id || "-"}`).trim();
+        card.dataset.pedidoDescripcion = pedidoDescripcion;
+
+        const fechaInicio = formatearFechaEuropea(linea.fecha_inicio);
+        const tipo = terminalFabricacion.tipos_producto?.[linea.tipo_producto_id]?.descripcion || "-";
+        const material = terminalFabricacion.materiales?.[linea.material_id]?.descripcion || "-";
+        const cantidad = Number(linea.cantidad) || 0;
+        const fabricada = Number(linea.cantidad_fabricada) || 0;
+        const falta = Math.max(0, cantidad - fabricada);
+        const pedidoCantidad = Number(pedido?.cantidad) || 0;
+        const pedidoFabricada = Number(pedido?.cantidad_fabricada) || 0;
+
+        card.innerHTML = `
+      <div class="fabricacion-card-title">
+        <div>
+          <h6>${pedidoDescripcion}</h6>
+        </div>
+        <span class="fabricacion-card-date">${fechaInicio || "-"}</span>
+      </div>
+      <div class="fabricacion-card-grid">
+        <div class="fabricacion-card-field">
+          <span class="fabricacion-card-label">Tipo</span>
+          <span class="fabricacion-card-value">${tipo}</span>
+        </div>
+        <div class="fabricacion-card-field">
+          <span class="fabricacion-card-label">Material</span>
+          <span class="fabricacion-card-value">${material}</span>
+        </div>
+        <div class="fabricacion-card-field">
+          <span class="fabricacion-card-label">Cantidad</span>
+          <span class="fabricacion-card-value">${cantidad}</span>
+        </div>
+        <div class="fabricacion-card-field">
+          <span class="fabricacion-card-label">Fabricada</span>
+          <span class="fabricacion-card-value">${fabricada}</span>
+        </div>
+        <div class="fabricacion-card-field">
+          <span class="fabricacion-card-label">Falta</span>
+          <span class="fabricacion-card-value">${falta}</span>
+        </div>
+        <div class="fabricacion-card-field">
+          <span class="fabricacion-card-label">Pedido</span>
+          <span class="fabricacion-card-value">${pedidoFabricada} / ${pedidoCantidad}</span>
+        </div>
+      </div>
+    `;
+        contenedor.appendChild(card);
     });
 }
 
@@ -1038,7 +1117,7 @@ function cargarCodigosBatideroEnSelector() {
 }
 
 function obtenerLoteDesdeCodigoPalet(codigoPalet) {
-    return String(codigoPalet || "").split("#", 1)[0].trim();
+    return String(codigoPalet || "").split("#", 1)[0].trim().slice(0, 8);
 }
 
 function sincronizarBackdropModales() {
@@ -1178,11 +1257,9 @@ async function imprimirEtiquetaFabricarBotaDesdeUI() {
         return;
     }
     try {
-        const trazabilidadIds = trazasLote.map((t) => Number(t.id)).filter(Boolean);
-        const paletCodigos = trazasLote.map((t) => t.palet_codigo || t.palet_id || "").filter(Boolean);
         const payload = {
-            trazabilidad_ids: trazabilidadIds,
-            palet_codigos: paletCodigos,
+            fabricacion_semanal_id: lineaFabricacionActualId,
+            lotes: [loteMadera],
             tipo: "BOTA",
             operarios_ids: [operarioFondadoId],
             batidero,
