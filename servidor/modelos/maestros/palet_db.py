@@ -9,7 +9,6 @@ class PaletDB(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     codigo: str
     linea_entrada_id: int | None = None
-    duela_tipo_id: int | None = None
     tipo_producto_id: int | None = None
     material_id: int | None = None
     cubicaje: float = 0.0

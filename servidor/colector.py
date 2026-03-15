@@ -10,14 +10,14 @@ from servidor.herramientas.utilidades import obtener_anterior_dia_semana
 from servidor.herramientas.BcryptHelper import BcryptHelper
 
 from .modelos import ClienteDB, EstadoPedidoDB, EstadoFabricacionSemanalDB, EstadoBotaDB, EstadoTrazabilidadFabricacionDB, EstadoPaletDB
-from .modelos import InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB, RolDB, PuestoTrabajoDB, MaterialDB, DuelaDB, EntradaDB, LineaEntradaDB, PaletDB, ProductoDB, ProductoOperarioDB, ArchivoSubidoDB, AmbienteDB, EntradaFlejeDB, CubicajeDB
+from .modelos import InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB, RolDB, PuestoTrabajoDB, MaterialDB, EntradaDB, LineaEntradaDB, PaletDB, ProductoDB, ProductoOperarioDB, ArchivoSubidoDB, AmbienteDB, EntradaFlejeDB, CubicajeDB
 from .modelos import PedidoDB, TipoProductoDB, FabricacionSemanalDB, TrazabilidadProcesadoDB, TrazabilidadFabricacionDB, TrazabilidadProductoDB, BotaDB, ConsumoDB
 from .modelos import PlanCamionDB, PlanFacturacionDB, PlanMaterialDB, CuadranteDB, CuadranteDetalleDB
 from .persistencia import GenericRepository, DB
 from sqlmodel import select
 from sqlalchemy import extract, func
 from .dominio import PlanificacionEntradasDTO, MaestrosDTO, PlanMaterialDTO, PlanFacturacionDTO, PlanCamionDTO, CuadranteDTO, CuadranteDetalleDTO, FabricacionDTO
-from .dominio import ClienteDTO, EstadoPedidoDTO, EstadoFabricacionSemanalDTO, EstadoBotaDTO, EstadoTrazabilidadFabricacionDTO, EstadoPaletDTO, InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO, RolDTO, PuestoTrabajoDTO, MaterialDTO, DuelaDTO, EntradaDTO, LineaEntradaDTO, PaletDTO, ProductoDTO, ArchivoSubidoDTO, AmbienteDTO, EntradaFlejeDTO, CubicajeDTO, CuadrantesDTO
+from .dominio import ClienteDTO, EstadoPedidoDTO, EstadoFabricacionSemanalDTO, EstadoBotaDTO, EstadoTrazabilidadFabricacionDTO, EstadoPaletDTO, InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO, RolDTO, PuestoTrabajoDTO, MaterialDTO, EntradaDTO, LineaEntradaDTO, PaletDTO, ProductoDTO, ArchivoSubidoDTO, AmbienteDTO, EntradaFlejeDTO, CubicajeDTO, CuadrantesDTO
 from .dominio import PedidoDTO, TipoProductoDTO, FabricacionSemanalDTO, TrazabilidadProcesadoDTO, TrazabilidadFabricacionDTO, TrazabilidadProductoDTO, BotaDTO, ConsumoDTO
 from servidor.impresion import ImprimirEtiqueta
 from servidor.conexiones.broadcast import broadcast_error, broadcast_event
@@ -56,7 +56,6 @@ class Colector:
         self.repo_puestos_trabajo = GenericRepository(PuestoTrabajoDB)
 
         self.repo_materiales_maestro = GenericRepository(MaterialDB)
-        self.repo_duelas = GenericRepository(DuelaDB)
         self.repo_entradas = GenericRepository(EntradaDB)
         self.repo_lineas_entrada = GenericRepository(LineaEntradaDB)
         self.repo_palets = GenericRepository(PaletDB)
@@ -103,6 +102,12 @@ class Colector:
         if not material:
             return str(material_id)
         return material.descripcion or str(material_id)
+
+    def _es_tipo_duela(self, tipo_producto_id: int | None) -> bool:
+        if not tipo_producto_id:
+            return False
+        tipo = self.fabricacion.tipos_producto.get(int(tipo_producto_id))
+        return str(getattr(tipo, "tipo", "")).upper() == "DUELA" if tipo else False
 
     def _log_receta_bota(self, bota: "BotaDTO") -> None:
         tipo_bota_id = int(bota.tipo_producto_id or 0)
@@ -158,7 +163,6 @@ class Colector:
             roles = self.repo_roles.list_all(session)
             puestos_trabajo = self.repo_puestos_trabajo.list_all(session)
             materiales = self.repo_materiales_maestro.list_all(session)
-            duelas = self.repo_duelas.list_all(session)
             entradas = self.repo_entradas.list_all(session)
             lineas_entrada = self.repo_lineas_entrada.list_all(session)
             palets = self.repo_palets.list_all(session)
@@ -181,7 +185,6 @@ class Colector:
             self.maestros.roles = {rol.id: RolDTO.from_db(rol) for rol in roles}
             self.maestros.puestos_trabajo = {puesto.id: PuestoTrabajoDTO.from_db(puesto) for puesto in puestos_trabajo}
             self.maestros.materiales = {material.id: MaterialDTO.from_db(material) for material in materiales}
-            self.maestros.duelas = {duela.id: DuelaDTO.from_db(duela) for duela in duelas}
             self.maestros.entradas = {entrada.id: EntradaDTO.from_db(entrada) for entrada in entradas}
             self.maestros.lineas_entrada = {linea.id: LineaEntradaDTO.from_db(linea) for linea in lineas_entrada}
             self.maestros.palets = {palet.id: PaletDTO.from_db(palet) for palet in palets}
@@ -244,8 +247,6 @@ class Colector:
             repo, maestro, objeto = self.obtener_repo(tabla)
             
             DTO = maestro.get(entrada_id)
-            if tabla == "palets" and campo in ("tipo_producto_id", "material_id"):
-                raise ValueError(f"Campo '{campo}' no editable en palets.")
             self.checkUpdate(DTO, tabla, entrada_id, campo)
             if tabla == "usuarios":
                 if campo == "codigo":
@@ -254,10 +255,10 @@ class Colector:
                     valor = BcryptHelper.hash_password(valor or "")
             valor = self._normalizar_vacio_numerico(objeto, campo, valor)
             setattr(DTO, campo, valor)
-            if tabla == "palets" and campo == "duela_tipo_id":
-                duela = self.maestros.duelas.get(int(valor)) if valor not in (None, "") else None
-                DTO.tipo_producto_id = duela.tipo_producto_id if duela else None
-                DTO.material_id = duela.material_id if duela else None
+            if tabla == "palets" and campo == "linea_entrada_id":
+                linea = self.maestros.lineas_entrada.get(int(valor)) if valor not in (None, "") else None
+                DTO.tipo_producto_id = linea.tipo_producto_id if linea else None
+                DTO.material_id = linea.material_id if linea else None
             if tabla == "entradas_flejes":
                 DTO.restante = float(DTO.peso or 0) - float(DTO.consumido or 0)
             if hasattr(DTO, "bind_db_model"):
@@ -270,7 +271,7 @@ class Colector:
             valor_log = "<oculto>" if (tabla == "usuarios" and campo == "clave") else valor
             logger.info(f"Entrada ID {entrada_id} modificada: {campo} = {valor_log}")
             respuesta = {"id": entrada_id, "campo": campo, "valor": valor_respuesta}
-            if tabla == "palets" and campo == "duela_tipo_id":
+            if tabla == "palets" and campo == "linea_entrada_id":
                 respuesta["valores"] = {
                     "tipo_producto_id": DTO.tipo_producto_id,
                     "material_id": DTO.material_id,
@@ -307,13 +308,13 @@ class Colector:
             data = self._normalizar_data_vacia_numerica(objeto, data)
             if tabla == "palets":
                 data = dict(data or {})
-                duela_tipo_id = data.get("duela_tipo_id")
-                if duela_tipo_id not in (None, ""):
-                    duela = self.maestros.duelas.get(int(duela_tipo_id))
-                    if not duela:
-                        raise ValueError("duela_tipo_id no valido.")
-                    data["tipo_producto_id"] = duela.tipo_producto_id
-                    data["material_id"] = duela.material_id
+                linea_entrada_id = data.get("linea_entrada_id")
+                if linea_entrada_id not in (None, "") and not data.get("tipo_producto_id") and not data.get("material_id"):
+                    linea = self.maestros.lineas_entrada.get(int(linea_entrada_id))
+                    if not linea:
+                        raise ValueError("linea_entrada_id no valido.")
+                    data["tipo_producto_id"] = linea.tipo_producto_id
+                    data["material_id"] = linea.material_id
             if tabla == "usuarios":
                 data = dict(data or {})
                 data["alias"] = data.get("alias")
@@ -515,29 +516,26 @@ class Colector:
                     PaletDB.ubicacion_id,
                     UbicacionDB.descripcion,
                     UbicacionDB.instalacion_id,
-                    PaletDB.duela_tipo_id,
-                    DuelaDB.descripcion,
-                    DuelaDB.tipo_producto_id,
-                    DuelaDB.material_id,
+                    PaletDB.tipo_producto_id,
+                    PaletDB.material_id,
                     PaletDB.cubicaje,
                     PaletDB.consumido,
                 )
                 .select_from(PaletDB)
                 .join(UbicacionDB, UbicacionDB.id == PaletDB.ubicacion_id, isouter=True)
-                .join(DuelaDB, DuelaDB.id == PaletDB.duela_tipo_id, isouter=True)
                 .where(PaletDB.linea_entrada_id.is_(None))
                 .where(PaletDB.procesado.is_(False))
-                .order_by(UbicacionDB.descripcion, DuelaDB.descripcion, PaletDB.codigo)
+                .order_by(UbicacionDB.descripcion, PaletDB.tipo_producto_id, PaletDB.material_id, PaletDB.codigo)
             )
             rows = session.exec(stmt).all()
             resultado = []
             for row in rows:
-                restante = max(float(row[10] or 0) - float(row[11] or 0), 0.0)
+                restante = max(float(row[8] or 0) - float(row[9] or 0), 0.0)
                 if restante <= 0:
                     continue
                 if row[5] is None:
                     continue
-                if row[8] is None or row[9] is None:
+                if row[6] is None or row[7] is None:
                     continue
                 resultado.append(
                     {
@@ -547,14 +545,12 @@ class Colector:
                         "ubicacion_id": row[3],
                         "ubicacion": row[4] or "Sin ubicación",
                         "id_instalacion": row[5],
-                        "duela_tipo_id": row[6],
-                        "duela": row[7] or "Sin duela",
-                        "tipo_producto": row[8],
-                        "id_material": row[9],
-                        "cubicaje": float(row[10] or 0),
-                        "consumido": float(row[11] or 0),
-                        "cantidad_stock": float(row[10] or 0),
-                        "cantidad_consumida": float(row[11] or 0),
+                        "tipo_producto": row[6],
+                        "id_material": row[7],
+                        "cubicaje": float(row[8] or 0),
+                        "consumido": float(row[9] or 0),
+                        "cantidad_stock": float(row[8] or 0),
+                        "cantidad_consumida": float(row[9] or 0),
                         "restante": restante,
                     }
                 )
@@ -578,22 +574,20 @@ class Colector:
                     PaletDB.codigo,
                     PaletDB.ubicacion_id,
                     UbicacionDB.instalacion_id,
-                    PaletDB.duela_tipo_id,
-                    DuelaDB.tipo_producto_id,
-                    DuelaDB.material_id,
+                    PaletDB.tipo_producto_id,
+                    PaletDB.material_id,
                     PaletDB.cubicaje,
                     PaletDB.consumido,
                 )
                 .select_from(PaletDB)
                 .join(UbicacionDB, UbicacionDB.id == PaletDB.ubicacion_id, isouter=True)
-                .join(DuelaDB, DuelaDB.id == PaletDB.duela_tipo_id, isouter=True)
                 .where(PaletDB.linea_entrada_id.is_(None))
                 .where(PaletDB.procesado.is_(False))
             )
             if tipo_producto_id:
-                stmt = stmt.where(DuelaDB.tipo_producto_id == tipo_producto_id)
+                stmt = stmt.where(PaletDB.tipo_producto_id == tipo_producto_id)
             if material_id:
-                stmt = stmt.where(DuelaDB.material_id == material_id)
+                stmt = stmt.where(PaletDB.material_id == material_id)
             if ubicacion_id:
                 stmt = stmt.where(UbicacionDB.instalacion_id == ubicacion_id)
 
@@ -608,13 +602,12 @@ class Colector:
                     "codigo": p[1] or "",
                     "ubicacion_id": p[2],
                     "id_instalacion": p[3],
-                    "duela_tipo_id": p[4],
-                    "tipo_producto": p[5],
-                    "id_material": p[6],
-                    "cubicaje": float(p[7] or 0),
-                    "consumido": float(p[8] or 0),
-                    "cantidad_stock": float(p[7] or 0),
-                    "cantidad_consumida": float(p[8] or 0),
+                    "tipo_producto": p[4],
+                    "id_material": p[5],
+                    "cubicaje": float(p[6] or 0),
+                    "consumido": float(p[7] or 0),
+                    "cantidad_stock": float(p[6] or 0),
+                    "cantidad_consumida": float(p[7] or 0),
                     "restante": restante,
                 })
 
@@ -722,7 +715,6 @@ class Colector:
             palet_nuevo = PaletDB(
                 codigo=codigo_nuevo,
                 linea_entrada_id=None,
-                duela_tipo_id=palet_origen.duela_tipo_id,
                 tipo_producto_id=palet_origen.tipo_producto_id,
                 material_id=palet_origen.material_id,
                 cubicaje=cubicaje_val,
@@ -1262,10 +1254,12 @@ class Colector:
 
     def inventario_duelas(self) -> dict:
         with DB.crear_sesion() as session:
-            palets_stmt = (
+            stmt = (
                 select(
-                    PaletDB.duela_tipo_id,
-                    DuelaDB.descripcion,
+                    PaletDB.tipo_producto_id,
+                    TipoProductoDB.descripcion,
+                    PaletDB.material_id,
+                    MaterialDB.descripcion,
                     UbicacionDB.id,
                     UbicacionDB.descripcion,
                     func.count(PaletDB.id).label("total_palets"),
@@ -1274,32 +1268,38 @@ class Colector:
                     func.coalesce(func.sum(PaletDB.cubicaje - PaletDB.consumido), 0).label("total_restante"),
                 )
                 .select_from(PaletDB)
+                .join(TipoProductoDB, TipoProductoDB.id == PaletDB.tipo_producto_id, isouter=True)
+                .join(MaterialDB, MaterialDB.id == PaletDB.material_id, isouter=True)
                 .join(UbicacionDB, UbicacionDB.id == PaletDB.ubicacion_id, isouter=True)
-                .join(DuelaDB, DuelaDB.id == PaletDB.duela_tipo_id, isouter=True)
                 .where(PaletDB.procesado == False)
+                .where(func.upper(TipoProductoDB.tipo) == "DUELA")
                 .group_by(
-                    PaletDB.duela_tipo_id,
-                    DuelaDB.descripcion,
+                    PaletDB.tipo_producto_id,
+                    TipoProductoDB.descripcion,
+                    PaletDB.material_id,
+                    MaterialDB.descripcion,
                     UbicacionDB.id,
                     UbicacionDB.descripcion,
                 )
-                .order_by(DuelaDB.descripcion, UbicacionDB.descripcion)
+                .order_by(TipoProductoDB.descripcion, MaterialDB.descripcion, UbicacionDB.descripcion)
             )
-            palets_rows = session.exec(palets_stmt).all()
+            rows = session.exec(stmt).all()
 
             return {
-                "palets_por_duela_ubicacion": [
+                "palets_por_tipo_material_ubicacion": [
                     {
-                        "duela_tipo_id": row[0],
-                        "duela": row[1] or "Sin tipo",
-                        "ubicacion_id": row[2],
-                        "ubicacion": row[3] or "Sin ubicación",
-                        "total_palets": int(row[4] or 0),
-                        "total_cubicaje": float(row[5] or 0),
-                        "total_consumido": float(row[6] or 0),
-                        "total_restante": float(row[7] or 0),
+                        "tipo_producto_id": row[0],
+                        "tipo_producto": row[1] or "Sin tipo",
+                        "material_id": row[2],
+                        "material": row[3] or "Sin material",
+                        "ubicacion_id": row[4],
+                        "ubicacion": row[5] or "Sin ubicación",
+                        "total_palets": int(row[6] or 0),
+                        "total_cubicaje": float(row[7] or 0),
+                        "total_consumido": float(row[8] or 0),
+                        "total_restante": float(row[9] or 0),
                     }
-                    for row in palets_rows
+                    for row in rows
                 ],
             }
 
@@ -1639,10 +1639,6 @@ class Colector:
             repo = self.repo_materiales_maestro
             maestro = self.maestros.materiales
             objeto = MaterialDTO
-        elif tabla == "duelas":
-            repo = self.repo_duelas
-            maestro = self.maestros.duelas
-            objeto = DuelaDTO
         elif tabla == "entradas":
             repo = self.repo_entradas
             maestro = self.maestros.entradas

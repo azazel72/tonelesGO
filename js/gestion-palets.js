@@ -1,6 +1,7 @@
 
 // ====== CREAR VENTANA PALETS ======
 function openPaletsWin() {
+  if (!asegurarFabricacionCargada("tipos_producto", "palets")) return null;
   const wb = comprobarVentanaAbierta("palets");
   if (wb) return wb;
 
@@ -20,7 +21,15 @@ function openPaletsWin() {
     })
   );
 
-  const duelasDict = Object.values(DATOS?.maestros?.duelas ?? {}).map(
+  const tiposProductoDict = Object.values(DATOS?.fabricacion?.tipos_producto ?? {})
+    .filter((tipo) => String(tipo?.tipo || "").toUpperCase() === "DUELA")
+    .map(({ id, descripcion, codigo, ...resto }) => ({
+      ...resto, id, descripcion, codigo,
+      value: id,
+      label: descripcion || codigo || String(id),
+    }));
+
+  const materialesDict = Object.values(DATOS?.maestros?.materiales ?? {}).map(
     ({ id, descripcion, ...resto }) => ({
       ...resto, id, descripcion,
       value: id,
@@ -93,11 +102,11 @@ function openPaletsWin() {
             formatter: cell => DATOS?.maestros?.ubicaciones?.[cell.getValue()]?.descripcion ?? cell.getValue(),
           },
           {
-            title: "Tipo duela",
-            field: "duela_tipo_id",
+            title: "Tipo producto",
+            field: "tipo_producto_id",
             editor: "list",
             editorParams: {
-              values: duelasDict,
+              values: tiposProductoDict,
               clearable: true,
               autocomplete: true,
               allowEmpty: true,
@@ -106,19 +115,21 @@ function openPaletsWin() {
             },
             editable: tablaEditable,
             cssClass: "filtrable",
-            formatter: cell => DATOS?.maestros?.duelas?.[cell.getValue()]?.descripcion ?? cell.getValue(),
-          },
-          {
-            title: "Tipo producto",
-            field: "tipo_producto_id",
-            editable: false,
-            cssClass: "filtrable",
             formatter: cell => DATOS?.fabricacion?.tipos_producto?.[cell.getValue()]?.descripcion ?? cell.getValue(),
           },
           {
             title: "Material",
             field: "material_id",
-            editable: false,
+            editor: "list",
+            editorParams: {
+              values: materialesDict,
+              clearable: true,
+              autocomplete: true,
+              allowEmpty: true,
+              listOnEmpty: true,
+              freetext: false,
+            },
+            editable: tablaEditable,
             cssClass: "filtrable",
             formatter: cell => DATOS?.maestros?.materiales?.[cell.getValue()]?.descripcion ?? cell.getValue(),
           },

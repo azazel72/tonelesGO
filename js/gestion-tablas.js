@@ -243,7 +243,6 @@ function cerrarVentanasMaestros() {
     "estados_trazabilidad_fabricacion",
     "estados_palets",
     "materiales",
-    "duelas",
     "entradas",
     "lineas_entrada",
     "entradas_flejes",

@@ -38,7 +38,7 @@ function openCubicajeWin() {
         columns: [
           { title: "Tipo producto ID", field: "tipo_producto_id", width: 130, hozAlign: "right" },
           {
-            title: "Tipo de duela",
+            title: "Tipo DUELA",
             field: "tipo_producto_id",
             cssClass: "filtrable",
             formatter: (cell) => DATOS?.fabricacion?.tipos_producto?.[cell.getValue()]?.descripcion ?? cell.getValue(),

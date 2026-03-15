@@ -55,10 +55,6 @@ window.onload = () => {
             await openMaterialesWin();
         },
 
-        async "ver-duelas"() {
-            await openDuelasWin();
-        },
-
         async "ver-entradas"() {
             await openEntradasWin();
         },
@@ -171,7 +167,6 @@ window.onload = () => {
         estados_palets: openEstadosPaletsWin,
         puestos_trabajo: openPuestosTrabajoWin,
         materiales: openMaterialesWin,
-        duelas: openDuelasWin,
         entradas: openEntradasWin,
         lineas_entrada: openLineasEntradaWin,
         entradas_flejes: openEntradasFlejesWin,
@@ -191,6 +186,7 @@ window.onload = () => {
         consumos: openConsumosWin,
         planificacion_entradas: openPlanificacionEntradasWin,
         cuadrantes: openCuadrantesWin,
+        inventario_duelas: openInventarioDuelasWin,
         inventario_flejes: openInventarioFlejesWin,
     };
 

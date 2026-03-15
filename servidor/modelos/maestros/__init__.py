@@ -12,7 +12,6 @@ from .usuario_db import UsuarioDB
 from .rol_db import RolDB
 from .puesto_trabajo_db import PuestoTrabajoDB
 from .material_db import MaterialDB
-from .duela_db import DuelaDB
 from .entrada_db import EntradaDB
 from .linea_entrada_db import LineaEntradaDB
 from .palet_db import PaletDB
@@ -37,7 +36,6 @@ __all__ = [
     "RolDB",
     "PuestoTrabajoDB",
     "MaterialDB",
-    "DuelaDB",
     "EntradaDB",
     "LineaEntradaDB",
     "PaletDB",

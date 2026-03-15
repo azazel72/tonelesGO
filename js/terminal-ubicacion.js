@@ -8,13 +8,20 @@ function prepararEventosUbicacion() {
     const selMaterial = document.getElementById("crearstock-material");
     const selUbicacion = document.getElementById("crearstock-ubicacion");
     const btnCrear = document.getElementById("crearstock-crear");
+    const selOrigen = document.getElementById("crearstock-origen");
+    const inputLote = document.getElementById("crearstock-lote");
+    const inputCubico = document.getElementById("crearstock-cubico");
 
     if (selTipo) selTipo.addEventListener("change", actualizarSelectorOrigenCrearStock);
     if (selMaterial) selMaterial.addEventListener("change", actualizarSelectorOrigenCrearStock);
     if (selUbicacion) selUbicacion.addEventListener("change", actualizarSelectorOrigenCrearStock);
+    if (selOrigen) selOrigen.addEventListener("change", actualizarEstadoBotonCrearStock);
+    if (inputLote) inputLote.addEventListener("input", actualizarEstadoBotonCrearStock);
+    if (inputCubico) inputCubico.addEventListener("input", actualizarEstadoBotonCrearStock);
     if (btnCrear) {
         btnCrear.disabled = true;
-        btnCrear.title = "Desactivado temporalmente";
+        btnCrear.title = "Completa los datos para crear el palet";
+        btnCrear.addEventListener("click", crearPaletDesdeStock);
     }
 }
 
@@ -88,7 +95,6 @@ function actualizarSelectorOrigenCrearStock() {
     const ubicacionId = Number(selUbicacion.value || 0);
 
     const palets = Object.values(terminalUbicacion.maestros?.palets || {});
-    const duelas = terminalUbicacion.maestros?.duelas || {};
     const materiales = terminalUbicacion.maestros?.materiales || {};
     const ubicaciones = terminalUbicacion.maestros?.ubicaciones || {};
 
@@ -96,10 +102,8 @@ function actualizarSelectorOrigenCrearStock() {
         .filter((p) => p?.linea_entrada_id == null)
         .filter((p) => !Boolean(p?.procesado))
         .filter((p) => {
-            const duela = duelas?.[p.duela_tipo_id];
-            if (!duela) return false;
-            if (tipoId && Number(duela.tipo_producto_id || 0) !== tipoId) return false;
-            if (materialId && Number(duela.material_id || 0) !== materialId) return false;
+            if (tipoId && Number(p.tipo_producto_id || 0) !== tipoId) return false;
+            if (materialId && Number(p.material_id || 0) !== materialId) return false;
             if (ubicacionId && Number(p.ubicacion_id || 0) !== ubicacionId) return false;
             return true;
         })
@@ -109,12 +113,12 @@ function actualizarSelectorOrigenCrearStock() {
     if (!filtrados.length) {
         selOrigen.innerHTML = `<option value="">Sin palets para este filtro</option>`;
         setEstadoCrearStock("No hay palets de origen para la selección actual.", "muted");
+        actualizarEstadoBotonCrearStock();
         return;
     }
 
     selOrigen.innerHTML += filtrados.map((p) => {
-        const duela = duelas?.[p.duela_tipo_id];
-        const material = materiales?.[duela?.material_id]?.descripcion || "";
+        const material = materiales?.[p.material_id]?.descripcion || "";
         const ubic = ubicaciones?.[p.ubicacion_id]?.descripcion || "";
         const restante = Math.max(Number(p.cubicaje || 0) - Number(p.consumido || 0), 0);
         const restoTxt = restante.toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 3 });
@@ -122,6 +126,23 @@ function actualizarSelectorOrigenCrearStock() {
     }).join("");
 
     setEstadoCrearStock(`${filtrados.length} palet(s) disponibles como origen.`, "muted");
+    actualizarEstadoBotonCrearStock();
+}
+
+function actualizarEstadoBotonCrearStock() {
+    const selOrigen = document.getElementById("crearstock-origen");
+    const inputLote = document.getElementById("crearstock-lote");
+    const inputCubico = document.getElementById("crearstock-cubico");
+    const btnCrear = document.getElementById("crearstock-crear");
+    if (!selOrigen || !inputLote || !inputCubico || !btnCrear) return;
+
+    const origenId = Number(selOrigen.value || 0);
+    const lote = String(inputLote.value || "").trim();
+    const cubicaje = Number.parseFloat(String(inputCubico.value || "").replace(",", "."));
+    const habilitado = Boolean(origenId) && Boolean(lote) && Number.isFinite(cubicaje) && cubicaje > 0;
+
+    btnCrear.disabled = !habilitado;
+    btnCrear.title = habilitado ? "" : "Completa los datos para crear el palet";
 }
 
 async function crearPaletDesdeStock() {
@@ -178,7 +199,8 @@ async function crearPaletDesdeStock() {
             tabla: "palets",
             codigo,
             linea_entrada_id: null,
-            duela_tipo_id: paletOrigen.duela_tipo_id ?? null,
+            tipo_producto_id: paletOrigen.tipo_producto_id ?? null,
+            material_id: paletOrigen.material_id ?? null,
             cubicaje,
             consumido: 0,
             estado: paletOrigen.estado ?? null,

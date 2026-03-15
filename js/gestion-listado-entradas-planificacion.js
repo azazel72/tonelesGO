@@ -1,5 +1,6 @@
 // ====== LISTADO ENTRADAS DESDE PLANIFICACION ======
 function openListadoEntradasPlanificacionWin(contexto = {}) {
+  if (!asegurarFabricacionCargada("tipos_producto", "listado_entradas_planificacion")) return null;
   const wb = comprobarVentanaAbierta("listado_entradas_planificacion");
   if (wb) {
     if (contexto.forceReload) {
@@ -154,8 +155,15 @@ function openListadoEntradasPlanificacionWin(contexto = {}) {
     return acc;
   }, {});
 
-  const duelasValores = Object.values(DATOS?.maestros?.duelas ?? {}).reduce((acc, duela) => {
-    acc[duela.id] = duela.descripcion;
+  const tiposProductoValores = Object.values(DATOS?.fabricacion?.tipos_producto ?? {})
+    .filter((tipo) => String(tipo?.tipo || "").toUpperCase() === "DUELA")
+    .reduce((acc, tipo) => {
+    acc[tipo.id] = tipo.descripcion || tipo.codigo || String(tipo.id);
+    return acc;
+  }, {});
+
+  const materialesValores = Object.values(DATOS?.maestros?.materiales ?? {}).reduce((acc, material) => {
+    acc[material.id] = material.descripcion;
     return acc;
   }, {});
 
@@ -270,12 +278,12 @@ function openListadoEntradasPlanificacionWin(contexto = {}) {
     columns: [
       { title: "ID", field: "id", width: 70, hozAlign: "right", cssClass: "filtrable" },
       {
-        title: "Duela",
-        field: "duela_id",
+        title: "Tipo producto",
+        field: "tipo_producto_id",
         editor: "list",
         editable: (cell) => !lineasBloqueadas && tablaEditable(cell),
         editorParams: {
-          values: duelasValores,
+          values: tiposProductoValores,
           clearable: true,
           autocomplete: true,
           allowEmpty: true,
@@ -285,10 +293,26 @@ function openListadoEntradasPlanificacionWin(contexto = {}) {
         formatter: (cell) => {
           const id = cell.getValue();
           if (id === null || id === undefined || id === "") return "";
-          const duelas = DATOS.maestros?.duelas ?? {};
-          const key = Number(id);
-          const duela = Number.isNaN(key) ? null : duelas[key];
-          return duela?.descripcion ?? "";
+          return DATOS?.fabricacion?.tipos_producto?.[id]?.descripcion ?? "";
+        },
+      },
+      {
+        title: "Material",
+        field: "material_id",
+        editor: "list",
+        editable: (cell) => !lineasBloqueadas && tablaEditable(cell),
+        editorParams: {
+          values: materialesValores,
+          clearable: true,
+          autocomplete: true,
+          allowEmpty: true,
+          listOnEmpty: true,
+        },
+        cssClass: "filtrable",
+        formatter: (cell) => {
+          const id = cell.getValue();
+          if (id === null || id === undefined || id === "") return "";
+          return DATOS?.maestros?.materiales?.[id]?.descripcion ?? "";
         },
       },
       { title: "Bultos", field: "bultos", width: 90, hozAlign: "right", editor: "number", editable: (cell) => !lineasBloqueadas && tablaEditable(cell), cssClass: "filtrable" },
@@ -552,6 +576,8 @@ function openListadoEntradasPlanificacionWin(contexto = {}) {
     }
     const rowData = {
       entrada_id: entradaSeleccionada.id,
+      tipo_producto_id: null,
+      material_id: null,
       bultos: 0,
       kilos: 0,
       bultos_entregados: 0,

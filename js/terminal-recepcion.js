@@ -16,27 +16,30 @@ function prepararEventosRecepcion() {
     });
 }
 
-// Cache sencillo para maestros que necesitamos mostrar (proveedores, duelas/materiales)
+// Cache sencillo para maestros que necesitamos mostrar en recepción.
 const terminalMaestros = {
   proveedores: null,
-  duelas: null,
+  materiales: null,
+  tipos_producto: null,
 };
 let entradaRecepcionActualId = null;
 
 async function asegurarMaestrosTerminal() {
   // Si ya los tenemos, no hacemos nada
-  if (terminalMaestros.proveedores && terminalMaestros.duelas) return;
+  if (terminalMaestros.proveedores && terminalMaestros.materiales && terminalMaestros.tipos_producto) return;
   try {
-    const resp = await wsRequest("maestros", {});
+    const [resp, fabricacion] = await Promise.all([wsRequest("maestros", {}), wsRequest("fabricacion", {})]);
     if (resp && resp.proveedores) terminalMaestros.proveedores = resp.proveedores;
-    if (resp && resp.duelas) terminalMaestros.duelas = resp.duelas;
+    if (resp && resp.materiales) terminalMaestros.materiales = resp.materiales;
+    if (fabricacion && fabricacion.tipos_producto) terminalMaestros.tipos_producto = fabricacion.tipos_producto;
     if (!terminalMaestros.proveedores) terminalMaestros.proveedores = {};
-    if (!terminalMaestros.duelas) terminalMaestros.duelas = {};
+    if (!terminalMaestros.materiales) terminalMaestros.materiales = {};
+    if (!terminalMaestros.tipos_producto) terminalMaestros.tipos_producto = {};
   } catch (err) {
     console.error("No se pudieron cargar maestros para terminal:", err);
-    // Fallback vacío para no romper el pintado
     terminalMaestros.proveedores = terminalMaestros.proveedores || {};
-    terminalMaestros.duelas = terminalMaestros.duelas || {};
+    terminalMaestros.materiales = terminalMaestros.materiales || {};
+    terminalMaestros.tipos_producto = terminalMaestros.tipos_producto || {};
   }
 }
 
@@ -111,7 +114,7 @@ function seleccionarContenidoEntrada(fila) {
 }
 
 function verificarLineaEntradaRecepcion(fila) {
-  const duela = fila.dataset.duelaNombre || fila.children?.[0]?.textContent || "";
+  const descripcion = fila.dataset.lineaDescripcion || fila.children?.[0]?.textContent || "";
   const bultosPrevistos = fila.dataset.bultos || "0";
   const kilosPrevistos = fila.dataset.kilos || "0";
   const bultosEntregados = fila.dataset.bultosEntregados || bultosPrevistos;
@@ -122,7 +125,7 @@ function verificarLineaEntradaRecepcion(fila) {
   const bultosRec = document.getElementById("recepcion-bultos-recibidos");
   const btnConfirmar = document.getElementById("recepcion-confirmar-verificacion");
 
-  if (material) material.textContent = duela;
+  if (material) material.textContent = descripcion;
   if (bultosPrev) bultosPrev.value = bultosPrevistos;
   if (kilosPrev) kilosPrev.value = kilosPrevistos;
   if (bultosRec) bultosRec.value = bultosEntregados;
@@ -160,16 +163,17 @@ function actualizarTablaLineas(lineas) {
   lineas.forEach((l) => {
     const tr = document.createElement("tr");
     tr.dataset.lineaId = l.id ?? "";
-    tr.dataset.duelaId = l.duela_id ?? "";
+    tr.dataset.tipoProductoId = l.tipo_producto_id ?? "";
+    tr.dataset.materialId = l.material_id ?? "";
     tr.dataset.bultos = l.bultos ?? 0;
     tr.dataset.kilos = l.kilos ?? 0;
     tr.dataset.bultosEntregados = l.bultos_entregados ?? 0;
-    const duela =
-      terminalMaestros.duelas?.[l.duela_id]?.descripcion ||
-      (typeof l.duela_id !== "undefined" ? String(l.duela_id) : "");
-    tr.dataset.duelaNombre = duela;
+    const tipo = terminalMaestros.tipos_producto?.[l.tipo_producto_id]?.descripcion || "";
+    const material = terminalMaestros.materiales?.[l.material_id]?.descripcion || "";
+    const descripcion = [tipo, material].filter(Boolean).join(" | ");
+    tr.dataset.lineaDescripcion = descripcion;
     tr.innerHTML = `
-      <td>${duela}</td>
+      <td>${descripcion}</td>
       <td>${l.kilos ?? ""}</td>
       <td>${l.bultos ?? ""}</td>
       <td><i class="bi bi-check-circle"></i></td>

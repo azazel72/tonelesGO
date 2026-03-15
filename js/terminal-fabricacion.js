@@ -258,7 +258,6 @@ const terminalFabricacion = {
     estados_trazabilidad_fabricacion: null,
     tipos_producto: null,
     materiales: null,
-    duelas: null,
     instalaciones: null,
     ubicaciones: null,
     palets: null,
@@ -277,7 +276,6 @@ async function refrescarMaestrosFabricacion() {
         terminalFabricacion.clientes = maestros?.clientes || {};
         terminalFabricacion.estados_trazabilidad_fabricacion = maestros?.estados_trazabilidad_fabricacion || {};
         terminalFabricacion.materiales = maestros?.materiales || {};
-        terminalFabricacion.duelas = maestros?.duelas || {};
         terminalFabricacion.instalaciones = maestros?.instalaciones || {};
         terminalFabricacion.ubicaciones = maestros?.ubicaciones || {};
         terminalFabricacion.palets = maestros?.palets || {};
@@ -295,7 +293,6 @@ async function asegurarDatosFabricacionTerminal() {
         terminalFabricacion.estados_trazabilidad_fabricacion &&
         terminalFabricacion.tipos_producto &&
         terminalFabricacion.materiales &&
-        terminalFabricacion.duelas &&
         terminalFabricacion.ubicaciones &&
         terminalFabricacion.usuarios
     ) return;
@@ -304,7 +301,6 @@ async function asegurarDatosFabricacionTerminal() {
         terminalFabricacion.clientes = maestros?.clientes || {};
         terminalFabricacion.estados_trazabilidad_fabricacion = maestros?.estados_trazabilidad_fabricacion || {};
         terminalFabricacion.materiales = maestros?.materiales || {};
-        terminalFabricacion.duelas = maestros?.duelas || {};
         terminalFabricacion.instalaciones = maestros?.instalaciones || {};
         terminalFabricacion.ubicaciones = maestros?.ubicaciones || {};
         terminalFabricacion.palets = maestros?.palets || {};
@@ -321,7 +317,6 @@ async function asegurarDatosFabricacionTerminal() {
         terminalFabricacion.estados_trazabilidad_fabricacion = terminalFabricacion.estados_trazabilidad_fabricacion || {};
         terminalFabricacion.tipos_producto = terminalFabricacion.tipos_producto || {};
         terminalFabricacion.materiales = terminalFabricacion.materiales || {};
-        terminalFabricacion.duelas = terminalFabricacion.duelas || {};
         terminalFabricacion.instalaciones = terminalFabricacion.instalaciones || {};
         terminalFabricacion.ubicaciones = terminalFabricacion.ubicaciones || {};
         terminalFabricacion.palets = terminalFabricacion.palets || {};
@@ -336,10 +331,8 @@ async function asegurarDatosFabricacionTerminal() {
 
 function resolverTipoDuelaDesdeConsumos(tipoBotaId, materialId = null) {
     const consumos = Object.values(terminalFabricacion.consumos || {});
-    const duelas = Object.values(terminalFabricacion.duelas || {});
     const tipos = terminalFabricacion.tipos_producto || {};
     const botaIdNum = Number(tipoBotaId || 0);
-    const materialIdNum = Number(materialId || 0);
     if (!botaIdNum) return null;
 
     const candidatos = consumos
@@ -351,12 +344,7 @@ function resolverTipoDuelaDesdeConsumos(tipoBotaId, materialId = null) {
         });
 
     if (!candidatos.length) return null;
-    if (!materialIdNum) return candidatos[0];
-
-    const candidatoPorMaterial = candidatos.find((tipoDuelaId) =>
-        duelas.some((d) => Number(d?.tipo_producto_id || 0) === tipoDuelaId && Number(d?.material_id || 0) === materialIdNum)
-    );
-    return candidatoPorMaterial || candidatos[0];
+    return candidatos[0];
 }
 
 async function cargarOrdenesFabricacion(opciones = {}) {

@@ -22,7 +22,6 @@ const ACCIONES_PERMISO_GESTION = {
     "ver-instalaciones": [],
     "ver-ubicaciones": [],
     "ver-materiales": [],
-    "ver-duelas": [],
     "ver-entradas": { permisos: [], marcarCandado: true },
     "ver-lineas-entrada": { permisos: [], marcarCandado: true },
     "ver-entradas-flejes": [],

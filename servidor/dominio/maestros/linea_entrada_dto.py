@@ -6,7 +6,8 @@ from servidor.modelos import LineaEntradaDB
 class LineaEntradaDTO(BaseModel):
     id: int | None
     entrada_id: int
-    duela_id: int
+    tipo_producto_id: int | None = None
+    material_id: int | None = None
     bultos: int = 0
     kilos: float = 0
     bultos_entregados: int = 0
@@ -16,7 +17,8 @@ class LineaEntradaDTO(BaseModel):
         return LineaEntradaDTO(
             id=linea_db.id,
             entrada_id=linea_db.entrada_id,
-            duela_id=linea_db.duela_id,
+            tipo_producto_id=linea_db.tipo_producto_id,
+            material_id=linea_db.material_id,
             bultos=linea_db.bultos,
             kilos=linea_db.kilos,
             bultos_entregados=linea_db.bultos_entregados,
@@ -27,7 +29,8 @@ class LineaEntradaDTO(BaseModel):
         return LineaEntradaDB(
             id=self.id,
             entrada_id=self.entrada_id,
-            duela_id=self.duela_id,
+            tipo_producto_id=self.tipo_producto_id,
+            material_id=self.material_id,
             bultos=self.bultos,
             kilos=self.kilos,
             bultos_entregados=self.bultos_entregados,

@@ -1,5 +1,7 @@
 function openInventarioDuelasWin() {
   const KEY = "inventario_duelas";
+  if (!asegurarFabricacionCargada("tipos_producto", KEY)) return null;
+
   const wb = comprobarVentanaAbierta(KEY);
   if (wb) return wb;
 
@@ -10,98 +12,179 @@ function openInventarioDuelasWin() {
     class: "btn btn-sm btn-outline-primary",
     content: "Actualizar",
   });
-  const selectorAgrupacion = crearElemento("select", {
-    id: "u-agrupacion-inventario-duelas",
-    class: "form-select form-select-sm",
-    style: "width:auto;",
+  const btnPlegar = crearElemento("button", {
+    id: "u-plegar-inventario-duelas",
+    class: "btn btn-sm btn-outline-secondary",
+    content: "Plegar todo",
   });
-  selectorAgrupacion.innerHTML = `
-    <option value="duela">Agrupar por duela</option>
-    <option value="ubicacion">Agrupar por ubicación</option>
+  const switches = crearElemento("div", {
+    class: "d-flex gap-3 align-items-center flex-wrap ms-auto",
+  });
+  switches.innerHTML = `
+    <div class="form-check form-switch mb-0">
+      <input class="form-check-input" type="checkbox" id="u-agrupacion-duela" checked>
+      <label class="form-check-label" for="u-agrupacion-duela">Tipo de duela</label>
+    </div>
+    <div class="form-check form-switch mb-0">
+      <input class="form-check-input" type="checkbox" id="u-agrupacion-madera">
+      <label class="form-check-label" for="u-agrupacion-madera">Tipo de madera</label>
+    </div>
+    <div class="form-check form-switch mb-0">
+      <input class="form-check-input" type="checkbox" id="u-agrupacion-instalacion">
+      <label class="form-check-label" for="u-agrupacion-instalacion">Instalación</label>
+    </div>
   `;
   cabecera.appendChild(btnActualizar);
-  cabecera.appendChild(selectorAgrupacion);
+  cabecera.appendChild(btnPlegar);
+  cabecera.appendChild(switches);
   contenedor.appendChild(cabecera);
 
   const cuerpo = crearElemento("div", { class: "p-2 overflow-auto", style: "height: calc(100% - 52px);" });
   cuerpo.innerHTML = `
-    <h6 class="mt-1">Duelas activas por ubicación (agrupado por duela)</h6>
+    <h6 class="mt-1">Palets de madera por tipo de duela, madera e instalación</h6>
     <table class="table table-sm table-striped" id="tabla-informe-palets-duela">
-      <thead><tr><th>Ubicación</th><th class="text-end">Total palets</th><th class="text-end">Cubicaje</th><th class="text-end">Consumido</th><th class="text-end">Restante</th></tr></thead>
+      <thead>
+        <tr>
+          <th>Grupo</th>
+          <th>Detalle</th>
+          <th class="text-end">Palets</th>
+          <th class="text-end">Cubicaje</th>
+          <th class="text-end">Consumido</th>
+          <th class="text-end">Restante</th>
+        </tr>
+      </thead>
       <tbody></tbody>
     </table>
   `;
   contenedor.appendChild(cuerpo);
 
   const nueva = crearWinBox(KEY, contenedor, {
-    title: "Inventario Duelas",
+    title: "Inventario de maderas",
     x: 200,
     y: 120,
-    width: "900px",
-    height: "560px",
+    width: "1020px",
+    height: "600px",
   });
   windowsRegistry.set(KEY, { wb: nueva, table: null });
 
-  btnActualizar.addEventListener("click", () => cargarInformeMaterial(cuerpo, selectorAgrupacion.value));
-  selectorAgrupacion.addEventListener("change", () => cargarInformeMaterial(cuerpo, selectorAgrupacion.value));
-  cargarInformeMaterial(cuerpo, selectorAgrupacion.value);
+  const obtenerAgrupacion = () => ({
+    tipo: Boolean(contenedor.querySelector("#u-agrupacion-duela")?.checked),
+    material: Boolean(contenedor.querySelector("#u-agrupacion-madera")?.checked),
+    instalacion: Boolean(contenedor.querySelector("#u-agrupacion-instalacion")?.checked),
+  });
+  const aplicarEstadoGrupos = (contraido) => {
+    cuerpo.querySelectorAll("tr[data-grupo]").forEach((filaGrupo) => {
+      const grupo = filaGrupo.dataset.grupo;
+      filaGrupo.dataset.contraido = contraido ? "1" : "0";
+      filaGrupo.classList.toggle("inventario-grupo-contraido", contraido);
+      cuerpo.querySelectorAll(`tr[data-detalle-grupo="${grupo}"]`).forEach((fila) => {
+        fila.hidden = contraido;
+      });
+    });
+    btnPlegar.textContent = contraido ? "Desplegar todo" : "Plegar todo";
+    btnPlegar.dataset.contraido = contraido ? "1" : "0";
+  };
+  const recargar = () => cargarInventarioDuelas(cuerpo, obtenerAgrupacion());
+  btnActualizar.addEventListener("click", recargar);
+  btnPlegar.addEventListener("click", () => {
+    const contraido = btnPlegar.dataset.contraido === "1";
+    aplicarEstadoGrupos(!contraido);
+  });
+  contenedor.querySelectorAll(".form-check-input").forEach((input) => {
+    input.addEventListener("change", recargar);
+  });
+  cuerpo.addEventListener("click", (event) => {
+    const filaGrupo = event.target.closest("tr[data-grupo]");
+    if (!filaGrupo) return;
+    const grupo = filaGrupo.dataset.grupo;
+    const contraido = filaGrupo.dataset.contraido === "1";
+    filaGrupo.dataset.contraido = contraido ? "0" : "1";
+    filaGrupo.classList.toggle("inventario-grupo-contraido", !contraido);
+    cuerpo.querySelectorAll(`tr[data-detalle-grupo="${grupo}"]`).forEach((fila) => {
+      fila.hidden = !contraido;
+    });
+    const hayExpandido = Array.from(cuerpo.querySelectorAll("tr[data-grupo]")).some((fila) => fila.dataset.contraido !== "1");
+    btnPlegar.textContent = hayExpandido ? "Plegar todo" : "Desplegar todo";
+    btnPlegar.dataset.contraido = hayExpandido ? "0" : "1";
+  });
+  recargar();
   return nueva;
 }
 
-async function cargarInformeMaterial(contenedor, agrupacion = "duela") {
-  const tbodyPalets = contenedor.querySelector("#tabla-informe-palets-duela tbody");
-  if (!tbodyPalets) return;
-  tbodyPalets.innerHTML = `<tr><td colspan="5">Cargando...</td></tr>`;
+async function cargarInventarioDuelas(contenedor, agrupacion = { tipo: true, material: true, instalacion: false }) {
+  const tbody = contenedor.querySelector("#tabla-informe-palets-duela tbody");
+  if (!tbody) return;
+  tbody.innerHTML = `<tr><td colspan="6">Cargando...</td></tr>`;
 
   try {
     const data = await wsRequest("inventario_duelas", {});
-    const filas = data?.palets_por_duela_ubicacion || [];
+    const filas = data?.palets_por_tipo_material_ubicacion || [];
 
     if (!filas.length) {
-      tbodyPalets.innerHTML = `<tr><td colspan="5">Sin datos</td></tr>`;
+      tbody.innerHTML = `<tr><td colspan="6">Sin datos</td></tr>`;
       return;
     }
 
-    let html = "";
-    const agruparPorDuela = agrupacion !== "ubicacion";
     const grupos = new Map();
-    for (const r of filas) {
-      const clave = agruparPorDuela ? (r.duela ?? "Sin tipo") : (r.ubicacion ?? "Sin ubicación");
+    for (const fila of filas) {
+      const partesGrupo = [];
+      if (agrupacion.tipo) partesGrupo.push(fila.tipo_producto || "Sin tipo");
+      if (agrupacion.material) partesGrupo.push(fila.material || "Sin material");
+      if (agrupacion.instalacion) partesGrupo.push(fila.ubicacion || "Sin ubicación");
+      const clave = partesGrupo.length ? partesGrupo.join(" | ") : "Total";
       if (!grupos.has(clave)) grupos.set(clave, []);
-      grupos.get(clave).push(r);
+      grupos.get(clave).push(fila);
     }
 
-    for (const [clave, items] of grupos.entries()) {
-      const sumPalets = items.reduce((acc, x) => acc + Number(x.total_palets || 0), 0);
-      const sumCubicaje = items.reduce((acc, x) => acc + Number(x.total_cubicaje || 0), 0);
-      const sumConsumido = items.reduce((acc, x) => acc + Number(x.total_consumido || 0), 0);
-      const sumRestante = items.reduce((acc, x) => acc + Number(x.total_restante || 0), 0);
+    let html = "";
+    let indiceGrupo = 0;
+    for (const [grupo, items] of grupos.entries()) {
+      indiceGrupo += 1;
+      const grupoId = `grupo-${indiceGrupo}`;
+      const totalPalets = items.reduce((acc, x) => acc + Number(x.total_palets || 0), 0);
+      const totalCubicaje = items.reduce((acc, x) => acc + Number(x.total_cubicaje || 0), 0);
+      const totalConsumido = items.reduce((acc, x) => acc + Number(x.total_consumido || 0), 0);
+      const totalRestante = items.reduce((acc, x) => acc + Number(x.total_restante || 0), 0);
 
       html += `
-        <tr class="table-secondary">
-          <td><strong>${clave}</strong></td>
-          <td class="text-end"><strong>${sumPalets.toLocaleString("es-ES")}</strong></td>
-          <td class="text-end"><strong>${sumCubicaje.toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 3 })}</strong></td>
-          <td class="text-end"><strong>${sumConsumido.toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 3 })}</strong></td>
-          <td class="text-end"><strong>${sumRestante.toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 3 })}</strong></td>
+        <tr class="table-secondary inventario-grupo" data-grupo="${grupoId}" data-contraido="0" style="cursor:pointer;">
+          <td><strong>${grupo}</strong></td>
+          <td></td>
+          <td class="text-end"><strong>${totalPalets.toLocaleString("es-ES")}</strong></td>
+          <td class="text-end"><strong>${totalCubicaje.toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 3 })}</strong></td>
+          <td class="text-end"><strong>${totalConsumido.toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 3 })}</strong></td>
+          <td class="text-end"><strong>${totalRestante.toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 3 })}</strong></td>
         </tr>
       `;
 
-      for (const r of items) {
+      for (const item of items) {
+        const partesDetalle = [];
+        if (!agrupacion.tipo) partesDetalle.push(item.tipo_producto || "Sin tipo");
+        if (!agrupacion.material) partesDetalle.push(item.material || "Sin material");
+        if (!agrupacion.instalacion) partesDetalle.push(item.ubicacion || "Sin ubicación");
+        const detalle = partesDetalle.join(" | ");
         html += `
-          <tr>
-            <td>${agruparPorDuela ? (r.ubicacion ?? "Sin ubicación") : (r.duela ?? "Sin tipo")}</td>
-            <td class="text-end">${Number(r.total_palets || 0).toLocaleString("es-ES")}</td>
-            <td class="text-end">${Number(r.total_cubicaje || 0).toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 3 })}</td>
-            <td class="text-end">${Number(r.total_consumido || 0).toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 3 })}</td>
-            <td class="text-end">${Number(r.total_restante || 0).toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 3 })}</td>
+          <tr data-detalle-grupo="${grupoId}">
+            <td></td>
+            <td>${detalle}</td>
+            <td class="text-end">${Number(item.total_palets || 0).toLocaleString("es-ES")}</td>
+            <td class="text-end">${Number(item.total_cubicaje || 0).toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 3 })}</td>
+            <td class="text-end">${Number(item.total_consumido || 0).toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 3 })}</td>
+            <td class="text-end">${Number(item.total_restante || 0).toLocaleString("es-ES", { minimumFractionDigits: 0, maximumFractionDigits: 3 })}</td>
           </tr>
         `;
       }
     }
-    tbodyPalets.innerHTML = html;
+
+    tbody.innerHTML = html;
+    const contenedorWin = tbody.closest(".overflow-auto");
+    const botonPlegar = contenedorWin?.previousElementSibling?.querySelector("#u-plegar-inventario-duelas");
+    if (botonPlegar) {
+      botonPlegar.textContent = "Plegar todo";
+      botonPlegar.dataset.contraido = "0";
+    }
   } catch (error) {
     console.error(error);
-    tbodyPalets.innerHTML = `<tr><td colspan="5">Error al cargar informe</td></tr>`;
+    tbody.innerHTML = `<tr><td colspan="6">Error al cargar inventario</td></tr>`;
   }
 }
