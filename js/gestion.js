@@ -91,6 +91,10 @@ window.onload = () => {
             setPantalla?.("gestion_fabricacion", { vista: "pedidos" });
             await openPedidosWin();
         },
+        async "ver-planificacion-pedidos"() {
+            setPantalla?.("gestion_fabricacion", { vista: "planificacion_pedidos" });
+            await openPlanificacionPedidosWin();
+        },
         async "ver-tipos-producto"() {
             await openTiposProductoWin();
         },
@@ -177,6 +181,7 @@ window.onload = () => {
         archivos_subidos: openArchivosSubidosWin,
         ambientes: openAmbientesWin,
         pedidos: openPedidosWin,
+        planificacion_pedidos: openPlanificacionPedidosWin,
         tipos_producto: openTiposProductoWin,
         fabricacion_semanal: openFabricacionSemanalWin,
         trazabilidad_procesado: openTrazabilidadProcesadoWin,
@@ -249,6 +254,7 @@ function respuesta_fabricacion(response) {
         DATOS.fabricacion = response.data;
         console.log("Fabricacion recibida:", DATOS.fabricacion);
         actualizarLineasFabricacionEditorOrdenes?.();
+        refrescarVentanasFabricacionGestion?.();
         if (window.__reloadKey) {
             const key = window.__reloadKey;
             window.__reloadKey = null;
@@ -257,6 +263,20 @@ function respuesta_fabricacion(response) {
     } else {
         alert("Error al recibir fabricacion: " + response.error);
     }
+}
+
+function refrescarVentanasFabricacionGestion() {
+    const pedidos = windowsRegistry.get("pedidos")?.table;
+    if (pedidos) {
+        pedidos.replaceData(Object.values(DATOS.fabricacion.pedidos || {}));
+    }
+
+    const fabricacionSemanal = windowsRegistry.get("fabricacion_semanal")?.table;
+    if (fabricacionSemanal) {
+        fabricacionSemanal.replaceData(Object.values(DATOS.fabricacion.fabricacion_semanal || {}));
+    }
+
+    refrescarPlanificacionPedidosWin?.();
 }
 
 function asegurarFabricacionCargada(key, reloadKey = key) {

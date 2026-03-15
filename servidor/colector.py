@@ -435,11 +435,35 @@ class Colector:
     #endregion
 
     #region Metodos Listados Fabricacion
-    def listar_pedidos(self, año: int | None = None):
+    def listar_pedidos(self, filtros: dict | None = None):
         with DB.crear_sesion() as session:
             statement = select(PedidoDB)
+            filtros = filtros or {}
+
+            año = filtros.get("año")
+            estados = [int(v) for v in (filtros.get("estados") or []) if str(v).strip() != ""]
+            clientes = [int(v) for v in (filtros.get("clientes") or []) if str(v).strip() != ""]
+            tipos_producto = [int(v) for v in (filtros.get("tipos_producto") or []) if str(v).strip() != ""]
+            material_id = filtros.get("material_id")
+            materiales = [int(v) for v in (filtros.get("materiales") or []) if str(v).strip() != ""]
+            fecha = filtros.get("fecha")
+
             if año:
-                statement = statement.where(extract("year", PedidoDB.fecha) == año)
+                statement = statement.where(extract("year", PedidoDB.fecha) == int(año))
+            if estados:
+                statement = statement.where(PedidoDB.estado.in_(estados))
+            if clientes:
+                statement = statement.where(PedidoDB.cliente_id.in_(clientes))
+            if tipos_producto:
+                statement = statement.where(PedidoDB.tipo_producto_id.in_(tipos_producto))
+            if materiales:
+                statement = statement.where(PedidoDB.material_id.in_(materiales))
+            elif material_id not in (None, ""):
+                statement = statement.where(PedidoDB.material_id == int(material_id))
+            if fecha not in (None, ""):
+                statement = statement.where(PedidoDB.fecha == fecha)
+
+            statement = statement.order_by(PedidoDB.fecha.desc(), PedidoDB.id.desc())
             ordenes = session.exec(statement).all()
             return [PedidoDTO.from_db(orden) for orden in ordenes]
 

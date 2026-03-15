@@ -7,6 +7,7 @@ from servidor.modelos import PedidoDB
 class PedidoDTO(BaseModel):
     id: int | None
     numero: str = ""
+    cliente_id: int | None = None
     tipo_producto_id: int | None = None
     material_id: int | None = None
     cantidad: int = 0
@@ -20,6 +21,7 @@ class PedidoDTO(BaseModel):
         return PedidoDTO(
             id=orden_db.id,
             numero=orden_db.numero,
+            cliente_id=orden_db.cliente_id,
             tipo_producto_id=orden_db.tipo_producto_id,
             material_id=orden_db.material_id,
             cantidad=orden_db.cantidad,
@@ -34,6 +36,7 @@ class PedidoDTO(BaseModel):
         return PedidoDB(
             id=self.id,
             numero=self.numero,
+            cliente_id=self.cliente_id,
             tipo_producto_id=self.tipo_producto_id,
             material_id=self.material_id,
             cantidad=self.cantidad,

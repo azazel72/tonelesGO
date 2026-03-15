@@ -9,8 +9,26 @@ div.contenedor-tabla {
 /* Que el contenedor del header centre el contenido */
 .tabulator .tabulator-col .tabulator-col-content {
   display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: center;
+  gap: 0.35rem;
+}
+
+.tabulator .tabulator-col .tabulator-col-title-holder {
+  width: 100%;
+  display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.tabulator .tabulator-header .tabulator-col .tabulator-header-filter {
+  width: 100%;
+}
+
+.tabulator .tabulator-header .tabulator-col .tabulator-header-filter input,
+.tabulator .tabulator-header .tabulator-col .tabulator-header-filter select {
+  width: 100%;
 }
 
 /* Nuestro bloque personalizado */

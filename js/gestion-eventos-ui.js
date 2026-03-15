@@ -6,6 +6,7 @@ async function getCellClick(e, cell) {
   const tabla = cell.getTable();
   const storeKey = tabla.DATA_STORE || "maestros";
   const store = DATOS?.[storeKey] ?? null;
+  const maestro = store?.[tabla.KEY] ?? null;
   const row = cell.getRow();
   switch (action) {
     case "guardar":
@@ -13,8 +14,8 @@ async function getCellClick(e, cell) {
       respuesta = await wsRequest("insertar_maestro", { tabla: tabla.KEY, ...datos });
       console.log(respuesta);
       if (respuesta?.id) {
-        if (store && store[tabla.KEY]) {
-          store[tabla.KEY][respuesta.id] = respuesta;
+        if (maestro) {
+          maestro[respuesta.id] = respuesta;
         }
         row.update(respuesta);
         row.reformat();
@@ -33,6 +34,9 @@ async function getCellClick(e, cell) {
         if (!confirm(`¿Eliminar ID ${id}?`)) return;
         respuesta = await wsRequest("eliminar_maestro", { tabla: tabla.KEY, id: id });
         if (respuesta?.id == id) {
+          if (maestro) {
+            delete maestro[id];
+          }
           row.delete();
           if (tabla.KEY === "pedidos") {
             actualizarLineasFabricacionEditorOrdenes?.();

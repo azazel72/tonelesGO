@@ -9,6 +9,7 @@ class PedidoDB(SQLModel, table=True):
 
     id: Optional[int] = Field(default=None, primary_key=True)
     numero: str = ""
+    cliente_id: int | None = None
     tipo_producto_id: int | None = None
     material_id: int | None = None
     cantidad: int = 0

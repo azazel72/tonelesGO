@@ -13,6 +13,13 @@ function openPedidosWin() {
       label: descripcion,
     })
   );
+  const clientesDict = Object.values(DATOS?.maestros?.clientes ?? {}).map(
+    ({ id, nombre, ...resto }) => ({
+      ...resto, id, nombre,
+      value: id,
+      label: nombre || String(id),
+    })
+  );
   const tiposDict = Object.values(DATOS?.fabricacion?.tipos_producto ?? {}).map(
     ({ id, descripcion, codigo, ...resto }) => ({
       ...resto, id, descripcion, codigo,
@@ -44,6 +51,29 @@ function openPedidosWin() {
         editable: false,
         columns: [
           { title:"ID", field:"id", width:70, hozAlign:"right"},
+          {
+            title: "Numero",
+            field: "numero",
+            editor: "input",
+            editable: tablaEditable,
+            cssClass: "filtrable",
+          },
+          {
+            title: "Cliente",
+            field: "cliente_id",
+            editor: "list",
+            editorParams: {
+              values: clientesDict,
+              clearable: true,
+              autocomplete: true,
+              allowEmpty: true,
+              listOnEmpty: true,
+              freetext: false,
+            },
+            editable: tablaEditable,
+            cssClass: "filtrable",
+            formatter: cell => DATOS?.maestros?.clientes?.[cell.getValue()]?.nombre ?? cell.getValue(),
+          },
           {
             title: "Descripcion",
             field: "descripcion",

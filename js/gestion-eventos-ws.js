@@ -6,9 +6,20 @@ function routeMessage(data) {
       const pending = pendingWsRequests.get(msg.request_id);
       if (pending) {
         pendingWsRequests.delete(msg.request_id);
-        pending.resolve(msg.data);
+        if (msg.error) {
+          const error = new Error(msg.error);
+          pending.reject(error);
+          alert(msg.error);
+        } else {
+          pending.resolve(msg.data);
+        }
         return;
       }
+    }
+    if (msg.error) {
+      console.error("Error servidor:", msg.error, msg);
+      alert(msg.error);
+      return;
     }
     (ACCIONES[msg.action] || ACCIONES.default)?.(msg);
   } catch (e) {

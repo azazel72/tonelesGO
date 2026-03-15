@@ -320,6 +320,8 @@ function agregarEventosTabla(wb, tabla, cabecera, configuracion) {
     const d = cell.getRow().getData();
     const f = cell.getField();
     const t = configuracion.KEY;
+    const storeKey = tabla.DATA_STORE || "maestros";
+    const store = DATOS?.[storeKey]?.[t] ?? null;
     const resultado = await wsRequest("modificar_maestro", { tabla: t, id: d.id, campo: f, valor: d[f], valores: d });
     console.log(resultado);
 
@@ -346,6 +348,9 @@ function agregarEventosTabla(wb, tabla, cabecera, configuracion) {
 
     if (resultado?.id != d.id) {
       alert("Error al guardar los cambios en el servidor.");
+    }
+    if (store && store[d.id]) {
+      store[d.id] = { ...store[d.id], ...cell.getRow().getData() };
     }
     if (t === "pedidos") {
       actualizarLineasFabricacionEditorOrdenes?.();

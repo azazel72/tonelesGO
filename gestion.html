@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="./css/gestion.css?v=20260309a">
   <link rel="stylesheet" href="./css/gestion-tablas.css?v=20260309a" />
   <link rel="stylesheet" href="./css/gestion-winbox.css?v=20260309a" />
+  <link rel="icon" type="image/png" href="./imagenes/iconos/tonel.png">
 
 </head>
 <body class="bg-light">
@@ -139,6 +140,10 @@
               Fabricacion
             </a>
             <ul class="dropdown-menu">
+              <li><a class="dropdown-item" href="#" data-action="ver-planificacion-pedidos">
+                <i class="bi bi-diagram-3 me-1"></i> Planificación pedidos
+              </a></li>
+              <li><hr class="dropdown-divider"></li>
               <li><a class="dropdown-item" href="#" data-action="ver-pedidos">
                 <i class="bi bi-clipboard-check me-1"></i> Ver pedidos
               </a></li>
@@ -218,7 +223,7 @@
   <!-- Pie fijo -->
   <footer id="bottombar" class="bg-dark text-white-50 text-center py-2 fixed-bottom small">
     Edita celdas para guardar, usa “Añadir” o el icono de papelera para borrar.
-    <span class="ms-2">Version 2.0</span>
+    <span class="ms-2">Version 2.0.1</span>
   </footer>
 
   <div id="login-overlay"class="overlay">
@@ -338,6 +343,7 @@
   <script src="./js/gestion-productos.js?v=20260309a"></script>
   <script src="./js/gestion-cubicaje.js?v=20260309a"></script>
   <script src="./js/gestion-pedidos.js?v=20260309a"></script>
+  <script src="./js/gestion-pedidos-fabricacion.js?v=20260315a"></script>
   <script src="./js/gestion-tipos-producto.js?v=20260309a"></script>
   <script src="./js/gestion-fabricacion-semanal.js?v=20260309a"></script>
   <script src="./js/gestion-trazabilidad-procesado.js?v=20260309a"></script>

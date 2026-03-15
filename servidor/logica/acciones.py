@@ -13,7 +13,7 @@ def obtener_acciones() -> Dict[str, any]:
         "agregar_planificacion_entradas": lambda ws, req: Colector.colector.agregar_planificacion_entradas(req.data.get("año")),
         "listar_entradas_planificacion": lambda ws, req: Colector.colector.listar_entradas_planificacion(req.data.get("año"), req.data.get("proveedor_id")),
         "listar_lineas_entrada": lambda ws, req: Colector.colector.listar_lineas_entrada(req.data.get("entrada_id")),
-        "listar_pedidos": lambda ws, req: Colector.colector.listar_pedidos(req.data.get("año")),
+        "listar_pedidos": lambda ws, req: Colector.colector.listar_pedidos(req.data or {}),
         "listar_fabricacion_semanal": lambda ws, req: Colector.colector.listar_fabricacion_semanal(req.data.get("pedido_id")),
         "listar_trazabilidad_fabricacion": lambda ws, req: Colector.colector.listar_trazabilidad_fabricacion(req.data.get("fabricacion_semanal_id")),
         "listar_palets_consumo": lambda ws, req: Colector.colector.listar_palets_consumo(),

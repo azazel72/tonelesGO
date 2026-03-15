@@ -151,11 +151,12 @@ function construirOrdenesFabricacionDict() {
 function getEtiquetaPedido(pedido) {
   if (!pedido) return "";
   const descripcion = (pedido.descripcion || "").trim();
+  const cliente = DATOS?.maestros?.clientes?.[pedido.cliente_id]?.nombre || "";
   const tipo = DATOS?.fabricacion?.tipos_producto?.[pedido.tipo_producto_id]?.descripcion || "";
   const material = DATOS?.maestros?.materiales?.[pedido.material_id]?.descripcion || "";
   const cantidad = Number.parseInt(String(pedido.cantidad ?? ""), 10);
   const cantidadTxt = Number.isFinite(cantidad) ? String(cantidad) : "";
-  const partes = [descripcion, tipo, material, cantidadTxt ? `Cant. ${cantidadTxt}` : ""].filter(Boolean);
+  const partes = [descripcion, cliente, tipo, material, cantidadTxt ? `Cant. ${cantidadTxt}` : ""].filter(Boolean);
   if (partes.length) return partes.join(" | ");
   return pedido.numero || pedido.descripcion || String(pedido.id);
 }
@@ -163,11 +164,12 @@ function getEtiquetaPedido(pedido) {
 function getEtiquetaPedidoSelector(pedido) {
   if (!pedido) return "";
   const descripcion = (pedido.descripcion || "").trim();
+  const cliente = DATOS?.maestros?.clientes?.[pedido.cliente_id]?.nombre || "";
   const tipo = DATOS?.fabricacion?.tipos_producto?.[pedido.tipo_producto_id]?.descripcion || "";
   const material = DATOS?.maestros?.materiales?.[pedido.material_id]?.descripcion || "";
   const cantidad = Number.parseInt(String(pedido.cantidad ?? ""), 10);
   const cantidadTxt = Number.isFinite(cantidad) ? `Cant. ${cantidad}` : "";
-  const partes = [descripcion, tipo, material, cantidadTxt].filter(Boolean);
+  const partes = [descripcion, cliente, tipo, material, cantidadTxt].filter(Boolean);
   if (partes.length) return partes.join(" | ");
   return pedido.numero || String(pedido.id);
 }

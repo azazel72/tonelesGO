@@ -103,6 +103,17 @@ function crearContenidoPillCuadrante(nombre) {
   return wrapper;
 }
 
+function compararUsuariosCuadrantePorCodigo(a, b) {
+  const codigoA = String(a?.codigo ?? "").trim();
+  const codigoB = String(b?.codigo ?? "").trim();
+  if (codigoA && codigoB) {
+    return codigoA.localeCompare(codigoB, "es", { numeric: true, sensitivity: "base" });
+  }
+  if (codigoA) return -1;
+  if (codigoB) return 1;
+  return String(a?.nombre ?? "").localeCompare(String(b?.nombre ?? ""), "es", { sensitivity: "base" });
+}
+
 function obtenerDiasCuadranteActivos() {
   const fechaInicio = DATOS.cuadrante?.fecha_inicio;
   if (!fechaInicio) return [];
@@ -175,11 +186,10 @@ function formatterColumnasCuadrante(cell, formatterParams, onRendered) {
     el.innerHTML = "";
 
     // Pintar cada pill
-    value.forEach((detalle, index) => {
+    [...value]
+      .sort((a, b) => compararUsuariosCuadrantePorCodigo(a?.empleado, b?.empleado))
+      .forEach((detalle, index) => {
       if (!detalle?.usuario_id) {
-        console.log(Array.isArray(detalle));
-        console.log(detalle);
-        console.log(detalle?.usuario_id ?? "NADA");
         return;
       }
 
@@ -591,9 +601,9 @@ function abrirModalClonadoCuadrantes(tabla, fieldOrigen = null, fieldDestino = n
 
 function completarEmpleadosCuadrantes(key, listaUsuarios, usuarios, configuracion) {
   listaUsuarios.innerHTML = "";
-  Object.values(usuarios).sort((a, b) =>
-    a.nombre.localeCompare(b.nombre, 'es', { sensitivity: 'base' })
-  ).forEach(element => {
+  Object.values(usuarios)
+    .sort(compararUsuariosCuadrantePorCodigo)
+    .forEach(element => {
     if (element.empleado) {
       const pill = crearElemento("div",
         { value: element.id,

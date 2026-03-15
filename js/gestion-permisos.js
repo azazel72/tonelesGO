@@ -35,6 +35,7 @@ const ACCIONES_PERMISO_GESTION = {
     "ver-planificacion-entradas": { permisos: ["planificacion"], marcarCandado: true },
     "ver-cuadrantes": [],
     "ver-pedidos": [],
+    "ver-planificacion-pedidos": [],
     "ver-tipos-producto": [],
     "ver-fabricacion-semanal": [],
     "ver-botas": [],
