@@ -1440,6 +1440,31 @@ class Colector:
             logger.info(f"Detalle de cuadrante ID {id} eliminado.")
             return {"id": id }
 
+    def limpiar_cuadrante(self, data) -> CuadranteDTO:
+        cuadrante_id = data.get("cuadrante_id")
+
+        if not cuadrante_id:
+            raise ValueError("cuadrante_id requerido")
+
+        with DB.crear_sesion() as session:
+            cuadrante = self.repo_cuadrantes.get(session, cuadrante_id)
+            if not cuadrante:
+                raise ValueError(f"No existe cuadrante con id {cuadrante_id}")
+
+            detalles = self.repo_cuadrante_detalles.list_by_cuadrante_id(session, cuadrante_id)
+            for detalle in detalles:
+                session.delete(detalle)
+
+            try:
+                session.commit()
+            except Exception:
+                session.rollback()
+                raise
+
+            cuadrante_dto = CuadranteDTO.from_db(cuadrante)
+            cuadrante_dto.detalles = []
+            return cuadrante_dto
+
     def clonar_columna_cuadrante(self, data) -> CuadranteDTO:
         cuadrante_id = data.get("cuadrante_id")
         fecha_origen = data.get("fecha_origen")

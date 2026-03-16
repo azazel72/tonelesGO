@@ -79,6 +79,11 @@ function crearTituloClonableDia(dia, fecha) {
   `;
 }
 
+function obtenerTextoPillCuadrante(usuario) {
+  if (!usuario) return "Usuario no encontrado";
+  return usuario.alias || usuario.nombre || "Usuario no encontrado";
+}
+
 function crearContenidoPillCuadrante(nombre) {
   const indicador = document.createElement("span");
   indicador.className = "usuario-pill-faltas-dot";
@@ -161,6 +166,8 @@ function actualizarIndicadoresFaltasCuadrante() {
 
     const asignaciones = obtenerAsignacionesUsuarioPorDia(tabla, usuarioId);
     let faltaAlgunDia = false;
+    let faltaJueves = false;
+    let faltaOtroDia = false;
 
     Array.from(avisos.children).forEach((marca, index) => {
       const dia = dias[index];
@@ -168,10 +175,15 @@ function actualizarIndicadoresFaltasCuadrante() {
       const asignado = Boolean(asignaciones[dia.fecha]);
       marca.classList.toggle("falta-dia", !asignado);
       marca.classList.toggle("cubre-dia", asignado);
-      if (!asignado) faltaAlgunDia = true;
+      if (!asignado) {
+        faltaAlgunDia = true;
+        if (index === 0) faltaJueves = true;
+        else faltaOtroDia = true;
+      }
     });
 
     pill.classList.toggle("usuario-pill-con-faltas", faltaAlgunDia);
+    indicador.classList.toggle("usuario-pill-faltas-dot-aviso", !faltaJueves && faltaOtroDia);
     indicador.hidden = !faltaAlgunDia;
   });
 }
@@ -201,7 +213,7 @@ function formatterColumnasCuadrante(cell, formatterParams, onRendered) {
         }
       );
       pill.dataset.usuarioId = String(detalle.usuario_id);
-      pill.appendChild(crearContenidoPillCuadrante(detalle.empleado?.nombre ?? "Usuario no encontrado"));
+      pill.appendChild(crearContenidoPillCuadrante(obtenerTextoPillCuadrante(detalle.empleado)));
       // info para el drag
       pill.dataset.detalle = JSON.stringify(detalle);
 
@@ -613,7 +625,7 @@ function completarEmpleadosCuadrantes(key, listaUsuarios, usuarios, configuracio
         }
       );
       pill.dataset.usuarioId = String(element.id);
-      pill.appendChild(crearContenidoPillCuadrante(element.nombre));
+      pill.appendChild(crearContenidoPillCuadrante(obtenerTextoPillCuadrante(element)));
       pill.dataset.detalle = JSON.stringify({ empleado: element, usuario_id: element.id });
       listaUsuarios.appendChild(pill);
     }
@@ -696,6 +708,25 @@ function agregarEventosCuadrantes(wb, configuracion, contenedor) {
     } catch (err) {
       console.error(err);
       alert("Error al extender lunes: " + (err?.message || err));
+    } finally {
+      btn.disabled = false;
+    }
+  });
+
+  contenedor.querySelector("#u-limpiar-cuadrante")?.addEventListener("click", async (event) => {
+    if (!DATOS?.cuadrante?.id) return;
+    if (!confirm("¿Quieres limpiar todo el cuadrante actual?")) return;
+    const btn = event.currentTarget;
+    btn.disabled = true;
+    try {
+      const data = await wsRequest("limpiar_cuadrante", {
+        cuadrante_id: DATOS.cuadrante.id,
+      });
+      mostrar_cuadrantes({ data });
+      actualizarIndicadoresFaltasCuadrante();
+    } catch (err) {
+      console.error(err);
+      alert("Error al limpiar el cuadrante: " + (err?.message || err));
     } finally {
       btn.disabled = false;
     }

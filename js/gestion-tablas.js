@@ -46,6 +46,7 @@ let CeldaAcciones;
 window.addEventListener("load", () => {
   CeldaAcciones = {
     title:"Acciones", width:100, headerSort:false, hozAlign:"center",
+    download:false,
     formatter: getFormatter,
     cellClick: getCellClick,
   };
@@ -105,6 +106,16 @@ function crearTabla(KEY, contenedor, configuracion, dataKey = "maestros") {
     },
     */
     placeholder: "Sin datos",
+    downloadConfig:{
+      columnGroups:false,
+      rowGroups:false,
+      columnCalcs:false,
+      dataTree:false,
+    },
+    dependencies: {
+      XLSX: window.XLSX,
+      jsPDF: window.jspdf?.jsPDF,
+    },
     ...configuracion,
   });
 
@@ -163,6 +174,18 @@ function crearBotonesGenericos(tipo) {
         "data-bs-toggle": "button",
         "aria-pressed": "false",
         autocomplete: "off"
+      });
+    case "u-export-excel":
+      return crearElemento("button", {
+        id: "u-export-excel",
+        class: "btn btn-sm btn-outline-success",
+        content: "<i class=\"bi bi-filetype-xlsx\"></i> Excel"
+      });
+    case "u-export-pdf":
+      return crearElemento("button", {
+        id: "u-export-pdf",
+        class: "btn btn-sm btn-outline-danger",
+        content: "<i class=\"bi bi-filetype-pdf\"></i> PDF"
       });
     case "contenedor-botones-derecha":
       return crearElemento("div", {
@@ -268,7 +291,11 @@ function crearCabeceraVentana(configuracion) {
       const botonAdd    = crearBotonesGenericos("u-add");
       const botonFilter = crearBotonesGenericos("u-filter");
       const botonEditar = crearBotonesGenericos("u-editar");
+      const botonExcel = crearBotonesGenericos("u-export-excel");
+      const botonPdf = crearBotonesGenericos("u-export-pdf");
       const contenedorDerecha = crearBotonesGenericos("contenedor-botones-derecha");
+      contenedorDerecha.appendChild(botonExcel);
+      contenedorDerecha.appendChild(botonPdf);
       contenedorDerecha.appendChild(botonFilter);
       contenedorDerecha.appendChild(botonEditar);
       cabecera.appendChild(botonRecargarGenericos);
@@ -370,5 +397,26 @@ function comprobarVentanaAbierta(clave) {
 
 function tablaEditable(cell) {
   return cell.getTable().options.editable || cell.getRow().getData().id === undefined;
+}
+
+function obtenerNombreDescargaTabla(tabla) {
+  const nombreVentana = windowsRegistry.get(tabla?.KEY)?.wb?.title || tabla?.KEY || "tabla";
+  const nombreBase = String(nombreVentana)
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-zA-Z0-9_-]+/g, "_")
+    .replace(/^_+|_+$/g, "")
+    .replace(/_+/g, "_");
+  const fecha = new Date().toISOString().slice(0, 10);
+  return `${nombreBase || "tabla"}_${fecha}`;
+}
+
+function obtenerNombreHojaExcel(tabla) {
+  const nombre = String(tabla?.KEY || "Datos")
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[\\/*?:[\]]+/g, " ")
+    .trim();
+  return (nombre || "Datos").slice(0, 31);
 }
 

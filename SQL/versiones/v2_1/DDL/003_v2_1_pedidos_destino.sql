@@ -1,0 +1,6 @@
+ALTER TABLE pedidos
+  ADD COLUMN IF NOT EXISTS destino VARCHAR(20) NOT NULL DEFAULT 'CLIENTE' AFTER numero;
+
+UPDATE pedidos
+SET destino = 'CLIENTE'
+WHERE destino IS NULL OR TRIM(destino) = '';

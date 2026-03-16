@@ -37,6 +37,7 @@ def obtener_acciones() -> Dict[str, any]:
         "cargar_cuadrantes": lambda ws, req: Colector.colector.obtener_cuadrante(req.data.get("fecha")),
         "extender_jueves_semana_cuadrante": lambda ws, req: Colector.colector.extender_jueves_semana_cuadrante(req.data),
         "clonar_columna_cuadrante": lambda ws, req: Colector.colector.clonar_columna_cuadrante(req.data),
+        "limpiar_cuadrante": lambda ws, req: Colector.colector.limpiar_cuadrante(req.data),
         "actualizar_detalle_cuadrante": lambda ws, req: Colector.colector.actualizar_detalle_cuadrante(req.data),
         "insertar_detalle_cuadrante": lambda ws, req: Colector.colector.insertar_detalle_cuadrante(req.data),
         "eliminar_detalle_cuadrante": lambda ws, req: Colector.colector.eliminar_detalle_cuadrante(req.data),

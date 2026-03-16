@@ -3,3 +3,4 @@
 
 SOURCE ./DDL/001_v2_1_pedidos_cliente.sql;
 SOURCE ./DDL/002_v2_1_eliminar_entidad_duelas.sql;
+SOURCE ./DDL/003_v2_1_pedidos_destino.sql;

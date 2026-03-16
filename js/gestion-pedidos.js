@@ -34,6 +34,10 @@ function openPedidosWin() {
       label: descripcion || String(id),
     })
   );
+  const destinosDict = [
+    { value: "CLIENTE", label: "CLIENTE" },
+    { value: "ENVINADO", label: "ENVINADO" },
+  ];
 
   const configuracion = {
     KEY: "pedidos",
@@ -73,6 +77,21 @@ function openPedidosWin() {
             editable: tablaEditable,
             cssClass: "filtrable",
             formatter: cell => DATOS?.maestros?.clientes?.[cell.getValue()]?.nombre ?? cell.getValue(),
+          },
+          {
+            title: "Destino",
+            field: "destino",
+            editor: "list",
+            editorParams: {
+              values: destinosDict,
+              clearable: false,
+              autocomplete: true,
+              allowEmpty: false,
+              listOnEmpty: true,
+              freetext: false,
+            },
+            editable: tablaEditable,
+            cssClass: "filtrable",
           },
           {
             title: "Descripcion",

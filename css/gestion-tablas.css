@@ -147,6 +147,9 @@ div.contenedor-tabla {
   background: #d90429;
   box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.55);
 }
+.usuario-pill-faltas-dot.usuario-pill-faltas-dot-aviso {
+  background: blue;
+}
 #contenedor-cuadrante:not(.ver-faltas) .usuario-pill-avisos {
   display: none;
 }

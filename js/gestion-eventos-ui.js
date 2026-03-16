@@ -89,9 +89,12 @@ async function eventoClickCabecera(e, tabla, cabecera) {
         alert("Por favor, complete el registro nuevo antes de crear otro.");
         return;
       }
-      const rowComp = await tabla.addRow({}, true);
-      rowComp.scrollTo("center", true);
-      rowComp.getElement().classList.add('nuevo-registro');
+      {
+        const nuevosDatos = tabla.KEY === "pedidos" ? { destino: "CLIENTE" } : {};
+        const rowComp = await tabla.addRow(nuevosDatos, true);
+        rowComp.scrollTo("center", true);
+        rowComp.getElement().classList.add('nuevo-registro');
+      }
       break;
     case "u-filter":
       activo = btn.getAttribute("aria-pressed") === "true";
@@ -148,6 +151,29 @@ async function eventoClickCabecera(e, tabla, cabecera) {
       break;
     case "u-editar":
       tabla.options.editable = btn.getAttribute("aria-pressed") === "true";
+      break;
+    case "u-export-excel":
+      if (!window.XLSX) {
+        alert("No está cargada la librería de Excel.");
+        return;
+      }
+      tabla.download("xlsx", `${obtenerNombreDescargaTabla(tabla)}.xlsx`, {
+        sheetName: obtenerNombreHojaExcel(tabla),
+      });
+      break;
+    case "u-export-pdf":
+      if (!window.jspdf?.jsPDF) {
+        alert("No está cargada la librería de PDF.");
+        return;
+      }
+      tabla.download("pdf", `${obtenerNombreDescargaTabla(tabla)}.pdf`, {
+        orientation: "landscape",
+        title: tabla.KEY || "Datos",
+        autoTable: {
+          styles: { fontSize: 8 },
+          headStyles: { fillColor: [52, 58, 64] },
+        },
+      });
       break;
   }
 }

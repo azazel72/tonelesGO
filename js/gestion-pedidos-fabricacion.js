@@ -159,6 +159,10 @@ function construirColumnasPlanificacionPedidos() {
   const tiposDict = Object.values(DATOS?.fabricacion?.tipos_producto ?? {}).map(({ id, descripcion, codigo }) => ({ value: id, label: descripcion || codigo || String(id) }));
   const materialesDict = Object.values(DATOS?.maestros?.materiales ?? {}).map(({ id, descripcion }) => ({ value: id, label: descripcion || String(id) }));
   const estadosDict = Object.values(DATOS?.maestros?.estados_pedidos ?? {}).map(({ id, descripcion }) => ({ value: id, label: descripcion || String(id) }));
+  const destinosDict = [
+    { value: "CLIENTE", label: "CLIENTE" },
+    { value: "ENVINADO", label: "ENVINADO" },
+  ];
 
   return [
     { title: "ID", field: "id", width: 70, hozAlign: "right" },
@@ -171,6 +175,14 @@ function construirColumnasPlanificacionPedidos() {
       editable: tablaEditablePlanificacion,
       formatter: (cell) => DATOS?.maestros?.clientes?.[cell.getValue()]?.nombre ?? cell.getValue(),
       minWidth: 150,
+    },
+    {
+      title: "Destino",
+      field: "destino",
+      editor: "list",
+      editorParams: { values: destinosDict, clearable: false, autocomplete: true, allowEmpty: false, listOnEmpty: true, freetext: false },
+      editable: tablaEditablePlanificacion,
+      width: 120,
     },
     { title: "Descripcion", field: "descripcion", editor: "input", editable: tablaEditablePlanificacion, minWidth: 180 },
     {
@@ -602,6 +614,7 @@ function crearPedidoVacioPlanificacion() {
   const primerEstado = Object.values(DATOS?.maestros?.estados_pedidos ?? {})[0]?.id ?? null;
   return {
     numero: "",
+    destino: "CLIENTE",
     cliente_id: null,
     descripcion: "",
     tipo_producto_id: null,
