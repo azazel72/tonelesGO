@@ -9,5 +9,8 @@ class ProductoDB(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     tipo: str
     codigo: str
+    tipo_producto_id: Optional[int] = None
     material_id: Optional[int] = None
+    ubicacion_id: Optional[int] = None
     produccion_id: Optional[int] = None
+    estado: Optional[int] = 1

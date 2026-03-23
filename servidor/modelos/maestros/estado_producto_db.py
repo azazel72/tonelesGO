@@ -2,8 +2,8 @@ from sqlmodel import SQLModel, Field
 from typing import Optional
 
 
-class EstadoBotaDB(SQLModel, table=True):
-    __tablename__ = "estados_botas"
+class EstadoProductoDB(SQLModel, table=True):
+    __tablename__ = "estados_productos"
 
     id: Optional[int] = Field(default=None, primary_key=True)
     descripcion: str

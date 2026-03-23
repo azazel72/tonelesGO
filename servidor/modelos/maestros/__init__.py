@@ -2,7 +2,7 @@
 from .cliente_db import ClienteDB
 from .estado_pedido_db import EstadoPedidoDB
 from .estado_fabricacion_semanal_db import EstadoFabricacionSemanalDB
-from .estado_bota_db import EstadoBotaDB
+from .estado_producto_db import EstadoProductoDB
 from .estado_trazabilidad_fabricacion_db import EstadoTrazabilidadFabricacionDB
 from .estado_palet_db import EstadoPaletDB
 from .instalacion_db import InstalacionDB
@@ -26,7 +26,7 @@ __all__ = [
     "ClienteDB",
     "EstadoPedidoDB",
     "EstadoFabricacionSemanalDB",
-    "EstadoBotaDB",
+    "EstadoProductoDB",
     "EstadoTrazabilidadFabricacionDB",
     "EstadoPaletDB",
     "InstalacionDB",

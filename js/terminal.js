@@ -40,7 +40,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
     prepararEventosRecepcion();
     prepararEventosFabricacion();
-    prepararEventosExpedicion();
+    prepararEventosSalidas();
+    prepararEventosEnvinado();
     prepararEventosMenuFlejes();
     prepararEventosUbicacion();
     prepararEventosMoverStock();
@@ -107,6 +108,12 @@ function mostrarSeccion(id) {
         }
         if (id === "vista_ambientes") {
             cargarFormularioAmbientes();
+        }
+        if (id === "vista_salidas") {
+            cargarVistaSalidas?.();
+        }
+        if (id === "vista_envinado") {
+            cargarVistaEnvinado?.();
         }
         // Actualiza las migas de pan
         actualizarMigasPan(id);
@@ -275,12 +282,20 @@ function actualizarMigasPan(mostrarSeccion) {
             nuevaMiga = crearMigaPan("Fabricar bota", mostrarSeccion, true);
             migasPan.appendChild(nuevaMiga);
             break;
-        case "vista_expedicion":
+        case "vista_salidas":
             nuevaMiga = crearMigaPan("Inicio", "vista_tareas", false);
             migasPan.appendChild(nuevaMiga);
             nuevaMiga = crearMigaPan("Botas", "vista_menu_botas", false);
             migasPan.appendChild(nuevaMiga);
-            nuevaMiga = crearMigaPan("Expediciones", mostrarSeccion, true);
+            nuevaMiga = crearMigaPan("Salidas", mostrarSeccion, true);
+            migasPan.appendChild(nuevaMiga);
+            break;
+        case "vista_envinado":
+            nuevaMiga = crearMigaPan("Inicio", "vista_tareas", false);
+            migasPan.appendChild(nuevaMiga);
+            nuevaMiga = crearMigaPan("Botas", "vista_menu_botas", false);
+            migasPan.appendChild(nuevaMiga);
+            nuevaMiga = crearMigaPan("Envinado", mostrarSeccion, true);
             migasPan.appendChild(nuevaMiga);
             break;
         case "vista_ambientes":

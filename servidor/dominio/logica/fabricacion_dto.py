@@ -8,7 +8,6 @@ from servidor.dominio.fabricacion.fabricacion_semanal_dto import FabricacionSema
 from servidor.dominio.fabricacion.trazabilidad_procesado_dto import TrazabilidadProcesadoDTO
 from servidor.dominio.fabricacion.trazabilidad_fabricacion_dto import TrazabilidadFabricacionDTO
 from servidor.dominio.fabricacion.trazabilidad_producto_dto import TrazabilidadProductoDTO
-from servidor.dominio.fabricacion.bota_dto import BotaDTO
 from servidor.dominio.fabricacion.consumo_dto import ConsumoDTO
 
 
@@ -19,5 +18,4 @@ class FabricacionDTO(BaseModel):
     trazabilidad_procesado: Optional[Dict[int, TrazabilidadProcesadoDTO]] = {}
     trazabilidad_fabricacion: Optional[Dict[int, TrazabilidadFabricacionDTO]] = {}
     trazabilidad_producto: Optional[Dict[int, TrazabilidadProductoDTO]] = {}
-    botas: Optional[Dict[int, BotaDTO]] = {}
     consumos: Optional[Dict[int, ConsumoDTO]] = {}

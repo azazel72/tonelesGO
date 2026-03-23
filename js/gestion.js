@@ -37,8 +37,8 @@ window.onload = () => {
         async "ver-estados-fabricacion-semanal"() {
             await openEstadosFabricacionSemanalWin();
         },
-        async "ver-estados-botas"() {
-            await openEstadosBotasWin();
+        async "ver-estados-productos"() {
+            await openEstadosProductosWin();
         },
         async "ver-estados-trazabilidad-fabricacion"() {
             await openEstadosTrazabilidadFabricacionWin();
@@ -107,9 +107,6 @@ window.onload = () => {
         async "ver-trazabilidad-producto"() {
             await openTrazabilidadProductoWin();
         },
-        async "ver-botas"() {
-            await openBotasWin();
-        },
         async "ver-consumos"() {
             await openConsumosWin();
         },
@@ -162,7 +159,7 @@ window.onload = () => {
         ubicaciones: openUbicacionesWin,
         estados_pedidos: openEstadosPedidosWin,
         estados_fabricacion_semanal: openEstadosFabricacionSemanalWin,
-        estados_botas: openEstadosBotasWin,
+        estados_productos: openEstadosProductosWin,
         estados_trazabilidad_fabricacion: openEstadosTrazabilidadFabricacionWin,
         estados_palets: openEstadosPaletsWin,
         puestos_trabajo: openPuestosTrabajoWin,
@@ -182,7 +179,6 @@ window.onload = () => {
         trazabilidad_procesado: openTrazabilidadProcesadoWin,
         trazabilidad_fabricacion: openTrazabilidadFabricacionWin,
         trazabilidad_producto: openTrazabilidadProductoWin,
-        botas: openBotasWin,
         consumos: openConsumosWin,
         planificacion_entradas: openPlanificacionEntradasWin,
         cuadrantes: openCuadrantesWin,

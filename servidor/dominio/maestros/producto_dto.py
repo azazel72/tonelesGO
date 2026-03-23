@@ -7,16 +7,22 @@ class ProductoDTO(BaseModel):
     id: int | None
     tipo: str
     codigo: str
+    tipo_producto_id: int | None = None
     material_id: int | None = None
+    ubicacion_id: int | None = None
     produccion_id: int | None
+    estado: int | None = 1
 
     def from_db(producto_db: ProductoDB) -> "ProductoDTO":
         return ProductoDTO(
             id=producto_db.id,
             tipo=producto_db.tipo,
             codigo=producto_db.codigo,
+            tipo_producto_id=producto_db.tipo_producto_id,
             material_id=producto_db.material_id,
+            ubicacion_id=producto_db.ubicacion_id,
             produccion_id=producto_db.produccion_id,
+            estado=producto_db.estado,
         )
 
     def to_db(self) -> ProductoDB:
@@ -24,6 +30,9 @@ class ProductoDTO(BaseModel):
             id=self.id,
             tipo=self.tipo,
             codigo=self.codigo,
+            tipo_producto_id=self.tipo_producto_id,
             material_id=self.material_id,
+            ubicacion_id=self.ubicacion_id,
             produccion_id=self.produccion_id,
+            estado=self.estado,
         )

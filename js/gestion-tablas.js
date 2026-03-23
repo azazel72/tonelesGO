@@ -262,7 +262,7 @@ function cerrarVentanasMaestros() {
     "ubicaciones",
     "estados_pedidos",
     "estados_fabricacion_semanal",
-    "estados_botas",
+    "estados_productos",
     "estados_trazabilidad_fabricacion",
     "estados_palets",
     "materiales",

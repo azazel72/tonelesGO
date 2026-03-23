@@ -9,16 +9,16 @@ from sqlmodel import Session
 from servidor.herramientas.utilidades import obtener_anterior_dia_semana
 from servidor.herramientas.BcryptHelper import BcryptHelper
 
-from .modelos import ClienteDB, EstadoPedidoDB, EstadoFabricacionSemanalDB, EstadoBotaDB, EstadoTrazabilidadFabricacionDB, EstadoPaletDB
+from .modelos import ClienteDB, EstadoPedidoDB, EstadoFabricacionSemanalDB, EstadoProductoDB, EstadoTrazabilidadFabricacionDB, EstadoPaletDB
 from .modelos import InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB, RolDB, PuestoTrabajoDB, MaterialDB, EntradaDB, LineaEntradaDB, PaletDB, ProductoDB, ProductoOperarioDB, ArchivoSubidoDB, AmbienteDB, EntradaFlejeDB, CubicajeDB
-from .modelos import PedidoDB, TipoProductoDB, FabricacionSemanalDB, TrazabilidadProcesadoDB, TrazabilidadFabricacionDB, TrazabilidadProductoDB, BotaDB, ConsumoDB
+from .modelos import PedidoDB, TipoProductoDB, FabricacionSemanalDB, TrazabilidadProcesadoDB, TrazabilidadFabricacionDB, TrazabilidadProductoDB, ConsumoDB
 from .modelos import PlanCamionDB, PlanFacturacionDB, PlanMaterialDB, CuadranteDB, CuadranteDetalleDB
 from .persistencia import GenericRepository, DB
 from sqlmodel import select
 from sqlalchemy import extract, func
 from .dominio import PlanificacionEntradasDTO, MaestrosDTO, PlanMaterialDTO, PlanFacturacionDTO, PlanCamionDTO, CuadranteDTO, CuadranteDetalleDTO, FabricacionDTO
-from .dominio import ClienteDTO, EstadoPedidoDTO, EstadoFabricacionSemanalDTO, EstadoBotaDTO, EstadoTrazabilidadFabricacionDTO, EstadoPaletDTO, InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO, RolDTO, PuestoTrabajoDTO, MaterialDTO, EntradaDTO, LineaEntradaDTO, PaletDTO, ProductoDTO, ArchivoSubidoDTO, AmbienteDTO, EntradaFlejeDTO, CubicajeDTO, CuadrantesDTO
-from .dominio import PedidoDTO, TipoProductoDTO, FabricacionSemanalDTO, TrazabilidadProcesadoDTO, TrazabilidadFabricacionDTO, TrazabilidadProductoDTO, BotaDTO, ConsumoDTO
+from .dominio import ClienteDTO, EstadoPedidoDTO, EstadoFabricacionSemanalDTO, EstadoProductoDTO, EstadoTrazabilidadFabricacionDTO, EstadoPaletDTO, InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO, RolDTO, PuestoTrabajoDTO, MaterialDTO, EntradaDTO, LineaEntradaDTO, PaletDTO, ProductoDTO, ArchivoSubidoDTO, AmbienteDTO, EntradaFlejeDTO, CubicajeDTO, CuadrantesDTO
+from .dominio import PedidoDTO, TipoProductoDTO, FabricacionSemanalDTO, TrazabilidadProcesadoDTO, TrazabilidadFabricacionDTO, TrazabilidadProductoDTO, ConsumoDTO
 from servidor.impresion import ImprimirEtiqueta
 from servidor.conexiones.broadcast import broadcast_error, broadcast_event
 
@@ -47,7 +47,7 @@ class Colector:
         self.repo_clientes = GenericRepository(ClienteDB)
         self.repo_estados_pedidos = GenericRepository(EstadoPedidoDB)
         self.repo_estados_fabricacion_semanal = GenericRepository(EstadoFabricacionSemanalDB)
-        self.repo_estados_botas = GenericRepository(EstadoBotaDB)
+        self.repo_estados_productos = GenericRepository(EstadoProductoDB)
         self.repo_estados_trazabilidad_fabricacion = GenericRepository(EstadoTrazabilidadFabricacionDB)
         self.repo_estados_palets = GenericRepository(EstadoPaletDB)
         self.repo_instalaciones = GenericRepository(InstalacionDB)
@@ -70,7 +70,6 @@ class Colector:
         self.repo_trazabilidad_procesado = GenericRepository(TrazabilidadProcesadoDB)
         self.repo_trazabilidad_fabricacion = GenericRepository(TrazabilidadFabricacionDB)
         self.repo_trazabilidad_producto = GenericRepository(TrazabilidadProductoDB)
-        self.repo_botas = GenericRepository(BotaDB)
         self.repo_consumos = GenericRepository(ConsumoDB)
 
         self.repo_usuarios = GenericRepository(UsuarioDB)
@@ -109,42 +108,6 @@ class Colector:
         tipo = self.fabricacion.tipos_producto.get(int(tipo_producto_id))
         return str(getattr(tipo, "tipo", "")).upper() == "DUELA" if tipo else False
 
-    def _log_receta_bota(self, bota: "BotaDTO") -> None:
-        tipo_bota_id = int(bota.tipo_producto_id or 0)
-        consumos = [
-            consumo for consumo in self.fabricacion.consumos.values()
-            if int(consumo.bota_id or 0) == tipo_bota_id
-        ]
-
-        receta = {
-            "id": bota.id,
-            "codigo": bota.codigo,
-            "tipo_producto": self._descripcion_tipo_producto(bota.tipo_producto_id),
-            "material": self._descripcion_material(bota.material_id),
-            "vaso": self._descripcion_producto(bota.vaso_producto_id),
-            "fondo": self._descripcion_producto(bota.fondo_producto_id),
-            "tapa": self._descripcion_producto(bota.tapa_producto_id),
-            "flejes": [
-                self._descripcion_producto(bota.fleje_1_id),
-                self._descripcion_producto(bota.fleje_2_id),
-                self._descripcion_producto(bota.fleje_3_id),
-                self._descripcion_producto(bota.fleje_4_id),
-                self._descripcion_producto(bota.fleje_5_id),
-            ],
-        }
-
-        detalle_consumos = [
-            {
-                "id": consumo.id,
-                "consumible_id": consumo.consumible_id,
-                "consumible": self._descripcion_tipo_producto(consumo.consumible_id),
-                "consumo": consumo.consumo,
-            }
-            for consumo in consumos
-        ]
-
-        logger.info("Bota creada. Receta=%s Consumos=%s", receta, detalle_consumos)
-
     #region Métodos Maestros
 
 
@@ -153,7 +116,7 @@ class Colector:
             clientes = self.repo_clientes.list_all(session)
             estados_pedidos = self.repo_estados_pedidos.list_all(session)
             estados_fabricacion_semanal = self.repo_estados_fabricacion_semanal.list_all(session)
-            estados_botas = self.repo_estados_botas.list_all(session)
+            estados_productos = self.repo_estados_productos.list_all(session)
             estados_trazabilidad_fabricacion = self.repo_estados_trazabilidad_fabricacion.list_all(session)
             estados_palets = self.repo_estados_palets.list_all(session)
             instalaciones = self.repo_instalaciones.list_all(session)
@@ -175,7 +138,7 @@ class Colector:
             self.maestros.clientes = {cliente.id: ClienteDTO.from_db(cliente) for cliente in clientes}
             self.maestros.estados_pedidos = {estado.id: EstadoPedidoDTO.from_db(estado) for estado in estados_pedidos}
             self.maestros.estados_fabricacion_semanal = {estado.id: EstadoFabricacionSemanalDTO.from_db(estado) for estado in estados_fabricacion_semanal}
-            self.maestros.estados_botas = {estado.id: EstadoBotaDTO.from_db(estado) for estado in estados_botas}
+            self.maestros.estados_productos = {estado.id: EstadoProductoDTO.from_db(estado) for estado in estados_productos}
             self.maestros.estados_trazabilidad_fabricacion = {estado.id: EstadoTrazabilidadFabricacionDTO.from_db(estado) for estado in estados_trazabilidad_fabricacion}
             self.maestros.estados_palets = {estado.id: EstadoPaletDTO.from_db(estado) for estado in estados_palets}
             self.maestros.instalaciones = {instalacion.id: InstalacionDTO.from_db(instalacion) for instalacion in instalaciones}
@@ -205,7 +168,6 @@ class Colector:
             traz_procesado = self.repo_trazabilidad_procesado.list_all(session)
             traz_fabricacion = self.repo_trazabilidad_fabricacion.list_all(session)
             traz_producto = self.repo_trazabilidad_producto.list_all(session)
-            botas = self.repo_botas.list_all(session)
             consumos = self.repo_consumos.list_all(session)
 
             self.fabricacion.pedidos = {
@@ -225,9 +187,6 @@ class Colector:
             }
             self.fabricacion.trazabilidad_producto = {
                 traz.id: TrazabilidadProductoDTO.from_db(traz) for traz in traz_producto
-            }
-            self.fabricacion.botas = {
-                bota.id: BotaDTO.from_db(bota) for bota in botas
             }
             self.fabricacion.consumos = {
                 consumo.id: ConsumoDTO.from_db(consumo) for consumo in consumos
@@ -339,9 +298,6 @@ class Colector:
             maestro[new.id] = objeto_DTO
 
             logger.info(f"Insertado ID {new.id} en la tabla {tabla}")
-            if tabla == "botas":
-                self._log_receta_bota(objeto_DTO)
-
             if tabla == "usuarios":
                 return objeto_DTO.model_copy(update={"clave": ""})
             return objeto_DTO
@@ -473,6 +429,123 @@ class Colector:
             statement = select(FabricacionSemanalDB).where(FabricacionSemanalDB.pedido_id == pedido_id)
             lineas = session.exec(statement).all()
             return [FabricacionSemanalDTO.from_db(linea) for linea in lineas]
+
+    def listar_productos_por_filtros(self, filtros: dict | None = None):
+        filtros = filtros or {}
+        tipos_filtro = {
+            str(tipo).strip().upper()
+            for tipo in (filtros.get("tipos") or [])
+            if str(tipo).strip() != ""
+        }
+        pedido_estado = filtros.get("pedido_estado")
+        pedido_destino = str(filtros.get("pedido_destino") or "").strip().upper()
+        estados_producto = {
+            int(estado)
+            for estado in (filtros.get("estados_producto") or [])
+            if str(estado).strip() != ""
+        }
+
+        with DB.crear_sesion() as session:
+            pedidos = self.repo_pedidos.list_all(session)
+            clientes = self.repo_clientes.list_all(session)
+            tipos = self.repo_tipos_producto.list_all(session)
+            materiales = self.repo_materiales_maestro.list_all(session)
+            estados = self.repo_estados_productos.list_all(session)
+            lineas = self.repo_fabricacion_semanal.list_all(session)
+            productos = self.repo_productos.list_all(session)
+            trazabilidades_producto = self.repo_trazabilidad_producto.list_all(session)
+            trazabilidades_fabricacion = self.repo_trazabilidad_fabricacion.list_all(session)
+
+            pedidos_por_id = {pedido.id: pedido for pedido in pedidos}
+            clientes_por_id = {cliente.id: cliente for cliente in clientes}
+            tipos_por_id = {tipo.id: tipo for tipo in tipos}
+            materiales_por_id = {material.id: material for material in materiales}
+            estados_por_id = {estado.id: estado for estado in estados}
+            lineas_por_id = {linea.id: linea for linea in lineas}
+            trazabilidades_fabricacion_por_id = {traza.id: traza for traza in trazabilidades_fabricacion}
+
+            lineas_por_pedido = {}
+            for linea in lineas:
+                if linea.pedido_id is None:
+                    continue
+                lineas_por_pedido.setdefault(int(linea.pedido_id), []).append(linea)
+
+            linea_por_producto_id = {}
+            for traza_producto in trazabilidades_producto:
+                producto_id = int(traza_producto.producto_id or 0)
+                if not producto_id or producto_id in linea_por_producto_id:
+                    continue
+                traza_fabricacion = trazabilidades_fabricacion_por_id.get(int(traza_producto.trazabilidad_fabricacion_id or 0))
+                if not traza_fabricacion:
+                    continue
+                linea = lineas_por_id.get(int(traza_fabricacion.fabricacion_semanal_id or 0))
+                if linea:
+                    linea_por_producto_id[producto_id] = linea
+
+            productos_resueltos = []
+            for producto in productos:
+                tipo_producto = str(producto.tipo or "").strip().upper()
+                if tipos_filtro and tipo_producto not in tipos_filtro:
+                    continue
+
+                linea = lineas_por_id.get(int(producto.produccion_id or 0))
+                if not linea:
+                    linea = linea_por_producto_id.get(int(producto.id or 0))
+                pedido = pedidos_por_id.get(int(getattr(linea, "pedido_id", 0) or 0))
+                if not pedido:
+                    continue
+
+                if pedido_estado is not None and int(pedido.estado or 0) != int(pedido_estado):
+                    continue
+                if pedido_destino and str(pedido.destino or "").strip().upper() != pedido_destino:
+                    continue
+
+                if not linea:
+                    lineas_pedido = lineas_por_pedido.get(int(pedido.id or 0), [])
+                    if len(lineas_pedido) == 1:
+                        linea = lineas_pedido[0]
+
+                cliente = clientes_por_id.get(int(pedido.cliente_id or 0))
+                tipo = tipos_por_id.get(int(getattr(linea, "tipo_producto_id", 0) or 0))
+                material_id = producto.material_id if producto.material_id is not None else getattr(linea, "material_id", None)
+                material = materiales_por_id.get(int(material_id or 0))
+                estado_producto = int(producto.estado or 0)
+                estado = estados_por_id.get(estado_producto)
+
+                productos_resueltos.append({
+                    "id": producto.id,
+                    "codigo": producto.codigo,
+                    "producto_tipo": producto.tipo,
+                    "estado": estado_producto,
+                    "estado_descripcion": getattr(estado, "descripcion", None) or str(estado_producto),
+                    "pedido_id": pedido.id,
+                    "pedido_numero": pedido.numero,
+                    "pedido_descripcion": pedido.descripcion,
+                    "pedido_destino": pedido.destino,
+                    "pedido_estado": pedido.estado,
+                    "cliente_id": pedido.cliente_id,
+                    "cliente_nombre": getattr(cliente, "nombre", None) or "",
+                    "tipo_producto_id": getattr(linea, "tipo_producto_id", None),
+                    "tipo_producto_descripcion": getattr(tipo, "descripcion", None) or getattr(tipo, "codigo", None) or "",
+                    "material_id": material_id,
+                    "material_descripcion": getattr(material, "descripcion", None) or "",
+                    "fabricacion_semanal_id": getattr(linea, "id", None),
+                    "fabricacion_cantidad": getattr(linea, "cantidad", 0) if linea else 0,
+                    "fabricacion_cantidad_fabricada": getattr(linea, "cantidad_fabricada", 0) if linea else 0,
+                })
+
+            items = [
+                item for item in productos_resueltos
+                if not estados_producto or int(item.get("estado") or 0) in estados_producto
+            ]
+
+            items.sort(key=lambda item: (
+                int(item.get("estado") or 0),
+                str(item.get("cliente_nombre") or "").lower(),
+                str(item.get("pedido_numero") or "").lower(),
+                str(item.get("codigo") or "").lower(),
+            ))
+            return items
 
     def listar_trazabilidad_fabricacion(self, fabricacion_semanal_id: int):
         with DB.crear_sesion() as session:
@@ -1026,7 +1099,7 @@ class Colector:
                         linea_ref = session.get(FabricacionSemanalDB, int(fabricacion_semanal_id))
                         if not linea_ref:
                             raise ValueError("Linea de fabricacion no encontrada.")
-                        produccion_id = linea_ref.pedido_id
+                        produccion_id = linea_ref.id
                         _lote_normalizado, trazas_palets_lote = self._obtener_trazas_palets_por_lote(
                             session,
                             int(fabricacion_semanal_id),
@@ -1057,7 +1130,7 @@ class Colector:
                         if trazas:
                             linea_ref = session.get(FabricacionSemanalDB, trazas[0].fabricacion_semanal_id)
                             if linea_ref:
-                                produccion_id = linea_ref.pedido_id
+                                produccion_id = linea_ref.id
 
                     codigos_generados = []
                     ultimo_producto_id = None
@@ -1074,7 +1147,10 @@ class Colector:
                         producto = ProductoDB(
                             tipo=tipo,
                             codigo=codigo,
+                            tipo_producto_id=linea_ref.tipo_producto_id if linea_ref else None,
+                            material_id=linea_ref.material_id if linea_ref else None,
                             produccion_id=produccion_id,
+                            estado=1,
                         )
                         session.add(producto)
                         session.flush()
@@ -1811,10 +1887,10 @@ class Colector:
             repo = self.repo_estados_fabricacion_semanal
             maestro = self.maestros.estados_fabricacion_semanal
             objeto = EstadoFabricacionSemanalDTO
-        elif tabla == "estados_botas":
-            repo = self.repo_estados_botas
-            maestro = self.maestros.estados_botas
-            objeto = EstadoBotaDTO
+        elif tabla == "estados_productos":
+            repo = self.repo_estados_productos
+            maestro = self.maestros.estados_productos
+            objeto = EstadoProductoDTO
         elif tabla == "estados_trazabilidad_fabricacion":
             repo = self.repo_estados_trazabilidad_fabricacion
             maestro = self.maestros.estados_trazabilidad_fabricacion
@@ -1911,10 +1987,6 @@ class Colector:
             repo = self.repo_trazabilidad_producto
             maestro = self.fabricacion.trazabilidad_producto
             objeto = TrazabilidadProductoDTO
-        elif tabla == "botas":
-            repo = self.repo_botas
-            maestro = self.fabricacion.botas
-            objeto = BotaDTO
         elif tabla == "consumos":
             repo = self.repo_consumos
             maestro = self.fabricacion.consumos

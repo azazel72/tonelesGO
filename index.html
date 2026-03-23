@@ -95,10 +95,10 @@
                                 data-acceso-directo-fabricacion="1" data-bs-dismiss="offcanvas">
                                 Fabricación
                             </button>
-                            <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_ubicacion" data-contexto-ubicacion="botas" disabled>
+                            <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_salidas">
                                 Salidas
                             </button>
-                            <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_expedicion" disabled>
+                            <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_envinado">
                                 Envinado
                             </button>
                         </div>
@@ -180,7 +180,7 @@
         </section>
 
         <section id="vista_menu_maderas_madera" class="flex-fill menu-secundario">
-            <button class="boton rojo boton-con-icono" mostrar="vista_recepcion" data-contexto-recepcion="maderas_madera" disabled>
+            <button class="boton rojo boton-con-icono" mostrar="vista_recepcion" data-contexto-recepcion="maderas_madera">
                 <img class="boton-icono" src="./imagenes/iconos/camion_palet.png" alt="Recepción">
                 <span>Recepción</span>
             </button>
@@ -208,7 +208,7 @@
                 <i class="bi bi-arrow-left-right fs-2" aria-hidden="true"></i>
                 <span>Mover Stock</span>
             </button>
-            <button class="boton verde boton-con-icono" mostrar="vista_ubicacion" data-contexto-ubicacion="maderas_madera" disabled>
+            <button class="boton verde boton-con-icono" mostrar="vista_ubicacion" data-contexto-ubicacion="maderas_madera">
                 <i class="bi bi-plus-square fs-2" aria-hidden="true"></i>
                 <span>Crear a partir de Stock</span>
             </button>
@@ -222,12 +222,12 @@
                 <img class="boton-icono" src="./imagenes/iconos/tonel.png" alt="Fabricación">
                 <span>Fabricación</span>
             </button>
-            <button class="boton amarillo boton-con-icono" mostrar="vista_ubicacion" data-contexto-ubicacion="botas" disabled>
-                <img class="boton-icono" src="./imagenes/iconos/toneles.png" alt="Salidas de botas">
+            <button class="boton amarillo boton-con-icono" mostrar="vista_salidas">
+                <img class="boton-icono" src="./imagenes/iconos/camion_tonel.png" alt="Salidas de botas">
                 <span>Salidas</span>
             </button>
-            <button class="boton violeta boton-con-icono" mostrar="vista_expedicion" disabled>
-                <img class="boton-icono" src="./imagenes/iconos/camion_tonel.png" alt="Expediciones">
+            <button class="boton violeta boton-con-icono" mostrar="vista_envinado">
+                <img class="boton-icono" src="./imagenes/iconos/toneles.png" alt="Expediciones">
                 <span>Envinado</span>
             </button>
             <button class="boton boton-volver" mostrar="vista_tareas">
@@ -908,147 +908,32 @@
             </div>
         </div>
 
-        <section id="vista_expedicion" class="flex-fill" modo="listado_ventas">
-            <div class="table-responsive">
-                <table id="tabla_ordenes_venta" class="table table-striped table-bordered">
-                    <thead class="table-dark">
-                        <tr>
-                            <th colspan="3">Ordenes de Venta</th>
-                        </tr>
-                        <tr>
-                            <th scope="col">Nº de Orden</th>
-                            <th scope="col">Fecha</th>
-                            <th scope="col">Cliente</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>4500720598</td>
-                            <td>31/07/2025</td>
-                            <td>Irish Distillers</td>
-                        </tr>
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <th colspan="3">Ordenes de Venta</th>
-                        </tr>
-                    </tfoot>
-                </table>
-
-                <table id="tabla_contenido_orden_venta" class="table table-striped table-bordered">
-                    <thead class="table-dark">
-                        <tr>
-                            <th colspan="4"><span class="orden_venta_seleccionada">Orden 4500720598, 30/07/2025,
-                                    Irish Distillers</span></th>
-                        </tr>
-                        <tr>
-                            <th scope="col">Material</th>
-                            <th scope="col">Cant.</th>
-                            <th scope="col">Fab.</th>
-                            <th scope="col">Falta</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td>Malaga PX Butts BM</td>
-                            <td>45</td>
-                            <td>44</td>
-                            <td>1</td>
-                        </tr>
-                    </tbody>
-                    <tfoot>
-                        <tr>
-                            <td colspan="4">Volver a listado de órdenes de venta</td>
-                        </tr>
-                    </tfoot>
-                </table>
-            </div>
-
-            <div class="modal fade" id="miModal3" tabindex="-1" aria-labelledby="miModalLabel3" aria-hidden="true">
-                <div class="modal-dialog modal-dialog-centered">
-                    <div class="modal-content">
-
-                        <div class="modal-header">
-                            <h5 class="modal-title" id="miModalLabel3">Identificación de toneles</h5>
-                            <button type="button" class="btn-close" data-bs-dismiss="modal"
-                                aria-label="Cerrar"></button>
-                        </div>
-
-                        <div class="modal-body">
-                            <p>Id de toneles correspondientes a:
-                                <span id="productoOrden">Malaga PX Butts BM</span>
-                            </p>
-
-                            <div class="table-responsive">
-                                <table class="table table-bordered table-sm">
-                                    <thead class="table-light">
-                                        <tr>
-                                            <th scope="col">ID</th>
-                                            <th scope="col">Fab.</th>
-                                            <th scope="col">Ubic.</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>TONEL001</td>
-                                            <td>Sí</td>
-                                            <td></td>
-                                        </tr>
-                                        <tr>
-                                            <td>TONEL002</td>
-                                            <td>Sí</td>
-                                            <td></td>
-                                        </tr>
-                                        <tr>
-                                            <td>TONEL003</td>
-                                            <td>Sí</td>
-                                            <td></td>
-                                        </tr>
-                                        <tr>
-                                            <td>TONEL004</td>
-                                            <td>No</td>
-                                            <td>UBIC001</td>
-                                        </tr>
-                                    </tbody>
-                                    <tfoot>
-                                        <tr>
-                                            <td colspan="3" class="text-end">
-                                                <p>Solicitado: <span id="totalToneles">45</span> toneles</p>
-                                                <p>Fabricado: <span id="totalToneles">44</span> toneles</p>
-                                                <p>Almacenado: <span id="totalToneles">1</span> toneles</p>
-
-
-                                    <!-- Grupo de input + botón Agregar -->
-                                    <div class="input-group">
-                                        <input type="text" class="form-control"
-                                            placeholder="Id de tonel o ubicación">
-                                        <button class="btn btn-primary" type="button">
-                                            <i class="bi bi-search"></i> Agregar
-                                        </button>
-                                    </div>
-
-                                            </td>
-                                        </tr>
-                                    </tfoot>
-                                </table>
-
-                                <div class="modal-footer flex-column align-items-stretch gap-2">
-
-                                    <!-- Botones finales -->
-                                    <div class="d-flex justify-content-end gap-2">
-                                        <button type="button" class="btn btn-secondary"
-                                            data-bs-dismiss="modal">Cerrar</button>
-                                    </div>
-
-                                </div>
-
-                            </div>
-                        </div>
+        <section id="vista_salidas" class="flex-fill vista-panel-fija">
+            <div class="contenedor-panel-fijo panel-fijo">
+                <div class="panel-fijo-header">
+                    <h5 class="mb-0">Salidas</h5>
+                    <div id="salidas-resumen" class="small text-muted"></div>
+                </div>
+                <div class="panel-fijo-body">
+                    <div id="salidas-lista" class="destino-productos-lista">
+                        <div class="destino-productos-vacio">Cargando productos...</div>
                     </div>
-
                 </div>
             </div>
+        </section>
 
+        <section id="vista_envinado" class="flex-fill vista-panel-fija">
+            <div class="contenedor-panel-fijo panel-fijo">
+                <div class="panel-fijo-header">
+                    <h5 class="mb-0">Envinado</h5>
+                    <div id="envinado-resumen" class="small text-muted"></div>
+                </div>
+                <div class="panel-fijo-body">
+                    <div id="envinado-lista" class="destino-productos-lista">
+                        <div class="destino-productos-vacio">Cargando productos...</div>
+                    </div>
+                </div>
+            </div>
         </section>
     </main>
 
@@ -1082,7 +967,9 @@
     <script src="./js/gestion-auth.js?v=20260316c"></script>
     <script src="./js/terminal-recepcion.js?v=20260316c"></script>
     <script src="./js/terminal-fabricacion.js?v=20260316c"></script>
-    <script src="./js/terminal-expedicion.js?v=20260316c"></script>
+    <script src="./js/terminal-productos-destino.js?v=20260316c"></script>
+    <script src="./js/terminal-salidas.js?v=20260316c"></script>
+    <script src="./js/terminal-envinado.js?v=20260316c"></script>
     <script src="./js/terminal-ubicacion.js?v=20260316c"></script>
     <script src="./js/terminal-mover-stock.js?v=20260316c"></script>
     <script src="./js/terminal-procesar-stock.js?v=20260316c"></script>

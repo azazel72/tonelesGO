@@ -5,7 +5,7 @@ from pydantic import BaseModel
 from servidor.dominio.maestros.cliente_dto import ClienteDTO
 from servidor.dominio.maestros.estado_pedido_dto import EstadoPedidoDTO
 from servidor.dominio.maestros.estado_fabricacion_semanal_dto import EstadoFabricacionSemanalDTO
-from servidor.dominio.maestros.estado_bota_dto import EstadoBotaDTO
+from servidor.dominio.maestros.estado_producto_dto import EstadoProductoDTO
 from servidor.dominio.maestros.estado_trazabilidad_fabricacion_dto import EstadoTrazabilidadFabricacionDTO
 from servidor.dominio.maestros.estado_palet_dto import EstadoPaletDTO
 from servidor.dominio.maestros.instalacion_dto import InstalacionDTO
@@ -29,7 +29,7 @@ class MaestrosDTO(BaseModel):
     clientes: Optional[Dict[int, "ClienteDTO"]] = {}
     estados_pedidos: Optional[Dict[int, "EstadoPedidoDTO"]] = {}
     estados_fabricacion_semanal: Optional[Dict[int, "EstadoFabricacionSemanalDTO"]] = {}
-    estados_botas: Optional[Dict[int, "EstadoBotaDTO"]] = {}
+    estados_productos: Optional[Dict[int, "EstadoProductoDTO"]] = {}
     estados_trazabilidad_fabricacion: Optional[Dict[int, "EstadoTrazabilidadFabricacionDTO"]] = {}
     estados_palets: Optional[Dict[int, "EstadoPaletDTO"]] = {}
     instalaciones: Optional[Dict[int, InstalacionDTO]] = {}
