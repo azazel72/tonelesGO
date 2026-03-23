@@ -16,6 +16,12 @@ document.addEventListener("DOMContentLoaded", function () {
             if (boton.dataset.contextoUbicacion) {
                 contextoNavegacion.ubicacionOrigen = boton.dataset.contextoUbicacion;
             }
+            if (boton.dataset.contextoMoverStock) {
+                contextoNavegacion.moverStockOrigen = boton.dataset.contextoMoverStock;
+            }
+            if (boton.dataset.contextoProcesarStock) {
+                contextoNavegacion.procesarStockOrigen = boton.dataset.contextoProcesarStock;
+            }
             contextoNavegacion.autoAccesoConsumo = boton.dataset.accesoDirectoConsumo === "1";
             contextoNavegacion.autoAccesoFabricacion = boton.dataset.accesoDirectoFabricacion === "1";
             mostrarSeccion(boton.getAttribute("mostrar"));
@@ -37,6 +43,8 @@ document.addEventListener("DOMContentLoaded", function () {
     prepararEventosExpedicion();
     prepararEventosMenuFlejes();
     prepararEventosUbicacion();
+    prepararEventosMoverStock();
+    prepararEventosProcesarStock();
     prepararEventosAmbientes();
 
     // Muestra la sección de tareas al cargar la página
@@ -52,6 +60,8 @@ const contextoNavegacion = {
     recepcionOrigen: "maderas_madera",
     consumoOrigen: "maderas_madera",
     ubicacionOrigen: "botas",
+    moverStockOrigen: "maderas_madera",
+    procesarStockOrigen: "maderas_madera",
     autoAccesoConsumo: false,
     autoAccesoFabricacion: false,
 };
@@ -85,6 +95,12 @@ function mostrarSeccion(id) {
         }
         if (id === "vista_ubicacion") {
             cargarFormularioCrearStock();
+        }
+        if (id === "vista_mover_stock") {
+            cargarFormularioMoverStock();
+        }
+        if (id === "vista_procesar_stock") {
+            cargarFormularioProcesarStock();
         }
         if (id === "vista_menu_maderas_fleje") {
             cargarEntradasFlejesMenu();
@@ -176,6 +192,38 @@ function actualizarMigasPan(mostrarSeccion) {
                 nuevaMiga = crearMigaPan("Crear a partir de Stock", mostrarSeccion, true);
             } else {
                 nuevaMiga = crearMigaPan("Ubicación", mostrarSeccion, true);
+            }
+            migasPan.appendChild(nuevaMiga);
+            break;
+        case "vista_mover_stock":
+            nuevaMiga = crearMigaPan("Inicio", "vista_tareas", false);
+            migasPan.appendChild(nuevaMiga);
+            if (contextoNavegacion.moverStockOrigen === "maderas_madera") {
+                nuevaMiga = crearMigaPan("Maderas", "vista_menu_maderas", false);
+                migasPan.appendChild(nuevaMiga);
+                nuevaMiga = crearMigaPan("Madera", "vista_menu_maderas_madera", false);
+                migasPan.appendChild(nuevaMiga);
+                nuevaMiga = crearMigaPan("Movimientos", "vista_menu_movimientos", false);
+                migasPan.appendChild(nuevaMiga);
+                nuevaMiga = crearMigaPan("Mover Stock", mostrarSeccion, true);
+            } else {
+                nuevaMiga = crearMigaPan("Mover Stock", mostrarSeccion, true);
+            }
+            migasPan.appendChild(nuevaMiga);
+            break;
+        case "vista_procesar_stock":
+            nuevaMiga = crearMigaPan("Inicio", "vista_tareas", false);
+            migasPan.appendChild(nuevaMiga);
+            if (contextoNavegacion.procesarStockOrigen === "maderas_madera") {
+                nuevaMiga = crearMigaPan("Maderas", "vista_menu_maderas", false);
+                migasPan.appendChild(nuevaMiga);
+                nuevaMiga = crearMigaPan("Madera", "vista_menu_maderas_madera", false);
+                migasPan.appendChild(nuevaMiga);
+                nuevaMiga = crearMigaPan("Movimientos", "vista_menu_movimientos", false);
+                migasPan.appendChild(nuevaMiga);
+                nuevaMiga = crearMigaPan("Procesar", mostrarSeccion, true);
+            } else {
+                nuevaMiga = crearMigaPan("Procesar", mostrarSeccion, true);
             }
             migasPan.appendChild(nuevaMiga);
             break;
@@ -389,11 +437,23 @@ var ACCIONES = {
             || pantallaActual === "vista_consumo"
             || pantallaActual === "vista_fabricacion_semanal"
             || pantallaActual === "vista_consumo_semanal"
+            || pantallaActual === "vista_ubicacion"
+            || pantallaActual === "vista_mover_stock"
+            || pantallaActual === "vista_procesar_stock"
         ) {
             if (msg?.data?.refetch_maestros) {
                 refrescarMaestrosFabricacion?.();
             }
             refrescarFabricacionDesdeServidor?.(msg.data || {});
+            if (pantallaActual === "vista_ubicacion") {
+                cargarFormularioCrearStock?.();
+            }
+            if (pantallaActual === "vista_mover_stock") {
+                cargarFormularioMoverStock?.();
+            }
+            if (pantallaActual === "vista_procesar_stock") {
+                cargarFormularioProcesarStock?.();
+            }
         }
     },
     "async_error": (msg) => {

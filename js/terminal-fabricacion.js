@@ -15,6 +15,13 @@ function prepararEventosFabricacion() {
             agregarTrazabilidadFabricacionDesdePaletUI();
         });
     }
+    const tabsConsumo = document.getElementById("consumo-panel-tabs");
+    if (tabsConsumo) {
+        tabsConsumo.addEventListener("shown.bs.tab", (event) => {
+            actualizarBotonFooterConsumo(event.target?.id);
+        });
+        actualizarBotonFooterConsumo(document.querySelector("#consumo-panel-tabs .nav-link.active")?.id);
+    }
     const selectUbicacionConsumo = document.getElementById("consumo-ubicacion-origen");
     if (selectUbicacionConsumo) {
         selectUbicacionConsumo.addEventListener("change", async () => {
@@ -130,6 +137,15 @@ function prepararEventosFabricacion() {
         });
     }
 
+}
+
+function actualizarBotonFooterConsumo(tabActivaId) {
+    const btnStock = document.getElementById("consumo-stock-agregar-trazabilidad");
+    const btnPalet = document.getElementById("consumo-palet-agregar-trazabilidad");
+    if (!btnStock || !btnPalet) return;
+    const activaPalet = tabActivaId === "consumo-tab-palet";
+    btnStock.classList.toggle("d-none", activaPalet);
+    btnPalet.classList.toggle("d-none", !activaPalet);
 }
 
 function registrarEventosVistaProduccion(vistaId) {

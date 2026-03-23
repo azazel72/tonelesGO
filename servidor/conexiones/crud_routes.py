@@ -150,12 +150,16 @@ class CrudRoutes:
                             "actualizar_estado_trazabilidad_fabricacion",
                             "eliminar_trazabilidad_fabricacion",
                             "imprimir_etiqueta_fabricacion",
+                            "mover_stock",
+                            "procesar_stock",
                         }:
                             await broadcast_pantalla("vista_fabricacion", {"tabla": "trazabilidad_fabricacion"})
                             await broadcast_pantalla("vista_consumo", {"tabla": "trazabilidad_fabricacion"})
                             await broadcast_pantalla("vista_fabricacion_semanal", {"tabla": "trazabilidad_fabricacion"})
                             await broadcast_pantalla("vista_consumo_semanal", {"tabla": "trazabilidad_fabricacion"})
                             await broadcast_pantalla("gestion_fabricacion", {"tabla": "trazabilidad_fabricacion"})
+                            await broadcast_pantalla("vista_ubicacion", {"tabla": "palets", "refetch_maestros": True})
+                            await broadcast_pantalla("vista_mover_stock", {"tabla": "palets", "refetch_maestros": True})
                         elif msg.action in {"modificar_maestro", "insertar_maestro", "eliminar_maestro"}:
                             tabla = (msg.data or {}).get("tabla")
                             if tabla in {"pedidos", "tipos_producto", "fabricacion_semanal", "trazabilidad_fabricacion", "botas", "consumos"}:

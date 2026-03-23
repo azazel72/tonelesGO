@@ -594,8 +594,12 @@ class Colector:
             palets_db = session.exec(stmt).all()
             palets = []
             for p in palets_db:
-                restante = max(float(p[7] or 0) - float(p[8] or 0), 0.0)
+                restante = max(float(p[6] or 0) - float(p[7] or 0), 0.0)
                 if restante <= 0:
+                    continue
+                if p[3] is None:
+                    continue
+                if p[4] is None or p[5] is None:
                     continue
                 palets.append({
                     "id": p[0],
@@ -739,6 +743,193 @@ class Colector:
             session.refresh(palet_nuevo)
             session.refresh(retorno["trazabilidad"])
             return retorno
+
+    def _normalizar_segmento_stock(self, texto, fallback="stock"):
+        base = re.sub(r"[^A-Za-z0-9]+", "_", str(texto or fallback).strip().lower()).strip("_")
+        return base or fallback
+
+    def _generar_prefijo_stock_movido(self, palet_origen: PaletDB, ubicacion_destino_id: int | None = None) -> str:
+        tipo = self.fabricacion.tipos_producto.get(int(palet_origen.tipo_producto_id or 0))
+        material = self.maestros.materiales.get(int(palet_origen.material_id or 0))
+        tipo_txt = self._normalizar_segmento_stock(
+            getattr(tipo, "codigo", None) or getattr(tipo, "descripcion", None) or "duela",
+            "duela",
+        )
+        material_txt = self._normalizar_segmento_stock(
+            getattr(material, "descripcion", None) or getattr(material, "nombre", None) or "madera",
+            "madera",
+        )
+        if ubicacion_destino_id:
+            ubicacion = self.maestros.ubicaciones.get(int(ubicacion_destino_id))
+            ubicacion_txt = self._normalizar_segmento_stock(
+                getattr(ubicacion, "descripcion", None) or getattr(ubicacion, "nombre", None) or ubicacion_destino_id,
+                "ubicacion",
+            )
+            return f"stock_{tipo_txt}_{material_txt}_{ubicacion_txt}"
+        return f"stock_{tipo_txt}_{material_txt}"
+
+    def mover_stock(self, data):
+        palet_origen_id = data.get("palet_origen_id")
+        ubicacion_destino_id = data.get("ubicacion_destino_id")
+        cubicaje = data.get("cubicaje")
+        paquetes = data.get("paquetes")
+
+        if not palet_origen_id:
+            raise ValueError("palet_origen_id es obligatorio.")
+        if not ubicacion_destino_id:
+            raise ValueError("ubicacion_destino_id es obligatorio.")
+        if cubicaje is None or str(cubicaje).strip() == "":
+            raise ValueError("cubicaje es obligatorio.")
+
+        cubicaje_total = float(cubicaje) * float(paquetes or 1)
+        if cubicaje_total <= 0:
+            raise ValueError("cubicaje debe ser mayor que 0.")
+
+        with DB.crear_sesion() as session:
+            palet_origen = session.get(PaletDB, int(palet_origen_id))
+            if not palet_origen:
+                raise ValueError("palet_origen no encontrado.")
+            if palet_origen.linea_entrada_id is not None:
+                raise ValueError("El palet origen no es stock.")
+            if bool(palet_origen.procesado):
+                raise ValueError("El palet origen esta procesado.")
+            if not palet_origen.tipo_producto_id or not palet_origen.material_id:
+                raise ValueError("El palet origen no tiene tipo o madera.")
+            if int(palet_origen.ubicacion_id or 0) == int(ubicacion_destino_id):
+                raise ValueError("La ubicacion destino debe ser distinta del origen.")
+
+            restante_origen = max(float(palet_origen.cubicaje or 0) - float(palet_origen.consumido or 0), 0.0)
+            if cubicaje_total > restante_origen:
+                raise ValueError("El cubicaje solicitado supera el restante del palet origen.")
+
+            palet_destino = session.exec(
+                select(PaletDB)
+                .where(PaletDB.linea_entrada_id.is_(None))
+                .where(PaletDB.procesado.is_(False))
+                .where(PaletDB.tipo_producto_id == palet_origen.tipo_producto_id)
+                .where(PaletDB.material_id == palet_origen.material_id)
+                .where(PaletDB.ubicacion_id == int(ubicacion_destino_id))
+                .order_by(PaletDB.codigo, PaletDB.id)
+            ).first()
+
+            creado = False
+            if palet_destino:
+                palet_destino.cubicaje = float(palet_destino.cubicaje or 0) + cubicaje_total
+                session.add(palet_destino)
+            else:
+                codigo_nuevo = self._generar_prefijo_stock_movido(palet_origen, int(ubicacion_destino_id))
+                palet_destino = PaletDB(
+                    codigo=codigo_nuevo,
+                    linea_entrada_id=None,
+                    tipo_producto_id=palet_origen.tipo_producto_id,
+                    material_id=palet_origen.material_id,
+                    cubicaje=cubicaje_total,
+                    consumido=0.0,
+                    estado=palet_origen.estado,
+                    ubicacion_id=int(ubicacion_destino_id),
+                    procesado=False,
+                )
+                session.add(palet_destino)
+                creado = True
+
+            palet_origen.consumido = float(palet_origen.consumido or 0) + cubicaje_total
+            session.add(palet_origen)
+            session.commit()
+            session.refresh(palet_origen)
+            session.refresh(palet_destino)
+
+            self.maestros.palets[palet_origen.id] = PaletDTO.from_db(palet_origen)
+            self.maestros.palets[palet_destino.id] = PaletDTO.from_db(palet_destino)
+
+            return {
+                "ok": True,
+                "creado": creado,
+                "origen": PaletDTO.from_db(palet_origen).model_dump(),
+                "destino": PaletDTO.from_db(palet_destino).model_dump(),
+                "cubicaje_movido": cubicaje_total,
+            }
+
+    def _obtener_ubicacion_procesados(self, session) -> UbicacionDB:
+        ubicacion = session.exec(
+            select(UbicacionDB)
+            .join(InstalacionDB, InstalacionDB.id == UbicacionDB.instalacion_id)
+            .where(func.upper(UbicacionDB.descripcion) == "PROCESADOS")
+            .where(func.upper(InstalacionDB.nombre) == "PROCESADOS")
+            .order_by(UbicacionDB.id)
+        ).first()
+        if not ubicacion:
+            raise ValueError("No existe la ubicacion Procesados - Procesados.")
+        return ubicacion
+
+    def procesar_stock(self, data):
+        palet_origen_id = data.get("palet_origen_id")
+        cubicaje = data.get("cubicaje")
+        paquetes = data.get("paquetes")
+
+        if not palet_origen_id:
+            raise ValueError("palet_origen_id es obligatorio.")
+        if cubicaje is None or str(cubicaje).strip() == "":
+            raise ValueError("cubicaje es obligatorio.")
+
+        cubicaje_total = float(cubicaje) * float(paquetes or 1)
+        if cubicaje_total <= 0:
+            raise ValueError("cubicaje debe ser mayor que 0.")
+
+        with DB.crear_sesion() as session:
+            palet_origen = session.get(PaletDB, int(palet_origen_id))
+            if not palet_origen:
+                raise ValueError("palet_origen no encontrado.")
+            if palet_origen.linea_entrada_id is not None:
+                raise ValueError("El palet origen no es stock.")
+            if bool(palet_origen.procesado):
+                raise ValueError("El palet origen ya esta procesado.")
+
+            restante_origen = max(float(palet_origen.cubicaje or 0) - float(palet_origen.consumido or 0), 0.0)
+            if cubicaje_total > restante_origen:
+                raise ValueError("El cubicaje solicitado supera el restante del palet origen.")
+
+            ubicacion_procesados = self._obtener_ubicacion_procesados(session)
+            prefijo = self._extraer_prefijo_lote(palet_origen.codigo or "")
+            if not prefijo:
+                raise ValueError("No se pudo determinar el prefijo del palet origen.")
+            codigo_nuevo = prefijo
+
+            palet_destino = PaletDB(
+                codigo=codigo_nuevo,
+                linea_entrada_id=None,
+                tipo_producto_id=palet_origen.tipo_producto_id,
+                material_id=palet_origen.material_id,
+                cubicaje=cubicaje_total,
+                consumido=0.0,
+                estado=palet_origen.estado,
+                ubicacion_id=ubicacion_procesados.id,
+                procesado=True,
+            )
+            session.add(palet_destino)
+            session.flush()
+
+            session.add(
+                TrazabilidadProcesadoDB(
+                    palet_origen_id=palet_origen.id,
+                    palet_destino_id=palet_destino.id,
+                )
+            )
+
+            palet_origen.consumido = float(palet_origen.consumido or 0) + cubicaje_total
+            session.add(palet_origen)
+            session.commit()
+            session.refresh(palet_origen)
+            session.refresh(palet_destino)
+
+            self.maestros.palets[palet_origen.id] = PaletDTO.from_db(palet_origen)
+            self.maestros.palets[palet_destino.id] = PaletDTO.from_db(palet_destino)
+
+            return {
+                "ok": True,
+                "origen": PaletDTO.from_db(palet_origen).model_dump(),
+                "destino": PaletDTO.from_db(palet_destino).model_dump(),
+                "cubicaje_procesado": cubicaje_total,
+            }
 
     def eliminar_trazabilidad_fabricacion(self, data):
         trazabilidad_id = data.get("id")

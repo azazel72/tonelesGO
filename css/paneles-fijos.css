@@ -1,0 +1,67 @@
+.vista-panel-fija.pagina-activa {
+    padding: 20px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    min-height: 0;
+}
+
+.contenedor-panel-fijo {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+    max-width: none;
+    padding: 0;
+    margin: 0;
+}
+
+.panel-fijo {
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+    width: 100%;
+}
+
+.panel-fijo:not(.card) {
+    border: 1px solid #d8dee6;
+    border-radius: 0.75rem;
+    background: #fff;
+    overflow: hidden;
+}
+
+.panel-fijo-header,
+.panel-fijo-footer {
+    flex: 0 0 auto;
+}
+
+.panel-fijo:not(.card) > .panel-fijo-header,
+.panel-fijo:not(.card) > .panel-fijo-body,
+.panel-fijo:not(.card) > .panel-fijo-footer {
+    padding: 1rem;
+}
+
+.panel-fijo:not(.card) > .panel-fijo-header {
+    border-bottom: 1px solid #d8dee6;
+}
+
+.panel-fijo:not(.card) > .panel-fijo-footer {
+    border-top: 1px solid #d8dee6;
+}
+
+.panel-fijo-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.panel-fijo-body {
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+    overscroll-behavior: contain;
+}

@@ -30,6 +30,8 @@ def obtener_acciones() -> Dict[str, any]:
         "inventario_duelas": lambda ws, req: Colector.colector.inventario_duelas(),
         "inventario_flejes": lambda ws, req: Colector.colector.inventario_flejes(),
         "siguiente_codigo_palet": lambda ws, req: Colector.colector.siguiente_codigo_palet(req.data or {}),
+        "mover_stock": lambda ws, req: Colector.colector.mover_stock(req.data or {}),
+        "procesar_stock": lambda ws, req: Colector.colector.procesar_stock(req.data or {}),
         "modificar_maestro": lambda ws, req: Colector.colector.modificar_maestro(req.data),
         "modificar_entrada": lambda ws, req: Colector.colector.modificar_entrada(req.data),
         "eliminar_maestro": lambda ws, req: Colector.colector.eliminar_maestro(req.data),

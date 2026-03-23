@@ -7,20 +7,6 @@
     box-sizing: border-box;
 }
 
-#panelConsumo {
-    border: 1px solid #d8dee6;
-    border-radius: 0.75rem;
-    background: #fff;
-    padding: 1rem;
-}
-
-#panelBotas {
-    border: 1px solid #d8dee6;
-    border-radius: 0.75rem;
-    background: #fff;
-    padding: 1rem;
-}
-
 #panelConsumo .table-responsive {
     max-height: 50vh;
     overflow: auto;
@@ -29,6 +15,15 @@
 #panelBotas .table-responsive {
     max-height: 50vh;
     overflow: auto;
+}
+
+#panelConsumo .panel-fijo-body .table-responsive,
+#panelBotas .panel-fijo-body .table-responsive {
+    max-height: none;
+}
+
+#panelConsumo .panel-fijo-body > .table-responsive {
+    margin-bottom: 1rem;
 }
 
 .panel-botas-trazas {
@@ -59,10 +54,6 @@
 .panel-botas-trazas .table-responsive {
     margin: 0;
     padding: 0.75rem;
-}
-
-.panel-consumo-footer {
-    margin-top: 1rem;
 }
 
 #vista_fabricacion_semanal .table-responsive,
