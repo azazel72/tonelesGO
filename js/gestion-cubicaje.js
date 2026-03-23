@@ -34,7 +34,7 @@ function openCubicajeWin() {
     },
     tabulator: {
       options: {
-        editable: false,
+        editable: tablaEditable,
         columns: [
           { title: "Tipo producto ID", field: "tipo_producto_id", width: 130, hozAlign: "right" },
           {
@@ -43,7 +43,14 @@ function openCubicajeWin() {
             cssClass: "filtrable",
             formatter: (cell) => DATOS?.fabricacion?.tipos_producto?.[cell.getValue()]?.descripcion ?? cell.getValue(),
           },
-          { title: "Cubicaje estandar", field: "cubicaje_estandar", hozAlign: "right", cssClass: "filtrable" },
+          {
+            title: "Cubicaje estandar",
+            field: "cubicaje_estandar",
+            hozAlign: "right",
+            cssClass: "filtrable",
+            editor: "number",
+            editable: tablaEditable,
+          },
         ],
         data,
       },
