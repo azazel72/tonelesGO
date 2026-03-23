@@ -16,7 +16,7 @@ function openCubicajeWin() {
       || cubicajeLista.find((c) => Number(c?.tipo_producto_id || 0) === Number(tp.id))
       || null;
     return {
-      id: Number(tp.id),
+      id: registro?.id ?? undefined,
       tipo_producto_id: Number(tp.id),
       cubicaje_estandar: Number(registro?.cubicaje_estandar || 0),
     };
@@ -36,6 +36,7 @@ function openCubicajeWin() {
       options: {
         editable: tablaEditable,
         columns: [
+          { title: "ID", field: "id", width: 90, hozAlign: "right" },
           { title: "Tipo producto ID", field: "tipo_producto_id", width: 130, hozAlign: "right" },
           {
             title: "Tipo DUELA",
