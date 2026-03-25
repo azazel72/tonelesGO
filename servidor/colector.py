@@ -1064,10 +1064,13 @@ class Colector:
             else:
                 operarios_ids_codigo = [batidero_id]
 
+        lotes_normalizados = [self._normalizar_lote_traza(lote) for lote in (lotes or [])]
+        lotes_normalizados = [lote for lote in lotes_normalizados if lote]
+
         if tipo == "BOTA":
             if not fabricacion_semanal_id:
                 raise ValueError("fabricacion_semanal_id es obligatorio.")
-            if not isinstance(lotes, list) or not lotes or not self._normalizar_lote_traza(lotes[0]):
+            if not isinstance(lotes, list) or not lotes_normalizados:
                 raise ValueError("Debe seleccionar al menos un lote.")
             if batidero_id is None:
                 raise ValueError("batidero es obligatorio para fabricar botas.")
@@ -1093,20 +1096,29 @@ class Colector:
                     palet_codigos = []
                     linea_ref = None
                     produccion_id = None
-                    trazas_palets_lote = []
+                    grupos_trazas_palets_lote = []
 
                     if tipo == "BOTA":
                         linea_ref = session.get(FabricacionSemanalDB, int(fabricacion_semanal_id))
                         if not linea_ref:
                             raise ValueError("Linea de fabricacion no encontrada.")
                         produccion_id = linea_ref.id
-                        _lote_normalizado, trazas_palets_lote = self._obtener_trazas_palets_por_lote(
+                        grupos_trazas_palets_lote = self._obtener_trazas_palets_por_lotes(
                             session,
                             int(fabricacion_semanal_id),
-                            lotes[0],
+                            lotes_normalizados,
                         )
-                        trazas = [traza for traza, _palet in trazas_palets_lote]
-                        palet_codigos = [palet.codigo for _traza, palet in trazas_palets_lote if palet.codigo]
+                        trazas = [
+                            traza
+                            for grupo in grupos_trazas_palets_lote
+                            for traza, _palet in grupo["trazas_palets"]
+                        ]
+                        palet_codigos = [
+                            palet.codigo
+                            for grupo in grupos_trazas_palets_lote
+                            for _traza, palet in grupo["trazas_palets"]
+                            if palet.codigo
+                        ]
                     else:
                         trazas = session.exec(
                             select(TrazabilidadFabricacionDB).where(
@@ -1161,7 +1173,7 @@ class Colector:
                         if tipo == "BOTA" and linea_ref:
                             trazas_producto = self._consumir_duela_bota_desde_trazas(
                                 session,
-                                trazas_palets_lote,
+                                grupos_trazas_palets_lote,
                                 float(consumo_duela.consumo or 0),
                             )
                             for consumo_fleje in consumos_fleje:
@@ -1327,6 +1339,29 @@ class Colector:
         resultado.sort(key=lambda item: ((item[1].codigo or ""), int(item[1].id or 0), int(item[0].id or 0)))
         return lote_normalizado, resultado
 
+    def _obtener_trazas_palets_por_lotes(self, session, fabricacion_semanal_id: int, lotes: list[str]):
+        lotes_normalizados = []
+        vistos = set()
+        for lote in lotes or []:
+            lote_normalizado = self._normalizar_lote_traza(lote)
+            if not lote_normalizado or lote_normalizado in vistos:
+                continue
+            vistos.add(lote_normalizado)
+            lotes_normalizados.append(lote_normalizado)
+
+        if not lotes_normalizados:
+            raise ValueError("No se pudo determinar el lote seleccionado.")
+
+        resultado = []
+        for lote_normalizado in lotes_normalizados:
+            _, trazas_lote = self._obtener_trazas_palets_por_lote(session, fabricacion_semanal_id, lote_normalizado)
+            resultado.append({
+                "lote": lote_normalizado,
+                "trazas_palets": trazas_lote,
+            })
+
+        return resultado
+
     def _obtener_receta_bota(self, session, tipo_producto_id: int):
         consumos = session.exec(
             select(ConsumoDB).where(ConsumoDB.bota_id == tipo_producto_id)
@@ -1350,48 +1385,64 @@ class Colector:
 
         return consumos_duela[0], consumos_fleje
 
-    def _consumir_duela_bota_desde_trazas(self, session, trazas_palets, consumo_unitario: float):
-        if not trazas_palets:
+    def _consumir_duela_bota_desde_trazas(self, session, grupos_trazas_palets, consumo_unitario: float):
+        if not grupos_trazas_palets:
             raise ValueError("No hay trazas de lote para consumir duela.")
 
-        pendiente = float(consumo_unitario or 0)
         trazas_usadas = []
-        ultima_traza = None
-        ultimo_palet = None
+        grupos_validos = [grupo for grupo in (grupos_trazas_palets or []) if grupo.get("trazas_palets")]
+        if not grupos_validos:
+            raise ValueError("No hay trazas de lote para consumir duela.")
 
-        for traza, palet in trazas_palets:
-            ultima_traza = traza
-            ultimo_palet = palet
-            if pendiente <= 0:
-                break
+        consumo_por_lote = float(consumo_unitario or 0) / len(grupos_validos)
 
-            restante = float(palet.cubicaje or 0) - float(palet.consumido or 0)
-            if restante <= 0:
-                continue
+        for grupo in grupos_validos:
+            pendiente = consumo_por_lote
+            ultima_traza = None
+            ultimo_palet = None
+            primera_traza_consumida = None
 
-            traza.cantidad_fabricada = int(traza.cantidad_fabricada or 0) + 1
-            session.add(traza)
-            trazas_usadas.append(traza)
+            for traza, palet in grupo["trazas_palets"]:
+                ultima_traza = traza
+                ultimo_palet = palet
+                if pendiente <= 0:
+                    break
 
-            delta = min(restante, pendiente)
-            palet.consumido = float(palet.consumido or 0) + delta
-            if float(palet.consumido or 0) >= float(palet.cubicaje or 0):
-                palet.estado = 2
-            session.add(palet)
+                restante = float(palet.cubicaje or 0) - float(palet.consumido or 0)
+                if restante <= 0:
+                    continue
 
-            pendiente -= delta
+                if primera_traza_consumida is None:
+                    traza.cantidad_fabricada = int(traza.cantidad_fabricada or 0) + 1
+                    session.add(traza)
+                    primera_traza_consumida = traza
+                    trazas_usadas.append(traza)
+                elif all(t.id != traza.id for t in trazas_usadas):
+                    trazas_usadas.append(traza)
 
-        if pendiente > 0:
-            if ultima_traza is None or ultimo_palet is None:
-                raise ValueError("No se pudo determinar el ultimo palet del lote.")
-            if not trazas_usadas or trazas_usadas[-1].id != ultima_traza.id:
-                ultima_traza.cantidad_fabricada = int(ultima_traza.cantidad_fabricada or 0) + 1
-                session.add(ultima_traza)
-                trazas_usadas.append(ultima_traza)
-            ultimo_palet.consumido = float(ultimo_palet.consumido or 0) + pendiente
-            if float(ultimo_palet.consumido or 0) >= float(ultimo_palet.cubicaje or 0):
-                ultimo_palet.estado = 2
-            session.add(ultimo_palet)
+                delta = min(restante, pendiente)
+                palet.consumido = float(palet.consumido or 0) + delta
+                if float(palet.consumido or 0) >= float(palet.cubicaje or 0):
+                    palet.estado = 2
+                session.add(palet)
+
+                pendiente -= delta
+
+            if pendiente > 0:
+                if ultima_traza is None or ultimo_palet is None:
+                    raise ValueError("No se pudo determinar el ultimo palet del lote.")
+                if primera_traza_consumida is None:
+                    ultima_traza.cantidad_fabricada = int(ultima_traza.cantidad_fabricada or 0) + 1
+                    session.add(ultima_traza)
+                    primera_traza_consumida = ultima_traza
+                    trazas_usadas.append(ultima_traza)
+                elif all(t.id != ultima_traza.id for t in trazas_usadas):
+                    trazas_usadas.append(ultima_traza)
+
+                ultimo_palet.consumido = float(ultimo_palet.consumido or 0) + pendiente
+                if float(ultimo_palet.consumido or 0) >= float(ultimo_palet.cubicaje or 0):
+                    ultimo_palet.estado = 2
+                session.add(ultimo_palet)
 
         return trazas_usadas
 

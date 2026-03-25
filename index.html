@@ -46,38 +46,38 @@
                         </button>
 
                         <div class="offcanvas-menu-grupo">
-                            <h6>Maderas</h6>
-                            <button class="offcanvas-nav-btn" mostrar="vista_menu_maderas" data-bs-dismiss="offcanvas">
-                                Menú Maderas
+                            <h6>Palets</h6>
+                            <button class="offcanvas-nav-btn" mostrar="vista_menu_palets" data-bs-dismiss="offcanvas">
+                                Menú Palets
                             </button>
-                            <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_menu_maderas_fleje" data-bs-dismiss="offcanvas">
+                            <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_menu_palets_fleje" data-bs-dismiss="offcanvas">
                                 Fleje
                             </button>
-                            <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_menu_maderas_madera" data-bs-dismiss="offcanvas">
+                            <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_menu_palets_madera" data-bs-dismiss="offcanvas">
                                 Madera
                             </button>
                         </div>
 
                         <div class="offcanvas-menu-grupo">
-                            <h6>Maderas - Fleje</h6>
-                            <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_recepcion" data-contexto-recepcion="maderas_fleje"
+                            <h6>Palets - Fleje</h6>
+                            <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_recepcion" data-contexto-recepcion="palets_fleje"
                                 data-bs-dismiss="offcanvas">
                                 Recepción
                             </button>
-                            <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_consumo_semanal" data-origen-fabricacion="maderas_fleje"
-                                data-contexto-consumo="maderas_fleje" data-acceso-directo-consumo="1" data-bs-dismiss="offcanvas">
+                            <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_consumo_semanal" data-origen-fabricacion="palets_fleje"
+                                data-contexto-consumo="palets_fleje" data-acceso-directo-consumo="1" data-bs-dismiss="offcanvas">
                                 Consumo
                             </button>
                         </div>
 
                         <div class="offcanvas-menu-grupo">
-                            <h6>Maderas - Madera</h6>
-                            <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_recepcion" data-contexto-recepcion="maderas_madera"
+                            <h6>Palets - Madera</h6>
+                            <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_recepcion" data-contexto-recepcion="palets_madera"
                                 data-bs-dismiss="offcanvas">
                                 Recepción
                             </button>
-                            <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_consumo_semanal" data-origen-fabricacion="maderas_madera"
-                                data-contexto-consumo="maderas_madera" data-acceso-directo-consumo="1" data-bs-dismiss="offcanvas">
+                            <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_consumo_semanal" data-origen-fabricacion="palets_madera"
+                                data-contexto-consumo="palets_madera" data-acceso-directo-consumo="1" data-bs-dismiss="offcanvas">
                                 Consumo
                             </button>
                             <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_menu_movimientos"
@@ -126,7 +126,7 @@
     <main class="flex-fill d-flex flex-column overflow-hidden">
 
         <section id="vista_tareas" class="flex-fill pagina-activa menu-principal">
-            <button class="boton azul boton-con-icono" mostrar="vista_menu_maderas">
+            <button class="boton azul boton-con-icono" mostrar="vista_menu_palets">
                 <img class="boton-icono" src="./imagenes/iconos/palet.png" alt="Palets">
                 <span>Palets</span>
             </button>
@@ -136,12 +136,12 @@
             </button>
         </section>
 
-        <section id="vista_menu_maderas" class="flex-fill menu-secundario">
-            <button class="boton rojo boton-con-icono" mostrar="vista_menu_maderas_fleje">
+        <section id="vista_menu_palets" class="flex-fill menu-secundario">
+            <button class="boton rojo boton-con-icono" mostrar="vista_menu_palets_fleje">
                 <img class="boton-icono" src="./imagenes/iconos/camion_tonel.png" alt="Fleje">
                 <span>Fleje</span>
             </button>
-            <button class="boton verde boton-con-icono" mostrar="vista_menu_maderas_madera">
+            <button class="boton verde boton-con-icono" mostrar="vista_menu_palets_madera">
                 <img class="boton-icono" src="./imagenes/iconos/palet.png" alt="Madera">
                 <span>Madera</span>
             </button>
@@ -150,7 +150,7 @@
             </button>
         </section>
 
-        <section id="vista_menu_maderas_fleje" class="flex-fill vista-flejes">
+        <section id="vista_menu_palets_fleje" class="flex-fill vista-flejes">
             <div class="card shadow-sm fleje-card">
                 <div class="card-header d-flex justify-content-between align-items-center gap-2">
                     <h5 class="mb-0">Flejes disponibles</h5>
@@ -174,17 +174,17 @@
                     </div>
                 </div>
             </div>
-            <button class="boton boton-volver" mostrar="vista_menu_maderas">
+            <button class="boton boton-volver" mostrar="vista_menu_palets">
                 <span>Volver</span>
             </button>
         </section>
 
-        <section id="vista_menu_maderas_madera" class="flex-fill menu-secundario">
-            <button class="boton rojo boton-con-icono" mostrar="vista_recepcion" data-contexto-recepcion="maderas_madera">
+        <section id="vista_menu_palets_madera" class="flex-fill menu-secundario">
+            <button class="boton rojo boton-con-icono" mostrar="vista_recepcion" data-contexto-recepcion="palets_madera">
                 <img class="boton-icono" src="./imagenes/iconos/camion_palet.png" alt="Recepción">
                 <span>Recepción</span>
             </button>
-            <button class="boton verde boton-con-icono" mostrar="vista_consumo_semanal" data-origen-fabricacion="maderas_madera" data-contexto-consumo="maderas_madera" data-acceso-directo-consumo="1">
+            <button class="boton verde boton-con-icono" mostrar="vista_consumo_semanal" data-origen-fabricacion="palets_madera" data-contexto-consumo="palets_madera" data-acceso-directo-consumo="1">
                 <img class="boton-icono" src="./imagenes/iconos/palet.png" alt="Consumo">
                 <span>Consumo</span>
             </button>
@@ -194,25 +194,25 @@
                 </div>
                 <span>Movimientos</span>
             </button>
-            <button class="boton boton-volver" mostrar="vista_menu_maderas">
+            <button class="boton boton-volver" mostrar="vista_menu_palets">
                 <span>Volver</span>
             </button>
         </section>
 
         <section id="vista_menu_movimientos" class="flex-fill menu-secundario">
-            <button class="boton rojo boton-con-icono" mostrar="vista_procesar_stock" data-contexto-procesar-stock="maderas_madera">
+            <button class="boton rojo boton-con-icono" mostrar="vista_procesar_stock" data-contexto-procesar-stock="palets_madera">
                 <i class="bi bi-box-arrow-down fs-2" aria-hidden="true"></i>
                 <span>Procesar</span>
             </button>
-            <button class="boton naranja boton-con-icono" mostrar="vista_mover_stock" data-contexto-mover-stock="maderas_madera">
+            <button class="boton naranja boton-con-icono" mostrar="vista_mover_stock" data-contexto-mover-stock="palets_madera">
                 <i class="bi bi-arrow-left-right fs-2" aria-hidden="true"></i>
                 <span>Mover Stock</span>
             </button>
-            <button class="boton verde boton-con-icono" mostrar="vista_ubicacion" data-contexto-ubicacion="maderas_madera">
+            <button class="boton verde boton-con-icono" mostrar="vista_ubicacion" data-contexto-ubicacion="palets_madera">
                 <i class="bi bi-plus-square fs-2" aria-hidden="true"></i>
                 <span>Crear a partir de Stock</span>
             </button>
-            <button class="boton boton-volver" mostrar="vista_menu_maderas_madera">
+            <button class="boton boton-volver" mostrar="vista_menu_palets_madera">
                 <span>Volver</span>
             </button>
         </section>
@@ -827,41 +827,28 @@
 
                 <div class="panel-fijo-body">
                     <details class="panel-botas-trazas">
-                        <summary>Ver listado de lotes</summary>
-                        <div class="table-responsive">
-                            <table class="table table-bordered table-sm" id="tabla_trazabilidad_botas">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th scope="col">Palet</th>
-                                        <th scope="col">Restante</th>
-                                        <th scope="col">Cantidad</th>
-                                        <th scope="col">Estado</th>
-                                    </tr>
-                                </thead>
-                                <tbody></tbody>
-                            </table>
+                        <summary>
+                            <span>Ver listado de lotes</span>
+                            <span class="panel-botas-trazas-resumen" id="resumen_trazabilidad_botas"></span>
+                        </summary>
+                        <div class="panel-botas-trazas-lista" id="lista_trazabilidad_botas" aria-live="polite">
+                            <div class="panel-botas-trazas-vacio">Cargando lotes...</div>
                         </div>
                     </details>
                     <div class="row g-3 align-items-end mt-1">
-                        <div class="col-12 col-lg-4">
-                            <label for="fabricar-bota-lote-madera" class="form-label mb-1">Lote de madera</label>
-                            <select id="fabricar-bota-lote-madera" class="form-select">
-                                <option value="">Seleccione lote de madera...</option>
-                            </select>
-                        </div>
                         <div class="col-12 col-lg-3">
                             <label for="fabricar-bota-batidero" class="form-label mb-1">Código de batidero</label>
                             <select id="fabricar-bota-batidero" class="form-select">
                                 <option value="">Seleccione código...</option>
                             </select>
                         </div>
-                        <div class="col-12 col-lg-3">
+                        <div class="col-12 col-lg-5">
                             <label for="fabricar-bota-operario-fondado" class="form-label mb-1">Operario de fondado</label>
                             <select id="fabricar-bota-operario-fondado" class="form-select">
                                 <option value="">Seleccione operario...</option>
                             </select>
                         </div>
-                        <div class="col-12 col-lg-2">
+                        <div class="col-12 col-lg-4">
                             <label for="fabricar-bota-cantidad-etiquetas" class="form-label mb-1">Etiquetas</label>
                             <input type="number" class="form-control" id="fabricar-bota-cantidad-etiquetas" min="1" step="1" value="1">
                         </div>
@@ -966,6 +953,7 @@
     <script src="./js/conexiones.js?v=20260316c"></script>
     <script src="./js/gestion-auth.js?v=20260316c"></script>
     <script src="./js/terminal-recepcion.js?v=20260316c"></script>
+    <script src="./js/terminal-consumo.js?v=20260316c"></script>
     <script src="./js/terminal-fabricacion.js?v=20260316c"></script>
     <script src="./js/terminal-productos-destino.js?v=20260316c"></script>
     <script src="./js/terminal-salidas.js?v=20260316c"></script>

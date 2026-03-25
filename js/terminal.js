@@ -39,6 +39,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     prepararEventosRecepcion();
+    prepararEventosConsumo();
     prepararEventosFabricacion();
     prepararEventosSalidas();
     prepararEventosEnvinado();
@@ -57,12 +58,12 @@ document.addEventListener("DOMContentLoaded", function () {
 let pantallaActual = null;
 let contextoPantalla = {};
 const contextoNavegacion = {
-    fabricacionOrigen: "maderas_madera",
-    recepcionOrigen: "maderas_madera",
-    consumoOrigen: "maderas_madera",
+    fabricacionOrigen: "palets_madera",
+    recepcionOrigen: "palets_madera",
+    consumoOrigen: "palets_madera",
     ubicacionOrigen: "botas",
-    moverStockOrigen: "maderas_madera",
-    procesarStockOrigen: "maderas_madera",
+    moverStockOrigen: "palets_madera",
+    procesarStockOrigen: "palets_madera",
     autoAccesoConsumo: false,
     autoAccesoFabricacion: false,
 };
@@ -103,7 +104,7 @@ function mostrarSeccion(id) {
         if (id === "vista_procesar_stock") {
             cargarFormularioProcesarStock();
         }
-        if (id === "vista_menu_maderas_fleje") {
+        if (id === "vista_menu_palets_fleje") {
             cargarEntradasFlejesMenu();
         }
         if (id === "vista_ambientes") {
@@ -130,24 +131,24 @@ function actualizarMigasPan(mostrarSeccion) {
             nuevaMiga = crearMigaPan("Inicio", "vista_tareas", true);
             migasPan.appendChild(nuevaMiga);
             break;
-        case "vista_menu_maderas":
+        case "vista_menu_palets":
             nuevaMiga = crearMigaPan("Inicio", "vista_tareas", false);
             migasPan.appendChild(nuevaMiga);
-            nuevaMiga = crearMigaPan("Maderas", mostrarSeccion, true);
+            nuevaMiga = crearMigaPan("Palets", mostrarSeccion, true);
             migasPan.appendChild(nuevaMiga);
             break;
-        case "vista_menu_maderas_fleje":
+        case "vista_menu_palets_fleje":
             nuevaMiga = crearMigaPan("Inicio", "vista_tareas", false);
             migasPan.appendChild(nuevaMiga);
-            nuevaMiga = crearMigaPan("Maderas", "vista_menu_maderas", false);
+            nuevaMiga = crearMigaPan("Palets", "vista_menu_palets", false);
             migasPan.appendChild(nuevaMiga);
             nuevaMiga = crearMigaPan("Fleje", mostrarSeccion, true);
             migasPan.appendChild(nuevaMiga);
             break;
-        case "vista_menu_maderas_madera":
+        case "vista_menu_palets_madera":
             nuevaMiga = crearMigaPan("Inicio", "vista_tareas", false);
             migasPan.appendChild(nuevaMiga);
-            nuevaMiga = crearMigaPan("Maderas", "vista_menu_maderas", false);
+            nuevaMiga = crearMigaPan("Palets", "vista_menu_palets", false);
             migasPan.appendChild(nuevaMiga);
             nuevaMiga = crearMigaPan("Madera", mostrarSeccion, true);
             migasPan.appendChild(nuevaMiga);
@@ -155,9 +156,9 @@ function actualizarMigasPan(mostrarSeccion) {
         case "vista_menu_movimientos":
             nuevaMiga = crearMigaPan("Inicio", "vista_tareas", false);
             migasPan.appendChild(nuevaMiga);
-            nuevaMiga = crearMigaPan("Maderas", "vista_menu_maderas", false);
+            nuevaMiga = crearMigaPan("Palets", "vista_menu_palets", false);
             migasPan.appendChild(nuevaMiga);
-            nuevaMiga = crearMigaPan("Madera", "vista_menu_maderas_madera", false);
+            nuevaMiga = crearMigaPan("Madera", "vista_menu_palets_madera", false);
             migasPan.appendChild(nuevaMiga);
             nuevaMiga = crearMigaPan("Movimientos", mostrarSeccion, true);
             migasPan.appendChild(nuevaMiga);
@@ -171,12 +172,12 @@ function actualizarMigasPan(mostrarSeccion) {
         case "vista_recepcion":
             nuevaMiga = crearMigaPan("Inicio", "vista_tareas", false);
             migasPan.appendChild(nuevaMiga);
-            nuevaMiga = crearMigaPan("Maderas", "vista_menu_maderas", false);
+            nuevaMiga = crearMigaPan("Palets", "vista_menu_palets", false);
             migasPan.appendChild(nuevaMiga);
-            if (contextoNavegacion.recepcionOrigen === "maderas_fleje") {
-                nuevaMiga = crearMigaPan("Fleje", "vista_menu_maderas_fleje", false);
+            if (contextoNavegacion.recepcionOrigen === "palets_fleje") {
+                nuevaMiga = crearMigaPan("Fleje", "vista_menu_palets_fleje", false);
             } else {
-                nuevaMiga = crearMigaPan("Madera", "vista_menu_maderas_madera", false);
+                nuevaMiga = crearMigaPan("Madera", "vista_menu_palets_madera", false);
             }
             migasPan.appendChild(nuevaMiga);
             nuevaMiga = crearMigaPan("Recepción", mostrarSeccion, true);
@@ -189,10 +190,10 @@ function actualizarMigasPan(mostrarSeccion) {
                 nuevaMiga = crearMigaPan("Botas", "vista_menu_botas", false);
                 migasPan.appendChild(nuevaMiga);
                 nuevaMiga = crearMigaPan("Ubicación", mostrarSeccion, true);
-            } else if (contextoNavegacion.ubicacionOrigen === "maderas_madera") {
-                nuevaMiga = crearMigaPan("Maderas", "vista_menu_maderas", false);
+            } else if (contextoNavegacion.ubicacionOrigen === "palets_madera") {
+                nuevaMiga = crearMigaPan("Palets", "vista_menu_palets", false);
                 migasPan.appendChild(nuevaMiga);
-                nuevaMiga = crearMigaPan("Madera", "vista_menu_maderas_madera", false);
+                nuevaMiga = crearMigaPan("Madera", "vista_menu_palets_madera", false);
                 migasPan.appendChild(nuevaMiga);
                 nuevaMiga = crearMigaPan("Movimientos", "vista_menu_movimientos", false);
                 migasPan.appendChild(nuevaMiga);
@@ -205,10 +206,10 @@ function actualizarMigasPan(mostrarSeccion) {
         case "vista_mover_stock":
             nuevaMiga = crearMigaPan("Inicio", "vista_tareas", false);
             migasPan.appendChild(nuevaMiga);
-            if (contextoNavegacion.moverStockOrigen === "maderas_madera") {
-                nuevaMiga = crearMigaPan("Maderas", "vista_menu_maderas", false);
+            if (contextoNavegacion.moverStockOrigen === "palets_madera") {
+                nuevaMiga = crearMigaPan("Palets", "vista_menu_palets", false);
                 migasPan.appendChild(nuevaMiga);
-                nuevaMiga = crearMigaPan("Madera", "vista_menu_maderas_madera", false);
+                nuevaMiga = crearMigaPan("Madera", "vista_menu_palets_madera", false);
                 migasPan.appendChild(nuevaMiga);
                 nuevaMiga = crearMigaPan("Movimientos", "vista_menu_movimientos", false);
                 migasPan.appendChild(nuevaMiga);
@@ -221,10 +222,10 @@ function actualizarMigasPan(mostrarSeccion) {
         case "vista_procesar_stock":
             nuevaMiga = crearMigaPan("Inicio", "vista_tareas", false);
             migasPan.appendChild(nuevaMiga);
-            if (contextoNavegacion.procesarStockOrigen === "maderas_madera") {
-                nuevaMiga = crearMigaPan("Maderas", "vista_menu_maderas", false);
+            if (contextoNavegacion.procesarStockOrigen === "palets_madera") {
+                nuevaMiga = crearMigaPan("Palets", "vista_menu_palets", false);
                 migasPan.appendChild(nuevaMiga);
-                nuevaMiga = crearMigaPan("Madera", "vista_menu_maderas_madera", false);
+                nuevaMiga = crearMigaPan("Madera", "vista_menu_palets_madera", false);
                 migasPan.appendChild(nuevaMiga);
                 nuevaMiga = crearMigaPan("Movimientos", "vista_menu_movimientos", false);
                 migasPan.appendChild(nuevaMiga);
@@ -237,12 +238,12 @@ function actualizarMigasPan(mostrarSeccion) {
         case "vista_consumo_semanal":
             nuevaMiga = crearMigaPan("Inicio", "vista_tareas", false);
             migasPan.appendChild(nuevaMiga);
-            nuevaMiga = crearMigaPan("Maderas", "vista_menu_maderas", false);
+            nuevaMiga = crearMigaPan("Palets", "vista_menu_palets", false);
             migasPan.appendChild(nuevaMiga);
-            if (contextoNavegacion.consumoOrigen === "maderas_fleje") {
-                nuevaMiga = crearMigaPan("Fleje", "vista_menu_maderas_fleje", false);
+            if (contextoNavegacion.consumoOrigen === "palets_fleje") {
+                nuevaMiga = crearMigaPan("Fleje", "vista_menu_palets_fleje", false);
             } else {
-                nuevaMiga = crearMigaPan("Madera", "vista_menu_maderas_madera", false);
+                nuevaMiga = crearMigaPan("Madera", "vista_menu_palets_madera", false);
             }
             migasPan.appendChild(nuevaMiga);
             nuevaMiga = crearMigaPan("Fabricación semanal", mostrarSeccion, true);
@@ -251,12 +252,12 @@ function actualizarMigasPan(mostrarSeccion) {
         case "vista_consumo":
             nuevaMiga = crearMigaPan("Inicio", "vista_tareas", false);
             migasPan.appendChild(nuevaMiga);
-            nuevaMiga = crearMigaPan("Maderas", "vista_menu_maderas", false);
+            nuevaMiga = crearMigaPan("Palets", "vista_menu_palets", false);
             migasPan.appendChild(nuevaMiga);
-            if (contextoNavegacion.consumoOrigen === "maderas_fleje") {
-                nuevaMiga = crearMigaPan("Fleje", "vista_menu_maderas_fleje", false);
+            if (contextoNavegacion.consumoOrigen === "palets_fleje") {
+                nuevaMiga = crearMigaPan("Fleje", "vista_menu_palets_fleje", false);
             } else {
-                nuevaMiga = crearMigaPan("Madera", "vista_menu_maderas_madera", false);
+                nuevaMiga = crearMigaPan("Madera", "vista_menu_palets_madera", false);
             }
             migasPan.appendChild(nuevaMiga);
             nuevaMiga = crearMigaPan("Fabricación semanal", "vista_consumo_semanal", false);
@@ -459,7 +460,12 @@ var ACCIONES = {
             if (msg?.data?.refetch_maestros) {
                 refrescarMaestrosFabricacion?.();
             }
-            refrescarFabricacionDesdeServidor?.(msg.data || {});
+            if (pantallaActual === "vista_consumo" || pantallaActual === "vista_consumo_semanal") {
+                refrescarConsumoDesdeServidor?.(msg.data || {});
+            }
+            if (pantallaActual === "vista_fabricacion" || pantallaActual === "vista_fabricacion_semanal") {
+                refrescarFabricacionDesdeServidor?.(msg.data || {});
+            }
             if (pantallaActual === "vista_ubicacion") {
                 cargarFormularioCrearStock?.();
             }
