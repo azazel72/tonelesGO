@@ -12,5 +12,6 @@ class ProductoDB(SQLModel, table=True):
     tipo_producto_id: Optional[int] = None
     material_id: Optional[int] = None
     ubicacion_id: Optional[int] = None
+    contenedor_id: Optional[int] = None
     produccion_id: Optional[int] = None
     estado: Optional[int] = 1

@@ -1,8 +1,5 @@
-#vista_envinado {
-    /*justify-content: space-evenly;*/
+#vista_almacen {
     padding: 20px;
-    /*color: white;*/
-    /*background-color: rgba(200, 170, 50, 0.3);*/
 }
 
 .destino-productos-lista {
@@ -95,6 +92,16 @@
     overflow: hidden;
 }
 
+.destino-pedido-card-cliente {
+    border-color: #9ac9b1;
+    background: linear-gradient(180deg, #f7fff9 0%, #edf8f1 100%);
+}
+
+.destino-pedido-card-envinado {
+    border-color: #c7b1de;
+    background: linear-gradient(180deg, #fcf8ff 0%, #f2ebfa 100%);
+}
+
 .destino-pedido-resumen {
     list-style: none;
     cursor: pointer;
@@ -109,6 +116,12 @@
     display: none;
 }
 
+.destino-pedido-resumen-lateral {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+}
+
 .destino-pedido-resumen-main {
     display: flex;
     flex-direction: column;
@@ -120,10 +133,91 @@
     color: #6b7280;
 }
 
+.destino-pedido-destino {
+    font-weight: 700;
+    letter-spacing: 0.02em;
+}
+
 .destino-pedido-resumen-total {
     font-weight: 700;
     color: #18212f;
     white-space: nowrap;
+}
+
+.destino-pedido-accion {
+    width: 2.2rem;
+    height: 2.2rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 999px;
+    border: 1px solid rgba(24, 33, 47, 0.12);
+    background: rgba(255, 255, 255, 0.78);
+    color: #18212f;
+}
+
+.destino-pedido-card-cliente .destino-pedido-accion {
+    background: #e1f3e6;
+    border-color: #94caa6;
+    color: #25543a;
+}
+
+.destino-pedido-card-envinado .destino-pedido-accion {
+    background: #efe4fb;
+    border-color: #b99ad8;
+    color: #5a347e;
+}
+
+.destino-pedido-card-cliente .destino-pedido-accion:hover,
+.destino-pedido-card-cliente .destino-pedido-accion:focus,
+.destino-pedido-card-cliente .destino-pedido-accion:active,
+.destino-pedido-card-envinado .destino-pedido-accion:hover,
+.destino-pedido-card-envinado .destino-pedido-accion:focus,
+.destino-pedido-card-envinado .destino-pedido-accion:active {
+    box-shadow: none;
+}
+
+.destino-pedido-card-cliente .destino-pedido-accion:hover,
+.destino-pedido-card-cliente .destino-pedido-accion:focus,
+.destino-pedido-card-cliente .destino-pedido-accion:active {
+    background: #e1f3e6;
+    border-color: #94caa6;
+    color: #25543a;
+}
+
+.destino-pedido-card-envinado .destino-pedido-accion:hover,
+.destino-pedido-card-envinado .destino-pedido-accion:focus,
+.destino-pedido-card-envinado .destino-pedido-accion:active {
+    background: #efe4fb;
+    border-color: #b99ad8;
+    color: #5a347e;
+}
+
+.destino-expedir-codigos {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.destino-expedir-codigo {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.35rem;
+    padding: 0.32rem 0.65rem;
+    border-radius: 999px;
+    background: #edf8f1;
+    border: 1px solid #9ac9b1;
+    color: #1f4d34;
+    font-family: monospace;
+    font-size: 0.9rem;
+}
+
+.destino-expedir-codigo button {
+    border: 0;
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    line-height: 1;
 }
 
 .destino-pedido-codigos {

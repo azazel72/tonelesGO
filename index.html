@@ -6,16 +6,16 @@
     <title>Paez Lobato - GO</title>
     <meta name="viewport"
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <link rel="stylesheet" href="./static/css/bootstrap.min.css?v=20260316c" />
-    <link rel="stylesheet" href="./static/font/bootstrap-icons.css?v=20260316c">
+    <link rel="stylesheet" href="./static/css/bootstrap.min.css?v=20260325a" />
+    <link rel="stylesheet" href="./static/font/bootstrap-icons.css?v=20260325a">
 
-    <link rel="stylesheet" href="./css/app.css?v=20260316c" />
-    <link rel="stylesheet" href="./css/tareas.css?v=20260316c" />
-    <link rel="stylesheet" href="./css/recepcion.css?v=20260316c" />
-    <link rel="stylesheet" href="./css/paneles-fijos.css?v=20260316c" />
-    <link rel="stylesheet" href="./css/ubicacion.css?v=20260316c" />
-    <link rel="stylesheet" href="./css/fabricacion.css?v=20260316c" />
-    <link rel="stylesheet" href="./css/expedicion.css?v=20260316c" />
+    <link rel="stylesheet" href="./css/app.css?v=20260325a" />
+    <link rel="stylesheet" href="./css/tareas.css?v=20260325a" />
+    <link rel="stylesheet" href="./css/recepcion.css?v=20260325a" />
+    <link rel="stylesheet" href="./css/paneles-fijos.css?v=20260325a" />
+    <link rel="stylesheet" href="./css/ubicacion.css?v=20260325a" />
+    <link rel="stylesheet" href="./css/fabricacion.css?v=20260325a" />
+    <link rel="stylesheet" href="./css/expedicion.css?v=20260325a" />
     <link rel="icon" type="image/png" href="./imagenes/iconos/tonel.png">
 </head>
 
@@ -95,11 +95,11 @@
                                 data-acceso-directo-fabricacion="1" data-bs-dismiss="offcanvas">
                                 Fabricación
                             </button>
-                            <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_salidas">
-                                Salidas
+                            <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_destino">
+                                Destino
                             </button>
-                            <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_envinado">
-                                Envinado
+                            <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_almacen">
+                                Almacen
                             </button>
                         </div>
 
@@ -222,13 +222,13 @@
                 <img class="boton-icono" src="./imagenes/iconos/tonel.png" alt="Fabricación">
                 <span>Fabricación</span>
             </button>
-            <button class="boton amarillo boton-con-icono" mostrar="vista_salidas">
-                <img class="boton-icono" src="./imagenes/iconos/camion_tonel.png" alt="Salidas de botas">
-                <span>Salidas</span>
+            <button class="boton amarillo boton-con-icono" mostrar="vista_destino">
+                <img class="boton-icono" src="./imagenes/iconos/camion_tonel.png" alt="Destino de botas">
+                <span>Destino</span>
             </button>
-            <button class="boton violeta boton-con-icono" mostrar="vista_envinado">
-                <img class="boton-icono" src="./imagenes/iconos/toneles.png" alt="Expediciones">
-                <span>Envinado</span>
+            <button class="boton violeta boton-con-icono" mostrar="vista_almacen">
+                <img class="boton-icono" src="./imagenes/iconos/toneles.png" alt="Almacen de botas">
+                <span>Almacen</span>
             </button>
             <button class="boton boton-volver" mostrar="vista_tareas">
                 <span>Volver</span>
@@ -895,37 +895,112 @@
             </div>
         </div>
 
-        <section id="vista_salidas" class="flex-fill vista-panel-fija">
+        <section id="vista_destino" class="flex-fill vista-panel-fija">
             <div class="contenedor-panel-fijo panel-fijo">
                 <div class="panel-fijo-header">
-                    <h5 class="mb-0">Salidas</h5>
-                    <div id="salidas-resumen" class="small text-muted"></div>
+                    <h5 class="mb-0">Destino</h5>
+                    <div id="destino-resumen" class="small text-muted"></div>
                 </div>
                 <div class="panel-fijo-body">
-                    <div id="salidas-lista" class="destino-productos-lista">
+                    <div id="destino-lista" class="destino-productos-lista">
                         <div class="destino-productos-vacio">Cargando productos...</div>
                     </div>
                 </div>
             </div>
         </section>
 
-        <section id="vista_envinado" class="flex-fill vista-panel-fija">
-            <div class="contenedor-panel-fijo panel-fijo">
-                <div class="panel-fijo-header">
-                    <h5 class="mb-0">Envinado</h5>
-                    <div id="envinado-resumen" class="small text-muted"></div>
-                </div>
-                <div class="panel-fijo-body">
-                    <div id="envinado-lista" class="destino-productos-lista">
-                        <div class="destino-productos-vacio">Cargando productos...</div>
+        <div class="modal fade" id="modalExpedirDestino" tabindex="-1" aria-labelledby="modalExpedirDestinoLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalExpedirDestinoLabel">Expedir pedido</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <div class="small text-muted">Pedido</div>
+                            <div class="fw-semibold" id="destino-expedir-pedido"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="destino-expedir-contenedor" class="form-label">Contenedor</label>
+                            <input type="text" class="form-control" id="destino-expedir-contenedor" autocomplete="off">
+                        </div>
+                        <div class="mb-3">
+                            <label for="destino-expedir-codigo" class="form-label">Código de bota</label>
+                            <input type="text" class="form-control" id="destino-expedir-codigo" autocomplete="off" placeholder="Escribe un código y pulsa Intro">
+                            <div class="form-text">Solo se admiten códigos que estén en la lista del pedido.</div>
+                        </div>
+                        <div id="destino-expedir-error" class="alert alert-danger d-none py-2 mb-3"></div>
+                        <div class="border rounded p-2 bg-light-subtle">
+                            <div class="small text-muted mb-2">Botas seleccionadas</div>
+                            <div id="destino-expedir-codigos" class="destino-expedir-codigos">
+                                <div class="text-muted small">Sin botas seleccionadas.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary" id="destino-expedir-confirmar">Expedir</button>
                     </div>
                 </div>
             </div>
+        </div>
+
+        <div class="modal fade" id="modalEnvinarDestino" tabindex="-1" aria-labelledby="modalEnvinarDestinoLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalEnvinarDestinoLabel">Envinar pedido</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <div class="small text-muted">Pedido</div>
+                            <div class="fw-semibold" id="destino-envinar-pedido"></div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="destino-envinar-ubicacion" class="form-label">Ubicación</label>
+                            <select class="form-select" id="destino-envinar-ubicacion">
+                                <option value="">Selecciona una ubicación...</option>
+                            </select>
+                            <div class="form-text">Solo se muestran ubicaciones de instalaciones con tipo B.</div>
+                        </div>
+                        <div class="mb-3">
+                            <label for="destino-envinar-codigo" class="form-label">Código de bota</label>
+                            <input type="text" class="form-control" id="destino-envinar-codigo" autocomplete="off" placeholder="Escribe un código y pulsa Intro">
+                            <div class="form-text">Solo se admiten códigos que estén en la lista del pedido.</div>
+                        </div>
+                        <div id="destino-envinar-error" class="alert alert-danger d-none py-2 mb-3"></div>
+                        <div class="border rounded p-2 bg-light-subtle">
+                            <div class="small text-muted mb-2">Botas seleccionadas</div>
+                            <div id="destino-envinar-codigos" class="destino-expedir-codigos">
+                                <div class="text-muted small">Sin botas seleccionadas.</div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                        <button type="button" class="btn btn-primary" id="destino-envinar-confirmar">Envinar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <section id="vista_almacen" class="flex-fill vista-panel-fija">
+            <div class="contenedor-panel-fijo panel-fijo">
+                <div class="panel-fijo-header">
+                    <h5 class="mb-0">Almacen</h5>
+                </div>
+                <div class="panel-fijo-body">
+                    <div class="destino-productos-vacio">Pendiente de agregar listado de botas almacenadas, formulario y subida de documentos, y acciones de embarcar y envinar.</div>
+                </div>
+            </div>
         </section>
+
     </main>
 
     <footer class="bg-light py-1 text-center">
-        <p class="mb-0 small text-muted">Versión v2.0.1</p>
+        <p class="mb-0 small text-muted">Versión v2.1.0</p>
     </footer>
 
     <div id="login-overlay"class="overlay d-none">
@@ -948,21 +1023,21 @@
     </div>
 
 
-    <script src="./static/js/bootstrap.bundle.min.js?v=20260316c"></script>
-    <script src="./js/constantes.js?v=20260316c"></script>
-    <script src="./js/conexiones.js?v=20260316c"></script>
-    <script src="./js/gestion-auth.js?v=20260316c"></script>
-    <script src="./js/terminal-recepcion.js?v=20260316c"></script>
-    <script src="./js/terminal-consumo.js?v=20260316c"></script>
-    <script src="./js/terminal-fabricacion.js?v=20260316c"></script>
-    <script src="./js/terminal-productos-destino.js?v=20260316c"></script>
-    <script src="./js/terminal-salidas.js?v=20260316c"></script>
-    <script src="./js/terminal-envinado.js?v=20260316c"></script>
-    <script src="./js/terminal-ubicacion.js?v=20260316c"></script>
-    <script src="./js/terminal-mover-stock.js?v=20260316c"></script>
-    <script src="./js/terminal-procesar-stock.js?v=20260316c"></script>
-    <script src="./js/terminal-ambientes.js?v=20260316c"></script>
-    <script src="./js/terminal.js?v=20260316c"></script>
+    <script src="./static/js/bootstrap.bundle.min.js?v=20260325a"></script>
+    <script src="./js/constantes.js?v=20260325a"></script>
+    <script src="./js/conexiones.js?v=20260325a"></script>
+    <script src="./js/gestion-auth.js?v=20260325a"></script>
+    <script src="./js/terminal-recepcion.js?v=20260325a"></script>
+    <script src="./js/terminal-consumo.js?v=20260325a"></script>
+    <script src="./js/terminal-fabricacion.js?v=20260325a"></script>
+    <script src="./js/terminal-productos-destino.js?v=20260325a"></script>
+    <script src="./js/terminal-destino.js?v=20260325a"></script>
+    <script src="./js/terminal-almacen.js?v=20260325a"></script>
+    <script src="./js/terminal-ubicacion.js?v=20260325a"></script>
+    <script src="./js/terminal-mover-stock.js?v=20260325a"></script>
+    <script src="./js/terminal-procesar-stock.js?v=20260325a"></script>
+    <script src="./js/terminal-ambientes.js?v=20260325a"></script>
+    <script src="./js/terminal.js?v=20260325a"></script>
 
 </body>
 

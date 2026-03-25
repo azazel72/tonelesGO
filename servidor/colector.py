@@ -10,14 +10,14 @@ from servidor.herramientas.utilidades import obtener_anterior_dia_semana
 from servidor.herramientas.BcryptHelper import BcryptHelper
 
 from .modelos import ClienteDB, EstadoPedidoDB, EstadoFabricacionSemanalDB, EstadoProductoDB, EstadoTrazabilidadFabricacionDB, EstadoPaletDB
-from .modelos import InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB, RolDB, PuestoTrabajoDB, MaterialDB, EntradaDB, LineaEntradaDB, PaletDB, ProductoDB, ProductoOperarioDB, ArchivoSubidoDB, AmbienteDB, EntradaFlejeDB, CubicajeDB
+from .modelos import InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB, RolDB, PuestoTrabajoDB, MaterialDB, ContenedorDB, EntradaDB, LineaEntradaDB, PaletDB, ProductoDB, ProductoOperarioDB, ArchivoSubidoDB, AmbienteDB, EntradaFlejeDB, CubicajeDB
 from .modelos import PedidoDB, TipoProductoDB, FabricacionSemanalDB, TrazabilidadProcesadoDB, TrazabilidadFabricacionDB, TrazabilidadProductoDB, ConsumoDB
 from .modelos import PlanCamionDB, PlanFacturacionDB, PlanMaterialDB, CuadranteDB, CuadranteDetalleDB
 from .persistencia import GenericRepository, DB
 from sqlmodel import select
 from sqlalchemy import extract, func
 from .dominio import PlanificacionEntradasDTO, MaestrosDTO, PlanMaterialDTO, PlanFacturacionDTO, PlanCamionDTO, CuadranteDTO, CuadranteDetalleDTO, FabricacionDTO
-from .dominio import ClienteDTO, EstadoPedidoDTO, EstadoFabricacionSemanalDTO, EstadoProductoDTO, EstadoTrazabilidadFabricacionDTO, EstadoPaletDTO, InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO, RolDTO, PuestoTrabajoDTO, MaterialDTO, EntradaDTO, LineaEntradaDTO, PaletDTO, ProductoDTO, ArchivoSubidoDTO, AmbienteDTO, EntradaFlejeDTO, CubicajeDTO, CuadrantesDTO
+from .dominio import ClienteDTO, EstadoPedidoDTO, EstadoFabricacionSemanalDTO, EstadoProductoDTO, EstadoTrazabilidadFabricacionDTO, EstadoPaletDTO, InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO, RolDTO, PuestoTrabajoDTO, MaterialDTO, ContenedorDTO, EntradaDTO, LineaEntradaDTO, PaletDTO, ProductoDTO, ArchivoSubidoDTO, AmbienteDTO, EntradaFlejeDTO, CubicajeDTO, CuadrantesDTO
 from .dominio import PedidoDTO, TipoProductoDTO, FabricacionSemanalDTO, TrazabilidadProcesadoDTO, TrazabilidadFabricacionDTO, TrazabilidadProductoDTO, ConsumoDTO
 from servidor.impresion import ImprimirEtiqueta
 from servidor.conexiones.broadcast import broadcast_error, broadcast_event
@@ -56,6 +56,7 @@ class Colector:
         self.repo_puestos_trabajo = GenericRepository(PuestoTrabajoDB)
 
         self.repo_materiales_maestro = GenericRepository(MaterialDB)
+        self.repo_contenedores = GenericRepository(ContenedorDB)
         self.repo_entradas = GenericRepository(EntradaDB)
         self.repo_lineas_entrada = GenericRepository(LineaEntradaDB)
         self.repo_palets = GenericRepository(PaletDB)
@@ -126,6 +127,7 @@ class Colector:
             roles = self.repo_roles.list_all(session)
             puestos_trabajo = self.repo_puestos_trabajo.list_all(session)
             materiales = self.repo_materiales_maestro.list_all(session)
+            contenedores = self.repo_contenedores.list_all(session)
             entradas = self.repo_entradas.list_all(session)
             lineas_entrada = self.repo_lineas_entrada.list_all(session)
             palets = self.repo_palets.list_all(session)
@@ -148,6 +150,7 @@ class Colector:
             self.maestros.roles = {rol.id: RolDTO.from_db(rol) for rol in roles}
             self.maestros.puestos_trabajo = {puesto.id: PuestoTrabajoDTO.from_db(puesto) for puesto in puestos_trabajo}
             self.maestros.materiales = {material.id: MaterialDTO.from_db(material) for material in materiales}
+            self.maestros.contenedores = {contenedor.id: ContenedorDTO.from_db(contenedor) for contenedor in contenedores}
             self.maestros.entradas = {entrada.id: EntradaDTO.from_db(entrada) for entrada in entradas}
             self.maestros.lineas_entrada = {linea.id: LineaEntradaDTO.from_db(linea) for linea in lineas_entrada}
             self.maestros.palets = {palet.id: PaletDTO.from_db(palet) for palet in palets}
@@ -529,6 +532,7 @@ class Colector:
                     "tipo_producto_descripcion": getattr(tipo, "descripcion", None) or getattr(tipo, "codigo", None) or "",
                     "material_id": material_id,
                     "material_descripcion": getattr(material, "descripcion", None) or "",
+                    "contenedor_id": producto.contenedor_id,
                     "fabricacion_semanal_id": getattr(linea, "id", None),
                     "fabricacion_cantidad": getattr(linea, "cantidad", 0) if linea else 0,
                     "fabricacion_cantidad_fabricada": getattr(linea, "cantidad_fabricada", 0) if linea else 0,
@@ -628,6 +632,197 @@ class Colector:
                     }
                 )
             return resultado
+
+    def expedir_productos_destino(self, data):
+        data = data or {}
+        pedido_id = int(data.get("pedido_id") or 0)
+        codigos = [
+            str(codigo).strip()
+            for codigo in (data.get("codigos") or [])
+            if str(codigo).strip() != ""
+        ]
+        contenedor = str(data.get("contenedor") or "").strip()
+
+        if not pedido_id:
+            raise ValueError("pedido_id es obligatorio.")
+        if not contenedor:
+            raise ValueError("contenedor es obligatorio.")
+        if not codigos:
+            raise ValueError("codigos es obligatorio.")
+
+        codigos_unicos = list(dict.fromkeys(codigos))
+
+        with DB.crear_sesion() as session:
+            pedido = session.get(PedidoDB, pedido_id)
+            if not pedido:
+                raise ValueError("pedido no encontrado.")
+            if str(pedido.destino or "").strip().upper() != "CLIENTE":
+                raise ValueError("Solo se pueden expedir pedidos con destino CLIENTE.")
+
+            lineas = session.exec(
+                select(FabricacionSemanalDB).where(FabricacionSemanalDB.pedido_id == pedido_id)
+            ).all()
+            lineas_ids = {int(linea.id) for linea in lineas if linea.id}
+            if not lineas_ids:
+                raise ValueError("El pedido no tiene fabricación semanal.")
+
+            productos = session.exec(
+                select(ProductoDB).where(ProductoDB.codigo.in_(codigos_unicos))
+            ).all()
+            productos_por_codigo = {str(producto.codigo or "").strip(): producto for producto in productos}
+            trazabilidades_producto = session.exec(
+                select(TrazabilidadProductoDB).where(
+                    TrazabilidadProductoDB.producto_id.in_([int(producto.id) for producto in productos if producto.id])
+                )
+            ).all() if productos else []
+            trazabilidades_fabricacion = session.exec(select(TrazabilidadFabricacionDB)).all()
+            trazabilidades_fabricacion_por_id = {int(traza.id): traza for traza in trazabilidades_fabricacion if traza.id}
+            linea_por_producto_id = {}
+            for traza_producto in trazabilidades_producto:
+                producto_rel_id = int(traza_producto.producto_id or 0)
+                traza_fabricacion = trazabilidades_fabricacion_por_id.get(int(traza_producto.trazabilidad_fabricacion_id or 0))
+                if not producto_rel_id or not traza_fabricacion:
+                    continue
+                linea_por_producto_id[producto_rel_id] = int(traza_fabricacion.fabricacion_semanal_id or 0)
+
+            faltantes = [codigo for codigo in codigos_unicos if codigo not in productos_por_codigo]
+            if faltantes:
+                raise ValueError(f"No se encontraron estos códigos: {', '.join(faltantes)}")
+
+            productos_validos = []
+            for codigo in codigos_unicos:
+                producto = productos_por_codigo[codigo]
+                linea_producto_id = int(producto.produccion_id or 0) or int(linea_por_producto_id.get(int(producto.id or 0)) or 0)
+                if linea_producto_id not in lineas_ids:
+                    raise ValueError(f"El código {codigo} no pertenece al pedido seleccionado.")
+                productos_validos.append(producto)
+
+            contenedor_db = session.exec(
+                select(ContenedorDB)
+                .where(ContenedorDB.pedido_id == pedido_id)
+                .where(ContenedorDB.contenedor == contenedor)
+                .order_by(ContenedorDB.id.desc())
+            ).first()
+            if not contenedor_db:
+                contenedor_db = ContenedorDB(
+                    contenedor=contenedor,
+                    pedido_id=pedido_id,
+                )
+                session.add(contenedor_db)
+                session.flush()
+
+            actualizados = []
+            for producto in productos_validos:
+                producto.estado = 6
+                producto.contenedor_id = contenedor_db.id
+                session.add(producto)
+                actualizados.append(producto)
+
+            session.commit()
+
+            for producto in actualizados:
+                session.refresh(producto)
+                self.maestros.productos[producto.id] = ProductoDTO.from_db(producto)
+            self.maestros.contenedores[contenedor_db.id] = ContenedorDTO.from_db(contenedor_db)
+
+            return {
+                "ok": True,
+                "pedido_id": pedido_id,
+                "contenedor": contenedor,
+                "contenedor_id": contenedor_db.id,
+                "cantidad": len(actualizados),
+                "codigos": [producto.codigo for producto in actualizados],
+            }
+
+    def envinar_productos_destino(self, data):
+        data = data or {}
+        pedido_id = int(data.get("pedido_id") or 0)
+        ubicacion_id = int(data.get("ubicacion_id") or 0)
+        codigos = [
+            str(codigo).strip()
+            for codigo in (data.get("codigos") or [])
+            if str(codigo).strip() != ""
+        ]
+
+        if not pedido_id:
+            raise ValueError("pedido_id es obligatorio.")
+        if not ubicacion_id:
+            raise ValueError("ubicacion_id es obligatorio.")
+        if not codigos:
+            raise ValueError("codigos es obligatorio.")
+
+        codigos_unicos = list(dict.fromkeys(codigos))
+
+        with DB.crear_sesion() as session:
+            pedido = session.get(PedidoDB, pedido_id)
+            if not pedido:
+                raise ValueError("pedido no encontrado.")
+            if str(pedido.destino or "").strip().upper() != "ENVINADO":
+                raise ValueError("Solo se pueden envinar pedidos con destino ENVINADO.")
+
+            ubicacion = session.get(UbicacionDB, ubicacion_id)
+            if not ubicacion:
+                raise ValueError("ubicacion no encontrada.")
+
+            instalacion = session.get(InstalacionDB, int(ubicacion.instalacion_id or 0))
+            tipo_instalacion = str(getattr(instalacion, "tipo", "") or "").strip().upper()
+            if not instalacion or tipo_instalacion != "B":
+                raise ValueError("La ubicación seleccionada debe pertenecer a una instalación de tipo B.")
+
+            lineas = session.exec(
+                select(FabricacionSemanalDB).where(FabricacionSemanalDB.pedido_id == pedido_id)
+            ).all()
+            lineas_ids = {int(linea.id) for linea in lineas if linea.id}
+            if not lineas_ids:
+                raise ValueError("El pedido no tiene fabricación semanal.")
+
+            productos = session.exec(
+                select(ProductoDB).where(ProductoDB.codigo.in_(codigos_unicos))
+            ).all()
+            productos_por_codigo = {str(producto.codigo or "").strip(): producto for producto in productos}
+            trazabilidades_producto = session.exec(
+                select(TrazabilidadProductoDB).where(
+                    TrazabilidadProductoDB.producto_id.in_([int(producto.id) for producto in productos if producto.id])
+                )
+            ).all() if productos else []
+            trazabilidades_fabricacion = session.exec(select(TrazabilidadFabricacionDB)).all()
+            trazabilidades_fabricacion_por_id = {int(traza.id): traza for traza in trazabilidades_fabricacion if traza.id}
+            linea_por_producto_id = {}
+            for traza_producto in trazabilidades_producto:
+                producto_rel_id = int(traza_producto.producto_id or 0)
+                traza_fabricacion = trazabilidades_fabricacion_por_id.get(int(traza_producto.trazabilidad_fabricacion_id or 0))
+                if not producto_rel_id or not traza_fabricacion:
+                    continue
+                linea_por_producto_id[producto_rel_id] = int(traza_fabricacion.fabricacion_semanal_id or 0)
+
+            faltantes = [codigo for codigo in codigos_unicos if codigo not in productos_por_codigo]
+            if faltantes:
+                raise ValueError(f"No se encontraron estos códigos: {', '.join(faltantes)}")
+
+            actualizados = []
+            for codigo in codigos_unicos:
+                producto = productos_por_codigo[codigo]
+                linea_producto_id = int(producto.produccion_id or 0) or int(linea_por_producto_id.get(int(producto.id or 0)) or 0)
+                if linea_producto_id not in lineas_ids:
+                    raise ValueError(f"El código {codigo} no pertenece al pedido seleccionado.")
+                producto.estado = 4
+                producto.ubicacion_id = ubicacion.id
+                session.add(producto)
+                actualizados.append(producto)
+
+            session.commit()
+
+            for producto in actualizados:
+                session.refresh(producto)
+                self.maestros.productos[producto.id] = ProductoDTO.from_db(producto)
+
+            return {
+                "ok": True,
+                "pedido_id": pedido_id,
+                "ubicacion_id": ubicacion.id,
+                "cantidad": len(actualizados),
+                "codigos": [producto.codigo for producto in actualizados],
+            }
 
     def listar_cubicaje(self):
         with DB.crear_sesion() as session:

@@ -15,6 +15,8 @@ def obtener_acciones() -> Dict[str, any]:
         "listar_lineas_entrada": lambda ws, req: Colector.colector.listar_lineas_entrada(req.data.get("entrada_id")),
         "listar_pedidos": lambda ws, req: Colector.colector.listar_pedidos(req.data or {}),
         "listar_productos_por_filtros": lambda ws, req: Colector.colector.listar_productos_por_filtros(req.data or {}),
+        "expedir_productos_destino": lambda ws, req: Colector.colector.expedir_productos_destino(req.data or {}),
+        "envinar_productos_destino": lambda ws, req: Colector.colector.envinar_productos_destino(req.data or {}),
         "listar_fabricacion_semanal": lambda ws, req: Colector.colector.listar_fabricacion_semanal(req.data.get("pedido_id")),
         "listar_trazabilidad_fabricacion": lambda ws, req: Colector.colector.listar_trazabilidad_fabricacion(req.data.get("fabricacion_semanal_id")),
         "listar_palets_consumo": lambda ws, req: Colector.colector.listar_palets_consumo(),

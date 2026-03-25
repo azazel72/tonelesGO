@@ -24,6 +24,9 @@ async function cargarVistaProductosPorFiltros(config) {
             estadosProducto: config.estadosProducto,
             textoVacio: config.textoVacio,
             etiquetaResumen: config.etiquetaResumen,
+            mostrarDestinoPedido: config.mostrarDestinoPedido,
+            resolverClasePedido: config.resolverClasePedido,
+            renderAccionPedido: config.renderAccionPedido,
         });
     } catch (err) {
         console.error(`No se pudo cargar la vista ${config.listaId}:`, err);
@@ -73,7 +76,7 @@ function renderizarVistaProductosPorFiltros(config) {
 }
 
 function renderizarVistaProductosPorPedido(config) {
-    const { lista, resumen, items, textoVacio, etiquetaResumen } = config;
+    const { lista, resumen, items, textoVacio, etiquetaResumen, mostrarDestinoPedido, resolverClasePedido, renderAccionPedido } = config;
     const etiqueta = etiquetaResumen || "productos";
     if (!Array.isArray(items) || !items.length) {
         lista.innerHTML = `<div class="destino-productos-vacio">${textoVacio || "Sin productos."}</div>`;
@@ -90,6 +93,7 @@ function renderizarVistaProductosPorPedido(config) {
                 pedidoId,
                 pedidoNumero: item?.pedido_numero || item?.pedido_descripcion || `Pedido ${pedidoId}`,
                 cliente: item?.cliente_nombre || "Sin cliente",
+                pedidoDestino: String(item?.pedido_destino || "").trim(),
                 codigos: [],
             });
         }
@@ -101,13 +105,17 @@ function renderizarVistaProductosPorPedido(config) {
     );
 
     lista.innerHTML = grupos.map((grupo) => `
-        <details class="destino-pedido-card">
+        <details class="${escapeHtmlDestinoProductos(typeof resolverClasePedido === "function" ? resolverClasePedido(grupo.pedidoDestino) : "destino-pedido-card")}">
             <summary class="destino-pedido-resumen">
                 <div class="destino-pedido-resumen-main">
                     <strong>${escapeHtmlDestinoProductos(grupo.pedidoNumero)}</strong>
                     <span>${escapeHtmlDestinoProductos(grupo.cliente)}</span>
+                    ${mostrarDestinoPedido ? `<span class="destino-pedido-destino">${escapeHtmlDestinoProductos(grupo.pedidoDestino || "Sin destino")}</span>` : ""}
                 </div>
-                <div class="destino-pedido-resumen-total">${grupo.codigos.length} botas</div>
+                <div class="destino-pedido-resumen-lateral">
+                    <div class="destino-pedido-resumen-total">${grupo.codigos.length} botas</div>
+                    ${typeof renderAccionPedido === "function" ? renderAccionPedido(grupo) : ""}
+                </div>
             </summary>
             <div class="destino-pedido-codigos">
                 ${grupo.codigos

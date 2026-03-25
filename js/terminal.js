@@ -41,8 +41,8 @@ document.addEventListener("DOMContentLoaded", function () {
     prepararEventosRecepcion();
     prepararEventosConsumo();
     prepararEventosFabricacion();
-    prepararEventosSalidas();
-    prepararEventosEnvinado();
+    prepararEventosDestino();
+    prepararEventosAlmacen();
     prepararEventosMenuFlejes();
     prepararEventosUbicacion();
     prepararEventosMoverStock();
@@ -110,11 +110,11 @@ function mostrarSeccion(id) {
         if (id === "vista_ambientes") {
             cargarFormularioAmbientes();
         }
-        if (id === "vista_salidas") {
-            cargarVistaSalidas?.();
+        if (id === "vista_destino") {
+            cargarVistaDestino?.();
         }
-        if (id === "vista_envinado") {
-            cargarVistaEnvinado?.();
+        if (id === "vista_almacen") {
+            cargarVistaAlmacen?.();
         }
         // Actualiza las migas de pan
         actualizarMigasPan(id);
@@ -283,20 +283,20 @@ function actualizarMigasPan(mostrarSeccion) {
             nuevaMiga = crearMigaPan("Fabricar bota", mostrarSeccion, true);
             migasPan.appendChild(nuevaMiga);
             break;
-        case "vista_salidas":
+        case "vista_destino":
             nuevaMiga = crearMigaPan("Inicio", "vista_tareas", false);
             migasPan.appendChild(nuevaMiga);
             nuevaMiga = crearMigaPan("Botas", "vista_menu_botas", false);
             migasPan.appendChild(nuevaMiga);
-            nuevaMiga = crearMigaPan("Salidas", mostrarSeccion, true);
+            nuevaMiga = crearMigaPan("Destino", mostrarSeccion, true);
             migasPan.appendChild(nuevaMiga);
             break;
-        case "vista_envinado":
+        case "vista_almacen":
             nuevaMiga = crearMigaPan("Inicio", "vista_tareas", false);
             migasPan.appendChild(nuevaMiga);
             nuevaMiga = crearMigaPan("Botas", "vista_menu_botas", false);
             migasPan.appendChild(nuevaMiga);
-            nuevaMiga = crearMigaPan("Envinado", mostrarSeccion, true);
+            nuevaMiga = crearMigaPan("Almacen", mostrarSeccion, true);
             migasPan.appendChild(nuevaMiga);
             break;
         case "vista_ambientes":
