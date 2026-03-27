@@ -157,6 +157,30 @@
     cursor: pointer;
 }
 
+.produccion-card-actions,
+.fabricacion-card-actions {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 0.2rem;
+}
+
+.produccion-card-close-btn,
+.fabricacion-card-close-btn {
+    border: 0;
+    border-radius: 999px;
+    padding: 0.55rem 0.95rem;
+    font-size: 0.86rem;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(135deg, #0f766e 0%, #0ea5e9 100%);
+    box-shadow: 0 8px 18px rgba(14, 116, 144, 0.22);
+}
+
+.produccion-card-close-btn:active,
+.fabricacion-card-close-btn:active {
+    transform: scale(0.98);
+}
+
 .produccion-card:active {
     transform: scale(0.995);
 }
@@ -258,6 +282,121 @@
 
 .fabricacion-card:active {
     transform: scale(0.995);
+}
+
+.panel-fijo-header .small.text-muted {
+    white-space: pre-line;
+}
+
+.cierre-semanal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.cierre-semanal-bloque {
+    border: 1px solid #d8dee6;
+    border-radius: 1rem;
+    background: #fff;
+    padding: 0.95rem;
+}
+
+.cierre-semanal-bloque-titulo {
+    margin-bottom: 0.75rem;
+    font-weight: 700;
+    color: #18212f;
+}
+
+.cierre-semanal-resumen-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+}
+
+.cierre-semanal-kpi {
+    border: 1px solid #dbe4ec;
+    border-radius: 0.9rem;
+    background: linear-gradient(180deg, #f8fbff 0%, #ffffff 100%);
+    padding: 0.85rem 0.95rem;
+}
+
+.cierre-semanal-kpi-label {
+    display: block;
+    font-size: 0.76rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    color: #6b7280;
+}
+
+.cierre-semanal-kpi-value {
+    display: block;
+    margin-top: 0.2rem;
+    font-size: 1rem;
+    font-weight: 700;
+    color: #18212f;
+}
+
+.cierre-semanal-lotes-lista,
+.cierre-semanal-codigos {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.cierre-semanal-lote {
+    border: 1px solid #dbe4ec;
+    border-radius: 0.95rem;
+    background: #f8fafc;
+    padding: 0.9rem;
+}
+
+.cierre-semanal-lote-titulo {
+    font-weight: 700;
+    color: #18212f;
+    margin-bottom: 0.35rem;
+}
+
+.cierre-semanal-lote-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.45rem 0.75rem;
+}
+
+.cierre-semanal-lote-negativo {
+    border-color: #fecaca;
+    background: #fff1f2;
+}
+
+.cierre-semanal-codigos-lista {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+}
+
+.cierre-semanal-codigo {
+    border: 1px solid #cbd5e1;
+    border-radius: 999px;
+    background: #f8fafc;
+    padding: 0.35rem 0.7rem;
+    font-size: 0.88rem;
+    color: #334155;
+}
+
+.cierre-semanal-acciones {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+}
+
+.cierre-semanal-nota,
+.cierre-semanal-empty {
+    color: #64748b;
+}
+
+@media (min-width: 768px) {
+    .fabricacion-cards-list {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
 }
 
 .fabricacion-card-title {

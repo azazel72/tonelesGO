@@ -198,9 +198,7 @@ function formatterColumnasCuadrante(cell, formatterParams, onRendered) {
     el.innerHTML = "";
 
     // Pintar cada pill
-    [...value]
-      .sort((a, b) => compararUsuariosCuadrantePorCodigo(a?.empleado, b?.empleado))
-      .forEach((detalle, index) => {
+    [...value].forEach((detalle, index) => {
       if (!detalle?.usuario_id) {
         return;
       }

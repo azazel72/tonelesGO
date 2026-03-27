@@ -57,6 +57,15 @@ function registrarEventosVistaFabricacionSemanal() {
     const tablaLineas = document.querySelector("#vista_fabricacion_semanal #lista_fabricacion_semanal_botas");
     if (tablaLineas) {
         tablaLineas.addEventListener("click", function (event) {
+            const botonCierre = event.target.closest("[data-action='abrir-cierre-semanal']");
+            if (botonCierre) {
+                event.stopPropagation();
+                const lineaId = Number(botonCierre.getAttribute("data-linea-id") || 0);
+                if (lineaId) {
+                    abrirVistaCierreSemanalDesdeLinea?.(lineaId, "vista_fabricacion_semanal");
+                }
+                return;
+            }
             const fila = event.target.closest("[data-linea-id]");
             if (!fila) return;
             seleccionarLineaFabricacionSemanal(fila);
@@ -145,7 +154,8 @@ async function asegurarDatosFabricacionTerminal() {
     }
 }
 
-async function cargarFabricacionSemanalActivaFabricacion() {
+async function cargarFabricacionSemanalActivaFabricacion(opciones = {}) {
+    const autoAbrirLineaUnica = opciones.autoAbrirLineaUnica !== false;
     const contenedor = document.querySelector("#lista_fabricacion_semanal_botas");
     if (!contenedor) return;
     try {
@@ -163,7 +173,7 @@ async function cargarFabricacionSemanalActivaFabricacion() {
 
         actualizarCardsFabricacionSemanalBotas(lineas);
 
-        if (lineas.length === 1) {
+        if (autoAbrirLineaUnica && lineas.length === 1) {
             const filaUnica = contenedor.querySelector("[data-linea-id]");
             if (filaUnica) {
                 mostrarLineaFabricacion(filaUnica);
@@ -185,6 +195,7 @@ function mostrarLineaFabricacion(fila) {
     lineaFabricacionMaterialActualId = Number(fila.dataset.materialId || 0) || null;
     lineaFabricacionTipoBotaActualId = Number(fila.dataset.tipoProductoId || 0) || null;
     lineaFabricacionTipoActualId = lineaFabricacionTipoBotaActualId;
+    ordenFabricacionActualId = Number(fila.dataset.pedidoId || 0) || null;
     const tipoId = Number(fila.dataset.tipoProductoId || 0) || null;
     const descripcionProducto =
         (tipoId && terminalFabricacion.tipos_producto?.[tipoId]?.descripcion) ||
@@ -194,14 +205,30 @@ function mostrarLineaFabricacion(fila) {
         (lineaFabricacionMaterialActualId && terminalFabricacion.materiales?.[lineaFabricacionMaterialActualId]?.descripcion) ||
         descripcionProducto;
     const cantidadFabricar = Number(fila.dataset.cantidadFabricar || 0) || 0;
+    const cantidadFabricada = Number(fila.dataset.cantidadFabricada || 0) || 0;
     const pedidoDescripcionData = (fila.dataset.pedidoDescripcion || "").trim();
     const pedidoIdData = Number(fila.dataset.pedidoId || 0) || ordenFabricacionActualId || null;
     const pedidoDescripcionMapa = (pedidoIdData && terminalFabricacion.pedidos?.[pedidoIdData]?.descripcion) || "";
     const pedidoDescripcion = (pedidoDescripcionData || pedidoDescripcionMapa || "").trim();
-    const resumenProducto = `Tipo: ${descripcionProducto} | Madera: ${descripcionMaterial} | Cantidad a fabricar: ${cantidadFabricar}`;
+    const infoLinea = typeof obtenerInfoLineaSemanal === "function"
+        ? obtenerInfoLineaSemanal({
+            pedido_id: pedidoIdData,
+            tipo_producto_id: tipoId,
+            material_id: lineaFabricacionMaterialActualId,
+            cantidad: cantidadFabricar,
+            cantidad_fabricada: cantidadFabricada,
+        })
+        : null;
+    const resumenProducto = `Tipo: ${descripcionProducto} | Madera: ${descripcionMaterial}`;
     const titulo = document.getElementById("botas-producto-orden");
     if (titulo) {
         titulo.textContent = resumenProducto;
+    }
+    const resumenCantidades = document.getElementById("botas-resumen-cantidades");
+    if (resumenCantidades) {
+        resumenCantidades.textContent = infoLinea
+            ? construirResumenCantidadesLinea(infoLinea)
+            : `Semana: pedida ${cantidadFabricar} | fabricada ${cantidadFabricada}`;
     }
     const tituloPanel = document.getElementById("botas-panel-titulo");
     if (tituloPanel) {
@@ -244,53 +271,62 @@ function actualizarCardsFabricacionSemanalBotas(lineas) {
         card.dataset.materialId = linea.material_id ?? "";
         card.dataset.pedidoId = linea.pedido_id ?? "";
         card.dataset.cantidadFabricar = linea.cantidad ?? "";
+        card.dataset.cantidadFabricada = linea.cantidad_fabricada ?? "";
 
         const pedido = terminalFabricacion.pedidos?.[linea.pedido_id] || null;
         const pedidoDescripcion = (pedido?.descripcion || `Pedido ${linea.pedido_id || "-"}`).trim();
         card.dataset.pedidoDescripcion = pedidoDescripcion;
 
-        const fechaInicio = formatearFechaEuropea(linea.fecha_inicio);
-        const tipo = terminalFabricacion.tipos_producto?.[linea.tipo_producto_id]?.descripcion || "-";
-        const material = terminalFabricacion.materiales?.[linea.material_id]?.descripcion || "-";
-        const cantidad = Number(linea.cantidad) || 0;
-        const fabricada = Number(linea.cantidad_fabricada) || 0;
-        const falta = Math.max(0, cantidad - fabricada);
-        const pedidoCantidad = Number(pedido?.cantidad) || 0;
-        const pedidoFabricada = Number(pedido?.cantidad_fabricada) || 0;
+        const info = typeof obtenerInfoLineaSemanal === "function"
+            ? obtenerInfoLineaSemanal(linea)
+            : {
+                fechaInicio: formatearFechaEuropea(linea.fecha_inicio),
+                tipo: terminalFabricacion.tipos_producto?.[linea.tipo_producto_id]?.descripcion || "-",
+                material: terminalFabricacion.materiales?.[linea.material_id]?.descripcion || "-",
+                semanaPedida: Number(linea.cantidad) || 0,
+                semanaFabricada: Number(linea.cantidad_fabricada) || 0,
+                pedidoTotal: Number(pedido?.cantidad) || 0,
+                pedidoFabricado: Number(pedido?.cantidad_fabricada) || 0,
+            };
 
         card.innerHTML = `
       <div class="fabricacion-card-title">
         <div>
           <h6>${pedidoDescripcion}</h6>
         </div>
-        <span class="fabricacion-card-date">${fechaInicio || "-"}</span>
+        <span class="fabricacion-card-date">${info.fechaInicio || "-"}</span>
       </div>
       <div class="fabricacion-card-grid">
         <div class="fabricacion-card-field">
           <span class="fabricacion-card-label">Tipo</span>
-          <span class="fabricacion-card-value">${tipo}</span>
+          <span class="fabricacion-card-value">${info.tipo}</span>
         </div>
         <div class="fabricacion-card-field">
           <span class="fabricacion-card-label">Material</span>
-          <span class="fabricacion-card-value">${material}</span>
+          <span class="fabricacion-card-value">${info.material}</span>
         </div>
         <div class="fabricacion-card-field">
-          <span class="fabricacion-card-label">Cantidad</span>
-          <span class="fabricacion-card-value">${cantidad}</span>
+          <span class="fabricacion-card-label">Semana pedida</span>
+          <span class="fabricacion-card-value">${info.semanaPedida}</span>
         </div>
         <div class="fabricacion-card-field">
-          <span class="fabricacion-card-label">Fabricada</span>
-          <span class="fabricacion-card-value">${fabricada}</span>
+          <span class="fabricacion-card-label">Semana fabricada</span>
+          <span class="fabricacion-card-value">${info.semanaFabricada}</span>
         </div>
         <div class="fabricacion-card-field">
-          <span class="fabricacion-card-label">Falta</span>
-          <span class="fabricacion-card-value">${falta}</span>
+          <span class="fabricacion-card-label">Pedido total</span>
+          <span class="fabricacion-card-value">${info.pedidoTotal}</span>
         </div>
         <div class="fabricacion-card-field">
-          <span class="fabricacion-card-label">Pedido</span>
-          <span class="fabricacion-card-value">${pedidoFabricada} / ${pedidoCantidad}</span>
+          <span class="fabricacion-card-label">Pedido fabricado</span>
+          <span class="fabricacion-card-value">${info.pedidoFabricado}</span>
         </div>
       </div>
+        <div class="fabricacion-card-actions">
+          <button type="button" class="btn btn-outline-primary btn-sm" data-action="abrir-cierre-semanal" data-linea-id="${linea.id ?? ""}">
+            <i class="bi bi-clipboard-check"></i> Cierre semanal
+          </button>
+        </div>
     `;
         contenedor.appendChild(card);
     });

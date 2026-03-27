@@ -403,10 +403,17 @@ class Colector:
             año = filtros.get("año")
             estados = [int(v) for v in (filtros.get("estados") or []) if str(v).strip() != ""]
             clientes = [int(v) for v in (filtros.get("clientes") or []) if str(v).strip() != ""]
+            destinos_raw = [str(v).strip().upper() for v in (filtros.get("destinos") or []) if str(v).strip() != ""]
             tipos_producto = [int(v) for v in (filtros.get("tipos_producto") or []) if str(v).strip() != ""]
             material_id = filtros.get("material_id")
             materiales = [int(v) for v in (filtros.get("materiales") or []) if str(v).strip() != ""]
             fecha = filtros.get("fecha")
+
+            destino_aliases = {
+                "C": {"C", "CLIENTE"},
+                "E": {"E", "ENVINADO"},
+            }
+            destinos = sorted({alias for valor in destinos_raw for alias in destino_aliases.get(valor, {valor})})
 
             if año:
                 statement = statement.where(extract("year", PedidoDB.fecha) == int(año))
@@ -414,6 +421,8 @@ class Colector:
                 statement = statement.where(PedidoDB.estado.in_(estados))
             if clientes:
                 statement = statement.where(PedidoDB.cliente_id.in_(clientes))
+            if destinos:
+                statement = statement.where(PedidoDB.destino.in_(destinos))
             if tipos_producto:
                 statement = statement.where(PedidoDB.tipo_producto_id.in_(tipos_producto))
             if materiales:
@@ -582,6 +591,476 @@ class Colector:
                 }
                 for t in trazas
             ]
+
+    def obtener_cierre_semanal(self, fabricacion_semanal_id: int):
+        with DB.crear_sesion() as session:
+            linea = session.get(FabricacionSemanalDB, fabricacion_semanal_id)
+            if not linea:
+                raise ValueError("No se encontró la línea de fabricación semanal.")
+
+            pedido = session.get(PedidoDB, int(linea.pedido_id or 0)) if linea.pedido_id else None
+            tipo_bota = session.get(TipoProductoDB, int(linea.tipo_producto_id or 0)) if linea.tipo_producto_id else None
+            material = session.get(MaterialDB, int(linea.material_id or 0)) if linea.material_id else None
+
+            consumos = session.exec(
+                select(ConsumoDB).where(ConsumoDB.bota_id == int(linea.tipo_producto_id or 0))
+            ).all()
+            consumible_ids = [int(c.consumible_id or 0) for c in consumos if c.consumible_id]
+            tipos_consumibles = {}
+            if consumible_ids:
+                tipos_consumibles = {
+                    int(item.id): item
+                    for item in session.exec(
+                        select(TipoProductoDB).where(TipoProductoDB.id.in_(consumible_ids))
+                    ).all()
+                    if item.id
+                }
+            consumo_bota = 0.0
+            for consumo in consumos:
+                tipo_consumible = tipos_consumibles.get(int(consumo.consumible_id or 0))
+                if str(getattr(tipo_consumible, "tipo", "")).strip().upper() == "DUELA":
+                    consumo_bota = float(consumo.consumo or 0)
+                    break
+
+            trazas = session.exec(
+                select(TrazabilidadFabricacionDB).where(
+                    TrazabilidadFabricacionDB.fabricacion_semanal_id == fabricacion_semanal_id
+                )
+            ).all()
+            traza_ids = [int(t.id) for t in trazas if t.id]
+            palet_ids = sorted({int(t.palet_id) for t in trazas if t.palet_id})
+            palets = {}
+            if palet_ids:
+                palets = {
+                    int(p.id): p
+                    for p in session.exec(select(PaletDB).where(PaletDB.id.in_(palet_ids))).all()
+                    if p.id
+                }
+
+            trazas_producto = []
+            if traza_ids:
+                trazas_producto = session.exec(
+                    select(TrazabilidadProductoDB).where(
+                        TrazabilidadProductoDB.trazabilidad_fabricacion_id.in_(traza_ids)
+                    )
+                ).all()
+
+            producto_ids = [int(tp.producto_id) for tp in trazas_producto if tp.producto_id]
+            productos = {}
+            if producto_ids:
+                productos = {
+                    int(p.id): p
+                    for p in session.exec(select(ProductoDB).where(ProductoDB.id.in_(producto_ids))).all()
+                    if p.id
+                }
+
+            codigos_botas = sorted(
+                [
+                    str(producto.codigo).strip()
+                    for producto in productos.values()
+                    if str(producto.tipo or "").strip().upper() == "BOTA" and str(producto.codigo or "").strip()
+                ],
+                key=lambda x: [int(part) if part.isdigit() else part.lower() for part in re.split(r"(\d+)", x)],
+            )
+
+            productos_por_traza = {}
+            for traza_producto in trazas_producto:
+                productos_por_traza.setdefault(int(traza_producto.trazabilidad_fabricacion_id or 0), []).append(
+                    productos.get(int(traza_producto.producto_id or 0))
+                )
+
+            palets_detalle = []
+            total_m3 = 0.0
+            total_consumido_palets = 0.0
+            total_botas_registradas_traza = 0
+            for traza in trazas:
+                palet = palets.get(int(traza.palet_id or 0))
+                codigo_palet = getattr(palet, "codigo", None) or traza.palet_id
+                cubicaje = float(getattr(palet, "cubicaje", 0) or 0)
+                consumido = float(getattr(palet, "consumido", 0) or 0)
+                restante = cubicaje - consumido
+                productos_traza = [p for p in productos_por_traza.get(int(traza.id or 0), []) if p]
+                botas_traza = [p for p in productos_traza if str(p.tipo or "").strip().upper() == "BOTA"]
+                botas_registradas = len(botas_traza)
+                total_m3 += cubicaje
+                total_consumido_palets += consumido
+                total_botas_registradas_traza += botas_registradas
+                palets_detalle.append({
+                    "trazabilidad_id": traza.id,
+                    "palet_id": traza.palet_id,
+                    "palet_codigo": codigo_palet,
+                    "lote": (str(codigo_palet).split("#", 1)[0].strip()[:8] if codigo_palet else ""),
+                    "m3_total": cubicaje,
+                    "m3_consumidos": consumido,
+                    "m3_sobrante": restante,
+                    "negativa": restante < 0,
+                    "negativo": restante < 0,
+                    "cantidad_fabricada_bbdd": int(traza.cantidad_fabricada or 0),
+                    "botas_registradas": botas_registradas,
+                    "botas_posibles": int((restante // consumo_bota) if consumo_bota > 0 and restante > 0 else 0),
+                    "estado": int(traza.estado or 0),
+                    "codigos_botas": [str(p.codigo).strip() for p in botas_traza if str(p.codigo or "").strip()],
+                })
+
+            cantidad_bbdd_semana = int(linea.cantidad_fabricada or 0)
+            consumo_calculado_botas = float(total_botas_registradas_traza) * float(consumo_bota or 0)
+            diferencias = {
+                "semana_vs_botas": cantidad_bbdd_semana - total_botas_registradas_traza,
+                "consumo_vs_palets": round(consumo_calculado_botas - total_consumido_palets, 6),
+            }
+
+            return {
+                "linea": {
+                    "id": linea.id,
+                    "pedido_id": linea.pedido_id,
+                    "fecha_inicio": linea.fecha_inicio.isoformat() if linea.fecha_inicio else None,
+                    "tipo_producto_id": linea.tipo_producto_id,
+                    "tipo_producto_descripcion": getattr(tipo_bota, "descripcion", None) or getattr(tipo_bota, "codigo", None) or "",
+                    "material_id": linea.material_id,
+                    "material_descripcion": getattr(material, "descripcion", None) or "",
+                    "cantidad": int(linea.cantidad or 0),
+                    "cantidad_fabricada": cantidad_bbdd_semana,
+                    "estado": int(linea.estado or 0) if linea.estado is not None else None,
+                },
+                "pedido": {
+                    "id": getattr(pedido, "id", None),
+                    "descripcion": getattr(pedido, "descripcion", "") or "",
+                    "cantidad": int(getattr(pedido, "cantidad", 0) or 0),
+                    "cantidad_fabricada": int(getattr(pedido, "cantidad_fabricada", 0) or 0),
+                    "estado": int(getattr(pedido, "estado", 0) or 0) if pedido else None,
+                },
+                "consumo_unitario_bota": consumo_bota,
+                "totales": {
+                    "m3_total": total_m3,
+                    "m3_consumidos_palets": total_consumido_palets,
+                    "botas_registradas": total_botas_registradas_traza,
+                    "botas_posibles": sum(int(item["botas_posibles"]) for item in palets_detalle),
+                    "negativos": sum(1 for item in palets_detalle if item["negativo"]),
+                },
+                "consistencias": {
+                    "semana_fabricada_coincide": cantidad_bbdd_semana == total_botas_registradas_traza,
+                    "consumo_coincide": abs(consumo_calculado_botas - total_consumido_palets) < 0.000001,
+                    "cantidad_bbdd_semana": cantidad_bbdd_semana,
+                    "botas_registradas": total_botas_registradas_traza,
+                    "consumo_calculado_botas": consumo_calculado_botas,
+                    "consumo_total_palets": total_consumido_palets,
+                    "diferencias": diferencias,
+                },
+                "palets": palets_detalle,
+                "codigos_botas": codigos_botas,
+            }
+
+    def _obtener_consumo_unitario_bota_session(self, session: Session, tipo_producto_id: int) -> float:
+        if not tipo_producto_id:
+            return 0.0
+        consumos = session.exec(
+            select(ConsumoDB).where(ConsumoDB.bota_id == int(tipo_producto_id))
+        ).all()
+        consumible_ids = [int(c.consumible_id or 0) for c in consumos if c.consumible_id]
+        tipos_consumibles = {}
+        if consumible_ids:
+            tipos_consumibles = {
+                int(item.id): item
+                for item in session.exec(
+                    select(TipoProductoDB).where(TipoProductoDB.id.in_(consumible_ids))
+                ).all()
+                if item.id
+            }
+        for consumo in consumos:
+            tipo_consumible = tipos_consumibles.get(int(consumo.consumible_id or 0))
+            if str(getattr(tipo_consumible, "tipo", "")).strip().upper() == "DUELA":
+                return float(consumo.consumo or 0)
+        return 0.0
+
+    def _obtener_estado_fabricacion_finalizado_session(self, session: Session) -> EstadoFabricacionSemanalDB:
+        estado = session.exec(
+            select(EstadoFabricacionSemanalDB)
+            .where(func.upper(EstadoFabricacionSemanalDB.descripcion) == "FINALIZADO")
+            .order_by(EstadoFabricacionSemanalDB.id)
+        ).first()
+        if not estado:
+            raise ValueError("No existe el estado Finalizado en estados_fabricacion_semanal.")
+        return estado
+
+    def _obtener_ubicacion_almacen_cierre(self, session) -> UbicacionDB:
+        ubicacion = session.exec(
+            select(UbicacionDB)
+            .where(func.upper(UbicacionDB.descripcion) == "ALMACEN")
+            .order_by(UbicacionDB.id)
+        ).first()
+        if ubicacion:
+            return ubicacion
+        return self._obtener_ubicacion_procesados(session)
+
+    def _actualizar_cache_palet(self, palet: PaletDB):
+        if palet and palet.id:
+            self.maestros.palets[palet.id] = PaletDTO.from_db(palet)
+
+    def _actualizar_cache_traza_fabricacion(self, traza: TrazabilidadFabricacionDB):
+        if traza and traza.id:
+            self.fabricacion.trazabilidad_fabricacion[traza.id] = TrazabilidadFabricacionDTO.from_db(traza)
+
+    def _actualizar_cache_traza_producto(self, traza_producto: TrazabilidadProductoDB):
+        if traza_producto and traza_producto.id:
+            self.fabricacion.trazabilidad_producto[traza_producto.id] = TrazabilidadProductoDTO.from_db(traza_producto)
+
+    def _actualizar_cache_traza_procesado(self, traza_procesado: TrazabilidadProcesadoDB):
+        if traza_procesado and traza_procesado.id:
+            self.fabricacion.trazabilidad_procesado[traza_procesado.id] = TrazabilidadProcesadoDTO.from_db(traza_procesado)
+
+    def reasignar_consumo_negativo_cierre(self, data):
+        trazabilidad_origen_id = data.get("trazabilidad_origen_id")
+        trazabilidad_destino_id = data.get("trazabilidad_destino_id")
+        m3_mover = data.get("m3_mover")
+        if not trazabilidad_origen_id or not trazabilidad_destino_id:
+            raise ValueError("trazabilidad_origen_id y trazabilidad_destino_id son obligatorios.")
+        if m3_mover is None or str(m3_mover).strip() == "":
+            raise ValueError("m3_mover es obligatorio.")
+
+        m3_mover_val = float(m3_mover)
+        if m3_mover_val <= 0:
+            raise ValueError("m3_mover debe ser mayor que 0.")
+
+        with DB.crear_sesion() as session:
+            traza_origen = session.get(TrazabilidadFabricacionDB, int(trazabilidad_origen_id))
+            traza_destino = session.get(TrazabilidadFabricacionDB, int(trazabilidad_destino_id))
+            if not traza_origen or not traza_destino:
+                raise ValueError("No se encontró la trazabilidad origen o destino.")
+            if int(traza_origen.fabricacion_semanal_id or 0) != int(traza_destino.fabricacion_semanal_id or 0):
+                raise ValueError("Origen y destino deben pertenecer a la misma fabricación semanal.")
+            if int(traza_origen.id or 0) == int(traza_destino.id or 0):
+                raise ValueError("Origen y destino deben ser diferentes.")
+
+            linea = session.get(FabricacionSemanalDB, int(traza_origen.fabricacion_semanal_id))
+            if not linea:
+                raise ValueError("No se encontró la línea de fabricación semanal.")
+            consumo_bota = self._obtener_consumo_unitario_bota_session(session, int(linea.tipo_producto_id or 0))
+            if consumo_bota <= 0:
+                raise ValueError("No se pudo resolver el consumo unitario de la bota.")
+
+            palet_origen = session.get(PaletDB, int(traza_origen.palet_id or 0))
+            palet_destino = session.get(PaletDB, int(traza_destino.palet_id or 0))
+            if not palet_origen or not palet_destino:
+                raise ValueError("No se encontró el palet origen o destino.")
+
+            deficit_origen = max(float(palet_origen.consumido or 0) - float(palet_origen.cubicaje or 0), 0.0)
+            capacidad_destino = max(float(palet_destino.cubicaje or 0) - float(palet_destino.consumido or 0), 0.0)
+            if deficit_origen <= 0:
+                raise ValueError("La traza origen no tiene consumo negativo.")
+            if m3_mover_val > deficit_origen + 0.000001:
+                raise ValueError("El m3 a mover supera el negativo del origen.")
+            if m3_mover_val > capacidad_destino + 0.000001:
+                raise ValueError("El m3 a mover supera el sobrante del destino.")
+
+            botas_mover_float = float(m3_mover_val) / float(consumo_bota)
+            botas_mover = int(round(botas_mover_float))
+            if abs(botas_mover_float - botas_mover) > 0.000001 or botas_mover <= 0:
+                raise ValueError("El cubicaje a mover debe corresponder a un número entero de botas.")
+            if int(traza_origen.cantidad_fabricada or 0) < botas_mover:
+                raise ValueError("La traza origen no tiene suficientes botas para mover.")
+
+            enlaces = session.exec(
+                select(TrazabilidadProductoDB).where(
+                    TrazabilidadProductoDB.trazabilidad_fabricacion_id == int(traza_origen.id)
+                )
+            ).all()
+            productos = {}
+            if enlaces:
+                productos = {
+                    int(p.id): p
+                    for p in session.exec(
+                        select(ProductoDB).where(
+                            ProductoDB.id.in_([int(e.producto_id) for e in enlaces if e.producto_id])
+                        )
+                    ).all()
+                    if p.id
+                }
+            enlaces_bota = [
+                e for e in enlaces
+                if str(getattr(productos.get(int(e.producto_id or 0)), "tipo", "")).strip().upper() == "BOTA"
+            ]
+            enlaces_bota.sort(key=lambda e: int(e.id or 0))
+            if len(enlaces_bota) < botas_mover:
+                raise ValueError("No hay suficientes botas enlazadas para reasignar esa cantidad.")
+
+            mover_enlaces = enlaces_bota[-botas_mover:]
+            for enlace in mover_enlaces:
+                enlace.trazabilidad_fabricacion_id = int(traza_destino.id)
+                session.add(enlace)
+
+            traza_origen.cantidad_fabricada = int(traza_origen.cantidad_fabricada or 0) - botas_mover
+            traza_destino.cantidad_fabricada = int(traza_destino.cantidad_fabricada or 0) + botas_mover
+            palet_origen.consumido = float(palet_origen.consumido or 0) - m3_mover_val
+            palet_destino.consumido = float(palet_destino.consumido or 0) + m3_mover_val
+            session.add(traza_origen)
+            session.add(traza_destino)
+            session.add(palet_origen)
+            session.add(palet_destino)
+            session.commit()
+            session.refresh(traza_origen)
+            session.refresh(traza_destino)
+            session.refresh(palet_origen)
+            session.refresh(palet_destino)
+
+            self._actualizar_cache_traza_fabricacion(traza_origen)
+            self._actualizar_cache_traza_fabricacion(traza_destino)
+            self._actualizar_cache_palet(palet_origen)
+            self._actualizar_cache_palet(palet_destino)
+            for enlace in mover_enlaces:
+                self._actualizar_cache_traza_producto(enlace)
+
+            return self.obtener_cierre_semanal(int(traza_origen.fabricacion_semanal_id))
+
+    def crear_palet_procesado_desde_cierre(self, data):
+        fabricacion_semanal_id = data.get("fabricacion_semanal_id")
+        items = data.get("items") or []
+        if not fabricacion_semanal_id:
+            raise ValueError("fabricacion_semanal_id es obligatorio.")
+        if not isinstance(items, list) or not items:
+            raise ValueError("Debe indicar al menos un origen para procesar.")
+
+        with DB.crear_sesion() as session:
+            linea = session.get(FabricacionSemanalDB, int(fabricacion_semanal_id))
+            if not linea:
+                raise ValueError("No se encontró la línea de fabricación semanal.")
+
+            origenes = []
+            material_id = None
+            tipo_producto_id = None
+            cubicaje_total = 0.0
+            prefijo = ""
+            for item in items:
+                trazabilidad_id = item.get("trazabilidad_id")
+                m3 = item.get("m3")
+                if not trazabilidad_id or m3 is None or str(m3).strip() == "":
+                    raise ValueError("Cada item debe incluir trazabilidad_id y m3.")
+                traza = session.get(TrazabilidadFabricacionDB, int(trazabilidad_id))
+                if not traza or int(traza.fabricacion_semanal_id or 0) != int(fabricacion_semanal_id):
+                    raise ValueError("Una trazabilidad no pertenece a la línea semanal indicada.")
+                palet = session.get(PaletDB, int(traza.palet_id or 0))
+                if not palet:
+                    raise ValueError("No se encontró un palet origen.")
+                restante = max(float(palet.cubicaje or 0) - float(palet.consumido or 0), 0.0)
+                m3_val = float(m3)
+                if m3_val <= 0:
+                    raise ValueError("El m3 a procesar debe ser mayor que 0.")
+                if m3_val > restante + 0.000001:
+                    raise ValueError("El m3 a procesar supera el sobrante del palet origen.")
+                if material_id is None:
+                    material_id = palet.material_id
+                    tipo_producto_id = palet.tipo_producto_id
+                    prefijo = self._extraer_prefijo_lote(palet.codigo or "")
+                else:
+                    if int(material_id or 0) != int(palet.material_id or 0):
+                        raise ValueError("Todos los palets origen deben tener el mismo material.")
+                    if int(tipo_producto_id or 0) != int(palet.tipo_producto_id or 0):
+                        raise ValueError("Todos los palets origen deben tener el mismo tipo de producto.")
+                cubicaje_total += m3_val
+                origenes.append((palet, m3_val))
+
+            ubicacion_destino = self._obtener_ubicacion_almacen_cierre(session)
+            contador = self._siguiente_contador_global_palets(session)
+            codigo_nuevo = f"{prefijo or 'PROC'}#{contador:06d}"
+            while session.exec(select(PaletDB).where(PaletDB.codigo == codigo_nuevo)).first():
+                contador += 1
+                codigo_nuevo = f"{prefijo or 'PROC'}#{contador:06d}"
+
+            palet_destino = PaletDB(
+                codigo=codigo_nuevo,
+                linea_entrada_id=None,
+                tipo_producto_id=tipo_producto_id,
+                material_id=material_id,
+                cubicaje=cubicaje_total,
+                consumido=0.0,
+                estado=1,
+                ubicacion_id=ubicacion_destino.id,
+                procesado=True,
+            )
+            session.add(palet_destino)
+            session.flush()
+
+            trazas_proc = []
+            for palet_origen, m3_val in origenes:
+                palet_origen.consumido = float(palet_origen.consumido or 0) + float(m3_val)
+                session.add(palet_origen)
+                traza_proc = TrazabilidadProcesadoDB(
+                    palet_origen_id=int(palet_origen.id),
+                    palet_destino_id=int(palet_destino.id),
+                )
+                session.add(traza_proc)
+                session.flush()
+                trazas_proc.append(traza_proc)
+
+            session.commit()
+            session.refresh(palet_destino)
+            self._actualizar_cache_palet(palet_destino)
+            for palet_origen, _m3_val in origenes:
+                session.refresh(palet_origen)
+                self._actualizar_cache_palet(palet_origen)
+            for traza_proc in trazas_proc:
+                self._actualizar_cache_traza_procesado(traza_proc)
+
+            return {
+                "ok": True,
+                "palet_destino": PaletDTO.from_db(palet_destino).model_dump(),
+                "cubicaje_procesado": cubicaje_total,
+                "cierre": self.obtener_cierre_semanal(int(fabricacion_semanal_id)),
+            }
+
+    def cerrar_fabricacion_semanal(self, data):
+        fabricacion_semanal_id = data.get("fabricacion_semanal_id")
+        force = bool(data.get("force"))
+        if not fabricacion_semanal_id:
+            raise ValueError("fabricacion_semanal_id es obligatorio.")
+
+        cierre = self.obtener_cierre_semanal(int(fabricacion_semanal_id))
+        negativos = int((cierre.get("totales") or {}).get("negativos") or 0)
+        consistencias = cierre.get("consistencias") or {}
+        if not force:
+            if negativos > 0:
+                raise ValueError("No se puede cerrar mientras existan palets en negativo.")
+            if not consistencias.get("semana_fabricada_coincide"):
+                raise ValueError("No se puede cerrar: la cantidad fabricada semanal no coincide con las botas recuperadas.")
+            if not consistencias.get("consumo_coincide"):
+                raise ValueError("No se puede cerrar: el consumo de botas no coincide con el consumido total de palets.")
+
+        with DB.crear_sesion() as session:
+            linea = session.get(FabricacionSemanalDB, int(fabricacion_semanal_id))
+            if not linea:
+                raise ValueError("No se encontró la línea de fabricación semanal.")
+            pedido = session.get(PedidoDB, int(linea.pedido_id or 0)) if linea.pedido_id else None
+            estado_final = self._obtener_estado_fabricacion_finalizado_session(session)
+
+            linea.cantidad_fabricada = int((cierre.get("totales") or {}).get("botas_registradas") or 0)
+            linea.estado = int(estado_final.id)
+            session.add(linea)
+
+            if pedido:
+                lineas_pedido = session.exec(
+                    select(FabricacionSemanalDB).where(FabricacionSemanalDB.pedido_id == int(pedido.id))
+                ).all()
+                pedido.cantidad_fabricada = sum(
+                    int(linea.cantidad_fabricada or 0) if int(linea.id or 0) == int(fabricacion_semanal_id)
+                    else int(linea_pedido.cantidad_fabricada or 0)
+                    for linea_pedido in lineas_pedido
+                )
+                session.add(pedido)
+
+            session.commit()
+            session.refresh(linea)
+            self.fabricacion.fabricacion_semanal[linea.id] = FabricacionSemanalDTO.from_db(linea)
+            if pedido:
+                session.refresh(pedido)
+                self.fabricacion.pedidos[pedido.id] = PedidoDTO.from_db(pedido)
+
+            return {
+                "ok": True,
+                "linea_id": int(linea.id),
+                "estado_id": int(linea.estado or 0),
+                "cantidad_fabricada": int(linea.cantidad_fabricada or 0),
+                "pedido_cantidad_fabricada": int(getattr(pedido, "cantidad_fabricada", 0) or 0),
+                "cierre": self.obtener_cierre_semanal(int(fabricacion_semanal_id)),
+            }
 
     def listar_palets_consumo(self):
         with DB.crear_sesion() as session:
@@ -1244,14 +1723,14 @@ class Colector:
         operarios_ids_producto = self._normalizar_ids_operarios(operarios_ids_input)
         operarios_ids_codigo = list(operarios_ids_producto)
         batidero_id = None
-        codigos_batidero_validos = {11, 12, 13, 21, 22, 23}
+        codigos_batidero_validos = {11, 12, 21, 22, 31, 32, 41, 42, 51, 52}
         try:
             if batidero is not None and batidero != "":
                 batidero_id = int(batidero)
         except (TypeError, ValueError):
             batidero_id = None
         if batidero_id is not None and batidero_id not in codigos_batidero_validos:
-            raise ValueError("Codigo de batidero invalido. Valores permitidos: 11, 12, 13, 21, 22, 23.")
+            raise ValueError("Codigo de batidero invalido. Valores permitidos: 11, 12, 21, 22, 31, 32, 41, 42, 51, 52.")
         if batidero_id is not None:
             if operarios_ids_codigo:
                 resto = [op for op in operarios_ids_codigo[1:] if op != batidero_id]

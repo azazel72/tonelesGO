@@ -18,9 +18,15 @@ function openPlanificacionPedidosWin() {
             <label for="pf-filtro-estado">Estado <button type="button" class="btn btn-link btn-sm pedidos-fabricacion-clear" data-clear-filter="estado" title="Limpiar filtro"><i class="bi bi-x-circle"></i></button></label>
             <div id="pf-filtro-estado" class="pedidos-fabricacion-checklist"></div>
           </div>
-          <div class="pedidos-fabricacion-filter">
-            <label for="pf-filtro-fecha">Fecha <button type="button" class="btn btn-link btn-sm pedidos-fabricacion-clear" data-clear-filter="fecha" title="Limpiar filtro"><i class="bi bi-x-circle"></i></button></label>
-            <input id="pf-filtro-fecha" class="form-control form-control-sm" type="date" />
+          <div class="pedidos-fabricacion-filter pedidos-fabricacion-filter-stack">
+            <div class="pedidos-fabricacion-filter-stack-item">
+              <label for="pf-filtro-fecha">Fecha <button type="button" class="btn btn-link btn-sm pedidos-fabricacion-clear" data-clear-filter="fecha" title="Limpiar filtro"><i class="bi bi-x-circle"></i></button></label>
+              <input id="pf-filtro-fecha" class="form-control form-control-sm" type="date" />
+            </div>
+            <div class="pedidos-fabricacion-filter-stack-item">
+              <label for="pf-filtro-destino">Destino <button type="button" class="btn btn-link btn-sm pedidos-fabricacion-clear" data-clear-filter="destino" title="Limpiar filtro"><i class="bi bi-x-circle"></i></button></label>
+              <div id="pf-filtro-destino" class="pedidos-fabricacion-checklist pedidos-fabricacion-checklist-compact"></div>
+            </div>
           </div>
           <div class="pedidos-fabricacion-filter">
             <label for="pf-filtro-cliente">Cliente <button type="button" class="btn btn-link btn-sm pedidos-fabricacion-clear" data-clear-filter="cliente" title="Limpiar filtro"><i class="bi bi-x-circle"></i></button></label>
@@ -86,6 +92,7 @@ function openPlanificacionPedidosWin() {
     filtros: {
       estado: contenedor.querySelector("#pf-filtro-estado"),
       fecha: contenedor.querySelector("#pf-filtro-fecha"),
+      destino: contenedor.querySelector("#pf-filtro-destino"),
       cliente: contenedor.querySelector("#pf-filtro-cliente"),
       tipo: contenedor.querySelector("#pf-filtro-tipo"),
       material: contenedor.querySelector("#pf-filtro-material"),
@@ -160,8 +167,8 @@ function construirColumnasPlanificacionPedidos() {
   const materialesDict = Object.values(DATOS?.maestros?.materiales ?? {}).map(({ id, descripcion }) => ({ value: id, label: descripcion || String(id) }));
   const estadosDict = Object.values(DATOS?.maestros?.estados_pedidos ?? {}).map(({ id, descripcion }) => ({ value: id, label: descripcion || String(id) }));
   const destinosDict = [
-    { value: "CLIENTE", label: "CLIENTE" },
-    { value: "ENVINADO", label: "ENVINADO" },
+    { value: "C", label: "CLIENTE" },
+    { value: "E", label: "ENVINADO" },
   ];
 
   return [
@@ -182,6 +189,7 @@ function construirColumnasPlanificacionPedidos() {
       editor: "list",
       editorParams: { values: destinosDict, clearable: false, autocomplete: true, allowEmpty: false, listOnEmpty: true, freetext: false },
       editable: tablaEditablePlanificacion,
+      formatter: (cell) => ({ C: "CLIENTE", E: "ENVINADO" }[String(cell.getValue() || "").trim().toUpperCase()] ?? cell.getValue()),
       width: 120,
     },
     { title: "Descripcion", field: "descripcion", editor: "input", editable: tablaEditablePlanificacion, minWidth: 180 },
@@ -463,6 +471,10 @@ function desactivarModoEdicionPlanificacion(registro, keyTabla) {
 }
 
 function inicializarFiltrosPlanificacionPedidos(registro) {
+  poblarChecklistPlanificacion(registro.filtros.destino, "destino", [
+    { value: "C", label: "CLIENTE" },
+    { value: "E", label: "ENVINADO" },
+  ]);
   poblarChecklistPlanificacion(registro.filtros.estado, "estado", Object.values(DATOS?.maestros?.estados_pedidos ?? {}).map((x) => ({ value: x.id, label: x.descripcion })));
   poblarChecklistPlanificacion(registro.filtros.cliente, "cliente", Object.values(DATOS?.maestros?.clientes ?? {}).map((x) => ({ value: x.id, label: x.nombre })));
   poblarChecklistPlanificacion(
@@ -502,6 +514,7 @@ function seleccionarEstadosPorDefectoPlanificacion(contenedor) {
 
 function limpiarFiltrosPlanificacionPedidos(registro) {
   registro.filtros.fecha.value = "";
+  desmarcarChecklistPlanificacion(registro.filtros.destino);
   desmarcarChecklistPlanificacion(registro.filtros.material);
   desmarcarChecklistPlanificacion(registro.filtros.cliente);
   desmarcarChecklistPlanificacion(registro.filtros.tipo);
@@ -513,6 +526,9 @@ function limpiarFiltroPlanificacionPedidos(registro, filtro) {
   switch (filtro) {
     case "fecha":
       registro.filtros.fecha.value = "";
+      break;
+    case "destino":
+      desmarcarChecklistPlanificacion(registro.filtros.destino);
       break;
     case "material":
       desmarcarChecklistPlanificacion(registro.filtros.material);
@@ -543,6 +559,7 @@ function obtenerFiltrosPlanificacionPedidos(registro) {
   return {
     estados: obtenerValoresSeleccionadosPlanificacion(registro.filtros.estado),
     fecha: registro.filtros.fecha.value || null,
+    destinos: obtenerValoresSeleccionadosPlanificacion(registro.filtros.destino),
     clientes: obtenerValoresSeleccionadosPlanificacion(registro.filtros.cliente),
     tipos_producto: obtenerValoresSeleccionadosPlanificacion(registro.filtros.tipo),
     material_id: null,

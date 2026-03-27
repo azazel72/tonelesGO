@@ -41,6 +41,7 @@ document.addEventListener("DOMContentLoaded", function () {
     prepararEventosRecepcion();
     prepararEventosConsumo();
     prepararEventosFabricacion();
+    prepararEventosCierreSemanal?.();
     prepararEventosDestino();
     prepararEventosAlmacen();
     prepararEventosMenuFlejes();
@@ -64,6 +65,7 @@ const contextoNavegacion = {
     ubicacionOrigen: "botas",
     moverStockOrigen: "palets_madera",
     procesarStockOrigen: "palets_madera",
+    cierreSemanalOrigen: "vista_fabricacion_semanal",
     autoAccesoConsumo: false,
     autoAccesoFabricacion: false,
 };
@@ -115,6 +117,9 @@ function mostrarSeccion(id) {
         }
         if (id === "vista_almacen") {
             cargarVistaAlmacen?.();
+        }
+        if (id === "vista_cierre_semanal") {
+            cargarVistaCierreSemanal?.();
         }
         // Actualiza las migas de pan
         actualizarMigasPan(id);
@@ -281,6 +286,28 @@ function actualizarMigasPan(mostrarSeccion) {
             nuevaMiga = crearMigaPan("Fabricación semanal", "vista_fabricacion_semanal", false);
             migasPan.appendChild(nuevaMiga);
             nuevaMiga = crearMigaPan("Fabricar bota", mostrarSeccion, true);
+            migasPan.appendChild(nuevaMiga);
+            break;
+        case "vista_cierre_semanal":
+            nuevaMiga = crearMigaPan("Inicio", "vista_tareas", false);
+            migasPan.appendChild(nuevaMiga);
+            if (contextoNavegacion.cierreSemanalOrigen === "vista_consumo_semanal") {
+                nuevaMiga = crearMigaPan("Palets", "vista_menu_palets", false);
+                migasPan.appendChild(nuevaMiga);
+                if (contextoNavegacion.consumoOrigen === "palets_fleje") {
+                    nuevaMiga = crearMigaPan("Fleje", "vista_menu_palets_fleje", false);
+                } else {
+                    nuevaMiga = crearMigaPan("Madera", "vista_menu_palets_madera", false);
+                }
+                migasPan.appendChild(nuevaMiga);
+                nuevaMiga = crearMigaPan("Fabricación semanal", "vista_consumo_semanal", false);
+            } else {
+                nuevaMiga = crearMigaPan("Botas", "vista_menu_botas", false);
+                migasPan.appendChild(nuevaMiga);
+                nuevaMiga = crearMigaPan("Fabricación semanal", "vista_fabricacion_semanal", false);
+            }
+            migasPan.appendChild(nuevaMiga);
+            nuevaMiga = crearMigaPan("Cierre semanal", mostrarSeccion, true);
             migasPan.appendChild(nuevaMiga);
             break;
         case "vista_destino":

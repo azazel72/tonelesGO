@@ -35,8 +35,8 @@ function openPedidosWin() {
     })
   );
   const destinosDict = [
-    { value: "CLIENTE", label: "CLIENTE" },
-    { value: "ENVINADO", label: "ENVINADO" },
+    { value: "C", label: "CLIENTE" },
+    { value: "E", label: "ENVINADO" },
   ];
 
   const configuracion = {
@@ -92,6 +92,7 @@ function openPedidosWin() {
             },
             editable: tablaEditable,
             cssClass: "filtrable",
+            formatter: cell => ({ C: "CLIENTE", E: "ENVINADO" }[String(cell.getValue() || "").trim().toUpperCase()] ?? cell.getValue()),
           },
           {
             title: "Descripcion",
