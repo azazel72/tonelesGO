@@ -11,14 +11,21 @@ class ImprimirEtiqueta:
     MARGIN = 10
     GAP = 6
 
-    FONT_H = 20
-    FONT_W = 14
-    TITLE_FONT_H = 20
-    TITLE_FONT_W = 14
+    FONT_H = 30
+    FONT_W = 22
+    TITLE_FONT_H = 22
+    TITLE_FONT_W = 16
     TITLE_LINE_GAP = 1
     TITLE_CHAR_SPACING = 1
-    TITLE_SHIFT_LEFT = 24  # ~3 mm @ 203 dpi
+    TITLE_SHIFT_LEFT = 10
     TITLE_ALLOW_OVERLAP = 24  # permite meterse en zona blanca del logo (~3 mm)
+    BARCODE_MAX_MODULE_W = 4
+    BARCODE_HEIGHT_REDUCTION = 0
+    HEADER_CENTER_SHIFT_X = 18
+    HEADER_SHIFT_Y = 8
+    BARCODE_RAISE_Y = 10
+    CODE_BLOCK_SHIFT_X = -20  # ~5 mm @ 203 dpi
+    TEXT_SHIFT_X = 0
 
     LOGO_MAX_W = 84
     LOGO_MAX_H = 60
@@ -53,16 +60,16 @@ class ImprimirEtiqueta:
 
         avail_w = self.LABEL_W - (2 * self.MARGIN)
         modules = self._code128_modules_for_n_chars(len(value))
-        module_width = max(1, min(3, avail_w // modules))
+        module_width = max(1, min(self.BARCODE_MAX_MODULE_W, avail_w // modules))
         barcode_w = modules * module_width
-        bar_x = ((self.LABEL_W - barcode_w) // 2) - 40
+        bar_x = ((self.LABEL_W - barcode_w) // 2) + self.CODE_BLOCK_SHIFT_X
 
         # Bloque superior alineado al ancho del barcode.
-        header_y = self.MARGIN
-        logo_x = 0
+        header_y = self.MARGIN + self.HEADER_SHIFT_Y
+        logo_x = self.HEADER_CENTER_SHIFT_X
         logo_y = header_y + max(0, (self.LOGO_MAX_H - self.LOGO_H) // 2)
 
-        title_right = self.LABEL_W - self.MARGIN + 30
+        title_right = self.LABEL_W - self.MARGIN
         title_left_min = logo_x + self.LOGO_W + 8 - self.TITLE_ALLOW_OVERLAP - 60
         line2_estimated_w = len(self.TITLE_LINE_2) * (self.TITLE_FONT_W + self.TITLE_CHAR_SPACING)
         line3_estimated_w = len(self.TITLE_LINE_3) * (self.TITLE_FONT_W + self.TITLE_CHAR_SPACING)
@@ -74,13 +81,13 @@ class ImprimirEtiqueta:
         title_y = logo_y + max(0, (self.LOGO_H - title_block_h) // 2)
 
         header_h = max(self.LOGO_H, title_block_h) + 40
-        barcode_top = header_y + header_h
+        barcode_top = max(self.MARGIN, header_y + header_h - self.BARCODE_RAISE_Y)
 
-        bar_h = max(40, self.LABEL_H - barcode_top - self.GAP - self.FONT_H - self.MARGIN)
+        bar_h = max(64, self.LABEL_H - barcode_top - self.GAP - self.FONT_H - self.MARGIN)
         bar_y = barcode_top
         text_y = bar_y + bar_h + self.GAP
-        text_x = self.MARGIN
-        text_w = self.LABEL_W - (2 * self.MARGIN)
+        text_x = self.MARGIN + self.CODE_BLOCK_SHIFT_X + self.TEXT_SHIFT_X
+        text_w = self.LABEL_W - (2 * self.MARGIN) - self.CODE_BLOCK_SHIFT_X
         title_y_2 = title_y + self.TITLE_FONT_H + self.TITLE_LINE_GAP
         title_y_3 = title_y_2 + self.TITLE_FONT_H + self.TITLE_LINE_GAP
 
@@ -121,13 +128,13 @@ class ImprimirEtiqueta:
 ^FD{self.TITLE_LINE_3}^FS
 
 ^FO{bar_x},{bar_y}
-^BY{module_width},2,{bar_h-40}
+^BY{module_width},2,{bar_h-self.BARCODE_HEIGHT_REDUCTION}
 ^BCN,,N,N,N
 ^FD{value}^FS
 
-^FO{text_x},{text_y}
+^FO{text_x+10},{text_y}
 ^A0N,{self.FONT_H},{self.FONT_W}
-^FB{text_w},1,0,C,0
+^FB{text_w-10},1,0,C,0
 ^FD{value}^FS
 
 ^PQ{copies}
@@ -160,4 +167,4 @@ class ImprimirEtiqueta:
 
 
 ie = ImprimirEtiqueta()
-ie.imprimir_etiqueta("botas", "12345678- barH-40", 1)
+ie.imprimir_etiqueta("botas", "91AU4049811-260300003", 10)
