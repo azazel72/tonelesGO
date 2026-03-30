@@ -876,13 +876,6 @@
 
                 <div class="panel-fijo-body cierre-semanal-body">
                     <div class="cierre-semanal-bloque">
-                        <h6 class="cierre-semanal-bloque-titulo">Resumen</h6>
-                        <div class="cierre-semanal-resumen-grid" id="cierre-semanal-kpis">
-                            <div class="cierre-semanal-empty">Cargando resumen...</div>
-                        </div>
-                    </div>
-
-                    <div class="cierre-semanal-bloque">
                         <div class="d-flex justify-content-between align-items-center gap-2 flex-wrap">
                             <h6 class="cierre-semanal-bloque-titulo mb-0">Palets y lotes consumidos</h6>
                             <span class="small text-muted" id="cierre-semanal-lotes-resumen"></span>
@@ -892,28 +885,32 @@
                         </div>
                     </div>
 
-                    <div class="cierre-semanal-bloque">
-                        <h6 class="cierre-semanal-bloque-titulo">Botas fabricadas</h6>
+                    <details class="cierre-semanal-bloque cierre-semanal-desplegable" id="cierre-semanal-codigos-panel">
+                        <summary class="cierre-semanal-desplegable-titulo">Botas fabricadas</summary>
                         <div class="cierre-semanal-codigos" id="cierre-semanal-codigos">
                             <div class="cierre-semanal-empty">Cargando códigos...</div>
                         </div>
-                    </div>
+                    </details>
 
                     <div class="cierre-semanal-bloque">
-                        <h6 class="cierre-semanal-bloque-titulo">Acciones previstas</h6>
+                        <h6 class="cierre-semanal-bloque-titulo">Los cambios de esta pantalla son temporales hasta pulsar Finalizar.</h6>
                         <div class="cierre-semanal-acciones">
-                            <button type="button" class="btn btn-outline-warning" id="cierre-semanal-reasignar-negativo">
-                                <i class="bi bi-arrow-left-right"></i> Reasignar consumo negativo
-                            </button>
-                            <button type="button" class="btn btn-outline-success" id="cierre-semanal-crear-procesado">
-                                <i class="bi bi-box-seam"></i> Convertir sobrante en palet procesado
+                            <button type="button" class="btn btn-outline-secondary" id="cierre-semanal-reset">
+                                <i class="bi bi-arrow-counterclockwise"></i> Restablecer cambios
                             </button>
                             <button type="button" class="btn btn-primary" id="cierre-semanal-cerrar">
-                                <i class="bi bi-check2-circle"></i> Cerrar semanal
+                                <i class="bi bi-check2-circle"></i> Finalizar cierre
                             </button>
                         </div>
-                        <div class="cierre-semanal-nota" id="cierre-semanal-nota-acciones">
-                            Estas acciones quedan preparadas a nivel de vista y flujo, pero su lógica final se dejará ligera porque habrá que redefinirla.
+                        <div class="cierre-semanal-nota" id="cierre-semanal-nota-acciones"></div>
+                        <div class="cierre-semanal-traslado mt-3">
+                            <label for="cierre-semanal-siguiente-linea" class="form-label mb-1">Trasladar sobrante a siguiente semana</label>
+                            <select id="cierre-semanal-siguiente-linea" class="form-select form-select-sm">
+                                <option value="">Seleccione producción semanal...</option>
+                            </select>
+                            <button type="button" class="btn btn-outline-dark" id="cierre-semanal-trasladar-semana">
+                                <i class="bi bi-box-arrow-right"></i> Trasladar a siguiente semana
+                            </button>
                         </div>
                     </div>
                 </div>
@@ -1088,7 +1085,7 @@
     <script src="./js/terminal-recepcion.js?v=20260327b"></script>
     <script src="./js/terminal-consumo.js?v=20260327b"></script>
     <script src="./js/terminal-fabricacion.js?v=20260327b"></script>
-    <script src="./js/terminal-cierre-semanal.js?v=20260327b"></script>
+    <script src="./js/terminal-cierre-semanal.js?v=20260329a"></script>
     <script src="./js/terminal-productos-destino.js?v=20260327b"></script>
     <script src="./js/terminal-destino.js?v=20260327b"></script>
     <script src="./js/terminal-almacen.js?v=20260327b"></script>

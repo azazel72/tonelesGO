@@ -4,6 +4,7 @@ from .tipo_producto_dto import TipoProductoDTO
 from .fabricacion_semanal_dto import FabricacionSemanalDTO
 from .trazabilidad_procesado_dto import TrazabilidadProcesadoDTO
 from .trazabilidad_fabricacion_dto import TrazabilidadFabricacionDTO
+from .trazabilidad_movimiento_dto import TrazabilidadMovimientoDTO
 from .trazabilidad_producto_dto import TrazabilidadProductoDTO
 from .consumo_dto import ConsumoDTO
 
@@ -13,6 +14,7 @@ __all__ = [
     "FabricacionSemanalDTO",
     "TrazabilidadProcesadoDTO",
     "TrazabilidadFabricacionDTO",
+    "TrazabilidadMovimientoDTO",
     "TrazabilidadProductoDTO",
     "ConsumoDTO",
 ]

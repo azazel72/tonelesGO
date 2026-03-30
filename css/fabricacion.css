@@ -307,6 +307,21 @@
     color: #18212f;
 }
 
+.cierre-semanal-desplegable {
+    padding-top: 0.7rem;
+}
+
+.cierre-semanal-desplegable-titulo {
+    font-weight: 700;
+    color: #18212f;
+    cursor: pointer;
+    list-style: none;
+}
+
+.cierre-semanal-desplegable-titulo::-webkit-details-marker {
+    display: none;
+}
+
 .cierre-semanal-resumen-grid {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -356,15 +371,75 @@
     margin-bottom: 0.35rem;
 }
 
+.cierre-semanal-lote-meta {
+    margin-bottom: 0.75rem;
+    font-size: 0.82rem;
+    color: #64748b;
+}
+
 .cierre-semanal-lote-grid {
     display: grid;
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: minmax(0, 1fr);
     gap: 0.45rem 0.75rem;
+}
+
+.cierre-semanal-lote-grid > div {
+    white-space: nowrap;
 }
 
 .cierre-semanal-lote-negativo {
     border-color: #fecaca;
     background: #fff1f2;
+}
+
+.cierre-semanal-lote-positivo {
+    border-color: #bfdbfe;
+    background: #eff6ff;
+}
+
+.cierre-semanal-lote-acciones {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.75rem;
+}
+
+.cierre-semanal-lote-form {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    border: 1px solid #dbe4ec;
+    border-radius: 0.8rem;
+    background: #ffffff;
+    padding: 0.6rem 0.7rem;
+}
+
+.cierre-semanal-operacion-titulo {
+    cursor: pointer;
+    font-weight: 600;
+    color: #18212f;
+    list-style: none;
+}
+
+.cierre-semanal-operacion-titulo::-webkit-details-marker {
+    display: none;
+}
+
+.cierre-semanal-operacion-cuerpo {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    margin-top: 0.55rem;
+}
+
+.cierre-semanal-lote-inline {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.cierre-semanal-lote-form-full {
+    grid-column: 1 / -1;
 }
 
 .cierre-semanal-codigos-lista {
@@ -388,6 +463,12 @@
     gap: 0.75rem;
 }
 
+.cierre-semanal-traslado {
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+}
+
 .cierre-semanal-nota,
 .cierre-semanal-empty {
     color: #64748b;
@@ -396,6 +477,14 @@
 @media (min-width: 768px) {
     .fabricacion-cards-list {
         grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .cierre-semanal-lote-acciones {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+
+    .cierre-semanal-lote-form-full {
+        grid-column: 1 / -1;
     }
 }
 
