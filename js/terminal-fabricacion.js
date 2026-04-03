@@ -9,7 +9,6 @@ function prepararEventosFabricacion() {
     console.log("[fabricar-bota] boton imprimir encontrado:", !!btnImprimirFabricarBota);
     if (btnImprimirFabricarBota) {
         btnImprimirFabricarBota.addEventListener("click", async () => {
-            console.log("[fabricar-bota] click en boton imprimir (listener js)");
             await imprimirEtiquetaFabricarBotaDesdeUI();
         });
     }
@@ -176,7 +175,7 @@ async function cargarFabricacionSemanalActivaFabricacion(opciones = {}) {
         if (autoAbrirLineaUnica && lineas.length === 1) {
             const filaUnica = contenedor.querySelector("[data-linea-id]");
             if (filaUnica) {
-                mostrarLineaFabricacion(filaUnica);
+                await mostrarLineaFabricacion(filaUnica);
             }
         }
     } catch (err) {
@@ -190,7 +189,7 @@ function seleccionarLineaFabricacionSemanal(fila) {
     mostrarLineaFabricacion(fila);
 }
 
-function mostrarLineaFabricacion(fila) {
+async function mostrarLineaFabricacion(fila) {
     lineaFabricacionActualId = Number(fila.dataset.lineaId || 0) || null;
     lineaFabricacionMaterialActualId = Number(fila.dataset.materialId || 0) || null;
     lineaFabricacionTipoBotaActualId = Number(fila.dataset.tipoProductoId || 0) || null;
@@ -241,11 +240,11 @@ function mostrarLineaFabricacion(fila) {
         mostrarSeccion("vista_fabricacion");
     }
     const inputCantidad = document.getElementById("fabricar-bota-cantidad-etiquetas");
-    if (inputCantidad && (!inputCantidad.value || Number(inputCantidad.value) < 1)) {
-        inputCantidad.value = "1";
+    if (inputCantidad && (!inputCantidad.value || Number(inputCantidad.value) < 0)) {
+        inputCantidad.value = "0";
     }
-    cargarOperariosFondadoEnSelector();
-    cargarCodigosBatideroEnSelector();
+    await cargarOperariosFondadoEnSelector();
+    await cargarCodigosBatideroEnSelector();
     if (typeof setPantalla === "function") {
         setPantalla("vista_fabricacion", { pedido_id: ordenFabricacionActualId, fabricacion_semanal_id: lineaFabricacionActualId });
     }
@@ -551,9 +550,7 @@ async function cargarOperariosFondadoEnSelector() {
 }
 
 async function imprimirEtiquetaFabricarBotaDesdeUI() {
-    console.log("[fabricar-bota] imprimirEtiquetaFabricarBotaDesdeUI inicio");
     if (!lineaFabricacionActualId) {
-        console.log("[fabricar-bota] bloqueado: sin lineaFabricacionActualId");
         alert("Seleccione una linea de fabricacion.");
         return;
     }
@@ -562,17 +559,8 @@ async function imprimirEtiquetaFabricarBotaDesdeUI() {
         .map((item) => item.lote);
     const batidero = Number(document.getElementById("fabricar-bota-batidero")?.value || 0);
     const operarioFondadoId = Number(document.getElementById("fabricar-bota-operario-fondado")?.value || 0);
-    const cantidad = Math.max(1, Number.parseInt(document.getElementById("fabricar-bota-cantidad-etiquetas")?.value || "1", 10) || 1);
-    console.log("[fabricar-bota] valores formulario", {
-        lineaFabricacionActualId,
-        lotesSeleccionados,
-        batidero,
-        operarioFondadoId,
-        cantidad,
-    });
-
-    if (!lotesSeleccionados.length || !batidero || !operarioFondadoId) {
-        console.log("[fabricar-bota] bloqueado: faltan campos obligatorios");
+    const cantidad = Number(document.getElementById("fabricar-bota-cantidad-etiquetas")?.value || 0);
+    if (!lotesSeleccionados.length || !batidero || !operarioFondadoId || cantidad <= 0) {
         alert("Debes seleccionar al menos un lote, y completar batidero y operario de fondado.");
         return;
     }
@@ -588,8 +576,27 @@ async function imprimirEtiquetaFabricarBotaDesdeUI() {
         console.log("[fabricar-bota] enviando wsRequest imprimir_etiqueta_fabricacion", payload);
         const resp = await wsRequest("imprimir_etiqueta_fabricacion", payload);
         console.log("[fabricar-bota] respuesta wsRequest imprimir_etiqueta_fabricacion", resp);
-        cargarTrazabilidadFabricacion(lineaFabricacionActualId);
-        cargarFabricacionSemanalActivaFabricacion();
+
+        const selectorBatidero = document.getElementById("fabricar-bota-batidero");
+        const selectorOperario = document.getElementById("fabricar-bota-operario-fondado");
+        const batideroPrevio = String(selectorBatidero?.value || "");
+        const operarioPrevio = String(selectorOperario?.value || "");
+console.log(operarioPrevio);
+
+        await cargarTrazabilidadFabricacion(lineaFabricacionActualId);
+        await cargarFabricacionSemanalActivaFabricacion();
+
+        if (selectorBatidero && batideroPrevio && Array.from(selectorBatidero.options).some((opt) => opt.value === batideroPrevio)) {
+            selectorBatidero.value = batideroPrevio;
+        }
+        console.log(selectorOperario.options);
+        if (selectorOperario && operarioPrevio && Array.from(selectorOperario.options).some((opt) => opt.value === operarioPrevio)) {
+            selectorOperario.value = operarioPrevio;
+        }
+        const cantidadInput = document.getElementById("fabricar-bota-cantidad-etiquetas");
+        if (cantidadInput) {
+            cantidadInput.value = "0";
+        }
     } catch (err) {
         console.error("[fabricar-bota] error en imprimir_etiqueta_fabricacion", err);
         alert("Error al imprimir etiqueta.");
