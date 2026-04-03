@@ -1825,8 +1825,10 @@ class Colector:
                     if tipo == "BOTA" and linea_ref:
                         consumo_duela, consumos_fleje = self._obtener_receta_bota(session, linea_ref.tipo_producto_id)
 
+                    lotes_origenes = lotes_normalizados if tipo == "BOTA" else palet_codigos
+
                     for _ in range(cantidad_etiquetas):
-                        codigo = self._generar_codigo_producto(session, trazas, palet_codigos, operarios_ids_codigo)
+                        codigo = self._generar_codigo_producto(session, trazas, lotes_origenes, operarios_ids_codigo)
                         logger.info("Etiqueta fabricacion: codigo=%s origenes=%s", codigo, palet_codigos)
                         codigos_generados.append(codigo)
 
@@ -2224,12 +2226,12 @@ class Colector:
                 codigo_nuevo = f"{prefijo}#{contador:06d}"
             return {"codigo": codigo_nuevo, "prefijo": prefijo, "contador": contador}
 
-    def _generar_codigo_producto(self, session, trazas, palet_codigos, operarios_ids: list[int]) -> str:
-        sep = "X" if len([c for c in palet_codigos if c]) > 1 else "-"
+    def _generar_codigo_producto(self, session, trazas, lotes_origenes, operarios_ids: list[int]) -> str:
+        sep = "X" if len([c for c in (lotes_origenes or []) if c]) > 1 else "-"
 
         prefijo_lote = ""
-        if palet_codigos:
-            prefijo_lote = self._extraer_prefijo_lote(palet_codigos[0])
+        if lotes_origenes:
+            prefijo_lote = lotes_origenes[0]
         else:
             palet_id = trazas[0].palet_id if trazas else None
             if palet_id:

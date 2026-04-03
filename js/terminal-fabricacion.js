@@ -40,10 +40,8 @@ function prepararEventosFabricacion() {
             const activa = item.dataset.activa === "1";
             if (!lote) return;
             if (activa) {
-                if (!confirm("¿Desactivar este lote para que no entre en nuevas fabricaciones?")) return;
                 await actualizarEstadoLoteFabricacion(lote, 1);
             } else {
-                if (!confirm("¿Activar este lote para poder volver a usarlo?")) return;
                 await actualizarEstadoLoteFabricacion(lote, 0);
             }
             await cargarTrazabilidadFabricacion(lineaFabricacionActualId);
@@ -243,8 +241,8 @@ async function mostrarLineaFabricacion(fila) {
     if (inputCantidad && (!inputCantidad.value || Number(inputCantidad.value) < 0)) {
         inputCantidad.value = "0";
     }
-    await cargarOperariosFondadoEnSelector();
-    await cargarCodigosBatideroEnSelector();
+    await cargarOperariosFondadoEnSelector(true);
+    await cargarCodigosBatideroEnSelector(true);
     if (typeof setPantalla === "function") {
         setPantalla("vista_fabricacion", { pedido_id: ordenFabricacionActualId, fabricacion_semanal_id: lineaFabricacionActualId });
     }
@@ -408,9 +406,10 @@ async function abrirModalOperarioFabricacion() {
     ajustarZIndexModal(modalEl);
 }
 
-function cargarCodigosBatideroEnSelector() {
+async function cargarCodigosBatideroEnSelector(mantenerSeleccion = false) {
     const selector = document.getElementById("fabricar-bota-batidero");
     if (!selector) return;
+    const valorPrevio = selector.value || "";
     const dias = ["Jueves", "Viernes", "Lunes", "Martes", "Miércoles"];
     const options = [`<option value="">Seleccione código...</option>`];
     for (let i = 0; i < dias.length; i += 1) {
@@ -421,6 +420,11 @@ function cargarCodigosBatideroEnSelector() {
         options.push(`<option value="${tarde}">${tarde} (${dias[i]} tarde)</option>`);
     }
     selector.innerHTML = options.join("");
+    if (mantenerSeleccion && valorPrevio && Array.from(selector.options).some((opt) => opt.value === valorPrevio)) {
+        selector.value = valorPrevio;
+        return;
+    }
+    selector.value = "";
 }
 
 function obtenerLoteDesdeCodigoPalet(codigoPalet) {
@@ -515,11 +519,13 @@ function obtenerUltimaAsignacionPorUsuario(items = []) {
     return Array.from(porUsuario.values());
 }
 
-async function cargarOperariosFondadoEnSelector() {
+async function cargarOperariosFondadoEnSelector(mantenerSeleccion = false) {
+    console.log("sssssssssssssss", mantenerSeleccion);  
     const selector = document.getElementById("fabricar-bota-operario-fondado");
     if (!selector) return;
-    selector.innerHTML = `<option value="">Cargando operarios...</option>`;
+    const valorPrevio = selector.value || "";
     try {
+        selector.innerHTML = `<option value="">Cargando operarios...</option>`;
         const payload = (await wsRequest("listar_operarios_planificacion_fabricacion", {
             puesto_nombre: "FONDAR",
             dias_previos: 2,
@@ -543,6 +549,11 @@ async function cargarOperariosFondadoEnSelector() {
             const fecha = item.fecha ? formatearFechaEuropea(item.fecha) : "";
             return `<option value="${u.id}">${nombre}${fecha ? " | " + fecha : ""}</option>`;
         }).join("");
+        if (mantenerSeleccion && valorPrevio && Array.from(selector.options).some((opt) => opt.value === valorPrevio)) {
+            selector.value = valorPrevio;
+            return;
+        }
+        selector.value = "";
     } catch (err) {
         console.error("No se pudieron cargar operarios de fondado:", err);
         selector.innerHTML = `<option value="">Error cargando operarios</option>`;
@@ -577,22 +588,8 @@ async function imprimirEtiquetaFabricarBotaDesdeUI() {
         const resp = await wsRequest("imprimir_etiqueta_fabricacion", payload);
         console.log("[fabricar-bota] respuesta wsRequest imprimir_etiqueta_fabricacion", resp);
 
-        const selectorBatidero = document.getElementById("fabricar-bota-batidero");
-        const selectorOperario = document.getElementById("fabricar-bota-operario-fondado");
-        const batideroPrevio = String(selectorBatidero?.value || "");
-        const operarioPrevio = String(selectorOperario?.value || "");
-console.log(operarioPrevio);
-
-        await cargarTrazabilidadFabricacion(lineaFabricacionActualId);
-        await cargarFabricacionSemanalActivaFabricacion();
-
-        if (selectorBatidero && batideroPrevio && Array.from(selectorBatidero.options).some((opt) => opt.value === batideroPrevio)) {
-            selectorBatidero.value = batideroPrevio;
-        }
-        console.log(selectorOperario.options);
-        if (selectorOperario && operarioPrevio && Array.from(selectorOperario.options).some((opt) => opt.value === operarioPrevio)) {
-            selectorOperario.value = operarioPrevio;
-        }
+        cargarTrazabilidadFabricacion(lineaFabricacionActualId);
+        //cargarFabricacionSemanalActivaFabricacion();
         const cantidadInput = document.getElementById("fabricar-bota-cantidad-etiquetas");
         if (cantidadInput) {
             cantidadInput.value = "0";
