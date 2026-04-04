@@ -2830,6 +2830,241 @@ class Colector:
                     })
 
             return resultado
+
+    def listar_botas_diarias(self, fecha: str | None = None):
+        fecha_ref = date.today()
+        if fecha not in (None, ""):
+            fecha_ref = date.fromisoformat(str(fecha))
+
+        with DB.crear_sesion() as session:
+            enlaces_operario = session.exec(
+                select(ProductoOperarioDB).where(
+                    func.date(ProductoOperarioDB.created_at) == fecha_ref
+                )
+            ).all()
+            if not enlaces_operario:
+                return []
+
+            producto_ids = sorted({int(item.producto_id) for item in enlaces_operario if item.producto_id})
+            productos = session.exec(
+                select(ProductoDB).where(ProductoDB.id.in_(producto_ids))
+            ).all()
+            productos = [
+                producto for producto in productos
+                if str(getattr(producto, "tipo", "")).strip().upper() == "BOTA"
+            ]
+            if not productos:
+                return []
+
+            productos_por_id = {int(producto.id): producto for producto in productos if producto.id}
+            producto_ids = sorted(productos_por_id.keys())
+
+            enlaces_traza = session.exec(
+                select(TrazabilidadProductoDB).where(
+                    TrazabilidadProductoDB.producto_id.in_(producto_ids)
+                )
+            ).all()
+            traza_ids = sorted({
+                int(item.trazabilidad_fabricacion_id)
+                for item in enlaces_traza
+                if item.trazabilidad_fabricacion_id
+            })
+            trazas_fabricacion = session.exec(
+                select(TrazabilidadFabricacionDB).where(
+                    TrazabilidadFabricacionDB.id.in_(traza_ids)
+                )
+            ).all() if traza_ids else []
+            trazas_por_id = {int(item.id): item for item in trazas_fabricacion if item.id}
+
+            palet_ids = sorted({int(item.palet_id) for item in trazas_fabricacion if item.palet_id})
+            palets = session.exec(
+                select(PaletDB).where(PaletDB.id.in_(palet_ids))
+            ).all() if palet_ids else []
+            palets_por_id = {int(item.id): item for item in palets if item.id}
+
+            linea_ids = sorted({
+                int(producto.produccion_id or 0)
+                for producto in productos
+                if int(producto.produccion_id or 0) > 0
+            } | {
+                int(item.fabricacion_semanal_id or 0)
+                for item in trazas_fabricacion
+                if int(item.fabricacion_semanal_id or 0) > 0
+            })
+            lineas = session.exec(
+                select(FabricacionSemanalDB).where(FabricacionSemanalDB.id.in_(linea_ids))
+            ).all() if linea_ids else []
+            lineas_por_id = {int(item.id): item for item in lineas if item.id}
+
+            pedido_ids = sorted({int(item.pedido_id) for item in lineas if item.pedido_id})
+            pedidos = session.exec(
+                select(PedidoDB).where(PedidoDB.id.in_(pedido_ids))
+            ).all() if pedido_ids else []
+            pedidos_por_id = {int(item.id): item for item in pedidos if item.id}
+
+            tipo_ids = sorted({int(item.tipo_producto_id) for item in lineas if item.tipo_producto_id})
+            tipos = session.exec(
+                select(TipoProductoDB).where(TipoProductoDB.id.in_(tipo_ids))
+            ).all() if tipo_ids else []
+            tipos_por_id = {int(item.id): item for item in tipos if item.id}
+
+            material_ids = sorted({int(item.material_id) for item in lineas if item.material_id})
+            materiales = session.exec(
+                select(MaterialDB).where(MaterialDB.id.in_(material_ids))
+            ).all() if material_ids else []
+            materiales_por_id = {int(item.id): item for item in materiales if item.id}
+
+            estados = session.exec(select(EstadoProductoDB)).all()
+            estados_por_id = {int(item.id): item for item in estados if item.id}
+
+            usuario_ids = sorted({int(item.usuario_id) for item in enlaces_operario if item.usuario_id})
+            usuarios = session.exec(
+                select(UsuarioDB).where(UsuarioDB.id.in_(usuario_ids))
+            ).all() if usuario_ids else []
+            usuarios_por_id = {int(item.id): item for item in usuarios if item.id}
+
+            enlaces_operario_por_producto = {}
+            for item in enlaces_operario:
+                producto_id = int(item.producto_id or 0)
+                if producto_id not in productos_por_id:
+                    continue
+                enlaces_operario_por_producto.setdefault(producto_id, []).append(item)
+
+            trazas_por_producto = {}
+            for item in enlaces_traza:
+                producto_id = int(item.producto_id or 0)
+                traza = trazas_por_id.get(int(item.trazabilidad_fabricacion_id or 0))
+                if not traza or producto_id not in productos_por_id:
+                    continue
+                trazas_por_producto.setdefault(producto_id, []).append(traza)
+
+            items = []
+            for producto_id, producto in productos_por_id.items():
+                enlaces_producto = enlaces_operario_por_producto.get(producto_id, [])
+                if not enlaces_producto:
+                    continue
+
+                fecha_creacion = min(
+                    (item.created_at for item in enlaces_producto if item.created_at is not None),
+                    default=None,
+                )
+                codigo_batidero = next(
+                    (int(item.codigo_batidero) for item in enlaces_producto if item.codigo_batidero not in (None, "")),
+                    None,
+                )
+
+                operarios = []
+                usuarios_vistos = set()
+                for item in sorted(
+                    enlaces_producto,
+                    key=lambda row: ((row.created_at.isoformat() if row.created_at else ""), int(row.usuario_id or 0)),
+                ):
+                    usuario_id = int(item.usuario_id or 0)
+                    if not usuario_id or usuario_id in usuarios_vistos:
+                        continue
+                    usuarios_vistos.add(usuario_id)
+                    usuario = usuarios_por_id.get(usuario_id)
+                    operarios.append({
+                        "id": usuario_id,
+                        "nombre": getattr(usuario, "nombre", None) or getattr(usuario, "alias", None) or f"Operario {usuario_id}",
+                    })
+
+                trazas = trazas_por_producto.get(producto_id, [])
+                palets_codigo = []
+                lotes = []
+                palets_vistos = set()
+                lotes_vistos = set()
+                fabricacion_semanal_id = int(producto.produccion_id or 0)
+                for traza in trazas:
+                    if not fabricacion_semanal_id:
+                        fabricacion_semanal_id = int(traza.fabricacion_semanal_id or 0)
+                    palet = palets_por_id.get(int(traza.palet_id or 0))
+                    codigo_palet = str(getattr(palet, "codigo", "") or "").strip()
+                    if codigo_palet and codigo_palet not in palets_vistos:
+                        palets_vistos.add(codigo_palet)
+                        palets_codigo.append(codigo_palet)
+                    lote = self._normalizar_lote_traza(codigo_palet)
+                    if lote and lote not in lotes_vistos:
+                        lotes_vistos.add(lote)
+                        lotes.append(lote)
+
+                linea = lineas_por_id.get(fabricacion_semanal_id)
+                pedido = pedidos_por_id.get(int(getattr(linea, "pedido_id", 0) or 0))
+                tipo = tipos_por_id.get(int(getattr(linea, "tipo_producto_id", 0) or 0))
+                material = materiales_por_id.get(int(getattr(linea, "material_id", 0) or 0))
+
+                items.append({
+                    "producto_id": producto_id,
+                    "codigo": str(producto.codigo or "").strip(),
+                    "estado": int(producto.estado or 0),
+                    "estado_descripcion": getattr(estados_por_id.get(int(producto.estado or 0)), "descripcion", None) or str(int(producto.estado or 0)),
+                    "fecha": fecha_creacion.isoformat() if fecha_creacion else None,
+                    "codigo_batidero": codigo_batidero,
+                    "operarios": operarios,
+                    "fabricacion_semanal_id": fabricacion_semanal_id or None,
+                    "pedido_id": getattr(pedido, "id", None),
+                    "pedido_numero": getattr(pedido, "numero", None),
+                    "pedido_descripcion": getattr(pedido, "descripcion", None) or "",
+                    "tipo_producto_id": getattr(linea, "tipo_producto_id", None),
+                    "tipo_producto_descripcion": getattr(tipo, "descripcion", None) or getattr(tipo, "codigo", None) or "",
+                    "material_id": getattr(linea, "material_id", None),
+                    "material_descripcion": getattr(material, "descripcion", None) or "",
+                    "palets": palets_codigo,
+                    "lotes": lotes,
+                })
+
+            items.sort(
+                key=lambda item: (
+                    str(item.get("fecha") or ""),
+                    str(item.get("codigo") or ""),
+                ),
+                reverse=True,
+            )
+            return items
+
+    def reimprimir_etiqueta_bota(self, data, ws=None):
+        producto_id = int(data.get("producto_id") or 0)
+        if not producto_id:
+            raise ValueError("producto_id es obligatorio.")
+
+        with DB.crear_sesion() as session:
+            producto = session.get(ProductoDB, producto_id)
+            if not producto:
+                raise ValueError("Producto no encontrado.")
+            if str(getattr(producto, "tipo", "")).strip().upper() != "BOTA":
+                raise ValueError("Solo se pueden reimprimir etiquetas de botas.")
+
+            enlaces = session.exec(
+                select(TrazabilidadProductoDB).where(
+                    TrazabilidadProductoDB.producto_id == producto_id
+                )
+            ).all()
+            traza_ids = [int(item.trazabilidad_fabricacion_id) for item in enlaces if item.trazabilidad_fabricacion_id]
+            trazas = session.exec(
+                select(TrazabilidadFabricacionDB).where(
+                    TrazabilidadFabricacionDB.id.in_(traza_ids)
+                )
+            ).all() if traza_ids else []
+            palet_ids = sorted({int(item.palet_id) for item in trazas if item.palet_id})
+            palets = session.exec(
+                select(PaletDB).where(PaletDB.id.in_(palet_ids))
+            ).all() if palet_ids else []
+            origenes = [
+                str(item.codigo).strip()
+                for item in palets
+                if str(getattr(item, "codigo", "")).strip()
+            ]
+            codigo = str(producto.codigo or "").strip()
+
+        threading.Thread(
+            target=self._imprimir_etiquetas_async,
+            args=([codigo], origenes, ws),
+            daemon=True,
+        ).start()
+        return {
+            "producto_id": producto_id,
+            "codigo": codigo,
+        }
     #endregion
     
     def checkUpdate(self, objeto, tabla, entrada_id, campo):

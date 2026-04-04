@@ -49,6 +49,7 @@ document.addEventListener("DOMContentLoaded", function () {
     prepararEventosMoverStock();
     prepararEventosProcesarStock();
     prepararEventosAmbientes();
+    prepararEventosBotasDiarias?.();
 
     // Muestra la sección de tareas al cargar la página
     mostrarSeccion("vista_tareas");
@@ -111,6 +112,9 @@ function mostrarSeccion(id) {
         }
         if (id === "vista_ambientes") {
             cargarFormularioAmbientes();
+        }
+        if (id === "vista_botas_diarias") {
+            cargarVistaBotasDiarias?.();
         }
         if (id === "vista_destino") {
             cargarVistaDestino?.();
@@ -332,6 +336,12 @@ function actualizarMigasPan(mostrarSeccion) {
             nuevaMiga = crearMigaPan("Ambientes", mostrarSeccion, true);
             migasPan.appendChild(nuevaMiga);
             break;
+        case "vista_botas_diarias":
+            nuevaMiga = crearMigaPan("Inicio", "vista_tareas", false);
+            migasPan.appendChild(nuevaMiga);
+            nuevaMiga = crearMigaPan("Botas diarias", mostrarSeccion, true);
+            migasPan.appendChild(nuevaMiga);
+            break;
     }
 }
 
@@ -483,6 +493,7 @@ var ACCIONES = {
             || pantallaActual === "vista_ubicacion"
             || pantallaActual === "vista_mover_stock"
             || pantallaActual === "vista_procesar_stock"
+            || pantallaActual === "vista_botas_diarias"
         ) {
             if (msg?.data?.refetch_maestros) {
                 refrescarMaestrosFabricacion?.();
@@ -501,6 +512,9 @@ var ACCIONES = {
             }
             if (pantallaActual === "vista_procesar_stock") {
                 cargarFormularioProcesarStock?.();
+            }
+            if (pantallaActual === "vista_botas_diarias") {
+                refrescarBotasDiariasDesdeServidor?.(msg.data || {});
             }
         }
     },

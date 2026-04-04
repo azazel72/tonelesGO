@@ -33,6 +33,8 @@ def obtener_acciones() -> Dict[str, any]:
         "actualizar_estado_trazabilidad_fabricacion": lambda ws, req: Colector.colector.actualizar_estado_trazabilidad_fabricacion(req.data),
         "imprimir_etiqueta_fabricacion": lambda ws, req: Colector.colector.imprimir_etiqueta_fabricacion(req.data, ws),
         "listar_operarios_planificacion_fabricacion": lambda ws, req: Colector.colector.listar_operarios_planificacion_fabricacion(req.data or {}),
+        "listar_botas_diarias": lambda ws, req: Colector.colector.listar_botas_diarias(req.data.get("fecha")),
+        "reimprimir_etiqueta_bota": lambda ws, req: Colector.colector.reimprimir_etiqueta_bota(req.data or {}, ws),
         "listar_archivos_entidad": lambda ws, req: Colector.colector.listar_archivos_entidad(req.data.get("entidad"), req.data.get("entidad_id")),
         "inventario_duelas": lambda ws, req: Colector.colector.inventario_duelas(),
         "inventario_flejes": lambda ws, req: Colector.colector.inventario_flejes(),

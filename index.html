@@ -44,6 +44,9 @@
                         <button class="offcanvas-nav-btn" mostrar="vista_ambientes" data-bs-dismiss="offcanvas">
                             Ambientes
                         </button>
+                        <button class="offcanvas-nav-btn" mostrar="vista_botas_diarias" data-bs-dismiss="offcanvas">
+                            Botas diarias
+                        </button>
 
                         <div class="offcanvas-menu-grupo">
                             <h6>Palets</h6>
@@ -289,6 +292,31 @@
                     </div>
                 </div>
             </form>
+        </section>
+
+        <section id="vista_botas_diarias" class="flex-fill vista-panel-fija">
+            <div class="contenedor-panel-fijo panel-fijo">
+                <div class="panel-fijo-header">
+                    <h5 class="mb-0">Botas diarias</h5>
+                    <div class="small text-muted">Listado de botas fabricadas en la fecha indicada.</div>
+                </div>
+                <div class="panel-fijo-body">
+                    <div class="row g-2 align-items-end mb-3">
+                        <div class="col-8">
+                            <label for="botas-diarias-fecha" class="form-label mb-1">Fecha</label>
+                            <input type="date" class="form-control" id="botas-diarias-fecha">
+                        </div>
+                        <div class="col-4">
+                            <button type="button" class="btn btn-primary w-100" id="botas-diarias-obtener">
+                                Obtener
+                            </button>
+                        </div>
+                    </div>
+                    <div id="botas-diarias-lista" class="botas-diarias-lista">
+                        <div class="fabricacion-card-empty">Selecciona una fecha y pulsa Obtener.</div>
+                    </div>
+                </div>
+            </div>
         </section>
 
         <section id="vista_recepcion" class="flex-fill" modo="listado_entradas">
@@ -950,6 +978,28 @@
             </div>
         </div>
 
+        <div class="modal fade" id="modalBotasDiarias" tabindex="-1" aria-labelledby="modalBotasDiariasLabel" aria-hidden="true">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="modalBotasDiariasLabel">Detalle de bota</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div id="botas-diarias-detalle" class="botas-diarias-detalle">
+                            <div class="text-muted small">Cargando detalle...</div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cerrar</button>
+                        <button type="button" class="btn btn-primary" id="botas-diarias-reimprimir">
+                            <i class="bi bi-printer"></i> Reimprimir etiqueta
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <section id="vista_destino" class="flex-fill vista-panel-fija">
             <div class="contenedor-panel-fijo panel-fijo">
                 <div class="panel-fijo-header">
@@ -1093,6 +1143,7 @@
     <script src="./js/terminal-mover-stock.js?v=20260327b"></script>
     <script src="./js/terminal-procesar-stock.js?v=20260327b"></script>
     <script src="./js/terminal-ambientes.js?v=20260327b"></script>
+    <script src="./js/terminal-botas-diarias.js?v=20260404a"></script>
     <script src="./js/terminal.js?v=20260327b"></script>
 
 </body>

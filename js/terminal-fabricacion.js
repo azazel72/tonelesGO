@@ -520,7 +520,6 @@ function obtenerUltimaAsignacionPorUsuario(items = []) {
 }
 
 async function cargarOperariosFondadoEnSelector(mantenerSeleccion = false) {
-    console.log("sssssssssssssss", mantenerSeleccion);  
     const selector = document.getElementById("fabricar-bota-operario-fondado");
     if (!selector) return;
     const valorPrevio = selector.value || "";
