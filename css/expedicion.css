@@ -232,3 +232,18 @@
     font-size: 0.95rem;
     color: #18212f;
 }
+
+#modalExpedirDestino .modal-dialog {
+    max-height: 84vh;
+    margin-top: 4vh;
+    margin-bottom: 4vh;
+}
+
+#modalExpedirDestino .modal-content {
+    max-height: 84vh;
+    height: 100%;
+}
+
+#modalExpedirDestino .modal-body {
+    overflow: auto;
+}

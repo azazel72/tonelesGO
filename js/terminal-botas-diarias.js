@@ -15,6 +15,16 @@ function prepararEventosBotasDiarias() {
     const lista = document.getElementById("botas-diarias-lista");
     if (lista) {
         lista.addEventListener("click", (event) => {
+            const botonReimprimir = event.target.closest("[data-reimprimir-producto-id]");
+            if (botonReimprimir) {
+                event.preventDefault();
+                event.stopPropagation();
+                const productoId = Number(botonReimprimir.dataset.reimprimirProductoId || 0);
+                if (productoId) {
+                    reimprimirBotaDiariaPorId(productoId);
+                }
+                return;
+            }
             const card = event.target.closest("[data-producto-id]");
             if (!card) return;
             const productoId = Number(card.dataset.productoId || 0);
@@ -90,11 +100,27 @@ function renderizarListaBotasDiarias() {
         const pedido = item.pedido_descripcion || item.pedido_numero || "-";
         card.innerHTML = `
             <div class="botas-diarias-card-titulo">
-                <h6>${item.codigo || "-"}</h6>
+                <div class="botas-diarias-card-titulo-main">
+                    <h6>${item.codigo || "-"}</h6>
+                    <div class="botas-diarias-card-fecha">${formatearFechaHoraBotasDiarias(item.fecha)}</div>
+                </div>
             </div>
-            <div class="botas-diarias-card-fecha">${formatearFechaHoraBotasDiarias(item.fecha)}</div>
-            <div class="botas-diarias-card-linea">Pedido: ${pedido}</div>
-            <div class="botas-diarias-card-linea">Batidero y operarios de fondado: ${item.codigo_batidero || "-"} / ${operarios}</div>
+            <div class="botas-diarias-card-cuerpo">
+                <div class="botas-diarias-card-cuerpo-main">
+                    <div class="botas-diarias-card-linea botas-diarias-card-linea-secundaria">Pedido: ${pedido}</div>
+                    <div class="botas-diarias-card-linea botas-diarias-card-linea-secundaria">Batidero: ${item.codigo_batidero || "-"}</div>
+                    <div class="botas-diarias-card-linea botas-diarias-card-linea-secundaria">Fondado: ${operarios}</div>
+                </div>
+                <button
+                    type="button"
+                    class="btn btn-sm destino-pedido-accion"
+                    data-reimprimir-producto-id="${item.producto_id ?? ""}"
+                    title="Reimprimir etiqueta"
+                    aria-label="Reimprimir etiqueta"
+                >
+                    <i class="bi bi-printer"></i>
+                </button>
+            </div>
         `;
         lista.appendChild(card);
     });
@@ -145,11 +171,18 @@ async function reimprimirBotaDiariaSeleccionada() {
         alert("No hay bota seleccionada.");
         return;
     }
+    await reimprimirBotaDiariaPorId(item.producto_id, true);
+}
+
+async function reimprimirBotaDiariaPorId(productoId, cerrarModal = false) {
+    if (!productoId) return;
     try {
-        await wsRequest("reimprimir_etiqueta_bota", { producto_id: item.producto_id });
-        const modalEl = document.getElementById("modalBotasDiarias");
-        const modal = modalEl ? bootstrap.Modal.getOrCreateInstance(modalEl) : null;
-        modal?.hide();
+        await wsRequest("reimprimir_etiqueta_bota", { producto_id: productoId });
+        if (cerrarModal) {
+            const modalEl = document.getElementById("modalBotasDiarias");
+            const modal = modalEl ? bootstrap.Modal.getOrCreateInstance(modalEl) : null;
+            modal?.hide();
+        }
     } catch (err) {
         console.error("No se pudo reimprimir la etiqueta:", err);
         alert("Error al reimprimir la etiqueta.");

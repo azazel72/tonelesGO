@@ -837,7 +837,7 @@ async function imprimirEtiquetaFabricacion(operariosIds = [], cantidadEtiquetas 
 
 
 function refrescarFabricacionDesdeServidor(_data = {}) {
-    cargarFabricacionSemanalActivaFabricacion();
+    if (typeof pantallaActual !== "undefined" && pantallaActual !== "vista_fabricacion") cargarFabricacionSemanalActivaFabricacion();
     if (lineaFabricacionActualId) {
         cargarTrazabilidadFabricacion(lineaFabricacionActualId);
     }

@@ -1032,12 +1032,20 @@
                         </div>
                         <div class="mb-3">
                             <label for="destino-expedir-codigo" class="form-label">Código de bota</label>
-                            <input type="text" class="form-control" id="destino-expedir-codigo" autocomplete="off" placeholder="Escribe un código y pulsa Intro">
+                            <div class="input-group">
+                                <input type="text" class="form-control" id="destino-expedir-codigo" autocomplete="off" placeholder="Escribe un código y pulsa Intro">
+                                <button type="button" class="btn btn-outline-secondary" id="destino-expedir-codigo-limpiar" aria-label="Limpiar código">
+                                    <i class="bi bi-x-lg"></i>
+                                </button>
+                            </div>
                             <div class="form-text">Solo se admiten códigos que estén en la lista del pedido.</div>
                         </div>
                         <div id="destino-expedir-error" class="alert alert-danger d-none py-2 mb-3"></div>
                         <div class="border rounded p-2 bg-light-subtle">
-                            <div class="small text-muted mb-2">Botas seleccionadas</div>
+                            <div class="d-flex justify-content-between align-items-center gap-2 mb-2">
+                                <div class="small text-muted">Botas seleccionadas</div>
+                                <div class="small fw-semibold text-muted" id="destino-expedir-contador">0 escaneadas</div>
+                            </div>
                             <div id="destino-expedir-codigos" class="destino-expedir-codigos">
                                 <div class="text-muted small">Sin botas seleccionadas.</div>
                             </div>

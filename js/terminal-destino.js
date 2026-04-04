@@ -1,6 +1,7 @@
 function prepararEventosDestino() {
     const lista = document.getElementById("destino-lista");
     const inputCodigo = document.getElementById("destino-expedir-codigo");
+    const btnLimpiarCodigo = document.getElementById("destino-expedir-codigo-limpiar");
     const inputCodigoEnvinar = document.getElementById("destino-envinar-codigo");
     const btnConfirmar = document.getElementById("destino-expedir-confirmar");
     const btnConfirmarEnvinar = document.getElementById("destino-envinar-confirmar");
@@ -28,6 +29,14 @@ function prepararEventosDestino() {
             agregarCodigoExpedicionDestino(inputCodigo.value);
         });
     }
+    if (btnLimpiarCodigo) {
+        btnLimpiarCodigo.addEventListener("click", () => {
+            if (inputCodigo) {
+                inputCodigo.value = "";
+                inputCodigo.focus();
+            }
+        });
+    }
 
     if (inputCodigoEnvinar) {
         inputCodigoEnvinar.addEventListener("keydown", (event) => {
@@ -50,7 +59,11 @@ function prepararEventosDestino() {
     }
 
     if (modalEl) {
+        modalEl.addEventListener("shown.bs.modal", () => {
+            document.addEventListener("keydown", manejarTecladoModalExpedirDestino);
+        });
         modalEl.addEventListener("hidden.bs.modal", () => {
+            document.removeEventListener("keydown", manejarTecladoModalExpedirDestino);
             limpiarModalExpedirDestino();
         });
     }
@@ -101,6 +114,52 @@ const maestrosDestinoEnvinar = {
     instalaciones: {},
     ubicaciones: {},
 };
+
+function modalExpedirDestinoAbierto() {
+    const modalEl = document.getElementById("modalExpedirDestino");
+    return !!modalEl?.classList.contains("show");
+}
+
+function manejarTecladoModalExpedirDestino(event) {
+    if (!modalExpedirDestinoAbierto()) return;
+    if (event.ctrlKey || event.altKey || event.metaKey) return;
+
+    const inputCodigo = document.getElementById("destino-expedir-codigo");
+    const inputContenedor = document.getElementById("destino-expedir-contenedor");
+    const activo = document.activeElement;
+    if (!inputCodigo || !inputContenedor) return;
+    if (activo === inputContenedor) return;
+    if (activo && (activo.tagName === "TEXTAREA" || activo.isContentEditable)) return;
+    if (activo === inputCodigo && event.key !== "Escape") return;
+    if (event.key === "Tab" || event.key === "Escape") return;
+
+    if (event.key === "Enter") {
+        event.preventDefault();
+        inputCodigo.focus();
+        agregarCodigoExpedicionDestino(inputCodigo.value);
+        return;
+    }
+
+    if (event.key === "Backspace") {
+        event.preventDefault();
+        inputCodigo.focus();
+        inputCodigo.value = inputCodigo.value.slice(0, -1);
+        return;
+    }
+
+    if (event.key === "Delete") {
+        event.preventDefault();
+        inputCodigo.focus();
+        inputCodigo.value = "";
+        return;
+    }
+
+    if (event.key.length === 1) {
+        event.preventDefault();
+        inputCodigo.focus();
+        inputCodigo.value = `${inputCodigo.value || ""}${event.key}`;
+    }
+}
 
 function renderizarAccionPedidoDestino(grupo) {
     const destino = String(grupo?.pedidoDestino || "").trim().toUpperCase();
@@ -173,11 +232,11 @@ function agregarCodigoExpedicionDestino(codigoRaw) {
     const inputCodigo = document.getElementById("destino-expedir-codigo");
     if (!codigo) return;
     if (!estadoDestino.codigosPermitidos.includes(codigo)) {
-        mostrarErrorExpedicionDestino("Ese código no está en la lista del pedido.");
+        mostrarErrorExpedicionDestino("No existe.");
         return;
     }
     if (estadoDestino.codigosSeleccionados.includes(codigo)) {
-        mostrarErrorExpedicionDestino("Ese código ya está agregado.");
+        mostrarErrorExpedicionDestino("Ya escaneada");
         return;
     }
     estadoDestino.codigosSeleccionados.push(codigo);
@@ -193,7 +252,12 @@ function quitarCodigoExpedicionDestino(codigo) {
 
 function renderizarCodigosExpedicionDestino() {
     const contenedor = document.getElementById("destino-expedir-codigos");
+    const contador = document.getElementById("destino-expedir-contador");
     if (!contenedor) return;
+    if (contador) {
+        const total = estadoDestino.codigosSeleccionados.length;
+        contador.textContent = `${total} escaneada${total === 1 ? "" : "s"}`;
+    }
     if (!estadoDestino.codigosSeleccionados.length) {
         contenedor.innerHTML = `<div class="text-muted small">Sin botas seleccionadas.</div>`;
         return;
