@@ -16,6 +16,7 @@
     <link rel="stylesheet" href="./css/ubicacion.css?v=20260327b" />
     <link rel="stylesheet" href="./css/fabricacion.css?v=20260327b" />
     <link rel="stylesheet" href="./css/expedicion.css?v=20260327b" />
+    <link rel="stylesheet" href="./css/analiticas-envinado.css?v=20260405a" />
     <link rel="icon" type="image/png" href="./imagenes/iconos/tonel.png">
 </head>
 
@@ -46,6 +47,9 @@
                         </button>
                         <button class="offcanvas-nav-btn" mostrar="vista_botas_diarias" data-bs-dismiss="offcanvas">
                             Botas diarias
+                        </button>
+                        <button class="offcanvas-nav-btn" mostrar="vista_analiticas" data-bs-dismiss="offcanvas">
+                            Analiticas
                         </button>
 
                         <div class="offcanvas-menu-grupo">
@@ -101,8 +105,8 @@
                             <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_destino" data-bs-dismiss="offcanvas">
                                 Destino
                             </button>
-                            <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_almacen" data-bs-dismiss="offcanvas">
-                                Almacen
+                            <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_envinado" data-bs-dismiss="offcanvas">
+                                Envinado
                             </button>
                         </div>
 
@@ -229,9 +233,9 @@
                 <img class="boton-icono" src="./imagenes/iconos/camion_tonel.png" alt="Destino de botas">
                 <span>Destino</span>
             </button>
-            <button class="boton violeta boton-con-icono" mostrar="vista_almacen">
+            <button class="boton violeta boton-con-icono" mostrar="vista_envinado">
                 <img class="boton-icono" src="./imagenes/iconos/toneles.png" alt="Almacen de botas">
-                <span>Almacen</span>
+                <span>Envinado</span>
             </button>
             <button class="boton boton-volver" mostrar="vista_tareas">
                 <span>Volver</span>
@@ -1063,7 +1067,7 @@
             <div class="modal-dialog modal-dialog-centered">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h5 class="modal-title" id="modalEnvinarDestinoLabel">Envinar pedido</h5>
+                        <h5 class="modal-title" id="modalEnvinarDestinoLabel">Enviar a envinar</h5>
                         <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Cerrar"></button>
                     </div>
                     <div class="modal-body">
@@ -1081,7 +1085,7 @@
                         <div class="mb-3">
                             <label for="destino-envinar-codigo" class="form-label">Código de bota</label>
                             <input type="text" class="form-control" id="destino-envinar-codigo" autocomplete="off" placeholder="Escribe un código y pulsa Intro">
-                            <div class="form-text">Solo se admiten códigos que estén en la lista del pedido.</div>
+                            <div class="form-text">Estas botas pasarán a pendiente de envinar.</div>
                         </div>
                         <div id="destino-envinar-error" class="alert alert-danger d-none py-2 mb-3"></div>
                         <div class="border rounded p-2 bg-light-subtle">
@@ -1093,19 +1097,188 @@
                     </div>
                     <div class="modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                        <button type="button" class="btn btn-primary" id="destino-envinar-confirmar">Envinar</button>
+                        <button type="button" class="btn btn-primary" id="destino-envinar-confirmar">Enviar a envinar</button>
                     </div>
                 </div>
             </div>
         </div>
 
-        <section id="vista_almacen" class="flex-fill vista-panel-fija">
+        <section id="vista_analiticas" class="flex-fill vista-panel-fija">
             <div class="contenedor-panel-fijo panel-fijo">
                 <div class="panel-fijo-header">
-                    <h5 class="mb-0">Almacen</h5>
+                    <h5 class="mb-0">Analiticas</h5>
                 </div>
                 <div class="panel-fijo-body">
-                    <div class="destino-productos-vacio">Pendiente de agregar listado de botas almacenadas, formulario y subida de documentos, y acciones de embarcar y envinar.</div>
+                    <div class="d-flex flex-column gap-3">
+                        <div class="card shadow-sm">
+                            <div class="card-header d-flex justify-content-between align-items-center gap-2">
+                                <div>
+                                    <h6 class="mb-0">Analiticas registradas</h6>
+                                    <div class="small text-muted">Activas y finalizadas.</div>
+                                </div>
+                                <button type="button" class="btn btn-outline-secondary btn-sm" id="analiticas-recargar">
+                                    <i class="bi bi-arrow-clockwise"></i>
+                                </button>
+                            </div>
+                            <div class="card-body pt-3">
+                                <div class="row g-2 mb-3">
+                                    <div class="col-12 col-md-4">
+                                        <label for="analiticas-filtro-estado" class="form-label">Estado</label>
+                                        <select class="form-select" id="analiticas-filtro-estado">
+                                            <option value="">Todos</option>
+                                            <option value="ACTIVA">Activa</option>
+                                            <option value="FINALIZADA">Finalizada</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12 col-md-4">
+                                        <label for="analiticas-filtro-fecha" class="form-label">Fecha</label>
+                                        <input type="date" class="form-control" id="analiticas-filtro-fecha">
+                                    </div>
+                                    <div class="col-12 col-md-4 d-flex align-items-end">
+                                        <button type="button" class="btn btn-outline-secondary w-100" id="analiticas-filtro-limpiar">Limpiar filtros</button>
+                                    </div>
+                                </div>
+                                <details class="analiticas-bloque" id="analiticas-bloque-lista" open>
+                                    <summary class="analiticas-bloque-summary">
+                                        <span>Listado</span>
+                                        <span id="analiticas-lista-resumen" class="small text-muted"></span>
+                                    </summary>
+                                    <div class="analiticas-bloque-body">
+                                        <div id="analiticas-lista" class="analiticas-lista">
+                                            <div class="destino-productos-vacio">Cargando analiticas...</div>
+                                        </div>
+                                    </div>
+                                </details>
+                            </div>
+                        </div>
+
+                        <div class="card shadow-sm">
+                            <div class="card-header d-flex justify-content-between align-items-center gap-2">
+                                <h6 class="mb-0">Edicion de analitica</h6>
+                                <div id="analitica-estado-guardado" class="small text-muted"></div>
+                            </div>
+                            <div class="card-body d-flex flex-column gap-3">
+                                <div class="row g-2">
+                                    <div class="col-12 col-md-6">
+                                        <label for="analitica-fecha" class="form-label">Fecha</label>
+                                        <input type="date" class="form-control" id="analitica-fecha">
+                                    </div>
+                                    <div class="col-12 col-md-6">
+                                        <label for="analitica-estado" class="form-label">Estado</label>
+                                        <select class="form-select" id="analitica-estado">
+                                            <option value="ACTIVA">Activa</option>
+                                            <option value="FINALIZADA">Finalizada</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div>
+                                    <label for="analitica-descripcion" class="form-label">Descripcion</label>
+                                    <input type="text" class="form-control" id="analitica-descripcion" maxlength="255" placeholder="Ej. Vino fino bodega norte">
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <h6 class="mb-0">Valores analiticos</h6>
+                                </div>
+                                <div id="analitica-campos" class="analitica-campos-lista"></div>
+                                <div class="d-flex gap-2">
+                                    <button type="button" class="btn btn-outline-secondary" id="analitica-nueva">Nueva</button>
+                                    <button type="button" class="btn btn-primary" id="analitica-guardar">Guardar</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="vista_envinado" class="flex-fill vista-panel-fija">
+            <div class="contenedor-panel-fijo panel-fijo">
+                <div class="panel-fijo-header">
+                    <h5 class="mb-0">Envinado</h5>
+                    <div id="envinado-resumen" class="small text-muted"></div>
+                </div>
+                <div class="panel-fijo-body">
+                    <div class="row g-3">
+                        <div class="col-12 col-xl-5">
+                            <div class="card shadow-sm mb-3">
+                                <div class="card-header">
+                                    <h6 class="mb-0">Envinar botas pendientes</h6>
+                                </div>
+                                <div class="card-body d-flex flex-column gap-3">
+                                    <div>
+                                        <label for="envinado-analitica" class="form-label">Analitica activa</label>
+                                        <select class="form-select" id="envinado-analitica">
+                                            <option value="">Selecciona una analitica...</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label for="envinado-codigo" class="form-label">Codigo de bota</label>
+                                        <input type="text" class="form-control" id="envinado-codigo" autocomplete="off" placeholder="Escanea o escribe y pulsa Intro">
+                                        <div class="form-text">Solo se admiten botas en estado pendiente de envinar.</div>
+                                    </div>
+                                    <div id="envinado-error" class="alert alert-danger d-none py-2 mb-0"></div>
+                                    <div id="envinado-codigos" class="destino-expedir-codigos">
+                                        <div class="text-muted small">Sin botas seleccionadas.</div>
+                                    </div>
+                                    <button type="button" class="btn btn-primary" id="envinado-confirmar">Marcar como envinadas</button>
+                                </div>
+                            </div>
+                            <div class="card shadow-sm">
+                                <div class="card-header">
+                                    <h6 class="mb-0">Adjuntar documento o foto</h6>
+                                </div>
+                                <div class="card-body d-flex flex-column gap-3">
+                                    <div>
+                                        <label for="envinado-archivo-titulo" class="form-label">Titulo</label>
+                                        <input type="text" class="form-control" id="envinado-archivo-titulo" maxlength="255" placeholder="Ej. Informe laboratorio abril">
+                                    </div>
+                                    <div>
+                                        <label for="envinado-archivo-file" class="form-label">Archivo o foto</label>
+                                        <input type="file" class="form-control" id="envinado-archivo-file" accept="application/pdf,image/jpeg" capture="environment">
+                                    </div>
+                                    <div>
+                                        <label for="envinado-archivo-codigo" class="form-label">Codigo de bota envinada</label>
+                                        <input type="text" class="form-control" id="envinado-archivo-codigo" autocomplete="off" placeholder="Escanea o escribe y pulsa Intro">
+                                        <div class="form-text">El mismo documento se vinculará a todas las botas añadidas.</div>
+                                    </div>
+                                    <div id="envinado-archivo-error" class="alert alert-danger d-none py-2 mb-0"></div>
+                                    <div id="envinado-archivo-codigos" class="destino-expedir-codigos">
+                                        <div class="text-muted small">Sin botas seleccionadas.</div>
+                                    </div>
+                                    <button type="button" class="btn btn-outline-primary" id="envinado-archivo-subir">Subir y vincular</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-12 col-xl-7">
+                            <div class="card shadow-sm mb-3">
+                                <div class="card-header d-flex justify-content-between align-items-center gap-2">
+                                    <div>
+                                        <h6 class="mb-0">Pendientes de envinar</h6>
+                                        <div class="small text-muted">Estado 3</div>
+                                    </div>
+                                    <span id="envinado-pendientes-contador" class="badge text-bg-secondary">0</span>
+                                </div>
+                                <div class="card-body">
+                                    <div id="envinado-pendientes-lista" class="analiticas-lista">
+                                        <div class="destino-productos-vacio">Cargando botas pendientes...</div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="card shadow-sm">
+                                <div class="card-header d-flex justify-content-between align-items-center gap-2">
+                                    <div>
+                                        <h6 class="mb-0">Botas envinadas</h6>
+                                        <div class="small text-muted">Estado 4</div>
+                                    </div>
+                                    <span id="envinado-finalizadas-contador" class="badge text-bg-secondary">0</span>
+                                </div>
+                                <div class="card-body">
+                                    <div id="envinado-finalizadas-lista" class="analiticas-lista">
+                                        <div class="destino-productos-vacio">Cargando botas envinadas...</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
@@ -1145,14 +1318,16 @@
     <script src="./js/terminal-fabricacion.js?v=20260327b"></script>
     <script src="./js/terminal-cierre-semanal.js?v=20260329a"></script>
     <script src="./js/terminal-productos-destino.js?v=20260327b"></script>
-    <script src="./js/terminal-destino.js?v=20260327b"></script>
+    <script src="./js/terminal-destino.js?v=20260405a"></script>
     <script src="./js/terminal-almacen.js?v=20260327b"></script>
+    <script src="./js/terminal-analiticas.js?v=20260405a"></script>
+    <script src="./js/terminal-envinado.js?v=20260405a"></script>
     <script src="./js/terminal-ubicacion.js?v=20260327b"></script>
     <script src="./js/terminal-mover-stock.js?v=20260327b"></script>
     <script src="./js/terminal-procesar-stock.js?v=20260327b"></script>
     <script src="./js/terminal-ambientes.js?v=20260327b"></script>
     <script src="./js/terminal-botas-diarias.js?v=20260404a"></script>
-    <script src="./js/terminal.js?v=20260327b"></script>
+    <script src="./js/terminal.js?v=20260405a"></script>
 
 </body>
 

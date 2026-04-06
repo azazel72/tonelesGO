@@ -8,7 +8,7 @@ from .maestros import EntradaFlejeDTO
 from .maestros import CubicajeDTO
 from .cuadrantes import CuadranteDTO, CuadranteDetalleDTO
 from .fabricacion import PedidoDTO, TipoProductoDTO, FabricacionSemanalDTO, TrazabilidadProcesadoDTO
-from .fabricacion import TrazabilidadFabricacionDTO, TrazabilidadProductoDTO, ConsumoDTO
+from .fabricacion import TrazabilidadFabricacionDTO, TrazabilidadProductoDTO, ConsumoDTO, AnaliticaDTO
 
 __all__ = [
     "PlanificacionEntradasDTO",
@@ -44,6 +44,7 @@ __all__ = [
     "CuadranteDetalleDTO",
     "FabricacionDTO",
     "PedidoDTO",
+    "AnaliticaDTO",
     "TipoProductoDTO",
     "FabricacionSemanalDTO",
     "TrazabilidadProcesadoDTO",

@@ -44,6 +44,8 @@ document.addEventListener("DOMContentLoaded", function () {
     prepararEventosCierreSemanal?.();
     prepararEventosDestino();
     prepararEventosAlmacen();
+    prepararEventosAnaliticas?.();
+    prepararEventosEnvinado?.();
     prepararEventosMenuFlejes();
     prepararEventosUbicacion();
     prepararEventosMoverStock();
@@ -119,8 +121,11 @@ function mostrarSeccion(id) {
         if (id === "vista_destino") {
             cargarVistaDestino?.();
         }
-        if (id === "vista_almacen") {
-            cargarVistaAlmacen?.();
+        if (id === "vista_analiticas") {
+            cargarVistaAnaliticas?.();
+        }
+        if (id === "vista_envinado") {
+            cargarVistaEnvinado?.();
         }
         if (id === "vista_cierre_semanal") {
             cargarVistaCierreSemanal?.();
@@ -322,12 +327,20 @@ function actualizarMigasPan(mostrarSeccion) {
             nuevaMiga = crearMigaPan("Destino", mostrarSeccion, true);
             migasPan.appendChild(nuevaMiga);
             break;
-        case "vista_almacen":
+        case "vista_analiticas":
             nuevaMiga = crearMigaPan("Inicio", "vista_tareas", false);
             migasPan.appendChild(nuevaMiga);
             nuevaMiga = crearMigaPan("Botas", "vista_menu_botas", false);
             migasPan.appendChild(nuevaMiga);
-            nuevaMiga = crearMigaPan("Almacen", mostrarSeccion, true);
+            nuevaMiga = crearMigaPan("Analiticas", mostrarSeccion, true);
+            migasPan.appendChild(nuevaMiga);
+            break;
+        case "vista_envinado":
+            nuevaMiga = crearMigaPan("Inicio", "vista_tareas", false);
+            migasPan.appendChild(nuevaMiga);
+            nuevaMiga = crearMigaPan("Botas", "vista_menu_botas", false);
+            migasPan.appendChild(nuevaMiga);
+            nuevaMiga = crearMigaPan("Envinado", mostrarSeccion, true);
             migasPan.appendChild(nuevaMiga);
             break;
         case "vista_ambientes":
@@ -494,6 +507,8 @@ var ACCIONES = {
             || pantallaActual === "vista_mover_stock"
             || pantallaActual === "vista_procesar_stock"
             || pantallaActual === "vista_botas_diarias"
+            || pantallaActual === "vista_analiticas"
+            || pantallaActual === "vista_envinado"
         ) {
             if (msg?.data?.refetch_maestros) {
                 refrescarMaestrosFabricacion?.();
@@ -515,6 +530,12 @@ var ACCIONES = {
             }
             if (pantallaActual === "vista_botas_diarias") {
                 refrescarBotasDiariasDesdeServidor?.(msg.data || {});
+            }
+            if (pantallaActual === "vista_analiticas") {
+                cargarVistaAnaliticas?.(true);
+            }
+            if (pantallaActual === "vista_envinado") {
+                cargarVistaEnvinado?.(true);
             }
         }
     },

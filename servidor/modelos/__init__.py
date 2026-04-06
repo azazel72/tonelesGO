@@ -8,6 +8,7 @@ from .maestros import EntradaFlejeDB
 from .maestros import CubicajeDB
 from .fabricacion import PedidoDB, TipoProductoDB, FabricacionSemanalDB, TrazabilidadProcesadoDB
 from .fabricacion import TrazabilidadFabricacionDB, TrazabilidadMovimientoDB, TrazabilidadProductoDB, ConsumoDB
+from .fabricacion import AnaliticaDB, BotaEnvinadaAnaliticaDB, BotaEnvinadaArchivoDB
 
 __all__ = [
     "PlanCamionDB",
@@ -39,6 +40,9 @@ __all__ = [
     "CuadranteDB",
     "CuadranteDetalleDB",
     "PedidoDB",
+    "AnaliticaDB",
+    "BotaEnvinadaAnaliticaDB",
+    "BotaEnvinadaArchivoDB",
     "TipoProductoDB",
     "FabricacionSemanalDB",
     "TrazabilidadProcesadoDB",

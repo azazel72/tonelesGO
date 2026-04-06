@@ -3,6 +3,7 @@ from typing import Dict, Optional
 from pydantic import BaseModel
 
 from servidor.dominio.fabricacion.pedido_dto import PedidoDTO
+from servidor.dominio.fabricacion.analitica_dto import AnaliticaDTO
 from servidor.dominio.fabricacion.tipo_producto_dto import TipoProductoDTO
 from servidor.dominio.fabricacion.fabricacion_semanal_dto import FabricacionSemanalDTO
 from servidor.dominio.fabricacion.trazabilidad_procesado_dto import TrazabilidadProcesadoDTO
@@ -13,6 +14,7 @@ from servidor.dominio.fabricacion.consumo_dto import ConsumoDTO
 
 class FabricacionDTO(BaseModel):
     pedidos: Optional[Dict[int, PedidoDTO]] = {}
+    analiticas: Optional[Dict[int, AnaliticaDTO]] = {}
     tipos_producto: Optional[Dict[int, TipoProductoDTO]] = {}
     fabricacion_semanal: Optional[Dict[int, FabricacionSemanalDTO]] = {}
     trazabilidad_procesado: Optional[Dict[int, TrazabilidadProcesadoDTO]] = {}

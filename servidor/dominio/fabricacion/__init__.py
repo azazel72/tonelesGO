@@ -1,5 +1,6 @@
 
 from .pedido_dto import PedidoDTO
+from .analitica_dto import AnaliticaDTO
 from .tipo_producto_dto import TipoProductoDTO
 from .fabricacion_semanal_dto import FabricacionSemanalDTO
 from .trazabilidad_procesado_dto import TrazabilidadProcesadoDTO
@@ -10,6 +11,7 @@ from .consumo_dto import ConsumoDTO
 
 __all__ = [
     "PedidoDTO",
+    "AnaliticaDTO",
     "TipoProductoDTO",
     "FabricacionSemanalDTO",
     "TrazabilidadProcesadoDTO",

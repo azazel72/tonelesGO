@@ -11,14 +11,15 @@ from servidor.herramientas.BcryptHelper import BcryptHelper
 
 from .modelos import ClienteDB, EstadoPedidoDB, EstadoFabricacionSemanalDB, EstadoProductoDB, EstadoTrazabilidadFabricacionDB, EstadoPaletDB
 from .modelos import InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB, RolDB, PuestoTrabajoDB, MaterialDB, ContenedorDB, EntradaDB, LineaEntradaDB, PaletDB, ProductoDB, ProductoOperarioDB, ArchivoSubidoDB, AmbienteDB, EntradaFlejeDB, CubicajeDB
-from .modelos import PedidoDB, TipoProductoDB, FabricacionSemanalDB, TrazabilidadProcesadoDB, TrazabilidadFabricacionDB, TrazabilidadProductoDB, ConsumoDB
+from .modelos import PedidoDB, AnaliticaDB, BotaEnvinadaAnaliticaDB, BotaEnvinadaArchivoDB
+from .modelos import TipoProductoDB, FabricacionSemanalDB, TrazabilidadProcesadoDB, TrazabilidadFabricacionDB, TrazabilidadProductoDB, ConsumoDB
 from .modelos import PlanCamionDB, PlanFacturacionDB, PlanMaterialDB, CuadranteDB, CuadranteDetalleDB
 from .persistencia import GenericRepository, DB
 from sqlmodel import select
 from sqlalchemy import extract, func
 from .dominio import PlanificacionEntradasDTO, MaestrosDTO, PlanMaterialDTO, PlanFacturacionDTO, PlanCamionDTO, CuadranteDTO, CuadranteDetalleDTO, FabricacionDTO
 from .dominio import ClienteDTO, EstadoPedidoDTO, EstadoFabricacionSemanalDTO, EstadoProductoDTO, EstadoTrazabilidadFabricacionDTO, EstadoPaletDTO, InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO, RolDTO, PuestoTrabajoDTO, MaterialDTO, ContenedorDTO, EntradaDTO, LineaEntradaDTO, PaletDTO, ProductoDTO, ArchivoSubidoDTO, AmbienteDTO, EntradaFlejeDTO, CubicajeDTO, CuadrantesDTO
-from .dominio import PedidoDTO, TipoProductoDTO, FabricacionSemanalDTO, TrazabilidadProcesadoDTO, TrazabilidadFabricacionDTO, TrazabilidadProductoDTO, ConsumoDTO
+from .dominio import PedidoDTO, AnaliticaDTO, TipoProductoDTO, FabricacionSemanalDTO, TrazabilidadProcesadoDTO, TrazabilidadFabricacionDTO, TrazabilidadProductoDTO, ConsumoDTO
 from servidor.impresion import ImprimirEtiqueta
 from servidor.conexiones.broadcast import broadcast_error, broadcast_event
 
@@ -66,6 +67,9 @@ class Colector:
         self.repo_entradas_flejes = GenericRepository(EntradaFlejeDB)
         self.repo_cubicaje = GenericRepository(CubicajeDB)
         self.repo_pedidos = GenericRepository(PedidoDB)
+        self.repo_analiticas = GenericRepository(AnaliticaDB)
+        self.repo_bota_envinada_analitica = GenericRepository(BotaEnvinadaAnaliticaDB)
+        self.repo_bota_envinada_archivo = GenericRepository(BotaEnvinadaArchivoDB)
         self.repo_tipos_producto = GenericRepository(TipoProductoDB)
         self.repo_fabricacion_semanal = GenericRepository(FabricacionSemanalDB)
         self.repo_trazabilidad_procesado = GenericRepository(TrazabilidadProcesadoDB)
@@ -108,6 +112,55 @@ class Colector:
             return False
         tipo = self.fabricacion.tipos_producto.get(int(tipo_producto_id))
         return str(getattr(tipo, "tipo", "")).upper() == "DUELA" if tipo else False
+
+    def _campos_analitica(self) -> list[dict]:
+        return [
+            {"clave": "grado_alcoholico", "etiqueta": "Grado alcoholico", "unidad": "% vol"},
+            {"clave": "ph", "etiqueta": "pH", "unidad": ""},
+            {"clave": "acidez_total", "etiqueta": "Acidez total", "unidad": "g/l"},
+            {"clave": "acidez_volatil", "etiqueta": "Acidez volatil", "unidad": "g/l"},
+            {"clave": "so2_libre", "etiqueta": "SO2 libre", "unidad": "mg/l"},
+            {"clave": "so2_total", "etiqueta": "SO2 total", "unidad": "mg/l"},
+            {"clave": "azucar_residual", "etiqueta": "Azucar residual", "unidad": "g/l"},
+            {"clave": "temperatura", "etiqueta": "Temperatura", "unidad": "C"},
+        ]
+
+    def _normalizar_estado_analitica(self, estado: str | None) -> str:
+        valor = str(estado or "ACTIVA").strip().upper()
+        if valor not in {"ACTIVA", "FINALIZADA"}:
+            return "ACTIVA"
+        return valor
+
+    def _actualizar_cache_analitica(self, analitica: AnaliticaDB | None):
+        if not analitica or not analitica.id:
+            return
+        self.fabricacion.analiticas[int(analitica.id)] = AnaliticaDTO.from_db(analitica)
+
+    def _resolver_productos_bota_por_codigos(self, session: Session, codigos: list[str]) -> tuple[list[ProductoDB], dict[str, ProductoDB]]:
+        productos = session.exec(
+            select(ProductoDB).where(ProductoDB.codigo.in_(codigos))
+        ).all() if codigos else []
+        productos_por_codigo = {str(producto.codigo or "").strip(): producto for producto in productos}
+        return productos, productos_por_codigo
+
+    def _resolver_contexto_productos(self, session: Session, productos: list[ProductoDB]) -> tuple[dict[int, int], set[int]]:
+        trazabilidades_producto = session.exec(
+            select(TrazabilidadProductoDB).where(
+                TrazabilidadProductoDB.producto_id.in_([int(producto.id) for producto in productos if producto.id])
+            )
+        ).all() if productos else []
+        trazabilidades_fabricacion = session.exec(select(TrazabilidadFabricacionDB)).all()
+        trazabilidades_fabricacion_por_id = {int(traza.id): traza for traza in trazabilidades_fabricacion if traza.id}
+        linea_por_producto_id = {}
+        for traza_producto in trazabilidades_producto:
+            producto_rel_id = int(traza_producto.producto_id or 0)
+            traza_fabricacion = trazabilidades_fabricacion_por_id.get(int(traza_producto.trazabilidad_fabricacion_id or 0))
+            if not producto_rel_id or not traza_fabricacion:
+                continue
+            linea_por_producto_id[producto_rel_id] = int(traza_fabricacion.fabricacion_semanal_id or 0)
+        return linea_por_producto_id, {
+            int(traza.id) for traza in trazabilidades_fabricacion if traza.id
+        }
 
     #region Métodos Maestros
 
@@ -166,6 +219,7 @@ class Colector:
     def obtener_fabricacion(self) -> FabricacionDTO:
         with DB.crear_sesion() as session:
             ordenes = self.repo_pedidos.list_all(session)
+            analiticas = self.repo_analiticas.list_all(session)
             tipos = self.repo_tipos_producto.list_all(session)
             lineas = self.repo_fabricacion_semanal.list_all(session)
             traz_procesado = self.repo_trazabilidad_procesado.list_all(session)
@@ -175,6 +229,9 @@ class Colector:
 
             self.fabricacion.pedidos = {
                 orden.id: PedidoDTO.from_db(orden) for orden in ordenes
+            }
+            self.fabricacion.analiticas = {
+                analitica.id: AnaliticaDTO.from_db(analitica) for analitica in analiticas
             }
             self.fabricacion.tipos_producto = {
                 tipo.id: TipoProductoDTO.from_db(tipo) for tipo in tipos
@@ -215,6 +272,8 @@ class Colector:
                     valor = str(valor or "").strip()[:2]
                 if campo == "clave":
                     valor = BcryptHelper.hash_password(valor or "")
+            if tabla == "analiticas" and campo == "estado":
+                valor = self._normalizar_estado_analitica(valor)
             valor = self._normalizar_vacio_numerico(objeto, campo, valor)
             setattr(DTO, campo, valor)
             if tabla == "palets" and campo == "linea_entrada_id":
@@ -227,7 +286,6 @@ class Colector:
                 DTO.bind_db_model(repo.model)
             updated = DTO.to_db()
             repo.update(session, updated)
-
             maestro[entrada_id] = DTO
             valor_respuesta = "" if (tabla == "usuarios" and campo == "clave") else valor
             valor_log = "<oculto>" if (tabla == "usuarios" and campo == "clave") else valor
@@ -288,6 +346,9 @@ class Colector:
                     raise ValueError("La clave es obligatoria.")
                 data["clave"] = BcryptHelper.hash_password(clave_plana)
                 data["empleado"] = bool(data.get("empleado", False))
+            if tabla == "analiticas":
+                data = dict(data or {})
+                data["estado"] = self._normalizar_estado_analitica(data.get("estado"))
 
             objeto_DTO = objeto(id=0, **data)
             if tabla == "entradas_flejes":
@@ -299,7 +360,6 @@ class Colector:
             new = repo.insert(session, objeto_DB)
             objeto_DTO = objeto.from_db(new)
             maestro[new.id] = objeto_DTO
-
             logger.info(f"Insertado ID {new.id} en la tabla {tabla}")
             if tabla == "usuarios":
                 return objeto_DTO.model_copy(update={"clave": ""})
@@ -441,6 +501,100 @@ class Colector:
             statement = select(FabricacionSemanalDB).where(FabricacionSemanalDB.pedido_id == pedido_id)
             lineas = session.exec(statement).all()
             return [FabricacionSemanalDTO.from_db(linea) for linea in lineas]
+
+    def listar_analiticas(self, filtros: dict | None = None):
+        filtros = filtros or {}
+        estados = {
+            self._normalizar_estado_analitica(estado)
+            for estado in (filtros.get("estados") or [])
+            if str(estado).strip() != ""
+        }
+
+        with DB.crear_sesion() as session:
+            analiticas = session.exec(
+                select(AnaliticaDB).order_by(AnaliticaDB.fecha.desc(), AnaliticaDB.id.desc())
+            ).all()
+
+            items = []
+            for analitica in analiticas:
+                estado = self._normalizar_estado_analitica(analitica.estado)
+                if estados and estado not in estados:
+                    continue
+                items.append({
+                    "id": analitica.id,
+                    "fecha": analitica.fecha.isoformat() if analitica.fecha else None,
+                    "descripcion": analitica.descripcion,
+                    "estado": estado,
+                    "campos_total": len(self._campos_analitica()),
+                    "campos_cumplimentados": sum(
+                        1 for campo in self._campos_analitica()
+                        if str(getattr(analitica, campo["clave"], "") or "").strip() != ""
+                    ),
+                    "created_at": analitica.created_at.isoformat() if analitica.created_at else None,
+                    "updated_at": analitica.updated_at.isoformat() if analitica.updated_at else None,
+                })
+            return items
+
+    def obtener_analitica(self, analitica_id: int):
+        analitica_id = int(analitica_id or 0)
+        if not analitica_id:
+            raise ValueError("analitica_id es obligatorio.")
+
+        with DB.crear_sesion() as session:
+            analitica = session.get(AnaliticaDB, analitica_id)
+            if not analitica:
+                raise ValueError("Analitica no encontrada.")
+            return {
+                "id": analitica.id,
+                "fecha": analitica.fecha.isoformat() if analitica.fecha else None,
+                "descripcion": analitica.descripcion,
+                "estado": self._normalizar_estado_analitica(analitica.estado),
+                "valores": {
+                    campo["clave"]: getattr(analitica, campo["clave"], None)
+                    for campo in self._campos_analitica()
+                },
+            }
+
+    def guardar_analitica(self, data: dict | None = None):
+        data = data or {}
+        analitica_id = int(data.get("id") or 0)
+        descripcion = str(data.get("descripcion") or "").strip()
+        fecha_raw = data.get("fecha")
+        estado = self._normalizar_estado_analitica(data.get("estado"))
+        valores = data.get("valores") or {}
+
+        if not descripcion:
+            raise ValueError("descripcion es obligatoria.")
+        if not fecha_raw:
+            raise ValueError("fecha es obligatoria.")
+
+        fecha = date.fromisoformat(str(fecha_raw))
+
+        with DB.crear_sesion() as session:
+            if analitica_id:
+                analitica = session.get(AnaliticaDB, analitica_id)
+                if not analitica:
+                    raise ValueError("Analitica no encontrada.")
+            else:
+                analitica = AnaliticaDB(fecha=fecha, descripcion=descripcion, estado=estado)
+
+            analitica.fecha = fecha
+            analitica.descripcion = descripcion
+            analitica.estado = estado
+            for campo in self._campos_analitica():
+                clave = campo["clave"]
+                if isinstance(valores, dict):
+                    valor = valores.get(clave)
+                else:
+                    valor = None
+                setattr(analitica, clave, str(valor).strip() if valor not in (None, "") else None)
+
+            session.add(analitica)
+            session.commit()
+            session.refresh(analitica)
+
+            self._actualizar_cache_analitica(analitica)
+            return self.obtener_analitica(int(analitica.id))
 
     def listar_productos_por_filtros(self, filtros: dict | None = None):
         filtros = filtros or {}
@@ -1284,7 +1438,7 @@ class Colector:
                 linea_producto_id = int(producto.produccion_id or 0) or int(linea_por_producto_id.get(int(producto.id or 0)) or 0)
                 if linea_producto_id not in lineas_ids:
                     raise ValueError(f"El código {codigo} no pertenece al pedido seleccionado.")
-                producto.estado = 4
+                producto.estado = 3
                 producto.ubicacion_id = ubicacion.id
                 session.add(producto)
                 actualizados.append(producto)
@@ -1301,7 +1455,284 @@ class Colector:
                 "ubicacion_id": ubicacion.id,
                 "cantidad": len(actualizados),
                 "codigos": [producto.codigo for producto in actualizados],
+                "estado": 3,
             }
+
+    def listar_resumen_envinado(self, filtros: dict | None = None):
+        filtros = filtros or {}
+        estados = {
+            int(estado)
+            for estado in (filtros.get("estados") or [3, 4])
+            if str(estado).strip() != ""
+        }
+
+        with DB.crear_sesion() as session:
+            analiticas = session.exec(select(AnaliticaDB)).all()
+            productos = session.exec(
+                select(ProductoDB).where(
+                    ProductoDB.tipo == "BOTA",
+                    ProductoDB.estado.in_(list(estados)),
+                )
+            ).all()
+            if not productos:
+                analiticas_activas = [
+                    {
+                        "id": analitica.id,
+                        "fecha": analitica.fecha.isoformat() if analitica.fecha else None,
+                        "descripcion": analitica.descripcion,
+                        "estado": self._normalizar_estado_analitica(analitica.estado),
+                    }
+                    for analitica in analiticas
+                    if self._normalizar_estado_analitica(analitica.estado) == "ACTIVA"
+                ]
+                return {"pendientes": [], "envinadas": [], "analiticas_activas": analiticas_activas}
+
+            pedidos = self.repo_pedidos.list_all(session)
+            clientes = self.repo_clientes.list_all(session)
+            instalaciones = self.repo_instalaciones.list_all(session)
+            ubicaciones = self.repo_ubicaciones.list_all(session)
+            lineas = self.repo_fabricacion_semanal.list_all(session)
+            estados_producto = self.repo_estados_productos.list_all(session)
+            relaciones_analitica = session.exec(select(BotaEnvinadaAnaliticaDB)).all()
+            relaciones_archivo = session.exec(select(BotaEnvinadaArchivoDB)).all()
+            trazabilidades_producto = session.exec(
+                select(TrazabilidadProductoDB).where(
+                    TrazabilidadProductoDB.producto_id.in_([int(producto.id) for producto in productos if producto.id])
+                )
+            ).all()
+            trazabilidades_fabricacion = session.exec(select(TrazabilidadFabricacionDB)).all()
+
+            pedidos_por_id = {int(pedido.id): pedido for pedido in pedidos if pedido.id}
+            clientes_por_id = {int(cliente.id): cliente for cliente in clientes if cliente.id}
+            instalaciones_por_id = {int(instalacion.id): instalacion for instalacion in instalaciones if instalacion.id}
+            ubicaciones_por_id = {int(ubicacion.id): ubicacion for ubicacion in ubicaciones if ubicacion.id}
+            lineas_por_id = {int(linea.id): linea for linea in lineas if linea.id}
+            estados_por_id = {int(estado.id): estado for estado in estados_producto if estado.id is not None}
+            analiticas_por_id = {int(analitica.id): analitica for analitica in analiticas if analitica.id}
+            trazas_por_id = {int(traza.id): traza for traza in trazabilidades_fabricacion if traza.id}
+
+            linea_por_producto_id = {}
+            for traza_producto in trazabilidades_producto:
+                producto_id = int(traza_producto.producto_id or 0)
+                traza = trazas_por_id.get(int(traza_producto.trazabilidad_fabricacion_id or 0))
+                if producto_id and traza and int(traza.fabricacion_semanal_id or 0):
+                    linea_por_producto_id[producto_id] = int(traza.fabricacion_semanal_id or 0)
+
+            analitica_por_producto_id = {
+                int(rel.producto_id): int(rel.analitica_id)
+                for rel in relaciones_analitica
+                if rel.producto_id and rel.analitica_id
+            }
+            archivos_por_producto_id = {}
+            for rel in relaciones_archivo:
+                producto_id = int(rel.producto_id or 0)
+                if not producto_id:
+                    continue
+                archivos_por_producto_id[producto_id] = archivos_por_producto_id.get(producto_id, 0) + 1
+
+            items = []
+            for producto in productos:
+                producto_id = int(producto.id or 0)
+                linea = lineas_por_id.get(int(producto.produccion_id or 0) or linea_por_producto_id.get(producto_id, 0))
+                pedido = pedidos_por_id.get(int(getattr(linea, "pedido_id", 0) or 0))
+                cliente = clientes_por_id.get(int(getattr(pedido, "cliente_id", 0) or 0))
+                ubicacion = ubicaciones_por_id.get(int(producto.ubicacion_id or 0))
+                instalacion = instalaciones_por_id.get(int(getattr(ubicacion, "instalacion_id", 0) or 0))
+                analitica = analiticas_por_id.get(analitica_por_producto_id.get(producto_id, 0))
+                texto_ubicacion = str(getattr(ubicacion, "descripcion", "") or "").strip()
+                texto_instalacion = str(getattr(instalacion, "nombre", "") or "").strip()
+                ubicacion_texto = f"{texto_instalacion} - {texto_ubicacion}".strip(" -")
+                estado_id = int(producto.estado or 0)
+                items.append({
+                    "id": producto_id,
+                    "codigo": str(producto.codigo or "").strip(),
+                    "estado": estado_id,
+                    "estado_descripcion": getattr(estados_por_id.get(estado_id), "descripcion", None) or str(estado_id),
+                    "ubicacion_id": producto.ubicacion_id,
+                    "ubicacion": ubicacion_texto or "-",
+                    "pedido_id": getattr(pedido, "id", None),
+                    "pedido_numero": getattr(pedido, "numero", None) or getattr(pedido, "descripcion", None) or "",
+                    "cliente_nombre": getattr(cliente, "nombre", None) or "",
+                    "analitica_id": getattr(analitica, "id", None),
+                    "analitica_descripcion": getattr(analitica, "descripcion", None) or "",
+                    "analitica_fecha": analitica.fecha.isoformat() if getattr(analitica, "fecha", None) else None,
+                    "documentos_count": archivos_por_producto_id.get(producto_id, 0),
+                })
+
+            pendientes = [item for item in items if int(item.get("estado") or 0) == 3]
+            envinadas = [item for item in items if int(item.get("estado") or 0) == 4]
+            pendientes.sort(key=lambda item: (str(item.get("ubicacion") or ""), str(item.get("codigo") or "")))
+            envinadas.sort(key=lambda item: (str(item.get("analitica_descripcion") or ""), str(item.get("codigo") or "")))
+
+            analiticas_activas = [
+                {
+                    "id": analitica.id,
+                    "fecha": analitica.fecha.isoformat() if analitica.fecha else None,
+                    "descripcion": analitica.descripcion,
+                    "estado": self._normalizar_estado_analitica(analitica.estado),
+                }
+                for analitica in analiticas
+                if self._normalizar_estado_analitica(analitica.estado) == "ACTIVA"
+            ]
+            analiticas_activas.sort(key=lambda item: (str(item["fecha"] or ""), str(item["descripcion"] or "")))
+
+            return {
+                "pendientes": pendientes,
+                "envinadas": envinadas,
+                "analiticas_activas": analiticas_activas,
+            }
+
+    def envinar_botas_pendientes(self, data: dict | None = None):
+        data = data or {}
+        analitica_id = int(data.get("analitica_id") or 0)
+        codigos = [
+            str(codigo).strip()
+            for codigo in (data.get("codigos") or [])
+            if str(codigo).strip() != ""
+        ]
+        if not analitica_id:
+            raise ValueError("analitica_id es obligatorio.")
+        if not codigos:
+            raise ValueError("codigos es obligatorio.")
+
+        codigos_unicos = list(dict.fromkeys(codigos))
+
+        with DB.crear_sesion() as session:
+            analitica = session.get(AnaliticaDB, analitica_id)
+            if not analitica:
+                raise ValueError("Analitica no encontrada.")
+            if self._normalizar_estado_analitica(analitica.estado) != "ACTIVA":
+                raise ValueError("La analitica seleccionada no esta activa.")
+
+            _, productos_por_codigo = self._resolver_productos_bota_por_codigos(session, codigos_unicos)
+            faltantes = [codigo for codigo in codigos_unicos if codigo not in productos_por_codigo]
+            if faltantes:
+                raise ValueError(f"No se encontraron estos códigos: {', '.join(faltantes)}")
+
+            resultado = []
+            for codigo in codigos_unicos:
+                producto = productos_por_codigo[codigo]
+                if str(producto.tipo or "").strip().upper() != "BOTA":
+                    raise ValueError(f"El código {codigo} no corresponde a una bota.")
+                if int(producto.estado or 0) != 3:
+                    raise ValueError(f"El código {codigo} no esta pendiente de envinar.")
+
+                producto.estado = 4
+                session.add(producto)
+
+                relacion = session.exec(
+                    select(BotaEnvinadaAnaliticaDB).where(BotaEnvinadaAnaliticaDB.producto_id == int(producto.id))
+                ).first()
+                if not relacion:
+                    relacion = BotaEnvinadaAnaliticaDB(producto_id=int(producto.id), analitica_id=analitica_id)
+                else:
+                    relacion.analitica_id = analitica_id
+                session.add(relacion)
+                resultado.append(str(producto.codigo or "").strip())
+
+            session.commit()
+            for producto in productos_por_codigo.values():
+                if producto.id:
+                    self.maestros.productos[producto.id] = ProductoDTO.from_db(producto)
+
+            return {
+                "ok": True,
+                "analitica_id": analitica_id,
+                "cantidad": len(resultado),
+                "codigos": resultado,
+            }
+
+    def vincular_archivos_botas_envinadas(self, data: dict | None = None):
+        data = data or {}
+        archivo_ids = [
+            int(archivo_id)
+            for archivo_id in (data.get("archivo_ids") or [])
+            if str(archivo_id).strip() != ""
+        ]
+        producto_ids = [
+            int(producto_id)
+            for producto_id in (data.get("producto_ids") or [])
+            if str(producto_id).strip() != ""
+        ]
+        codigos = [
+            str(codigo).strip()
+            for codigo in (data.get("codigos") or [])
+            if str(codigo).strip() != ""
+        ]
+        if not archivo_ids:
+            raise ValueError("archivo_ids es obligatorio.")
+        if not producto_ids and not codigos:
+            raise ValueError("producto_ids o codigos es obligatorio.")
+
+        with DB.crear_sesion() as session:
+            if codigos and not producto_ids:
+                productos, productos_por_codigo = self._resolver_productos_bota_por_codigos(session, list(dict.fromkeys(codigos)))
+                faltantes = [codigo for codigo in codigos if codigo not in productos_por_codigo]
+                if faltantes:
+                    raise ValueError(f"No se encontraron estos códigos: {', '.join(faltantes)}")
+                producto_ids = [int(producto.id) for producto in productos if producto.id]
+
+            productos = session.exec(
+                select(ProductoDB).where(ProductoDB.id.in_(list(dict.fromkeys(producto_ids))))
+            ).all()
+            productos_por_id = {int(producto.id): producto for producto in productos if producto.id}
+            if len(productos_por_id) != len(set(producto_ids)):
+                raise ValueError("Alguna bota seleccionada no existe.")
+
+            archivos = session.exec(
+                select(ArchivoSubidoDB).where(ArchivoSubidoDB.id.in_(list(dict.fromkeys(archivo_ids))))
+            ).all()
+            archivos_por_id = {int(archivo.id): archivo for archivo in archivos if archivo.id}
+            if len(archivos_por_id) != len(set(archivo_ids)):
+                raise ValueError("Alguno de los archivos no existe.")
+
+            creados = 0
+            for producto in productos_por_id.values():
+                if str(producto.tipo or "").strip().upper() != "BOTA" or int(producto.estado or 0) != 4:
+                    raise ValueError(f"La bota {producto.codigo} no esta envinada.")
+                for archivo_id in archivo_ids:
+                    existente = session.exec(
+                        select(BotaEnvinadaArchivoDB).where(
+                            BotaEnvinadaArchivoDB.producto_id == int(producto.id),
+                            BotaEnvinadaArchivoDB.archivo_subido_id == int(archivo_id),
+                        )
+                    ).first()
+                    if existente:
+                        continue
+                    session.add(BotaEnvinadaArchivoDB(
+                        producto_id=int(producto.id),
+                        archivo_subido_id=int(archivo_id),
+                    ))
+                    creados += 1
+
+            session.commit()
+            return {
+                "ok": True,
+                "archivo_ids": archivo_ids,
+                "producto_ids": sorted(productos_por_id.keys()),
+                "enlaces_creados": creados,
+            }
+
+    def listar_archivos_bota_envinada(self, producto_id: int):
+        producto_id = int(producto_id or 0)
+        if not producto_id:
+            raise ValueError("producto_id es obligatorio.")
+
+        with DB.crear_sesion() as session:
+            relaciones = session.exec(
+                select(BotaEnvinadaArchivoDB).where(BotaEnvinadaArchivoDB.producto_id == producto_id)
+            ).all()
+            archivo_ids = [int(rel.archivo_subido_id) for rel in relaciones if rel.archivo_subido_id]
+            if not archivo_ids:
+                return []
+            archivos = session.exec(
+                select(ArchivoSubidoDB).where(
+                    ArchivoSubidoDB.id.in_(archivo_ids),
+                    ArchivoSubidoDB.is_deleted == False,
+                )
+            ).all()
+            archivos.sort(key=lambda item: int(item.id or 0), reverse=True)
+            return [ArchivoSubidoDTO.from_db(archivo) for archivo in archivos]
 
     def listar_cubicaje(self):
         with DB.crear_sesion() as session:
@@ -2694,6 +3125,10 @@ class Colector:
             repo = self.repo_pedidos
             maestro = self.fabricacion.pedidos
             objeto = PedidoDTO
+        elif tabla == "analiticas":
+            repo = self.repo_analiticas
+            maestro = self.fabricacion.analiticas
+            objeto = AnaliticaDTO
         elif tabla == "tipos_producto":
             repo = self.repo_tipos_producto
             maestro = self.fabricacion.tipos_producto

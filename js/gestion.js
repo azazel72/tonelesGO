@@ -87,6 +87,10 @@ window.onload = () => {
             setPantalla?.("gestion_fabricacion", { vista: "pedidos" });
             await openPedidosWin();
         },
+        async "ver-analiticas-vino"() {
+            setPantalla?.("gestion_fabricacion", { vista: "analiticas" });
+            await openAnaliticasWin();
+        },
         async "ver-planificacion-pedidos"() {
             setPantalla?.("gestion_fabricacion", { vista: "planificacion_pedidos" });
             await openPlanificacionPedidosWin();
@@ -109,6 +113,9 @@ window.onload = () => {
         },
         async "ver-consumos"() {
             await openConsumosWin();
+        },
+        async "ver-documentos-botas-envinadas"() {
+            await openDocumentosBotasEnvinadasWin();
         },
 
         async "ver-planificacion-entradas"() {
@@ -173,6 +180,7 @@ window.onload = () => {
         archivos_subidos: openArchivosSubidosWin,
         ambientes: openAmbientesWin,
         pedidos: openPedidosWin,
+        analiticas: openAnaliticasWin,
         planificacion_pedidos: openPlanificacionPedidosWin,
         tipos_producto: openTiposProductoWin,
         fabricacion_semanal: openFabricacionSemanalWin,
@@ -266,6 +274,11 @@ function refrescarVentanasFabricacionGestion() {
     const fabricacionSemanal = windowsRegistry.get("fabricacion_semanal")?.table;
     if (fabricacionSemanal) {
         fabricacionSemanal.replaceData(Object.values(DATOS.fabricacion.fabricacion_semanal || {}));
+    }
+
+    const analiticas = windowsRegistry.get("analiticas")?.table;
+    if (analiticas) {
+        analiticas.replaceData(Object.values(DATOS.fabricacion.analiticas || {}));
     }
 
     refrescarPlanificacionPedidosWin?.();

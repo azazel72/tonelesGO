@@ -81,7 +81,7 @@ async function cargarVistaDestino() {
         resumenId: "destino-resumen",
         tipos: ["BOTA"],
         pedidoEstado: 2,
-        estadosProducto: [1, 2, 3],
+        estadosProducto: [1, 2],
         etiquetaResumen: "botas",
         textoVacio: "No hay botas para destino.",
         renderizador: renderizarVistaProductosPorPedido,
@@ -189,8 +189,8 @@ function renderizarAccionPedidoDestino(grupo) {
             data-pedido-id="${Number(grupo?.pedidoId || 0)}"
             data-pedido-numero="${escapeHtmlDestinoProductos(grupo?.pedidoNumero || "")}"
             data-codigos="${escapeHtmlDestinoProductos((grupo?.codigos || []).join("|"))}"
-            title="Envinar"
-            aria-label="Envinar pedido"
+            title="Enviar a envinar"
+            aria-label="Enviar a envinar"
         >
             <svg viewBox="0 0 64 64" width="18" height="18" aria-hidden="true" focusable="false">
                 <path fill="currentColor" d="M21 6c-2.8 0-5 2.2-5 5v12c0 9.2 6.3 16.9 14.8 19.1L29 52h-6c-1.7 0-3 1.3-3 3v3h24v-3c0-1.7-1.3-3-3-3h-6l-1.8-9.9C41.7 39.9 48 32.2 48 23V11c0-2.8-2.2-5-5-5H21zm1 6h20v10c0 7.7-5.4 14.1-12.6 15.6C25.2 36.8 22 30.8 22 24V12z"/>
@@ -505,8 +505,8 @@ async function confirmarEnvinarDestino() {
         modal?.hide();
         await cargarVistaDestino();
     } catch (err) {
-        console.error("No se pudo envinar el pedido:", err);
-        mostrarErrorEnvinar(err?.message || "No se pudo envinar el pedido.");
+        console.error("No se pudo enviar a envinar el pedido:", err);
+        mostrarErrorEnvinar(err?.message || "No se pudo enviar a envinar el pedido.");
     } finally {
         if (btnConfirmar) btnConfirmar.disabled = false;
     }

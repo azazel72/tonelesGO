@@ -4,6 +4,7 @@ function openSubirArchivoWin(options = {}) {
     const mensaje = options?.mensaje || "";
     const entidad = options?.entidad || "";
     const entidadId = options?.entidadId ?? "";
+    const onUploaded = typeof options?.onUploaded === "function" ? options.onUploaded : null;
 
     const content = document.createElement("div");
     content.classList.add("upload-winbox");
@@ -214,6 +215,9 @@ function openSubirArchivoWin(options = {}) {
 
             const ids = data.data?.ids || [];
             setStatus(`Subida correcta (${ids.length}).`, "green");
+            if (onUploaded) {
+                await onUploaded(ids, data.data || {});
+            }
         } catch (err) {
             console.error(err);
             setStatus(`Error en la subida: ${err.message}`, "red");
