@@ -6,22 +6,48 @@ const estadoVistaEnvinado = {
     codigosArchivoSeleccionados: [],
 };
 
+function codigoBotaCompletoSinIntroEnvinado(valor) {
+    return /(?:-|[xX])\d{9}$/.test(String(valor || "").trim());
+}
+
+function prepararAutoinsercionCodigoEnvinado(input, insertarCodigo) {
+    if (!input || typeof insertarCodigo !== "function") return;
+    input.addEventListener("input", () => {
+        const valor = String(input.value || "").trim();
+        if (!valor) {
+            delete input.dataset.autoinsertUltimo;
+            return;
+        }
+        if (!codigoBotaCompletoSinIntroEnvinado(valor)) return;
+        if (input.dataset.autoinsertUltimo === valor) return;
+        input.dataset.autoinsertUltimo = valor;
+        insertarCodigo(valor);
+        if (String(input.value || "").trim() !== valor) {
+            delete input.dataset.autoinsertUltimo;
+        }
+    });
+}
+
 function prepararEventosEnvinado() {
-    document.getElementById("envinado-codigo")?.addEventListener("keydown", (event) => {
+    const inputPendiente = document.getElementById("envinado-codigo");
+    inputPendiente?.addEventListener("keydown", (event) => {
         if (event.key !== "Enter") return;
         event.preventDefault();
         agregarCodigoPendienteEnvinado(event.target.value);
     });
+    prepararAutoinsercionCodigoEnvinado(inputPendiente, agregarCodigoPendienteEnvinado);
 
     document.getElementById("envinado-confirmar")?.addEventListener("click", async () => {
         await confirmarEnvinadoPendiente();
     });
 
-    document.getElementById("envinado-archivo-codigo")?.addEventListener("keydown", (event) => {
+    const inputArchivo = document.getElementById("envinado-archivo-codigo");
+    inputArchivo?.addEventListener("keydown", (event) => {
         if (event.key !== "Enter") return;
         event.preventDefault();
         agregarCodigoArchivoEnvinado(event.target.value);
     });
+    prepararAutoinsercionCodigoEnvinado(inputArchivo, agregarCodigoArchivoEnvinado);
 
     document.getElementById("envinado-archivo-subir")?.addEventListener("click", async () => {
         await subirArchivoBotaEnvinada();

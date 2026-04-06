@@ -1,3 +1,25 @@
+function codigoBotaCompletoSinIntro(valor) {
+    return /(?:-|[xX])\d{9}$/.test(String(valor || "").trim());
+}
+
+function prepararAutoinsercionCodigo(input, insertarCodigo) {
+    if (!input || typeof insertarCodigo !== "function") return;
+    input.addEventListener("input", () => {
+        const valor = String(input.value || "").trim();
+        if (!valor) {
+            delete input.dataset.autoinsertUltimo;
+            return;
+        }
+        if (!codigoBotaCompletoSinIntro(valor)) return;
+        if (input.dataset.autoinsertUltimo === valor) return;
+        input.dataset.autoinsertUltimo = valor;
+        insertarCodigo(valor);
+        if (String(input.value || "").trim() !== valor) {
+            delete input.dataset.autoinsertUltimo;
+        }
+    });
+}
+
 function prepararEventosDestino() {
     const lista = document.getElementById("destino-lista");
     const inputCodigo = document.getElementById("destino-expedir-codigo");
@@ -28,6 +50,7 @@ function prepararEventosDestino() {
             event.preventDefault();
             agregarCodigoExpedicionDestino(inputCodigo.value);
         });
+        prepararAutoinsercionCodigo(inputCodigo, agregarCodigoExpedicionDestino);
     }
     if (btnLimpiarCodigo) {
         btnLimpiarCodigo.addEventListener("click", () => {
@@ -44,6 +67,7 @@ function prepararEventosDestino() {
             event.preventDefault();
             agregarCodigoEnvinar(inputCodigoEnvinar.value);
         });
+        prepararAutoinsercionCodigo(inputCodigoEnvinar, agregarCodigoEnvinar);
     }
 
     if (btnConfirmar) {
