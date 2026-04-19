@@ -22,8 +22,8 @@ const ACCIONES_PERMISO_GESTION = {
     "ver-instalaciones": [],
     "ver-ubicaciones": [],
     "ver-materiales": [],
-    "ver-entradas": { permisos: [], marcarCandado: true },
-    "ver-lineas-entrada": { permisos: [], marcarCandado: true },
+    "ver-entradas": { permisos: [], marcarCandado: false, desactivada: false },
+    "ver-lineas-entrada": { permisos: [], marcarCandado: false, desactivada: false },
     "ver-entradas-flejes": [],
     "ver-palets": [],
     "ver-productos": [],
@@ -31,7 +31,7 @@ const ACCIONES_PERMISO_GESTION = {
     "ver-archivos-subidos": [],
     "ver-ambientes": [],
     "cerrar-maestros": [],
-    "ver-planificacion-entradas": { permisos: ["planificacion"], marcarCandado: true },
+    "ver-planificacion-entradas": { permisos: ["planificacion"], marcarCandado: false, desactivada: false },
     "ver-cuadrantes": [],
     "ver-pedidos": [],
     "ver-planificacion-pedidos": [],
@@ -58,16 +58,17 @@ const SESION_GESTION = {
 function obtenerConfigAccionGestion(action) {
     const entrada = ACCIONES_PERMISO_GESTION[action];
     if (Array.isArray(entrada)) {
-        return { definida: true, permisos: entrada, marcarCandado: false };
+        return { definida: true, permisos: entrada, marcarCandado: false, desactivada: false };
     }
     if (entrada && typeof entrada === "object") {
         return {
             definida: true,
             permisos: Array.isArray(entrada.permisos) ? entrada.permisos : [],
             marcarCandado: Boolean(entrada.marcarCandado),
+            desactivada: Boolean(entrada.desactivada),
         };
     }
-    return { definida: false, permisos: [], marcarCandado: false };
+    return { definida: false, permisos: [], marcarCandado: false, desactivada: false };
 }
 
 function registrarUsuarioLogado(usuario) {
@@ -156,7 +157,7 @@ function aplicarPermisosMenuGestion() {
         if (!action) continue;
         const config = obtenerConfigAccionGestion(action);
         aplicarMarcaCandadoMenu(el, config.marcarCandado);
-        const permitido = config.marcarCandado ? false : tienePermisoAccionGestion(action);
+        const permitido = config.desactivada ? false : tienePermisoAccionGestion(action);
         if (permitido) desbloquearAccionMenu(el);
         else bloquearAccionMenu(el);
     }

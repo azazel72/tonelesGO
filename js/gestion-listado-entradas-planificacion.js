@@ -16,25 +16,34 @@ function openListadoEntradasPlanificacionWin(contexto = {}) {
   const proveedorInicial = contexto.proveedor_id ?? "";
   const añoInicial = contexto.año ?? new Date().getFullYear();
 
-  const contenedor = crearElemento("div", { class: "contenedor-winbox listado-entradas-planificacion" });
+  const contenedor = crearElemento("div", { class: "contenedor-winbox listado-entradas-planificacion pedidos-fabricacion-win" });
 
-  const layout = crearElemento("div", { class: "listado-entradas-planificacion-body" });
-  const left = crearElemento("div", { class: "listado-entradas-planificacion-col" });
-  const right = crearElemento("div", { class: "listado-entradas-planificacion-col" });
+  const layout = crearElemento("div", { class: "pedidos-fabricacion-layout listado-entradas-planificacion-layout" });
+  const left = crearElemento("section", { class: "pedidos-fabricacion-panel" });
+  const right = crearElemento("section", { class: "pedidos-fabricacion-panel" });
   layout.appendChild(left);
   layout.appendChild(right);
   contenedor.appendChild(layout);
 
-  const leftHeader = crearElemento("div", { class: "listado-entradas-planificacion-header" });
+  const leftPanelHeader = crearElemento("div", { class: "pedidos-fabricacion-panel-header" });
+  leftPanelHeader.appendChild(crearElemento("h5", { class: "pedidos-fabricacion-panel-title", content: "Entradas" }));
+  leftPanelHeader.appendChild(crearElemento("span", { class: "pedidos-fabricacion-panel-subtitle", content: "Consulta y edita por proveedor y año" }));
+  left.appendChild(leftPanelHeader);
+
+  const leftFilters = crearElemento("div", { class: "pedidos-fabricacion-filters listado-entradas-planificacion-filters" });
+  const filtroAnno = crearElemento("div", { class: "listado-entradas-planificacion-filter" });
+  filtroAnno.appendChild(crearElemento("label", { content: "Ano" }));
+  const filtroProveedor = crearElemento("div", { class: "listado-entradas-planificacion-filter" });
+  filtroProveedor.appendChild(crearElemento("label", { content: "Proveedor" }));
 
   const botonConsultar = crearElemento("button", {
     id: "u-cargar-entradas-planificacion",
-    class: "btn btn-sm btn-outline-secondary",
+    class: "btn btn-sm btn-outline-primary",
     content: "Consultar"
   });
   const inputAnno = crearElemento("input", {
     id: "u-cargar-entradas-planificacion-anno",
-    class: "form-control-sm",
+    class: "form-control form-control-sm",
     type: "number",
     min: 1970,
     max: 2199,
@@ -54,11 +63,14 @@ function openListadoEntradasPlanificacionWin(contexto = {}) {
     }
     selectProveedor.appendChild(opt);
   });
+  filtroAnno.appendChild(inputAnno);
+  filtroProveedor.appendChild(selectProveedor);
+  leftFilters.appendChild(filtroAnno);
+  leftFilters.appendChild(filtroProveedor);
+  left.appendChild(leftFilters);
 
-  leftHeader.appendChild(botonConsultar);
-  leftHeader.appendChild(inputAnno);
-  leftHeader.appendChild(selectProveedor);
-  left.appendChild(leftHeader);
+  const leftToolbar = crearElemento("div", { class: "pedidos-fabricacion-toolbar" });
+  leftToolbar.appendChild(botonConsultar);
 
   const botonNuevaEntrada = crearElemento("button", {
     class: "btn btn-sm btn-outline-success",
@@ -76,14 +88,20 @@ function openListadoEntradasPlanificacionWin(contexto = {}) {
     "data-bs-toggle": "button",
     "aria-pressed": "false",
   });
-  leftHeader.appendChild(botonNuevaEntrada);
-  leftHeader.appendChild(botonFiltroEntradas);
-  leftHeader.appendChild(botonEditarEntradas);
+  leftToolbar.appendChild(botonNuevaEntrada);
+  leftToolbar.appendChild(botonFiltroEntradas);
+  leftToolbar.appendChild(botonEditarEntradas);
+  left.appendChild(leftToolbar);
 
-  const archivosHeader = crearElemento("div", { class: "listado-entradas-planificacion-header listado-entradas-planificacion-header-right" });
+  const rightPanelHeader = crearElemento("div", { class: "pedidos-fabricacion-panel-header" });
+  rightPanelHeader.appendChild(crearElemento("h5", { class: "pedidos-fabricacion-panel-title", content: "Archivos y lineas" }));
+  rightPanelHeader.appendChild(crearElemento("span", { class: "pedidos-fabricacion-panel-subtitle", content: "Gestion sobre la entrada seleccionada" }));
+  right.appendChild(rightPanelHeader);
+
+  const archivosHeader = crearElemento("div", { class: "pedidos-fabricacion-toolbar" });
   const selectArchivos = crearElemento("select", {
     id: "u-archivos-planificacion-selector",
-    class: "form-select form-select-sm",
+    class: "form-select form-select-sm listado-entradas-planificacion-toolbar-select",
   });
   selectArchivos.appendChild(crearElemento("option", { value: "", content: "Seleccione una entrada" }));
   const botonSubir = crearElemento("button", {
@@ -104,11 +122,7 @@ function openListadoEntradasPlanificacionWin(contexto = {}) {
   archivosHeader.appendChild(botonEliminarArchivo);
   right.appendChild(archivosHeader);
 
-  const archivosSelectRow = crearElemento("div", { class: "listado-entradas-planificacion-select-row" });
-  archivosSelectRow.appendChild(selectArchivos);
-  right.appendChild(archivosSelectRow);
-
-  const lineasHeader = crearElemento("div", { class: "listado-entradas-planificacion-header listado-entradas-planificacion-header-right" });
+  const lineasHeader = crearElemento("div", { class: "pedidos-fabricacion-toolbar" });
   const botonNuevaLinea = crearElemento("button", {
     class: "btn btn-sm btn-outline-success",
     content: "<i class=\"bi bi-plus-lg me-1\"></i> Nueva linea"
@@ -130,8 +144,8 @@ function openListadoEntradasPlanificacionWin(contexto = {}) {
   lineasHeader.appendChild(botonEditarLineas);
   right.appendChild(lineasHeader);
 
-  const leftTable = crearElemento("div", { class: "listado-entradas-planificacion-table" });
-  const rightTable = crearElemento("div", { class: "listado-entradas-planificacion-table" });
+  const leftTable = crearElemento("div", { class: "pedidos-fabricacion-table listado-entradas-planificacion-table" });
+  const rightTable = crearElemento("div", { class: "pedidos-fabricacion-table listado-entradas-planificacion-table" });
   left.appendChild(leftTable);
   right.appendChild(rightTable);
 
