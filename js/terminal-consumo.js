@@ -79,7 +79,7 @@ function registrarEventosVistaConsumoSemanal() {
             }
             return;
         }
-        const fila = event.target.closest("[data-linea-id]");
+        const fila = event.target.closest("[data-linea-id], [data-consumo-libre='1']");
         if (!fila) return;
         mostrarConsumoDesdeLinea(fila);
     });
@@ -129,7 +129,7 @@ async function cargarFabricacionSemanalConsumo(opciones = {}) {
 
         actualizarCardsFabricacionSemanalConsumo(lineas);
         if (autoAbrirLineaUnica && lineas.length === 1) {
-            const filaUnica = contenedor.querySelector("[data-linea-id]");
+            const filaUnica = contenedor.querySelector("[data-linea-real='1']");
             if (filaUnica) {
                 mostrarConsumoDesdeLinea(filaUnica);
             }
@@ -144,13 +144,43 @@ function actualizarCardsFabricacionSemanalConsumo(lineas) {
     const contenedor = document.querySelector("#lista_consumo_fabricacion_semanal");
     if (!contenedor) return;
     contenedor.innerHTML = "";
+    const cardLibre = document.createElement("article");
+    cardLibre.className = "produccion-card";
+    cardLibre.dataset.consumoLibre = "1";
+    cardLibre.innerHTML = `
+      <div class="produccion-card-title">
+        <div>
+          <h6>Sin orden semanal</h6>
+        </div>
+        <span class="produccion-card-date">Trazas huérfanas</span>
+      </div>
+      <div class="produccion-card-grid">
+        <div class="produccion-card-field">
+          <span class="produccion-card-label">Uso</span>
+          <span class="produccion-card-value">Consumo libre</span>
+        </div>
+        <div class="produccion-card-field">
+          <span class="produccion-card-label">Maderas</span>
+          <span class="produccion-card-value">Varias</span>
+        </div>
+        <div class="produccion-card-field">
+          <span class="produccion-card-label">Origen</span>
+          <span class="produccion-card-value">Sin vincular</span>
+        </div>
+      </div>
+    `;
+    contenedor.appendChild(cardLibre);
     if (!lineas || !lineas.length) {
-        contenedor.innerHTML = `<div class="produccion-card-empty">Sin líneas en estado Producción</div>`;
+        const vacio = document.createElement("div");
+        vacio.className = "produccion-card-empty";
+        vacio.textContent = "Sin líneas en estado Producción";
+        contenedor.appendChild(vacio);
         return;
     }
     lineas.forEach((linea) => {
         const card = document.createElement("article");
         card.className = "produccion-card";
+        card.dataset.lineaReal = "1";
         card.dataset.lineaId = linea.id ?? "";
         card.dataset.tipoProductoId = linea.tipo_producto_id ?? "";
         card.dataset.materialId = linea.material_id ?? "";
@@ -219,18 +249,23 @@ function actualizarCardsFabricacionSemanalConsumo(lineas) {
 
 function mostrarConsumoDesdeLinea(fila) {
     vistaProduccionActiva = "vista_consumo";
-    lineaFabricacionActualId = Number(fila.dataset.lineaId || 0) || null;
-    lineaFabricacionMaterialActualId = Number(fila.dataset.materialId || 0) || null;
-    lineaFabricacionTipoBotaActualId = Number(fila.dataset.tipoProductoId || 0) || null;
-    lineaFabricacionTipoActualId = Number(resolverTipoDuelaConsumo(lineaFabricacionTipoBotaActualId) || lineaFabricacionTipoBotaActualId || 0) || null;
-    ordenFabricacionActualId = Number(fila.dataset.pedidoId || 0) || null;
+    const esConsumoLibre = fila.dataset.consumoLibre === "1";
+    lineaFabricacionActualId = esConsumoLibre ? null : (Number(fila.dataset.lineaId || 0) || null);
+    lineaFabricacionMaterialActualId = esConsumoLibre ? null : (Number(fila.dataset.materialId || 0) || null);
+    lineaFabricacionTipoBotaActualId = esConsumoLibre ? null : (Number(fila.dataset.tipoProductoId || 0) || null);
+    lineaFabricacionTipoActualId = esConsumoLibre
+        ? null
+        : (Number(resolverTipoDuelaConsumo(lineaFabricacionTipoBotaActualId) || lineaFabricacionTipoBotaActualId || 0) || null);
+    ordenFabricacionActualId = esConsumoLibre ? null : (Number(fila.dataset.pedidoId || 0) || null);
 
     const tipoId = Number(fila.dataset.tipoProductoId || 0) || null;
     const descripcionProducto =
+        (esConsumoLibre ? "Sin orden semanal" : null) ||
         (tipoId && terminalFabricacion.tipos_producto?.[tipoId]?.descripcion) ||
         fila.children?.[0]?.textContent ||
         "Producto";
     const descripcionMaterial =
+        (esConsumoLibre ? "Varias maderas" : null) ||
         (lineaFabricacionMaterialActualId && terminalFabricacion.materiales?.[lineaFabricacionMaterialActualId]?.descripcion) ||
         descripcionProducto;
     const cantidadFabricar = Number(fila.dataset.cantidadFabricar || 0) || 0;
@@ -247,18 +282,24 @@ function mostrarConsumoDesdeLinea(fila) {
             cantidad_fabricada: cantidadFabricada,
         })
         : null;
-    const resumenProducto = `Tipo: ${descripcionProducto} | Madera: ${descripcionMaterial}`;
+    const resumenProducto = esConsumoLibre
+        ? "Trazas huérfanas sin origen de fabricación"
+        : `Tipo: ${descripcionProducto} | Madera: ${descripcionMaterial}`;
     const titulo = document.getElementById("consumo-producto-orden");
     if (titulo) titulo.textContent = resumenProducto;
     const resumenCantidades = document.getElementById("consumo-resumen-cantidades");
     if (resumenCantidades) {
-        resumenCantidades.textContent = infoLinea
-            ? construirResumenCantidadesLinea(infoLinea)
-            : `Semana: pedida ${cantidadFabricar} | fabricada ${cantidadFabricada}`;
+        resumenCantidades.textContent = esConsumoLibre
+            ? "Selecciona tipo, madera y palet. La traza quedará sin orden semanal hasta usarla en fabricación."
+            : infoLinea
+                ? construirResumenCantidadesLinea(infoLinea)
+                : `Semana: pedida ${cantidadFabricar} | fabricada ${cantidadFabricada}`;
     }
     const tituloPanel = document.getElementById("modalConsumoLabel");
     if (tituloPanel) {
-        tituloPanel.textContent = pedidoDescripcion ? `Consumo: ${pedidoDescripcion}` : "Consumo";
+        tituloPanel.textContent = esConsumoLibre
+            ? "Consumo sin orden semanal"
+            : (pedidoDescripcion ? `Consumo: ${pedidoDescripcion}` : "Consumo");
     }
 
     if (typeof mostrarSeccion === "function") {
@@ -275,9 +316,7 @@ function mostrarConsumoDesdeLinea(fila) {
     if (typeof setPantalla === "function") {
         setPantalla("vista_consumo", { pedido_id: ordenFabricacionActualId, fabricacion_semanal_id: lineaFabricacionActualId });
     }
-    if (lineaFabricacionActualId) {
-        cargarTrazabilidadConsumo(lineaFabricacionActualId);
-    }
+    cargarTrazabilidadConsumo(lineaFabricacionActualId);
 }
 
 function sincronizarFiltrosConsumoDesdeLinea() {
@@ -300,12 +339,14 @@ async function cargarTrazabilidadConsumo(lineaId) {
     if (!tbody) return;
     try {
         await asegurarDatosFabricacionTerminal();
-        const trazas = (await wsRequest("listar_trazabilidad_fabricacion", { fabricacion_semanal_id: lineaId })) || [];
+        const trazas = (await wsRequest("listar_trazabilidad_fabricacion", {
+            fabricacion_semanal_id: lineaId || null,
+        })) || [];
         tbody.innerHTML = "";
         if (!trazas.length) {
             const tr = document.createElement("tr");
             const td = document.createElement("td");
-            td.colSpan = 6;
+            td.colSpan = 7;
             td.textContent = "Sin registros";
             tr.appendChild(td);
             tbody.appendChild(tr);
@@ -344,6 +385,7 @@ async function cargarTrazabilidadConsumo(lineaId) {
                 : `<span class="text-muted">-</span>`;
             tr.innerHTML = `
         <td>${t.palet_codigo || t.palet_id || ""}</td>
+        <td>${t.material_descripcion || "-"}</td>
         <td>${cubicajeTxt}</td>
         <td>${consumidoTxt}</td>
         <td>${restanteTxt}</td>
@@ -356,7 +398,7 @@ async function cargarTrazabilidadConsumo(lineaId) {
         });
     } catch (err) {
         console.error(err);
-        tbody.innerHTML = `<tr><td colspan="6">Error al cargar trazabilidad</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="7">Error al cargar trazabilidad</td></tr>`;
     }
 }
 
@@ -552,10 +594,6 @@ async function agregarTrazabilidadConsumoDesdePaletStock() {
     const lote = (loteInput?.value || "").trim();
     const cubicaje = Number.parseFloat((cubicajeInput?.value || "").toString().replace(",", "."));
     const paquetes = Number.parseInt((paquetesInput?.value || "1").toString(), 10) || 1;
-    if (!lineaFabricacionActualId) {
-        alert("Seleccione una linea de fabricacion.");
-        return;
-    }
     if (!paletOrigenId || !lote || !Number.isFinite(cubicaje) || cubicaje <= 0) {
         alert("Debes completar palet origen, cubicaje, paquetes y lote.");
         return;
@@ -563,7 +601,7 @@ async function agregarTrazabilidadConsumoDesdePaletStock() {
 
     try {
         await wsRequest("agregar_trazabilidad_fabricacion_desde_palet_stock", {
-            fabricacion_semanal_id: lineaFabricacionActualId,
+            fabricacion_semanal_id: lineaFabricacionActualId || null,
             palet_origen_id: paletOrigenId,
             lote,
             cubicaje,
@@ -574,7 +612,7 @@ async function agregarTrazabilidadConsumoDesdePaletStock() {
         if (paquetesInput) paquetesInput.value = "1";
         if (selectPaletOrigen) selectPaletOrigen.value = "";
         cargarPaletsConsumoEnSelector();
-        cargarTrazabilidadConsumo(lineaFabricacionActualId);
+        cargarTrazabilidadConsumo(lineaFabricacionActualId || null);
         sincronizarBackdropModales();
     } catch (err) {
         console.error(err);
@@ -589,10 +627,6 @@ async function agregarTrazabilidadConsumoDesdePalet() {
     const lote_palet = (lotePaletInput?.value || "").trim();
     const cubicaje = Number.parseFloat((cubicajeInput?.value || "").toString().replace(",", "."));
 
-    if (!lineaFabricacionActualId) {
-        alert("Seleccione una linea de fabricacion.");
-        return;
-    }
     if (!lote_palet || !Number.isFinite(cubicaje) || cubicaje <= 0) {
         alert("Debes completar lote palet y cubicaje.");
         return;
@@ -600,13 +634,13 @@ async function agregarTrazabilidadConsumoDesdePalet() {
 
     try {
         await wsRequest("agregar_trazabilidad_fabricacion_desde_palet", {
-            fabricacion_semanal_id: lineaFabricacionActualId,
+            fabricacion_semanal_id: lineaFabricacionActualId || null,
             lote_palet,
             cubicaje,
         });
         if (lotePaletInput) lotePaletInput.value = "";
         if (cubicajeInput) cubicajeInput.value = "";
-        cargarTrazabilidadConsumo(lineaFabricacionActualId);
+        cargarTrazabilidadConsumo(lineaFabricacionActualId || null);
         sincronizarBackdropModales();
     } catch (err) {
         console.error(err);
@@ -617,8 +651,8 @@ async function agregarTrazabilidadConsumoDesdePalet() {
 
 function refrescarConsumoDesdeServidor() {
     cargarFabricacionSemanalConsumo({ autoAbrirLineaUnica: false });
-    if (lineaFabricacionActualId) {
-        cargarTrazabilidadConsumo(lineaFabricacionActualId);
+    if (vistaProduccionActiva === "vista_consumo") {
+        cargarTrazabilidadConsumo(lineaFabricacionActualId || null);
     }
 }
 
@@ -911,13 +945,43 @@ function actualizarCardsFabricacionSemanalConsumo(lineas) {
     const contenedor = document.querySelector("#lista_consumo_fabricacion_semanal");
     if (!contenedor) return;
     contenedor.innerHTML = "";
+    const cardLibre = document.createElement("article");
+    cardLibre.className = "produccion-card";
+    cardLibre.dataset.consumoLibre = "1";
+    cardLibre.innerHTML = `
+      <div class="produccion-card-title">
+        <div>
+          <h6>Sin orden semanal</h6>
+        </div>
+        <span class="produccion-card-date">Trazas huérfanas</span>
+      </div>
+      <div class="produccion-card-grid">
+        <div class="produccion-card-field">
+          <span class="produccion-card-label">Uso</span>
+          <span class="produccion-card-value">Consumo libre</span>
+        </div>
+        <div class="produccion-card-field">
+          <span class="produccion-card-label">Maderas</span>
+          <span class="produccion-card-value">Varias</span>
+        </div>
+        <div class="produccion-card-field">
+          <span class="produccion-card-label">Origen</span>
+          <span class="produccion-card-value">Sin vincular</span>
+        </div>
+      </div>
+    `;
+    contenedor.appendChild(cardLibre);
     if (!lineas || !lineas.length) {
-        contenedor.innerHTML = `<div class="produccion-card-empty">Sin líneas en estado Producción</div>`;
+        const vacio = document.createElement("div");
+        vacio.className = "produccion-card-empty";
+        vacio.textContent = "Sin líneas en estado Producción";
+        contenedor.appendChild(vacio);
         return;
     }
     lineas.forEach((linea) => {
         const card = document.createElement("article");
         card.className = "produccion-card";
+        card.dataset.lineaReal = "1";
         card.dataset.lineaId = linea.id ?? "";
         card.dataset.tipoProductoId = linea.tipo_producto_id ?? "";
         card.dataset.materialId = linea.material_id ?? "";

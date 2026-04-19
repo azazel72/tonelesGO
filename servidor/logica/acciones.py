@@ -25,7 +25,10 @@ def obtener_acciones() -> Dict[str, any]:
         "vincular_archivos_botas_envinadas": lambda ws, req: Colector.colector.vincular_archivos_botas_envinadas(req.data or {}),
         "listar_archivos_bota_envinada": lambda ws, req: Colector.colector.listar_archivos_bota_envinada(req.data.get("producto_id")),
         "listar_fabricacion_semanal": lambda ws, req: Colector.colector.listar_fabricacion_semanal(req.data.get("pedido_id")),
-        "listar_trazabilidad_fabricacion": lambda ws, req: Colector.colector.listar_trazabilidad_fabricacion(req.data.get("fabricacion_semanal_id")),
+        "listar_trazabilidad_fabricacion": lambda ws, req: Colector.colector.listar_trazabilidad_fabricacion(
+            (req.data or {}).get("fabricacion_semanal_id"),
+            bool((req.data or {}).get("incluir_huerfanas")),
+        ),
         "obtener_cierre_semanal": lambda ws, req: Colector.colector.obtener_cierre_semanal(req.data.get("fabricacion_semanal_id")),
         "reasignar_consumo_negativo_cierre": lambda ws, req: Colector.colector.reasignar_consumo_negativo_cierre(req.data or {}),
         "crear_palet_procesado_desde_cierre": lambda ws, req: Colector.colector.crear_palet_procesado_desde_cierre(req.data or {}),

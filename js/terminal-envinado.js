@@ -124,7 +124,6 @@ function renderizarCardPendienteEnvinado(item) {
                     <strong>${escapeHtmlDestinoProductos(item.codigo || "-")}</strong>
                     <div class="small text-muted">${escapeHtmlDestinoProductos(item.ubicacion || "-")}</div>
                 </div>
-                <span class="envinado-card-tag">${escapeHtmlDestinoProductos(item.estado_descripcion || "Pendiente")}</span>
             </div>
             <div class="envinado-card-meta">
                 <div>
@@ -135,6 +134,9 @@ function renderizarCardPendienteEnvinado(item) {
                     <span>Cliente</span>
                     <strong>${escapeHtmlDestinoProductos(item.cliente_nombre || "-")}</strong>
                 </div>
+            </div>
+            <div class="envinado-card-tags">
+                <span class="envinado-card-tag">${escapeHtmlDestinoProductos(item.estado_descripcion || "Pendiente")}</span>
             </div>
         </article>
     `;
@@ -148,7 +150,6 @@ function renderizarCardFinalizadaEnvinado(item) {
                     <strong>${escapeHtmlDestinoProductos(item.codigo || "-")}</strong>
                     <div class="small text-muted">${escapeHtmlDestinoProductos(item.ubicacion || "-")}</div>
                 </div>
-                <span class="envinado-card-tag">${Number(item.documentos_count || 0)} doc.</span>
             </div>
             <div class="envinado-card-meta">
                 <div>
@@ -162,7 +163,7 @@ function renderizarCardFinalizadaEnvinado(item) {
             </div>
             <div class="envinado-card-tags">
                 <span class="envinado-card-tag">${escapeHtmlDestinoProductos(item.estado_descripcion || "Envinada")}</span>
-                ${item.analitica_fecha ? `<span class="envinado-card-tag">${escapeHtmlDestinoProductos(item.analitica_fecha)}</span>` : ""}
+                <span class="envinado-card-tag">${Number(item.documentos_count || 0)} doc.</span>
             </div>
         </article>
     `;

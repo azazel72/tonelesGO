@@ -93,7 +93,11 @@ function prepararEventosDestino() {
     }
 
     if (modalEnvinarEl) {
+        modalEnvinarEl.addEventListener("shown.bs.modal", () => {
+            document.addEventListener("keydown", manejarTecladoModalEnvinarDestino);
+        });
         modalEnvinarEl.addEventListener("hidden.bs.modal", () => {
+            document.removeEventListener("keydown", manejarTecladoModalEnvinarDestino);
             limpiarModalEnvinarDestino();
         });
     }
@@ -144,15 +148,20 @@ function modalExpedirDestinoAbierto() {
     return !!modalEl?.classList.contains("show");
 }
 
-function manejarTecladoModalExpedirDestino(event) {
-    if (!modalExpedirDestinoAbierto()) return;
+function modalEnvinarDestinoAbierto() {
+    const modalEl = document.getElementById("modalEnvinarDestino");
+    return !!modalEl?.classList.contains("show");
+}
+
+function redirigirTecladoAlInputCodigoModal(event, opciones) {
+    if (!opciones?.abierto?.()) return;
     if (event.ctrlKey || event.altKey || event.metaKey) return;
 
-    const inputCodigo = document.getElementById("destino-expedir-codigo");
-    const inputContenedor = document.getElementById("destino-expedir-contenedor");
+    const inputCodigo = document.getElementById(opciones.inputCodigoId);
+    const inputBloqueante = opciones.inputBloqueanteId ? document.getElementById(opciones.inputBloqueanteId) : null;
     const activo = document.activeElement;
-    if (!inputCodigo || !inputContenedor) return;
-    if (activo === inputContenedor) return;
+    if (!inputCodigo) return;
+    if (activo === inputBloqueante) return;
     if (activo && (activo.tagName === "TEXTAREA" || activo.isContentEditable)) return;
     if (activo === inputCodigo && event.key !== "Escape") return;
     if (event.key === "Tab" || event.key === "Escape") return;
@@ -160,7 +169,7 @@ function manejarTecladoModalExpedirDestino(event) {
     if (event.key === "Enter") {
         event.preventDefault();
         inputCodigo.focus();
-        agregarCodigoExpedicionDestino(inputCodigo.value);
+        opciones.onEnter?.(inputCodigo.value);
         return;
     }
 
@@ -183,6 +192,24 @@ function manejarTecladoModalExpedirDestino(event) {
         inputCodigo.focus();
         inputCodigo.value = `${inputCodigo.value || ""}${event.key}`;
     }
+}
+
+function manejarTecladoModalExpedirDestino(event) {
+    redirigirTecladoAlInputCodigoModal(event, {
+        abierto: modalExpedirDestinoAbierto,
+        inputCodigoId: "destino-expedir-codigo",
+        inputBloqueanteId: "destino-expedir-contenedor",
+        onEnter: agregarCodigoExpedicionDestino,
+    });
+}
+
+function manejarTecladoModalEnvinarDestino(event) {
+    redirigirTecladoAlInputCodigoModal(event, {
+        abierto: modalEnvinarDestinoAbierto,
+        inputCodigoId: "destino-envinar-codigo",
+        inputBloqueanteId: "destino-envinar-ubicacion",
+        onEnter: agregarCodigoEnvinar,
+    });
 }
 
 function renderizarAccionPedidoDestino(grupo) {
@@ -304,9 +331,14 @@ function renderizarCodigosExpedicionDestino() {
 
 function mostrarErrorExpedicionDestino(texto) {
     const error = document.getElementById("destino-expedir-error");
+    const inputCodigo = document.getElementById("destino-expedir-codigo");
     if (!error) return;
     error.textContent = texto || "";
     error.classList.toggle("d-none", !texto);
+    if (texto && inputCodigo) {
+        inputCodigo.value = "";
+        inputCodigo.focus();
+    }
 }
 
 function limpiarModalExpedirDestino() {
@@ -477,9 +509,14 @@ function renderizarCodigosEnvinar() {
 
 function mostrarErrorEnvinar(texto) {
     const error = document.getElementById("destino-envinar-error");
+    const inputCodigo = document.getElementById("destino-envinar-codigo");
     if (!error) return;
     error.textContent = texto || "";
     error.classList.toggle("d-none", !texto);
+    if (texto && inputCodigo) {
+        inputCodigo.value = "";
+        inputCodigo.focus();
+    }
 }
 
 function limpiarModalEnvinarDestino() {

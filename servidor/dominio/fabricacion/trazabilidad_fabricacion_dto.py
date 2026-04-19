@@ -5,7 +5,7 @@ from servidor.modelos import TrazabilidadFabricacionDB
 
 class TrazabilidadFabricacionDTO(BaseModel):
     id: int | None
-    fabricacion_semanal_id: int
+    fabricacion_semanal_id: int | None = None
     palet_id: int
     cantidad_fabricada: int = 0
     estado: int = 0

@@ -1,4 +1,4 @@
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 import re
 import logging
 import sys
@@ -16,7 +16,7 @@ from .modelos import TipoProductoDB, FabricacionSemanalDB, TrazabilidadProcesado
 from .modelos import PlanCamionDB, PlanFacturacionDB, PlanMaterialDB, CuadranteDB, CuadranteDetalleDB
 from .persistencia import GenericRepository, DB
 from sqlmodel import select
-from sqlalchemy import extract, func
+from sqlalchemy import extract, func, or_
 from .dominio import PlanificacionEntradasDTO, MaestrosDTO, PlanMaterialDTO, PlanFacturacionDTO, PlanCamionDTO, CuadranteDTO, CuadranteDetalleDTO, FabricacionDTO
 from .dominio import ClienteDTO, EstadoPedidoDTO, EstadoFabricacionSemanalDTO, EstadoProductoDTO, EstadoTrazabilidadFabricacionDTO, EstadoPaletDTO, InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO, RolDTO, PuestoTrabajoDTO, MaterialDTO, ContenedorDTO, EntradaDTO, LineaEntradaDTO, PaletDTO, ProductoDTO, ArchivoSubidoDTO, AmbienteDTO, EntradaFlejeDTO, CubicajeDTO, CuadrantesDTO
 from .dominio import PedidoDTO, AnaliticaDTO, TipoProductoDTO, FabricacionSemanalDTO, TrazabilidadProcesadoDTO, TrazabilidadFabricacionDTO, TrazabilidadProductoDTO, ConsumoDTO
@@ -714,14 +714,27 @@ class Colector:
             ))
             return items
 
-    def listar_trazabilidad_fabricacion(self, fabricacion_semanal_id: int):
+    def listar_trazabilidad_fabricacion(self, fabricacion_semanal_id: int | None, incluir_huerfanas: bool = False):
         with DB.crear_sesion() as session:
-            statement = select(TrazabilidadFabricacionDB).where(
-                TrazabilidadFabricacionDB.fabricacion_semanal_id == fabricacion_semanal_id
-            )
+            statement = select(TrazabilidadFabricacionDB)
+            if fabricacion_semanal_id:
+                if incluir_huerfanas:
+                    statement = statement.where(
+                        or_(
+                            TrazabilidadFabricacionDB.fabricacion_semanal_id == fabricacion_semanal_id,
+                            TrazabilidadFabricacionDB.fabricacion_semanal_id.is_(None),
+                        )
+                    )
+                else:
+                    statement = statement.where(
+                        TrazabilidadFabricacionDB.fabricacion_semanal_id == fabricacion_semanal_id
+                    )
+            else:
+                statement = statement.where(TrazabilidadFabricacionDB.fabricacion_semanal_id.is_(None))
             trazas = session.exec(statement).all()
             palet_ids = {t.palet_id for t in trazas if t.palet_id}
             palet_map = {}
+            material_ids = set()
             if palet_ids:
                 palets = session.exec(select(PaletDB).where(PaletDB.id.in_(palet_ids))).all()
                 palet_map = {
@@ -729,17 +742,37 @@ class Colector:
                         "codigo": p.codigo,
                         "cubicaje": float(p.cubicaje or 0),
                         "consumido": float(p.consumido or 0),
+                        "material_id": p.material_id,
                     }
                     for p in palets
+                }
+                material_ids = {
+                    int(p.material_id)
+                    for p in palets
+                    if p.material_id is not None
+                }
+            materiales = {}
+            if material_ids:
+                materiales = {
+                    int(material.id): material
+                    for material in session.exec(select(MaterialDB).where(MaterialDB.id.in_(material_ids))).all()
+                    if material.id is not None
                 }
             return [
                 {
                     "id": t.id,
                     "fabricacion_semanal_id": t.fabricacion_semanal_id,
+                    "sin_origen_fabricacion": t.fabricacion_semanal_id is None,
                     "palet_id": t.palet_id,
                     "palet_codigo": (palet_map.get(t.palet_id) or {}).get("codigo"),
                     "palet_cubicaje": (palet_map.get(t.palet_id) or {}).get("cubicaje"),
                     "palet_consumido": (palet_map.get(t.palet_id) or {}).get("consumido"),
+                    "material_id": (palet_map.get(t.palet_id) or {}).get("material_id"),
+                    "material_descripcion": getattr(
+                        materiales.get((palet_map.get(t.palet_id) or {}).get("material_id")),
+                        "descripcion",
+                        None,
+                    ),
                     "cantidad_fabricada": t.cantidad_fabricada,
                     "estado": t.estado,
                 }
@@ -1598,6 +1631,7 @@ class Colector:
         codigos_unicos = list(dict.fromkeys(codigos))
 
         with DB.crear_sesion() as session:
+            ahora = datetime.now()
             analitica = session.get(AnaliticaDB, analitica_id)
             if not analitica:
                 raise ValueError("Analitica no encontrada.")
@@ -1624,9 +1658,15 @@ class Colector:
                     select(BotaEnvinadaAnaliticaDB).where(BotaEnvinadaAnaliticaDB.producto_id == int(producto.id))
                 ).first()
                 if not relacion:
-                    relacion = BotaEnvinadaAnaliticaDB(producto_id=int(producto.id), analitica_id=analitica_id)
+                    relacion = BotaEnvinadaAnaliticaDB(
+                        producto_id=int(producto.id),
+                        analitica_id=analitica_id,
+                        created_at=ahora,
+                        updated_at=ahora,
+                    )
                 else:
                     relacion.analitica_id = analitica_id
+                    relacion.updated_at = ahora
                 session.add(relacion)
                 resultado.append(str(producto.codigo or "").strip())
 
@@ -1687,6 +1727,7 @@ class Colector:
                 raise ValueError("Alguno de los archivos no existe.")
 
             creados = 0
+            ahora = datetime.now()
             for producto in productos_por_id.values():
                 if str(producto.tipo or "").strip().upper() != "BOTA" or int(producto.estado or 0) != 4:
                     raise ValueError(f"La bota {producto.codigo} no esta envinada.")
@@ -1702,6 +1743,7 @@ class Colector:
                     session.add(BotaEnvinadaArchivoDB(
                         producto_id=int(producto.id),
                         archivo_subido_id=int(archivo_id),
+                        created_at=ahora,
                     ))
                     creados += 1
 
@@ -1806,13 +1848,13 @@ class Colector:
                 "cubicaje_estandar": cubicaje_estandar,
             }
 
-    def agregar_trazabilidad_fabricacion(self, session: Session, fabricacion_semanal_id: int, palet: PaletDB):
-        existente = session.exec(
-            select(TrazabilidadFabricacionDB).where(
-                TrazabilidadFabricacionDB.fabricacion_semanal_id == fabricacion_semanal_id,
-                TrazabilidadFabricacionDB.palet_id == palet.id,
-            )
-        ).first()
+    def agregar_trazabilidad_fabricacion(self, session: Session, fabricacion_semanal_id: int | None, palet: PaletDB):
+        statement = select(TrazabilidadFabricacionDB).where(TrazabilidadFabricacionDB.palet_id == palet.id)
+        if fabricacion_semanal_id:
+            statement = statement.where(TrazabilidadFabricacionDB.fabricacion_semanal_id == fabricacion_semanal_id)
+        else:
+            statement = statement.where(TrazabilidadFabricacionDB.fabricacion_semanal_id.is_(None))
+        existente = session.exec(statement).first()
         if existente:
             raise ValueError("El palet ya esta asociado a esta linea de trazabilidad.")
 
@@ -1834,8 +1876,6 @@ class Colector:
         lote_palet = (data.get("lote_palet") or "").strip()
         cubicaje = data.get("cubicaje")
 
-        if not fabricacion_semanal_id:
-            raise ValueError("fabricacion_semanal_id es obligatorio.")
         if not lote_palet:
             raise ValueError("lote_palet es obligatorio.")
         if cubicaje is None or str(cubicaje).strip() == "":
@@ -1861,8 +1901,6 @@ class Colector:
         cubicaje = data.get("cubicaje")
         paquetes = data.get("paquetes")
 
-        if not fabricacion_semanal_id:
-            raise ValueError("fabricacion_semanal_id es obligatorio.")
         if not palet_origen_id:
             raise ValueError("palet_origen_id es obligatorio.")
         if not lote:
@@ -2212,7 +2250,13 @@ class Colector:
                             session,
                             int(fabricacion_semanal_id),
                             lotes_normalizados,
+                            incluir_huerfanas=True,
                         )
+                        for grupo in grupos_trazas_palets_lote:
+                            for traza, _palet in grupo["trazas_palets"]:
+                                if traza.fabricacion_semanal_id is None:
+                                    traza.fabricacion_semanal_id = int(fabricacion_semanal_id)
+                                    session.add(traza)
                         trazas = [
                             traza
                             for grupo in grupos_trazas_palets_lote
@@ -2409,17 +2453,26 @@ class Colector:
     def _normalizar_lote_traza(self, lote: str | None) -> str:
         return str(lote or "").strip()[:8]
 
-    def _obtener_trazas_palets_por_lote(self, session, fabricacion_semanal_id: int, lote: str):
+    def _obtener_trazas_palets_por_lote(self, session, fabricacion_semanal_id: int, lote: str, incluir_huerfanas: bool = False):
         lote_normalizado = self._normalizar_lote_traza(lote)
         if not lote_normalizado:
             raise ValueError("No se pudo determinar el lote seleccionado.")
 
-        trazas = session.exec(
+        statement = (
             select(TrazabilidadFabricacionDB)
-            .where(TrazabilidadFabricacionDB.fabricacion_semanal_id == fabricacion_semanal_id)
             .where(TrazabilidadFabricacionDB.estado == 0)
             .order_by(TrazabilidadFabricacionDB.id)
-        ).all()
+        )
+        if incluir_huerfanas:
+            statement = statement.where(
+                or_(
+                    TrazabilidadFabricacionDB.fabricacion_semanal_id == fabricacion_semanal_id,
+                    TrazabilidadFabricacionDB.fabricacion_semanal_id.is_(None),
+                )
+            )
+        else:
+            statement = statement.where(TrazabilidadFabricacionDB.fabricacion_semanal_id == fabricacion_semanal_id)
+        trazas = session.exec(statement).all()
         if not trazas:
             raise ValueError("No hay trazabilidades activas para la linea seleccionada.")
 
@@ -2446,7 +2499,7 @@ class Colector:
         resultado.sort(key=lambda item: ((item[1].codigo or ""), int(item[1].id or 0), int(item[0].id or 0)))
         return lote_normalizado, resultado
 
-    def _obtener_trazas_palets_por_lotes(self, session, fabricacion_semanal_id: int, lotes: list[str]):
+    def _obtener_trazas_palets_por_lotes(self, session, fabricacion_semanal_id: int, lotes: list[str], incluir_huerfanas: bool = False):
         lotes_normalizados = []
         vistos = set()
         for lote in lotes or []:
@@ -2461,7 +2514,12 @@ class Colector:
 
         resultado = []
         for lote_normalizado in lotes_normalizados:
-            _, trazas_lote = self._obtener_trazas_palets_por_lote(session, fabricacion_semanal_id, lote_normalizado)
+            _, trazas_lote = self._obtener_trazas_palets_por_lote(
+                session,
+                fabricacion_semanal_id,
+                lote_normalizado,
+                incluir_huerfanas=incluir_huerfanas,
+            )
             resultado.append({
                 "lote": lote_normalizado,
                 "trazas_palets": trazas_lote,

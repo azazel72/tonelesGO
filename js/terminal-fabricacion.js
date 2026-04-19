@@ -363,7 +363,10 @@ async function cargarTrazabilidadFabricacion(lineaId) {
     if (!lista) return;
     try {
         await asegurarDatosFabricacionTerminal();
-        const trazas = (await wsRequest("listar_trazabilidad_fabricacion", { fabricacion_semanal_id: lineaId })) || [];
+        const trazas = (await wsRequest("listar_trazabilidad_fabricacion", {
+            fabricacion_semanal_id: lineaId,
+            incluir_huerfanas: true,
+        })) || [];
         lotesFabricacionTabla = agruparLotesFabricacion(trazas);
         actualizarResumenLotesFabricacion();
         lista.innerHTML = "";
@@ -809,7 +812,10 @@ async function imprimirEtiquetaFabricacion(operariosIds = [], cantidadEtiquetas 
         return;
     }
     try {
-        const trazas = (await wsRequest("listar_trazabilidad_fabricacion", { fabricacion_semanal_id: lineaFabricacionActualId })) || [];
+        const trazas = (await wsRequest("listar_trazabilidad_fabricacion", {
+            fabricacion_semanal_id: lineaFabricacionActualId,
+            incluir_huerfanas: true,
+        })) || [];
         const activas = trazas.filter((t) => Number(t.estado || 0) === 0);
         if (!activas.length) {
             alert("No hay palets activos para imprimir.");
