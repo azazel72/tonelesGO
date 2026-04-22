@@ -1322,7 +1322,8 @@ class Colector:
             pedido = session.get(PedidoDB, pedido_id)
             if not pedido:
                 raise ValueError("pedido no encontrado.")
-            if str(pedido.destino or "").strip().upper() != "CLIENTE":
+            destinoPedido = str(pedido.destino or "").strip().upper() 
+            if destinoPedido != "CLIENTE" and destinoPedido != "C":
                 raise ValueError("Solo se pueden expedir pedidos con destino CLIENTE.")
 
             lineas = session.exec(
@@ -1423,7 +1424,8 @@ class Colector:
             pedido = session.get(PedidoDB, pedido_id)
             if not pedido:
                 raise ValueError("pedido no encontrado.")
-            if str(pedido.destino or "").strip().upper() != "ENVINADO":
+            destinoPedido = str(pedido.destino or "").strip().upper() 
+            if destinoPedido != "ENVINADO" and destinoPedido != "E":
                 raise ValueError("Solo se pueden envinar pedidos con destino ENVINADO.")
 
             ubicacion = session.get(UbicacionDB, ubicacion_id)
