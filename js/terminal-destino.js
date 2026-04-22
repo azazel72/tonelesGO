@@ -116,8 +116,8 @@ async function cargarVistaDestino() {
         mostrarDestinoPedido: true,
         resolverClasePedido: (destino) => {
             const valor = String(destino || "").trim().toUpperCase();
-            if (valor === "CLIENTE") return "destino-pedido-card destino-pedido-card-cliente";
-            if (valor === "ENVINADO") return "destino-pedido-card destino-pedido-card-envinado";
+            if (valor === "CLIENTE" || valor === "C") return "destino-pedido-card destino-pedido-card-cliente";
+            if (valor === "ENVINADO" || valor === "E") return "destino-pedido-card destino-pedido-card-envinado";
             return "destino-pedido-card";
         },
         renderAccionPedido: (grupo) => renderizarAccionPedidoDestino(grupo),
@@ -214,7 +214,7 @@ function manejarTecladoModalEnvinarDestino(event) {
 
 function renderizarAccionPedidoDestino(grupo) {
     const destino = String(grupo?.pedidoDestino || "").trim().toUpperCase();
-    if (destino === "CLIENTE") {
+    if (destino === "CLIENTE" || destino === "C") {
         return `
         <button
             type="button"
@@ -230,7 +230,7 @@ function renderizarAccionPedidoDestino(grupo) {
         </button>
     `;
     }
-    if (destino === "ENVINADO") {
+    if (destino === "ENVINADO" || destino === "E") {
         return `
         <button
             type="button"
