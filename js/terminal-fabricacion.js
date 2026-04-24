@@ -418,8 +418,10 @@ async function cargarCodigosBatideroEnSelector(mantenerSeleccion = false) {
     for (let i = 0; i < dias.length; i += 1) {
         const base = (i + 1) * 10;
         const manana = base + 1;
-        const tarde = base + 2;
+        const mediaTarde = base + 2;
+        const tarde = base + 3;
         options.push(`<option value="${manana}">${manana} (${dias[i]} mañana)</option>`);
+        options.push(`<option value="${mediaTarde}">${mediaTarde} (${dias[i]} media tarde)</option>`);
         options.push(`<option value="${tarde}">${tarde} (${dias[i]} tarde)</option>`);
     }
     selector.innerHTML = options.join("");

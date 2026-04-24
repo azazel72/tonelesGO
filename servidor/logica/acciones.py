@@ -25,6 +25,7 @@ def obtener_acciones() -> Dict[str, any]:
         "vincular_archivos_botas_envinadas": lambda ws, req: Colector.colector.vincular_archivos_botas_envinadas(req.data or {}),
         "listar_archivos_bota_envinada": lambda ws, req: Colector.colector.listar_archivos_bota_envinada(req.data.get("producto_id")),
         "listar_fabricacion_semanal": lambda ws, req: Colector.colector.listar_fabricacion_semanal(req.data.get("pedido_id")),
+        "listar_resumen_fabricacion_consumo": lambda ws, req: Colector.colector.listar_resumen_fabricacion_consumo(),
         "listar_trazabilidad_fabricacion": lambda ws, req: Colector.colector.listar_trazabilidad_fabricacion(
             (req.data or {}).get("fabricacion_semanal_id"),
             bool((req.data or {}).get("incluir_huerfanas")),

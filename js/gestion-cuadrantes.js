@@ -61,7 +61,7 @@ function crearColumnasCuadrantes(cuadrante) {
 
   const columnas = [
     { title: "ID", field: "id", visible: false, headerSort: false },
-    { title: "Puesto", field: "nombre", width: 150, frozen: true, headerSort: true },
+    { title: "Puesto", field: "nombre", width: 180, frozen: true, headerSort: true, formatter: formatterPuestoCuadranteConOrden, sorter: sorterPuestoCuadrantePorOrden },
     { title: crearTituloClonableDia("Jue", jue), field: jue, formatter: formatterColumnasCuadrante, variableHeight: true, cssClass: "celda-cuadrante", headerSort: false },
     { title: crearTituloClonableDia("Vie", vie), field: vie, formatter: formatterColumnasCuadrante, variableHeight: true, cssClass: "celda-cuadrante", headerSort: false },
     { title: crearTituloClonableDia("Lun", lun), field: lun, formatter: formatterColumnasCuadrante, variableHeight: true, cssClass: "celda-cuadrante", headerSort: false },
@@ -69,6 +69,27 @@ function crearColumnasCuadrantes(cuadrante) {
     { title: crearTituloClonableDia("Mié", mie), field: mie, formatter: formatterColumnasCuadrante, variableHeight: true, cssClass: "celda-cuadrante", headerSort: false },
   ];
   return columnas;
+}
+
+function formatterPuestoCuadranteConOrden(cell) {
+  const data = cell.getRow().getData() || {};
+  const nombre = String(data.nombre || "").trim();
+  return nombre;
+}
+
+function sorterPuestoCuadrantePorOrden(a, b, aRow, bRow) {
+  const dataA = aRow?.getData?.() || {};
+  const dataB = bRow?.getData?.() || {};
+  const ordenA = Number(dataA.orden || 0);
+  const ordenB = Number(dataB.orden || 0);
+  if (ordenA !== ordenB) return ordenA - ordenB;
+
+  const nombreA = String(dataA.nombre || "");
+  const nombreB = String(dataB.nombre || "");
+  const porNombre = nombreA.localeCompare(nombreB, "es", { sensitivity: "base" });
+  if (porNombre !== 0) return porNombre;
+
+  return Number(dataA.id || 0) - Number(dataB.id || 0);
 }
 
 function crearTituloClonableDia(dia, fecha) {
@@ -349,9 +370,17 @@ function crearDatosCuadrantes(cuadrante) {
   const lun = sumarDiasYYYYMMDD(cuadrante?.fecha_inicio, 4);
   const mar = sumarDiasYYYYMMDD(cuadrante?.fecha_inicio, 5);
   const mie = sumarDiasYYYYMMDD(cuadrante?.fecha_inicio, 6);
-  const datos = Object.values(DATOS.maestros.puestos_trabajo).map(puesto => ({
+  const datos = Object.values(DATOS.maestros.puestos_trabajo)
+    .sort((a, b) => {
+      const ordenA = Number(a?.orden || 0);
+      const ordenB = Number(b?.orden || 0);
+      if (ordenA !== ordenB) return ordenA - ordenB;
+      return Number(a?.id || 0) - Number(b?.id || 0);
+    })
+    .map(puesto => ({
     id: puesto.id,
     nombre: puesto.nombre,
+    orden: Number(puesto?.orden || 0),
     [jue]: cuadrante.detalles.filter(d => d.puesto_id === puesto.id && d.fecha === jue).map(d => {
       return {...d, empleado: DATOS.maestros.usuarios[d.usuario_id]};
     }),

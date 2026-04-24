@@ -174,11 +174,13 @@ function agregarCodigoPendienteEnvinado(codigoRaw) {
     const input = document.getElementById("envinado-codigo");
     if (!codigo) return;
     if (!estadoVistaEnvinado.pendientes.some((item) => String(item.codigo || "") === codigo)) {
-        mostrarErrorEnvinado("Ese código no está pendiente de envinar.");
+        if (input) input.value = "";
+        mostrarErrorEnvinado(`Código ${codigo}: no está pendiente de envinar.`);
         return;
     }
     if (estadoVistaEnvinado.codigosPendientesSeleccionados.includes(codigo)) {
-        mostrarErrorEnvinado("Ese código ya está agregado.");
+        if (input) input.value = "";
+        mostrarErrorEnvinado(`Código ${codigo}: ya está agregado.`);
         return;
     }
     estadoVistaEnvinado.codigosPendientesSeleccionados.push(codigo);
@@ -190,6 +192,11 @@ function agregarCodigoPendienteEnvinado(codigoRaw) {
 function renderizarCodigosPendientesEnvinado() {
     const contenedor = document.getElementById("envinado-codigos");
     if (!contenedor) return;
+    const contador = document.getElementById("envinado-codigos-contador");
+    if (contador) {
+        const total = estadoVistaEnvinado.codigosPendientesSeleccionados.length;
+        contador.textContent = `${total} seleccionada${total === 1 ? "" : "s"}`;
+    }
     if (!estadoVistaEnvinado.codigosPendientesSeleccionados.length) {
         contenedor.innerHTML = `<div class="text-muted small">Sin botas seleccionadas.</div>`;
         return;
@@ -226,6 +233,9 @@ async function confirmarEnvinadoPendiente() {
         mostrarErrorEnvinado("Debes agregar al menos una bota.");
         return;
     }
+    if (!confirm(`Hay ${estadoVistaEnvinado.codigosPendientesSeleccionados.length} botas seleccionadas. ¿Confirmas el envío?`)) {
+        return;
+    }
     try {
         mostrarErrorEnvinado("");
         await wsRequest("envinar_botas_pendientes", {
@@ -236,7 +246,8 @@ async function confirmarEnvinadoPendiente() {
         await cargarVistaEnvinado(true);
     } catch (err) {
         console.error("No se pudieron marcar las botas como envinadas:", err);
-        mostrarErrorEnvinado(err?.message || "No se pudieron marcar las botas.");
+        const codigos = estadoVistaEnvinado.codigosPendientesSeleccionados.join(", ");
+        mostrarErrorEnvinado(codigos ? `${codigos}: ${err?.message || "No se pudieron marcar las botas."}` : (err?.message || "No se pudieron marcar las botas."));
     }
 }
 
@@ -245,11 +256,13 @@ function agregarCodigoArchivoEnvinado(codigoRaw) {
     const input = document.getElementById("envinado-archivo-codigo");
     if (!codigo) return;
     if (!estadoVistaEnvinado.envinadas.some((item) => String(item.codigo || "") === codigo)) {
-        mostrarErrorArchivoEnvinado("Ese código no está envinado.");
+        if (input) input.value = "";
+        mostrarErrorArchivoEnvinado(`Código ${codigo}: no está envinado.`);
         return;
     }
     if (estadoVistaEnvinado.codigosArchivoSeleccionados.includes(codigo)) {
-        mostrarErrorArchivoEnvinado("Ese código ya está agregado.");
+        if (input) input.value = "";
+        mostrarErrorArchivoEnvinado(`Código ${codigo}: ya está agregado.`);
         return;
     }
     estadoVistaEnvinado.codigosArchivoSeleccionados.push(codigo);
@@ -261,6 +274,11 @@ function agregarCodigoArchivoEnvinado(codigoRaw) {
 function renderizarCodigosArchivoEnvinado() {
     const contenedor = document.getElementById("envinado-archivo-codigos");
     if (!contenedor) return;
+    const contador = document.getElementById("envinado-archivo-codigos-contador");
+    if (contador) {
+        const total = estadoVistaEnvinado.codigosArchivoSeleccionados.length;
+        contador.textContent = `${total} seleccionada${total === 1 ? "" : "s"}`;
+    }
     if (!estadoVistaEnvinado.codigosArchivoSeleccionados.length) {
         contenedor.innerHTML = `<div class="text-muted small">Sin botas seleccionadas.</div>`;
         return;
@@ -339,6 +357,7 @@ async function subirArchivoBotaEnvinada() {
         await cargarVistaEnvinado(true);
     } catch (err) {
         console.error("No se pudo subir el archivo de envinado:", err);
-        mostrarErrorArchivoEnvinado(err?.message || "No se pudo subir el archivo.");
+        const codigos = estadoVistaEnvinado.codigosArchivoSeleccionados.join(", ");
+        mostrarErrorArchivoEnvinado(codigos ? `${codigos}: ${err?.message || "No se pudo subir el archivo."}` : (err?.message || "No se pudo subir el archivo."));
     }
 }

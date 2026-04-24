@@ -283,11 +283,13 @@ function agregarCodigoExpedicionDestino(codigoRaw) {
     const inputCodigo = document.getElementById("destino-expedir-codigo");
     if (!codigo) return;
     if (!estadoDestino.codigosPermitidos.includes(codigo)) {
-        mostrarErrorExpedicionDestino("No existe.");
+        if (inputCodigo) inputCodigo.value = "";
+        mostrarErrorExpedicionDestino(`Código ${codigo}: no existe.`);
         return;
     }
     if (estadoDestino.codigosSeleccionados.includes(codigo)) {
-        mostrarErrorExpedicionDestino("Ya escaneada");
+        if (inputCodigo) inputCodigo.value = "";
+        mostrarErrorExpedicionDestino(`Código ${codigo}: ya escaneada.`);
         return;
     }
     estadoDestino.codigosSeleccionados.push(codigo);
@@ -372,6 +374,9 @@ async function confirmarExpedicionDestino() {
     }
     if (!estadoDestino.codigosSeleccionados.length) {
         mostrarErrorExpedicionDestino("Debes agregar al menos una bota.");
+        return;
+    }
+    if (!confirm(`Hay ${estadoDestino.codigosSeleccionados.length} botas seleccionadas. ¿Confirmas la expedición?`)) {
         return;
     }
 
@@ -466,11 +471,13 @@ function agregarCodigoEnvinar(codigoRaw) {
     const inputCodigo = document.getElementById("destino-envinar-codigo");
     if (!codigo) return;
     if (!estadoDestinoEnvinar.codigosPermitidos.includes(codigo)) {
-        mostrarErrorEnvinar("Ese código no está en la lista del pedido.");
+        if (inputCodigo) inputCodigo.value = "";
+        mostrarErrorEnvinar(`Código ${codigo}: no está en la lista del pedido.`);
         return;
     }
     if (estadoDestinoEnvinar.codigosSeleccionados.includes(codigo)) {
-        mostrarErrorEnvinar("Ese código ya está agregado.");
+        if (inputCodigo) inputCodigo.value = "";
+        mostrarErrorEnvinar(`Código ${codigo}: ya está agregado.`);
         return;
     }
     estadoDestinoEnvinar.codigosSeleccionados.push(codigo);
@@ -551,6 +558,9 @@ async function confirmarEnvinarDestino() {
     }
     if (!estadoDestinoEnvinar.codigosSeleccionados.length) {
         mostrarErrorEnvinar("Debes agregar al menos una bota.");
+        return;
+    }
+    if (!confirm(`Hay ${estadoDestinoEnvinar.codigosSeleccionados.length} botas seleccionadas. ¿Confirmas el envío a envinar?`)) {
         return;
     }
 

@@ -1,7 +1,6 @@
 #vista_fabricacion,
 #vista_fabricacion_semanal,
-#vista_consumo,
-#vista_consumo_semanal {
+#vista_consumo {
     /*justify-content: space-evenly;*/
     padding: 20px;
     box-sizing: border-box;
@@ -117,11 +116,38 @@
 }
 
 #vista_fabricacion_semanal .table-responsive,
-#vista_consumo_semanal .table-responsive,
 #vista_fabricacion .table-responsive,
 #vista_consumo .table-responsive {
     max-height: 50vh;
     overflow: auto;
+}
+
+.consumo-resumen-fabricacion {
+    border: 1px solid #d8dee6;
+    border-radius: 0.85rem;
+    background: #f8fafc;
+    padding: 0.6rem 0.75rem;
+    margin-bottom: 0.8rem;
+}
+
+.consumo-resumen-fabricacion > summary {
+    cursor: pointer;
+    font-weight: 700;
+    color: #1f2937;
+    margin-bottom: 0.5rem;
+}
+
+.consumo-resumen-fabricacion-lista {
+    max-height: 26vh;
+    overflow: auto;
+}
+
+.consumo-resumen-card {
+    cursor: default;
+}
+
+.consumo-resumen-card:active {
+    transform: none;
 }
 
 .produccion-cards {

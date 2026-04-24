@@ -70,7 +70,7 @@
                                 data-bs-dismiss="offcanvas">
                                 Recepción
                             </button>
-                            <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_consumo_semanal" data-origen-fabricacion="palets_fleje"
+                            <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_consumo" data-origen-fabricacion="palets_fleje"
                                 data-contexto-consumo="palets_fleje" data-acceso-directo-consumo="1" data-bs-dismiss="offcanvas">
                                 Consumo
                             </button>
@@ -82,7 +82,7 @@
                                 data-bs-dismiss="offcanvas">
                                 Recepción
                             </button>
-                            <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_consumo_semanal" data-origen-fabricacion="palets_madera"
+                            <button class="offcanvas-nav-btn offcanvas-nav-subop" mostrar="vista_consumo" data-origen-fabricacion="palets_madera"
                                 data-contexto-consumo="palets_madera" data-acceso-directo-consumo="1" data-bs-dismiss="offcanvas">
                                 Consumo
                             </button>
@@ -190,7 +190,7 @@
                 <img class="boton-icono" src="./imagenes/iconos/camion_palet.png" alt="Recepción">
                 <span>Recepción</span>
             </button>
-            <button class="boton verde boton-con-icono" mostrar="vista_consumo_semanal" data-origen-fabricacion="palets_madera" data-contexto-consumo="palets_madera" data-acceso-directo-consumo="1">
+            <button class="boton verde boton-con-icono" mostrar="vista_consumo" data-origen-fabricacion="palets_madera" data-contexto-consumo="palets_madera" data-acceso-directo-consumo="1">
                 <img class="boton-icono" src="./imagenes/iconos/palet.png" alt="Consumo">
                 <span>Consumo</span>
             </button>
@@ -689,27 +689,20 @@
             </form>
         </section>
 
-        <section id="vista_consumo_semanal" class="flex-fill" modo="listado_fabricacion_semanal">
-            <div class="produccion-cards">
-                <div class="produccion-cards-header">
-                    <h5 class="mb-0">Fabricación semanal [Consumo]</h5>
-                    <div class="small text-muted">Pulsa una línea para entrar al consumo o cierra la tarea semanal.</div>
-                </div>
-                <div id="lista_consumo_fabricacion_semanal" class="produccion-cards-list" aria-live="polite">
-                    <div class="produccion-card-empty">Cargando fabricaciones semanales...</div>
-                </div>
-            </div>
-        </section>
-
         <section id="vista_consumo" class="flex-fill vista-panel-fija" modo="contenido_pedido">
             <div id="panelConsumo" class="contenedor-panel-fijo panel-fijo">
                 <div class="panel-fijo-header">
-                    <h5 class="mb-1" id="modalConsumoLabel">Trazabilidad de consumo</h5>
-                    <div class="small fw-semibold mb-2" id="consumo-producto-orden">Producto</div>
-                    <div class="small text-muted" id="consumo-resumen-cantidades"></div>
+                    <h5 class="mb-1" id="modalConsumoLabel">Registro de lotes para consumo</h5>
                 </div>
 
                 <div class="panel-fijo-body">
+                    <details id="consumo-resumen-fabricacion" class="consumo-resumen-fabricacion">
+                        <summary>Fabricaciones semanales en producción (solo informativo)</summary>
+                        <div id="consumo-resumen-fabricacion-lista" class="produccion-cards-list consumo-resumen-fabricacion-lista" aria-live="polite">
+                            <div class="produccion-card-empty">Cargando fabricaciones semanales...</div>
+                        </div>
+                    </details>
+
                     <div class="table-responsive">
                         <table class="table table-bordered table-sm" id="tabla_trazabilidad_consumo">
                             <thead class="table-light">
@@ -843,7 +836,6 @@
             <div class="fabricacion-cards">
                 <div class="fabricacion-cards-header">
                     <h5 class="mb-0">Fabricación semanal [Producción]</h5>
-                    <div class="small text-muted">Pulsa una línea para entrar a fabricar botas o cierra la tarea semanal.</div>
                 </div>
                 <div id="lista_fabricacion_semanal_botas" class="fabricacion-cards-list" aria-live="polite">
                     <div class="fabricacion-card-empty">Cargando fabricación semanal activa...</div>
@@ -1055,7 +1047,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="modal-footer">
+                    <div class="modal-footer destino-modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                         <button type="button" class="btn btn-primary" id="destino-expedir-confirmar">Expedir</button>
                     </div>
@@ -1095,7 +1087,7 @@
                             </div>
                         </div>
                     </div>
-                    <div class="modal-footer">
+                    <div class="modal-footer destino-modal-footer">
                         <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
                         <button type="button" class="btn btn-primary" id="destino-envinar-confirmar">Enviar a envinar</button>
                     </div>
@@ -1216,6 +1208,10 @@
                                         <div class="form-text">Solo se admiten botas en estado pendiente de envinar.</div>
                                     </div>
                                     <div id="envinado-error" class="alert alert-danger d-none py-2 mb-0"></div>
+                                    <div class="d-flex justify-content-between align-items-center gap-2">
+                                        <div class="small text-muted">Botas seleccionadas</div>
+                                        <div id="envinado-codigos-contador" class="small fw-semibold text-muted">0 seleccionadas</div>
+                                    </div>
                                     <div id="envinado-codigos" class="destino-expedir-codigos">
                                         <div class="text-muted small">Sin botas seleccionadas.</div>
                                     </div>
@@ -1241,6 +1237,10 @@
                                         <div class="form-text">El mismo documento se vinculará a todas las botas añadidas.</div>
                                     </div>
                                     <div id="envinado-archivo-error" class="alert alert-danger d-none py-2 mb-0"></div>
+                                    <div class="d-flex justify-content-between align-items-center gap-2">
+                                        <div class="small text-muted">Botas seleccionadas</div>
+                                        <div id="envinado-archivo-codigos-contador" class="small fw-semibold text-muted">0 seleccionadas</div>
+                                    </div>
                                     <div id="envinado-archivo-codigos" class="destino-expedir-codigos">
                                         <div class="text-muted small">Sin botas seleccionadas.</div>
                                     </div>
@@ -1315,7 +1315,7 @@
     <script src="./js/gestion-auth.js?v=20260420c"></script>
     <script src="./js/terminal-recepcion.js?v=20260420c"></script>
     <script src="./js/terminal-consumo.js?v=20260420c"></script>
-    <script src="./js/terminal-fabricacion.js?v=20260420c"></script>
+    <script src="./js/terminal-fabricacion.js?v=20260424a"></script>
     <script src="./js/terminal-cierre-semanal.js?v=20260420c"></script>
     <script src="./js/terminal-productos-destino.js?v=20260420c"></script>
     <script src="./js/terminal-destino.js?v=20260420c"></script>

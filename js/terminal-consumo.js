@@ -1,6 +1,4 @@
 function prepararEventosConsumo() {
-    registrarEventosVistaConsumoSemanal();
-
     const btnAgregarDesdePaletStock = document.getElementById("consumo-stock-agregar-trazabilidad");
     if (btnAgregarDesdePaletStock) {
         btnAgregarDesdePaletStock.addEventListener("click", () => {
@@ -67,22 +65,7 @@ function prepararEventosConsumo() {
 }
 
 function registrarEventosVistaConsumoSemanal() {
-    const tablaLineas = document.querySelector("#vista_consumo_semanal #lista_consumo_fabricacion_semanal");
-    if (!tablaLineas) return;
-    tablaLineas.addEventListener("click", function (event) {
-        const botonCierre = event.target.closest("[data-action='abrir-cierre-semanal']");
-        if (botonCierre) {
-            event.stopPropagation();
-            const lineaId = Number(botonCierre.getAttribute("data-linea-id") || 0);
-            if (lineaId) {
-                abrirVistaCierreSemanalDesdeLinea?.(lineaId, "vista_consumo_semanal");
-            }
-            return;
-        }
-        const fila = event.target.closest("[data-linea-id], [data-consumo-libre='1']");
-        if (!fila) return;
-        mostrarConsumoDesdeLinea(fila);
-    });
+    return;
 }
 
 function actualizarBotonFooterConsumo(tabActivaId) {
@@ -92,6 +75,119 @@ function actualizarBotonFooterConsumo(tabActivaId) {
     const activaPalet = tabActivaId === "consumo-tab-palet";
     btnStock.classList.toggle("d-none", activaPalet);
     btnPalet.classList.toggle("d-none", !activaPalet);
+}
+
+async function iniciarVistaConsumoDirecta() {
+        vistaProduccionActiva = "vista_consumo";
+        lineaFabricacionActualId = null;
+        lineaFabricacionMaterialActualId = null;
+        lineaFabricacionTipoBotaActualId = null;
+        lineaFabricacionTipoActualId = null;
+        ordenFabricacionActualId = null;
+
+        const tituloPanel = document.getElementById("modalConsumoLabel");
+        if (tituloPanel) tituloPanel.textContent = "Registro de lotes para consumo";
+
+        const vista = document.getElementById("vista_consumo");
+        if (vista) vista.setAttribute("modo", "contenido_pedido");
+
+        const inputPaquetes = document.getElementById("consumo-paquetes");
+        if (inputPaquetes && (!inputPaquetes.value || Number(inputPaquetes.value) < 1)) {
+                inputPaquetes.value = "1";
+        }
+
+        await asegurarDatosFabricacionTerminal();
+        await cargarResumenFabricacionSemanalConsumo();
+        sincronizarFiltrosConsumoDesdeLinea();
+        await cargarPaletsConsumoEnSelector();
+
+        if (typeof setPantalla === "function") {
+                setPantalla("vista_consumo", { pedido_id: null, fabricacion_semanal_id: null });
+        }
+        await cargarTrazabilidadConsumo(null);
+}
+
+function obtenerInfoLineaSemanalConsumo(linea, pedido = null) {
+        const pedidoLinea = pedido || terminalFabricacion.pedidos?.[linea?.pedido_id] || null;
+        return {
+                fechaInicio: formatearFechaEuropea(linea?.fecha_inicio),
+        tipo: linea?.tipo_descripcion || terminalFabricacion.tipos_producto?.[linea?.tipo_producto_id]?.descripcion || "-",
+        material: linea?.material_descripcion || terminalFabricacion.materiales?.[linea?.material_id]?.descripcion || "-",
+                semanaPedida: Number(linea?.cantidad) || 0,
+                semanaFabricada: Number(linea?.cantidad_fabricada) || 0,
+        pedidoTotal: Number(linea?.pedido_total ?? pedidoLinea?.cantidad) || 0,
+        pedidoFabricado: Number(linea?.pedido_fabricado ?? pedidoLinea?.cantidad_fabricada) || 0,
+        };
+}
+
+async function cargarResumenFabricacionSemanalConsumo() {
+        const contenedor = document.getElementById("consumo-resumen-fabricacion-lista");
+        if (!contenedor) return;
+
+        contenedor.innerHTML = `<div class="produccion-card-empty">Cargando fabricaciones semanales...</div>`;
+        try {
+            const lineas = (await wsRequest("listar_resumen_fabricacion_consumo", {})) || [];
+                renderResumenFabricacionSemanalConsumo(lineas);
+        } catch (err) {
+                console.error(err);
+                contenedor.innerHTML = `<div class="produccion-card-empty">Error al cargar fabricaciones semanales</div>`;
+        }
+}
+
+function renderResumenFabricacionSemanalConsumo(lineas) {
+        const contenedor = document.getElementById("consumo-resumen-fabricacion-lista");
+        if (!contenedor) return;
+
+        contenedor.innerHTML = "";
+        if (!lineas?.length) {
+                contenedor.innerHTML = `<div class="produccion-card-empty">Sin líneas en estado Producción</div>`;
+                return;
+        }
+
+        lineas.forEach((linea) => {
+                const card = document.createElement("article");
+                card.className = "produccion-card consumo-resumen-card";
+
+                const pedido = null;
+                const pedidoDescripcion = String(linea?.pedido_descripcion || `Pedido ${linea.pedido_id || "-"}`).trim();
+                const info = obtenerInfoLineaSemanalConsumo(linea, pedido);
+
+                card.innerHTML = `
+            <div class="produccion-card-title">
+                <div>
+                    <h6>${pedidoDescripcion}</h6>
+                </div>
+                <span class="produccion-card-date">${info.fechaInicio || "-"}</span>
+            </div>
+            <div class="produccion-card-grid">
+                <div class="produccion-card-field">
+                    <span class="produccion-card-label">Tipo</span>
+                    <span class="produccion-card-value">${info.tipo}</span>
+                </div>
+                <div class="produccion-card-field">
+                    <span class="produccion-card-label">Material</span>
+                    <span class="produccion-card-value">${info.material}</span>
+                </div>
+                <div class="produccion-card-field">
+                    <span class="produccion-card-label">Semana pedida</span>
+                    <span class="produccion-card-value">${info.semanaPedida}</span>
+                </div>
+                <div class="produccion-card-field">
+                    <span class="produccion-card-label">Semana fabricada</span>
+                    <span class="produccion-card-value">${info.semanaFabricada}</span>
+                </div>
+                <div class="produccion-card-field">
+                    <span class="produccion-card-label">Pedido total</span>
+                    <span class="produccion-card-value">${info.pedidoTotal}</span>
+                </div>
+                <div class="produccion-card-field">
+                    <span class="produccion-card-label">Pedido fabricado</span>
+                    <span class="produccion-card-value">${info.pedidoFabricado}</span>
+                </div>
+            </div>
+        `;
+                contenedor.appendChild(card);
+        });
 }
 
 function resolverTipoDuelaConsumo(tipoBotaId) {
@@ -113,138 +209,11 @@ function resolverTipoDuelaConsumo(tipoBotaId) {
 }
 
 async function cargarFabricacionSemanalConsumo(opciones = {}) {
-    vistaProduccionActiva = "vista_consumo_semanal";
-    const vista = document.getElementById("vista_consumo_semanal");
-    if (vista) vista.setAttribute("modo", "listado_fabricacion_semanal");
-    const autoAbrirLineaUnica = opciones.autoAbrirLineaUnica !== false;
-    const contenedor = document.querySelector("#lista_consumo_fabricacion_semanal");
-    if (!contenedor) return;
-    try {
-        await asegurarDatosFabricacionTerminal();
-        const fabricacion = (await wsRequest("fabricacion", {})) || {};
-        terminalFabricacion.pedidos = fabricacion?.pedidos || {};
-        terminalFabricacion.tipos_producto = fabricacion?.tipos_producto || {};
-        const lineas = Object.values(fabricacion?.fabricacion_semanal || {})
-            .filter((l) => Number(l?.estado || 0) === 2);
-
-        actualizarCardsFabricacionSemanalConsumo(lineas);
-        if (autoAbrirLineaUnica && lineas.length === 1) {
-            const filaUnica = contenedor.querySelector("[data-linea-real='1']");
-            if (filaUnica) {
-                mostrarConsumoDesdeLinea(filaUnica);
-            }
-        }
-    } catch (err) {
-        console.error(err);
-        contenedor.innerHTML = `<div class="produccion-card-empty">Error al cargar fabricaciones semanales</div>`;
-    }
+        await iniciarVistaConsumoDirecta();
 }
 
 function actualizarCardsFabricacionSemanalConsumo(lineas) {
-    const contenedor = document.querySelector("#lista_consumo_fabricacion_semanal");
-    if (!contenedor) return;
-    contenedor.innerHTML = "";
-    const cardLibre = document.createElement("article");
-    cardLibre.className = "produccion-card";
-    cardLibre.dataset.consumoLibre = "1";
-    cardLibre.innerHTML = `
-      <div class="produccion-card-title">
-        <div>
-          <h6>Sin orden semanal</h6>
-        </div>
-        <span class="produccion-card-date">Trazas huérfanas</span>
-      </div>
-      <div class="produccion-card-grid">
-        <div class="produccion-card-field">
-          <span class="produccion-card-label">Uso</span>
-          <span class="produccion-card-value">Consumo libre</span>
-        </div>
-        <div class="produccion-card-field">
-          <span class="produccion-card-label">Maderas</span>
-          <span class="produccion-card-value">Varias</span>
-        </div>
-        <div class="produccion-card-field">
-          <span class="produccion-card-label">Origen</span>
-          <span class="produccion-card-value">Sin vincular</span>
-        </div>
-      </div>
-    `;
-    contenedor.appendChild(cardLibre);
-    if (!lineas || !lineas.length) {
-        const vacio = document.createElement("div");
-        vacio.className = "produccion-card-empty";
-        vacio.textContent = "Sin líneas en estado Producción";
-        contenedor.appendChild(vacio);
-        return;
-    }
-    lineas.forEach((linea) => {
-        const card = document.createElement("article");
-        card.className = "produccion-card";
-        card.dataset.lineaReal = "1";
-        card.dataset.lineaId = linea.id ?? "";
-        card.dataset.tipoProductoId = linea.tipo_producto_id ?? "";
-        card.dataset.materialId = linea.material_id ?? "";
-        card.dataset.pedidoId = linea.pedido_id ?? "";
-        card.dataset.cantidadFabricar = linea.cantidad ?? "";
-        card.dataset.cantidadFabricada = linea.cantidad_fabricada ?? "";
-
-        const pedido = terminalFabricacion.pedidos?.[linea.pedido_id] || null;
-        const pedidoDescripcion = (pedido?.descripcion || `Pedido ${linea.pedido_id || "-"}`).trim();
-        card.dataset.pedidoDescripcion = pedidoDescripcion;
-
-        const info = typeof obtenerInfoLineaSemanal === "function"
-            ? obtenerInfoLineaSemanal(linea)
-            : {
-                fechaInicio: formatearFechaEuropea(linea.fecha_inicio),
-                tipo: terminalFabricacion.tipos_producto?.[linea.tipo_producto_id]?.descripcion || "-",
-                material: terminalFabricacion.materiales?.[linea.material_id]?.descripcion || "-",
-                semanaPedida: Number(linea.cantidad) || 0,
-                semanaFabricada: Number(linea.cantidad_fabricada) || 0,
-                pedidoTotal: Number(pedido?.cantidad) || 0,
-                pedidoFabricado: Number(pedido?.cantidad_fabricada) || 0,
-            };
-
-        card.innerHTML = `
-      <div class="produccion-card-title">
-        <div>
-          <h6>${pedidoDescripcion}</h6>
-        </div>
-        <span class="produccion-card-date">${info.fechaInicio || "-"}</span>
-      </div>
-      <div class="produccion-card-grid">
-        <div class="produccion-card-field">
-          <span class="produccion-card-label">Tipo</span>
-          <span class="produccion-card-value">${info.tipo}</span>
-        </div>
-        <div class="produccion-card-field">
-          <span class="produccion-card-label">Material</span>
-          <span class="produccion-card-value">${info.material}</span>
-        </div>
-        <div class="produccion-card-field">
-          <span class="produccion-card-label">Semana pedida</span>
-          <span class="produccion-card-value">${info.semanaPedida}</span>
-        </div>
-        <div class="produccion-card-field">
-          <span class="produccion-card-label">Semana fabricada</span>
-          <span class="produccion-card-value">${info.semanaFabricada}</span>
-        </div>
-        <div class="produccion-card-field">
-          <span class="produccion-card-label">Pedido total</span>
-          <span class="produccion-card-value">${info.pedidoTotal}</span>
-        </div>
-        <div class="produccion-card-field">
-          <span class="produccion-card-label">Pedido fabricado</span>
-          <span class="produccion-card-value">${info.pedidoFabricado}</span>
-        </div>
-      </div>
-        <div class="produccion-card-actions">
-          <button type="button" class="btn btn-outline-primary btn-sm" data-action="abrir-cierre-semanal" data-linea-id="${linea.id ?? ""}">
-            <i class="bi bi-clipboard-check"></i> Cierre semanal
-          </button>
-        </div>
-    `;
-        contenedor.appendChild(card);
-    });
+        renderResumenFabricacionSemanalConsumo(lineas);
 }
 
 function mostrarConsumoDesdeLinea(fila) {
@@ -273,34 +242,15 @@ function mostrarConsumoDesdeLinea(fila) {
     const pedidoDescripcionData = (fila.dataset.pedidoDescripcion || "").trim();
     const pedidoDescripcionMapa = (ordenFabricacionActualId && terminalFabricacion.pedidos?.[ordenFabricacionActualId]?.descripcion) || "";
     const pedidoDescripcion = (pedidoDescripcionData || pedidoDescripcionMapa || "").trim();
-    const infoLinea = typeof obtenerInfoLineaSemanal === "function"
-        ? obtenerInfoLineaSemanal({
-            pedido_id: ordenFabricacionActualId,
-            tipo_producto_id: tipoId,
-            material_id: lineaFabricacionMaterialActualId,
-            cantidad: cantidadFabricar,
-            cantidad_fabricada: cantidadFabricada,
-        })
-        : null;
-    const resumenProducto = esConsumoLibre
-        ? "Trazas huérfanas sin origen de fabricación"
-        : `Tipo: ${descripcionProducto} | Madera: ${descripcionMaterial}`;
-    const titulo = document.getElementById("consumo-producto-orden");
-    if (titulo) titulo.textContent = resumenProducto;
-    const resumenCantidades = document.getElementById("consumo-resumen-cantidades");
-    if (resumenCantidades) {
-        resumenCantidades.textContent = esConsumoLibre
-            ? "Selecciona tipo, madera y palet. La traza quedará sin orden semanal hasta usarla en fabricación."
-            : infoLinea
-                ? construirResumenCantidadesLinea(infoLinea)
-                : `Semana: pedida ${cantidadFabricar} | fabricada ${cantidadFabricada}`;
-    }
+    const infoLinea = obtenerInfoLineaSemanalConsumo({
+        pedido_id: ordenFabricacionActualId,
+        tipo_producto_id: tipoId,
+        material_id: lineaFabricacionMaterialActualId,
+        cantidad: cantidadFabricar,
+        cantidad_fabricada: cantidadFabricada,
+    });
     const tituloPanel = document.getElementById("modalConsumoLabel");
-    if (tituloPanel) {
-        tituloPanel.textContent = esConsumoLibre
-            ? "Consumo sin orden semanal"
-            : (pedidoDescripcion ? `Consumo: ${pedidoDescripcion}` : "Consumo");
-    }
+    if (tituloPanel) tituloPanel.textContent = "Registro de lotes para consumo";
 
     if (typeof mostrarSeccion === "function") {
         mostrarSeccion("vista_consumo");
@@ -409,7 +359,7 @@ function poblarFiltrosConsumo(valorTipoPrevio = "", valorMaderaPrevio = "") {
 
     const tipos = Object.values(terminalFabricacion.tipos_producto || {})
         .filter((t) => String(t?.tipo || "").toUpperCase() === "DUELA")
-        .sort((a, b) => String(a.descripcion || "").localeCompare(String(b.descripcion || ""), "es"));
+        .sort((a, b) => String(b.descripcion || "").localeCompare(String(a.descripcion || ""), "es"));
     const maderas = Object.values(terminalFabricacion.materiales || {})
         .sort((a, b) => String(a.descripcion || "").localeCompare(String(b.descripcion || ""), "es"));
 
@@ -594,6 +544,10 @@ async function agregarTrazabilidadConsumoDesdePaletStock() {
     const lote = (loteInput?.value || "").trim();
     const cubicaje = Number.parseFloat((cubicajeInput?.value || "").toString().replace(",", "."));
     const paquetes = Number.parseInt((paquetesInput?.value || "1").toString(), 10) || 1;
+    const tipoPrevio = String(document.getElementById("consumo-tipo-producto")?.value || "");
+    const maderaPrevia = String(document.getElementById("consumo-madera")?.value || "");
+    const ubicacionPrevia = String(document.getElementById("consumo-ubicacion-origen")?.value || "");
+    const paletPrevio = String(selectPaletOrigen?.value || "");
     if (!paletOrigenId || !lote || !Number.isFinite(cubicaje) || cubicaje <= 0) {
         alert("Debes completar palet origen, cubicaje, paquetes y lote.");
         return;
@@ -610,9 +564,15 @@ async function agregarTrazabilidadConsumoDesdePaletStock() {
         if (loteInput) loteInput.value = "";
         if (cubicajeInput) cubicajeInput.value = "";
         if (paquetesInput) paquetesInput.value = "1";
-        if (selectPaletOrigen) selectPaletOrigen.value = "";
-        cargarPaletsConsumoEnSelector();
-        cargarTrazabilidadConsumo(lineaFabricacionActualId || null);
+        const selectorTipo = document.getElementById("consumo-tipo-producto");
+        const selectorMadera = document.getElementById("consumo-madera");
+        const selectorUbicacion = document.getElementById("consumo-ubicacion-origen");
+        if (selectorTipo) selectorTipo.value = tipoPrevio;
+        if (selectorMadera) selectorMadera.value = maderaPrevia;
+        if (selectorUbicacion) selectorUbicacion.value = ubicacionPrevia;
+        if (selectPaletOrigen) selectPaletOrigen.value = paletPrevio;
+        await cargarPaletsConsumoEnSelector();
+        await cargarTrazabilidadConsumo(lineaFabricacionActualId || null);
         sincronizarBackdropModales();
     } catch (err) {
         console.error(err);
@@ -650,7 +610,7 @@ async function agregarTrazabilidadConsumoDesdePalet() {
 }
 
 function refrescarConsumoDesdeServidor() {
-    cargarFabricacionSemanalConsumo({ autoAbrirLineaUnica: false });
+    cargarResumenFabricacionSemanalConsumo();
     if (vistaProduccionActiva === "vista_consumo") {
         cargarTrazabilidadConsumo(lineaFabricacionActualId || null);
     }
@@ -665,10 +625,16 @@ async function cargarPaletsConsumoEnSelector() {
     const selectorMadera = document.getElementById("consumo-madera");
     if (!selector || !selectorUbicacion) return;
 
+    await asegurarDatosFabricacionTerminal();
+
     const valorStockPrevio = selector.value || "";
     const valorUbicacionPrevio = selectorUbicacion.value || "";
-    const valorTipoPrevio = String(lineaFabricacionTipoActualId || "");
-    const valorMaderaPrevio = String(lineaFabricacionMaterialActualId || "");
+    const valorTipoPrevio = selectorTipo
+        ? String(selectorTipo.value || "")
+        : String(lineaFabricacionTipoActualId || "");
+    const valorMaderaPrevio = selectorMadera
+        ? String(selectorMadera.value || "")
+        : String(lineaFabricacionMaterialActualId || "");
 
     selector.innerHTML = `<option value="">Cargando palets...</option>`;
     selectorUbicacion.innerHTML = `<option value="">Cargando ubicaciones...</option>`;
@@ -697,7 +663,7 @@ function poblarFiltrosConsumo(valorTipoPrevio = "", valorMaderaPrevio = "") {
 
     const tipos = Object.values(terminalFabricacion.tipos_producto || {})
         .filter((t) => String(t?.tipo || "").toUpperCase() === "DUELA")
-        .sort((a, b) => String(a.descripcion || "").localeCompare(String(b.descripcion || ""), "es"));
+        .sort((a, b) => String(b.descripcion || "").localeCompare(String(a.descripcion || ""), "es"));
     const maderas = Object.values(terminalFabricacion.materiales || {})
         .sort((a, b) => String(a.descripcion || "").localeCompare(String(b.descripcion || ""), "es"));
 
@@ -942,108 +908,5 @@ function actualizarTablaLineasFabricacion(lineas, vistaId = null) {
 }
 
 function actualizarCardsFabricacionSemanalConsumo(lineas) {
-    const contenedor = document.querySelector("#lista_consumo_fabricacion_semanal");
-    if (!contenedor) return;
-    contenedor.innerHTML = "";
-    const cardLibre = document.createElement("article");
-    cardLibre.className = "produccion-card";
-    cardLibre.dataset.consumoLibre = "1";
-    cardLibre.innerHTML = `
-      <div class="produccion-card-title">
-        <div>
-          <h6>Sin orden semanal</h6>
-        </div>
-        <span class="produccion-card-date">Trazas huérfanas</span>
-      </div>
-      <div class="produccion-card-grid">
-        <div class="produccion-card-field">
-          <span class="produccion-card-label">Uso</span>
-          <span class="produccion-card-value">Consumo libre</span>
-        </div>
-        <div class="produccion-card-field">
-          <span class="produccion-card-label">Maderas</span>
-          <span class="produccion-card-value">Varias</span>
-        </div>
-        <div class="produccion-card-field">
-          <span class="produccion-card-label">Origen</span>
-          <span class="produccion-card-value">Sin vincular</span>
-        </div>
-      </div>
-    `;
-    contenedor.appendChild(cardLibre);
-    if (!lineas || !lineas.length) {
-        const vacio = document.createElement("div");
-        vacio.className = "produccion-card-empty";
-        vacio.textContent = "Sin líneas en estado Producción";
-        contenedor.appendChild(vacio);
-        return;
-    }
-    lineas.forEach((linea) => {
-        const card = document.createElement("article");
-        card.className = "produccion-card";
-        card.dataset.lineaReal = "1";
-        card.dataset.lineaId = linea.id ?? "";
-        card.dataset.tipoProductoId = linea.tipo_producto_id ?? "";
-        card.dataset.materialId = linea.material_id ?? "";
-        card.dataset.pedidoId = linea.pedido_id ?? "";
-        card.dataset.cantidadFabricar = linea.cantidad ?? "";
-        card.dataset.cantidadFabricada = linea.cantidad_fabricada ?? "";
-
-        const pedido = terminalFabricacion.pedidos?.[linea.pedido_id] || null;
-        const pedidoDescripcion = (pedido?.descripcion || `Pedido ${linea.pedido_id || "-"}`).trim();
-        card.dataset.pedidoDescripcion = pedidoDescripcion;
-
-        const info = typeof obtenerInfoLineaSemanal === "function"
-            ? obtenerInfoLineaSemanal(linea)
-            : {
-                fechaInicio: formatearFechaEuropea(linea.fecha_inicio),
-                tipo: terminalFabricacion.tipos_producto?.[linea.tipo_producto_id]?.descripcion || "-",
-                material: terminalFabricacion.materiales?.[linea.material_id]?.descripcion || "-",
-                semanaPedida: Number(linea.cantidad) || 0,
-                semanaFabricada: Number(linea.cantidad_fabricada) || 0,
-                pedidoTotal: Number(pedido?.cantidad) || 0,
-                pedidoFabricado: Number(pedido?.cantidad_fabricada) || 0,
-            };
-
-        card.innerHTML = `
-      <div class="produccion-card-title">
-        <div>
-          <h6>${pedidoDescripcion}</h6>
-        </div>
-        <span class="produccion-card-date">${info.fechaInicio || "-"}</span>
-      </div>
-      <div class="produccion-card-grid">
-        <div class="produccion-card-field">
-          <span class="produccion-card-label">Tipo</span>
-          <span class="produccion-card-value">${info.tipo}</span>
-        </div>
-        <div class="produccion-card-field">
-          <span class="produccion-card-label">Material</span>
-          <span class="produccion-card-value">${info.material}</span>
-        </div>
-        <div class="produccion-card-field">
-          <span class="produccion-card-label">Semana pedida</span>
-          <span class="produccion-card-value">${info.semanaPedida}</span>
-        </div>
-        <div class="produccion-card-field">
-          <span class="produccion-card-label">Semana fabricada</span>
-          <span class="produccion-card-value">${info.semanaFabricada}</span>
-        </div>
-        <div class="produccion-card-field">
-          <span class="produccion-card-label">Pedido total</span>
-          <span class="produccion-card-value">${info.pedidoTotal}</span>
-        </div>
-        <div class="produccion-card-field">
-          <span class="produccion-card-label">Pedido fabricado</span>
-          <span class="produccion-card-value">${info.pedidoFabricado}</span>
-        </div>
-      </div>
-        <div class="produccion-card-actions">
-          <button type="button" class="btn btn-outline-primary btn-sm" data-action="abrir-cierre-semanal" data-linea-id="${linea.id ?? ""}">
-            <i class="bi bi-clipboard-check"></i> Cierre semanal
-          </button>
-        </div>
-    `;
-        contenedor.appendChild(card);
-    });
+        renderResumenFabricacionSemanalConsumo(lineas);
 }

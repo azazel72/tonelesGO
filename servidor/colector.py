@@ -502,6 +502,36 @@ class Colector:
             lineas = session.exec(statement).all()
             return [FabricacionSemanalDTO.from_db(linea) for linea in lineas]
 
+    def listar_resumen_fabricacion_consumo(self):
+        with DB.crear_sesion() as session:
+            statement = (
+                select(FabricacionSemanalDB, PedidoDB, TipoProductoDB, MaterialDB)
+                .join(PedidoDB, PedidoDB.id == FabricacionSemanalDB.pedido_id, isouter=True)
+                .join(TipoProductoDB, TipoProductoDB.id == FabricacionSemanalDB.tipo_producto_id, isouter=True)
+                .join(MaterialDB, MaterialDB.id == FabricacionSemanalDB.material_id, isouter=True)
+                .where(FabricacionSemanalDB.estado == 2)
+                .order_by(FabricacionSemanalDB.fecha_inicio.desc(), FabricacionSemanalDB.id.desc())
+            )
+            filas = session.exec(statement).all()
+
+            resumen = []
+            for linea, pedido, tipo, material in filas:
+                resumen.append({
+                    "id": linea.id,
+                    "pedido_id": linea.pedido_id,
+                    "fecha_inicio": linea.fecha_inicio.isoformat() if linea.fecha_inicio else None,
+                    "tipo_producto_id": linea.tipo_producto_id,
+                    "material_id": linea.material_id,
+                    "cantidad": int(linea.cantidad or 0),
+                    "cantidad_fabricada": int(linea.cantidad_fabricada or 0),
+                    "pedido_descripcion": (pedido.descripcion if pedido else None) or f"Pedido {linea.pedido_id or '-'}",
+                    "pedido_total": int((pedido.cantidad if pedido else 0) or 0),
+                    "pedido_fabricado": int((pedido.cantidad_fabricada if pedido else 0) or 0),
+                    "tipo_descripcion": ((tipo.descripcion if tipo else None) or (tipo.codigo if tipo else None) or "-"),
+                    "material_descripcion": ((material.descripcion if material else None) or "-"),
+                })
+            return resumen
+
     def listar_analiticas(self, filtros: dict | None = None):
         filtros = filtros or {}
         estados = {
@@ -1863,6 +1893,7 @@ class Colector:
         trazabilidad = TrazabilidadFabricacionDB(
             fabricacion_semanal_id=fabricacion_semanal_id,
             palet_id=palet.id,
+            estado=1,
         )
         session.add(trazabilidad)
         session.flush()
@@ -2194,14 +2225,14 @@ class Colector:
         operarios_ids_producto = self._normalizar_ids_operarios(operarios_ids_input)
         operarios_ids_codigo = list(operarios_ids_producto)
         batidero_id = None
-        codigos_batidero_validos = {11, 12, 21, 22, 31, 32, 41, 42, 51, 52}
+        codigos_batidero_validos = {11, 12, 13, 21, 22, 23, 31, 32, 33, 41, 42, 43, 51, 52, 53}
         try:
             if batidero is not None and batidero != "":
                 batidero_id = int(batidero)
         except (TypeError, ValueError):
             batidero_id = None
         if batidero_id is not None and batidero_id not in codigos_batidero_validos:
-            raise ValueError("Codigo de batidero invalido. Valores permitidos: 11, 12, 21, 22, 31, 32, 41, 42, 51, 52.")
+            raise ValueError("Codigo de batidero invalido. Valores permitidos: 11, 12, 13, 21, 22, 23, 31, 32, 33, 41, 42, 43, 51, 52, 53.")
         if batidero_id is not None:
             if operarios_ids_codigo:
                 resto = [op for op in operarios_ids_codigo[1:] if op != batidero_id]
@@ -3040,31 +3071,29 @@ class Colector:
                 raise ValueError("El jueves indicado no tiene asignaciones en este cuadrante.")
 
             puestos = self.repo_puestos_trabajo.list_all(session)
-            puesto_batidero_manana_id = None
-            puesto_batidero_tarde_id = None
-            for puesto in puestos:
-                nombre = str(getattr(puesto, "nombre", "")).strip()
-                if nombre == "BATIDERO MAÑANA":
-                    puesto_batidero_manana_id = puesto.id
-                elif nombre == "BATIDERO TARDE":
-                    puesto_batidero_tarde_id = puesto.id
+            puestos_batidero = [
+                puesto for puesto in puestos
+                if str(getattr(puesto, "nombre", "")).strip().upper().startswith("BATIDERO")
+            ]
+            puestos_batidero.sort(key=lambda p: ((getattr(p, "orden", 0) or 0), (getattr(p, "id", 0) or 0)))
+            batidero_ids = [p.id for p in puestos_batidero if p.id is not None]
+            batidero_index = {puesto_id: idx for idx, puesto_id in enumerate(batidero_ids)}
 
             for indice_destino, fecha_destino in enumerate(fechas_destino):
                 # Borrar previamente todo lo del dia destino para este cuadrante
                 for det in [d for d in detalles if d.fecha == fecha_destino]:
                     session.delete(det)
 
-                # Insertar copias desde jueves, alternando puestos de batidero
+                # Insertar copias desde jueves, rotando puestos de batidero.
+                # Con 2 puestos mantiene la alternancia previa; con 3 rota sobre los tres.
                 nuevos = []
+                rotacion = (indice_destino + 1) % len(batidero_ids) if batidero_ids else 0
                 for det in detalles_jueves:
                     puesto_destino_id = det.puesto_id
-                    # Alternancia semanal: Vie(swapped), Lun(normal), Mar(swapped), Mie(normal)
-                    aplicar_swap = (indice_destino % 2 == 0)
-                    if aplicar_swap and puesto_batidero_manana_id and puesto_batidero_tarde_id:
-                        if puesto_destino_id == puesto_batidero_manana_id:
-                            puesto_destino_id = puesto_batidero_tarde_id
-                        elif puesto_destino_id == puesto_batidero_tarde_id:
-                            puesto_destino_id = puesto_batidero_manana_id
+                    idx_origen = batidero_index.get(puesto_destino_id)
+                    if idx_origen is not None and rotacion:
+                        idx_destino = (idx_origen + rotacion) % len(batidero_ids)
+                        puesto_destino_id = batidero_ids[idx_destino]
 
                     nuevos.append(
                         CuadranteDetalleDB(

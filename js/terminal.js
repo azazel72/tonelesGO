@@ -89,10 +89,14 @@ function mostrarSeccion(id) {
         if (id === "vista_recepcion") {
             cargarEntradasRecepcion();
         }
-        if (id === "vista_consumo_semanal") {
+        if (id === "vista_consumo") {
             const activarAutoAccesoConsumo = contextoNavegacion.autoAccesoConsumo === true;
             contextoNavegacion.autoAccesoConsumo = false;
-            cargarFabricacionSemanalConsumo({ autoAbrirLineaUnica: activarAutoAccesoConsumo });
+            if (activarAutoAccesoConsumo) {
+                iniciarVistaConsumoDirecta?.();
+            } else {
+                cargarResumenFabricacionSemanalConsumo?.();
+            }
         }
         if (id === "vista_fabricacion_semanal") {
             contextoNavegacion.autoAccesoConsumo = false;
@@ -249,20 +253,6 @@ function actualizarMigasPan(mostrarSeccion) {
             }
             migasPan.appendChild(nuevaMiga);
             break;
-        case "vista_consumo_semanal":
-            nuevaMiga = crearMigaPan("Inicio", "vista_tareas", false);
-            migasPan.appendChild(nuevaMiga);
-            nuevaMiga = crearMigaPan("Palets", "vista_menu_palets", false);
-            migasPan.appendChild(nuevaMiga);
-            if (contextoNavegacion.consumoOrigen === "palets_fleje") {
-                nuevaMiga = crearMigaPan("Fleje", "vista_menu_palets_fleje", false);
-            } else {
-                nuevaMiga = crearMigaPan("Madera", "vista_menu_palets_madera", false);
-            }
-            migasPan.appendChild(nuevaMiga);
-            nuevaMiga = crearMigaPan("Fabricación semanal", mostrarSeccion, true);
-            migasPan.appendChild(nuevaMiga);
-            break;
         case "vista_consumo":
             nuevaMiga = crearMigaPan("Inicio", "vista_tareas", false);
             migasPan.appendChild(nuevaMiga);
@@ -273,9 +263,6 @@ function actualizarMigasPan(mostrarSeccion) {
             } else {
                 nuevaMiga = crearMigaPan("Madera", "vista_menu_palets_madera", false);
             }
-            migasPan.appendChild(nuevaMiga);
-            nuevaMiga = crearMigaPan("Fabricación semanal", "vista_consumo_semanal", false);
-            migasPan.appendChild(nuevaMiga);
             nuevaMiga = crearMigaPan("Consumo", mostrarSeccion, true);
             migasPan.appendChild(nuevaMiga);
             break;
@@ -300,7 +287,7 @@ function actualizarMigasPan(mostrarSeccion) {
         case "vista_cierre_semanal":
             nuevaMiga = crearMigaPan("Inicio", "vista_tareas", false);
             migasPan.appendChild(nuevaMiga);
-            if (contextoNavegacion.cierreSemanalOrigen === "vista_consumo_semanal") {
+            if (contextoNavegacion.cierreSemanalOrigen === "vista_consumo") {
                 nuevaMiga = crearMigaPan("Palets", "vista_menu_palets", false);
                 migasPan.appendChild(nuevaMiga);
                 if (contextoNavegacion.consumoOrigen === "palets_fleje") {
@@ -309,7 +296,7 @@ function actualizarMigasPan(mostrarSeccion) {
                     nuevaMiga = crearMigaPan("Madera", "vista_menu_palets_madera", false);
                 }
                 migasPan.appendChild(nuevaMiga);
-                nuevaMiga = crearMigaPan("Fabricación semanal", "vista_consumo_semanal", false);
+                nuevaMiga = crearMigaPan("Consumo", "vista_consumo", false);
             } else {
                 nuevaMiga = crearMigaPan("Botas", "vista_menu_botas", false);
                 migasPan.appendChild(nuevaMiga);
@@ -502,7 +489,6 @@ var ACCIONES = {
             pantallaActual === "vista_fabricacion"
             || pantallaActual === "vista_consumo"
             || pantallaActual === "vista_fabricacion_semanal"
-            || pantallaActual === "vista_consumo_semanal"
             || pantallaActual === "vista_ubicacion"
             || pantallaActual === "vista_mover_stock"
             || pantallaActual === "vista_procesar_stock"
@@ -513,7 +499,7 @@ var ACCIONES = {
             if (msg?.data?.refetch_maestros) {
                 refrescarMaestrosFabricacion?.();
             }
-            if (pantallaActual === "vista_consumo" || pantallaActual === "vista_consumo_semanal") {
+            if (pantallaActual === "vista_consumo") {
                 refrescarConsumoDesdeServidor?.(msg.data || {});
             }
             if (pantallaActual === "vista_fabricacion" || pantallaActual === "vista_fabricacion_semanal") {

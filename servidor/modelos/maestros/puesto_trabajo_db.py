@@ -7,5 +7,6 @@ class PuestoTrabajoDB(SQLModel, table=True):
 
     id: Optional[int] = Field(default=None, primary_key=True)
     nombre: Optional[str] = None
+    orden: Optional[int] = Field(default=0)
     es_maquinaria: Optional[bool] = Field(default=False)
     fabricacion: Optional[bool] = Field(default=False)
