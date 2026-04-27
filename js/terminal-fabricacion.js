@@ -421,7 +421,7 @@ async function cargarCodigosBatideroEnSelector(mantenerSeleccion = false) {
         const mediaTarde = base + 2;
         const tarde = base + 3;
         options.push(`<option value="${manana}">${manana} (${dias[i]} mañana)</option>`);
-        options.push(`<option value="${mediaTarde}">${mediaTarde} (${dias[i]} media tarde)</option>`);
+        options.push(`<option value="${mediaTarde}">${mediaTarde} (${dias[i]} media mañana)</option>`);
         options.push(`<option value="${tarde}">${tarde} (${dias[i]} tarde)</option>`);
     }
     selector.innerHTML = options.join("");
@@ -466,6 +466,7 @@ function agruparLotesFabricacion(trazas) {
                 volumenTotal: 0,
                 consumidoTotal: 0,
                 botasRestantesEstimadas: 0,
+                primerRegistroId: Number(t.id || 0) || Number.MAX_SAFE_INTEGER,
                 activa: false,
                 trazas: [],
             });
@@ -477,14 +478,20 @@ function agruparLotesFabricacion(trazas) {
         item.cantidad += Number(t.cantidad_fabricada || 0);
         item.volumenTotal += cubicaje;
         item.consumidoTotal += consumido;
+        item.primerRegistroId = Math.min(item.primerRegistroId, Number(t.id || 0) || Number.MAX_SAFE_INTEGER);
         item.activa = item.activa || Number(t.estado || 0) === 0;
         item.trazas.push(t);
     });
     lotes.forEach((item) => {
         const restante = Math.max(0, item.volumenTotal - item.consumidoTotal);
         item.botasRestantesEstimadas = consumoDuela > 0 ? Math.floor(restante / consumoDuela) : 0;
+        item.agotado = restante <= 0;
     });
-    return Array.from(lotes.values()).sort((a, b) => String(a.lote).localeCompare(String(b.lote), "es"));
+    return Array.from(lotes.values()).sort((a, b) => {
+        if (a.agotado !== b.agotado) return a.agotado ? 1 : -1;
+        if (a.primerRegistroId !== b.primerRegistroId) return a.primerRegistroId - b.primerRegistroId;
+        return String(a.lote).localeCompare(String(b.lote), "es", { numeric: true, sensitivity: "base" });
+    });
 }
 
 async function actualizarEstadoLoteFabricacion(lote, estado) {

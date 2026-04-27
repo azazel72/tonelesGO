@@ -1,5 +1,5 @@
 -- v2.1.009
--- productos_operarios: ampliar codigo_batidero a manana, media tarde y tarde.
+-- productos_operarios: ampliar codigo_batidero a manana, media mañana y tarde.
 
 SET @chk = (
   SELECT COUNT(*) FROM information_schema.table_constraints

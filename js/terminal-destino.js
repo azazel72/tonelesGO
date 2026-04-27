@@ -284,16 +284,19 @@ function agregarCodigoExpedicionDestino(codigoRaw) {
     if (!codigo) return;
     if (!estadoDestino.codigosPermitidos.includes(codigo)) {
         if (inputCodigo) inputCodigo.value = "";
+        reproducirCodigoError();
         mostrarErrorExpedicionDestino(`Código ${codigo}: no existe.`);
         return;
     }
     if (estadoDestino.codigosSeleccionados.includes(codigo)) {
         if (inputCodigo) inputCodigo.value = "";
+        reproducirCodigoError();
         mostrarErrorExpedicionDestino(`Código ${codigo}: ya escaneada.`);
         return;
     }
     estadoDestino.codigosSeleccionados.push(codigo);
     if (inputCodigo) inputCodigo.value = "";
+    reproducirCodigoCorrecto();
     mostrarErrorExpedicionDestino("");
     renderizarCodigosExpedicionDestino();
 }
@@ -417,9 +420,10 @@ function obtenerUbicacionesEnvinar() {
             return String(instalacion?.tipo || "").trim().toUpperCase() === "B";
         })
         .sort((a, b) => {
-            const textoA = obtenerTextoUbicacionEnvinar(a);
-            const textoB = obtenerTextoUbicacionEnvinar(b);
-            return textoA.localeCompare(textoB, "es");
+            const ordenA = Number(a?.orden || 0);
+            const ordenB = Number(b?.orden || 0);
+            if (ordenA !== ordenB) return ordenA - ordenB;
+            return Number(a?.id || 0) - Number(b?.id || 0);
         });
 }
 
@@ -472,16 +476,19 @@ function agregarCodigoEnvinar(codigoRaw) {
     if (!codigo) return;
     if (!estadoDestinoEnvinar.codigosPermitidos.includes(codigo)) {
         if (inputCodigo) inputCodigo.value = "";
+        reproducirCodigoError();
         mostrarErrorEnvinar(`Código ${codigo}: no está en la lista del pedido.`);
         return;
     }
     if (estadoDestinoEnvinar.codigosSeleccionados.includes(codigo)) {
         if (inputCodigo) inputCodigo.value = "";
+        reproducirCodigoError();
         mostrarErrorEnvinar(`Código ${codigo}: ya está agregado.`);
         return;
     }
     estadoDestinoEnvinar.codigosSeleccionados.push(codigo);
     if (inputCodigo) inputCodigo.value = "";
+    reproducirCodigoCorrecto();
     mostrarErrorEnvinar("");
     renderizarCodigosEnvinar();
 }
@@ -493,7 +500,12 @@ function quitarCodigoEnvinar(codigo) {
 
 function renderizarCodigosEnvinar() {
     const contenedor = document.getElementById("destino-envinar-codigos");
+    const contador = document.getElementById("destino-envinar-contador");
     if (!contenedor) return;
+    if (contador) {
+        const total = estadoDestinoEnvinar.codigosSeleccionados.length;
+        contador.textContent = `${total} seleccionada${total === 1 ? "" : "s"}`;
+    }
     if (!estadoDestinoEnvinar.codigosSeleccionados.length) {
         contenedor.innerHTML = `<div class="text-muted small">Sin botas seleccionadas.</div>`;
         return;

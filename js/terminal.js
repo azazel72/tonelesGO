@@ -52,6 +52,7 @@ document.addEventListener("DOMContentLoaded", function () {
     prepararEventosProcesarStock();
     prepararEventosAmbientes();
     prepararEventosBotasDiarias?.();
+    prepararEventosBuscarBotas?.();
 
     // Muestra la sección de tareas al cargar la página
     mostrarSeccion("vista_tareas");
@@ -121,6 +122,9 @@ function mostrarSeccion(id) {
         }
         if (id === "vista_botas_diarias") {
             cargarVistaBotasDiarias?.();
+        }
+        if (id === "vista_buscar_botas") {
+            cargarVistaBuscarBotas?.();
         }
         if (id === "vista_destino") {
             cargarVistaDestino?.();
@@ -342,6 +346,12 @@ function actualizarMigasPan(mostrarSeccion) {
             nuevaMiga = crearMigaPan("Botas diarias", mostrarSeccion, true);
             migasPan.appendChild(nuevaMiga);
             break;
+        case "vista_buscar_botas":
+            nuevaMiga = crearMigaPan("Inicio", "vista_tareas", false);
+            migasPan.appendChild(nuevaMiga);
+            nuevaMiga = crearMigaPan("Buscar botas", mostrarSeccion, true);
+            migasPan.appendChild(nuevaMiga);
+            break;
     }
 }
 
@@ -493,6 +503,7 @@ var ACCIONES = {
             || pantallaActual === "vista_mover_stock"
             || pantallaActual === "vista_procesar_stock"
             || pantallaActual === "vista_botas_diarias"
+            || pantallaActual === "vista_buscar_botas"
             || pantallaActual === "vista_analiticas"
             || pantallaActual === "vista_envinado"
         ) {
@@ -516,6 +527,9 @@ var ACCIONES = {
             }
             if (pantallaActual === "vista_botas_diarias") {
                 refrescarBotasDiariasDesdeServidor?.(msg.data || {});
+            }
+            if (pantallaActual === "vista_buscar_botas") {
+                refrescarBuscarBotasDesdeServidor?.(msg.data || {});
             }
             if (pantallaActual === "vista_analiticas") {
                 cargarVistaAnaliticas?.(true);

@@ -1,3 +1,55 @@
+function reproducirFeedbackCodigo(tipo) {
+    try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!AudioCtx) return;
+        const ctx = reproducirFeedbackCodigo.ctx || new AudioCtx();
+        reproducirFeedbackCodigo.ctx = ctx;
+        const ahora = ctx.currentTime;
+        const correcto = tipo === "ok";
+        const crearPulso = (inicio, frecuencia, duracion, volumen) => {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = "sine";
+            osc.frequency.setValueAtTime(frecuencia, inicio);
+            gain.gain.setValueAtTime(0.0001, inicio);
+            gain.gain.exponentialRampToValueAtTime(volumen, inicio + 0.01);
+            gain.gain.exponentialRampToValueAtTime(0.0001, inicio + duracion);
+            osc.connect(gain);
+            gain.connect(ctx.destination);
+            osc.start(inicio);
+            osc.stop(inicio + duracion + 0.01);
+        };
+        if (!correcto) {
+            crearPulso(ahora, 220, 0.11, 0.22);
+            crearPulso(ahora + 0.16, 220, 0.11, 0.22);
+            crearPulso(ahora + 0.32, 220, 0.11, 0.22);
+            return;
+        }
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = "sine";
+        osc.frequency.setValueAtTime(880, ahora);
+        osc.frequency.exponentialRampToValueAtTime(1174, ahora + 0.08);
+        gain.gain.setValueAtTime(0.0001, ahora);
+        gain.gain.exponentialRampToValueAtTime(0.14, ahora + 0.01);
+        gain.gain.exponentialRampToValueAtTime(0.0001, ahora + 0.12);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(ahora);
+        osc.stop(ahora + 0.13);
+    } catch (err) {
+        console.warn("No se pudo reproducir feedback sonoro:", err);
+    }
+}
+
+function reproducirCodigoCorrecto() {
+    reproducirFeedbackCodigo("ok");
+}
+
+function reproducirCodigoError() {
+    reproducirFeedbackCodigo("error");
+}
+
 async function cargarVistaProductosPorFiltros(config) {
     const lista = document.getElementById(config.listaId);
     const resumen = document.getElementById(config.resumenId);
@@ -110,7 +162,7 @@ function renderizarVistaProductosPorPedido(config) {
                 <div class="destino-pedido-resumen-main">
                     <strong>${escapeHtmlDestinoProductos(grupo.pedidoNumero)}</strong>
                     <span>${escapeHtmlDestinoProductos(grupo.cliente)}</span>
-                    ${mostrarDestinoPedido ? `<span class="destino-pedido-destino">${escapeHtmlDestinoProductos(grupo.pedidoDestino || "Sin destino")}</span>` : ""}
+                    ${mostrarDestinoPedido ? `<span class="destino-pedido-destino">${escapeHtmlDestinoProductos(obtenerTextoDestinoPedido(grupo.pedidoDestino))}</span>` : ""}
                 </div>
                 <div class="destino-pedido-resumen-lateral">
                     <div class="destino-pedido-resumen-total">${grupo.codigos.length} botas</div>
@@ -128,6 +180,13 @@ function renderizarVistaProductosPorPedido(config) {
     `).join("");
 
     resumen.textContent = `${items.length} ${etiqueta}`;
+}
+
+function obtenerTextoDestinoPedido(destino) {
+    const valor = String(destino || "").trim().toUpperCase();
+    if (valor === "E" || valor === "ENVINADO") return "Envinar";
+    if (valor === "C" || valor === "CLIENTE") return "Cliente";
+    return String(destino || "Sin destino");
 }
 
 function renderizarCardProductoDestino(item) {

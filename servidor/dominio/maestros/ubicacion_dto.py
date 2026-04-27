@@ -13,7 +13,7 @@ class UbicacionDTO(BaseModel):
             id=ubicacion_db.id,
             descripcion=ubicacion_db.descripcion,
             instalacion_id=ubicacion_db.instalacion_id,
-            orden=ubicacion_db.orden
+            orden=int(getattr(ubicacion_db, "orden", 0) or 0)
         )
     
     def to_db(self) -> UbicacionDB:

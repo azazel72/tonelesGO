@@ -175,16 +175,19 @@ function agregarCodigoPendienteEnvinado(codigoRaw) {
     if (!codigo) return;
     if (!estadoVistaEnvinado.pendientes.some((item) => String(item.codigo || "") === codigo)) {
         if (input) input.value = "";
+        reproducirCodigoError();
         mostrarErrorEnvinado(`Código ${codigo}: no está pendiente de envinar.`);
         return;
     }
     if (estadoVistaEnvinado.codigosPendientesSeleccionados.includes(codigo)) {
         if (input) input.value = "";
+        reproducirCodigoError();
         mostrarErrorEnvinado(`Código ${codigo}: ya está agregado.`);
         return;
     }
     estadoVistaEnvinado.codigosPendientesSeleccionados.push(codigo);
     if (input) input.value = "";
+    reproducirCodigoCorrecto();
     mostrarErrorEnvinado("");
     renderizarCodigosPendientesEnvinado();
 }
