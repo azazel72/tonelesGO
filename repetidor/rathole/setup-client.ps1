@@ -96,20 +96,31 @@ function Install-ScheduledTask {
 Ensure-Admin
 Enable-Tls12
 
-New-Item -ItemType Directory -Path $InstallDir -Force | Out-Null
+# Verificar si Rathole ya está instalado
+if (Test-Path -Path (Join-Path $InstallDir "rathole.exe")) {
+    Write-Status "Rathole ya está instalado. Omitiendo descarga."
+    $exePath = Join-Path $InstallDir "rathole.exe"
+} else {
+    New-Item -ItemType Directory -Path $InstallDir -Force | Out-Null
+    $exePath = Download-Rathole -TargetDir $InstallDir
+}
 
-$exePath = Download-Rathole -TargetDir $InstallDir
-$configPath = Write-ClientConfig -TargetDir $InstallDir -Host $VpsHost -RemotePort $TunnelPort -Port $LocalPort -Secret $Token
-
-Write-Status "Configuracion creada en $configPath"
-Get-Content -LiteralPath $configPath
+# Verificar si el archivo de configuración ya existe
+if (Test-Path -Path (Join-Path $InstallDir "client.toml")) {
+    Write-Status "El archivo de configuración ya existe. Omitiendo creación."
+    $configPath = Join-Path $InstallDir "client.toml"
+} else {
+    $configPath = Write-ClientConfig -TargetDir $InstallDir -Host $VpsHost -RemotePort $TunnelPort -Port $LocalPort -Secret $Token
+    Write-Status "Configuración creada en $configPath"
+    Get-Content -LiteralPath $configPath
+}
 
 if ($CreateScheduledTask) {
-    Write-Status "Creando tarea automatica de Windows..."
+    Write-Status "Creando tarea automática de Windows..."
     Install-ScheduledTask -ExePath $exePath -ConfigPath $configPath
     Write-Status "Tarea creada: RatholeClient"
 } else {
-    Write-Status "No se ha creado tarea automatica."
+    Write-Status "No se ha creado tarea automática."
 }
 
 Write-Status "Prueba manual:"
