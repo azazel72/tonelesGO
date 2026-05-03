@@ -22,6 +22,7 @@ function Write-Status {
 function Ensure-Admin {
     $identity = [Security.Principal.WindowsIdentity]::GetCurrent()
     $principal = New-Object Security.Principal.WindowsPrincipal($identity)
+
     if (-not $principal.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)) {
         throw "Ejecuta este script en PowerShell como administrador."
     }
@@ -59,7 +60,7 @@ function Download-Rathole {
 function Write-ClientConfig {
     param(
         [string]$TargetDir,
-        [string]$Host,
+        [string]$VpsAddress,
         [int]$RemotePort,
         [int]$WsPort,
         [string]$WsSecret,
@@ -71,15 +72,15 @@ function Write-ClientConfig {
 
 @"
 [client]
-remote_addr = "$Host`:$RemotePort"
+remote_addr = "$($VpsAddress):$($RemotePort)"
 
 [client.services.ws5001]
 token = "$WsSecret"
-local_addr = "127.0.0.1`:$WsPort"
+local_addr = "127.0.0.1:$($WsPort)"
 
 [client.services.http8080]
 token = "$HttpSecret"
-local_addr = "127.0.0.1`:$HttpPort"
+local_addr = "127.0.0.1:$($HttpPort)"
 "@ | Set-Content -LiteralPath $configPath -Encoding ASCII
 
     return $configPath
@@ -99,9 +100,16 @@ function Install-ScheduledTask {
         Unregister-ScheduledTask -TaskName $taskName -Confirm:$false
     }
 
-    $action = New-ScheduledTaskAction -Execute $ExePath -Argument "`"$ConfigPath`""
+    $action = New-ScheduledTaskAction `
+        -Execute $ExePath `
+        -Argument "`"$ConfigPath`""
+
     $trigger = New-ScheduledTaskTrigger -AtStartup
-    $principal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
+
+    $principal = New-ScheduledTaskPrincipal `
+        -UserId "SYSTEM" `
+        -LogonType ServiceAccount `
+        -RunLevel Highest
 
     $settings = New-ScheduledTaskSettingsSet `
         -AllowStartIfOnBatteries `
@@ -125,16 +133,17 @@ Enable-Tls12
 
 New-Item -ItemType Directory -Path $InstallDir -Force | Out-Null
 
-if (Test-Path -Path (Join-Path $InstallDir "rathole.exe")) {
+$exePath = Join-Path $InstallDir "rathole.exe"
+
+if (Test-Path -Path $exePath) {
     Write-Status "Rathole ya está instalado. Omitiendo descarga."
-    $exePath = Join-Path $InstallDir "rathole.exe"
 } else {
     $exePath = Download-Rathole -TargetDir $InstallDir
 }
 
 $configPath = Write-ClientConfig `
     -TargetDir $InstallDir `
-    -Host $VpsHost `
+    -VpsAddress $VpsHost `
     -RemotePort $TunnelPort `
     -WsPort $WsLocalPort `
     -WsSecret $WsToken `
@@ -145,7 +154,7 @@ Write-Status "Configuración creada/actualizada en $configPath"
 Get-Content -LiteralPath $configPath
 
 if ($CreateScheduledTask) {
-    Write-Status "Creando tarea automática de Windows..."
+    Write-Status "Creando/reiniciando tarea automática de Windows..."
     Install-ScheduledTask -ExePath $exePath -ConfigPath $configPath
     Write-Status "Tarea creada/reiniciada: RatholeClient"
 } else {
