@@ -1,0 +1,10 @@
+[client]
+remote_addr = "212.227.228.46:2333"
+
+[client.services.ws5001]
+token = "a8f3c9e7d4b6f1a2e3c4d5b7a9f8e6c3"
+local_addr = "127.0.0.1:5001"
+
+[client.services.http8080]
+token = "b7e6c3a9f8d5b4c2a1f3e7d6c8b9a4f2"
+local_addr = "127.0.0.1:8080"

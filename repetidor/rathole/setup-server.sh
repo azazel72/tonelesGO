@@ -2,8 +2,13 @@
 set -euo pipefail
 
 VPS_BIND_PORT="${VPS_BIND_PORT:-2333}"
-PUBLIC_PORT="${PUBLIC_PORT:-5001}"
-TOKEN="${TOKEN:-8f2d6b41c9a74f2bb03f0b8e5c4d91aa}"
+
+WS_PUBLIC_PORT="${WS_PUBLIC_PORT:-5001}"
+WS_TOKEN="${WS_TOKEN:-a8f3c9e7d4b6f1a2e3c4d5b7a9f8e6c3}"
+
+HTTP_PUBLIC_PORT="${HTTP_PUBLIC_PORT:-8080}"
+HTTP_TOKEN="${HTTP_TOKEN:-b7e6c3a9f8d5b4c2a1f3e7d6c8b9a4f2}"
+
 INSTALL_DIR="${INSTALL_DIR:-/opt/rathole}"
 CONFIG_DIR="${CONFIG_DIR:-/etc/rathole}"
 SERVICE_NAME="${SERVICE_NAME:-rathole-server}"
@@ -54,13 +59,19 @@ download_rathole() {
 }
 
 write_config() {
+  mkdir -p "${CONFIG_DIR}"
+
   cat > "${CONFIG_DIR}/server.toml" <<EOF
 [server]
 bind_addr = "0.0.0.0:${VPS_BIND_PORT}"
 
 [server.services.ws5001]
-token = "${TOKEN}"
-bind_addr = "0.0.0.0:${PUBLIC_PORT}"
+token = "${WS_TOKEN}"
+bind_addr = "0.0.0.0:${WS_PUBLIC_PORT}"
+
+[server.services.http8080]
+token = "${HTTP_TOKEN}"
+bind_addr = "0.0.0.0:${HTTP_PUBLIC_PORT}"
 EOF
 }
 
@@ -85,13 +96,15 @@ configure_ufw() {
   if command -v ufw >/dev/null 2>&1; then
     log "Abriendo puertos en ufw..."
     ufw allow "${VPS_BIND_PORT}/tcp"
-    ufw allow "${PUBLIC_PORT}/tcp"
+    ufw allow "${WS_PUBLIC_PORT}/tcp"
+    ufw allow "${HTTP_PUBLIC_PORT}/tcp"
   fi
 }
 
 start_service() {
   systemctl daemon-reload
-  systemctl enable --now "${SERVICE_NAME}"
+  systemctl enable "${SERVICE_NAME}"
+  systemctl restart "${SERVICE_NAME}"
   systemctl status "${SERVICE_NAME}" --no-pager || true
 }
 

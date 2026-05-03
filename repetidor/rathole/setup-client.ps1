@@ -1,8 +1,13 @@
 param(
     [string]$VpsHost = "212.227.228.46",
     [int]$TunnelPort = 2333,
-    [int]$LocalPort = 5001,
-    [string]$Token = "8f2d6b41c9a74f2bb03f0b8e5c4d91aa",
+
+    [int]$WsLocalPort = 5001,
+    [string]$WsToken = "a8f3c9e7d4b6f1a2e3c4d5b7a9f8e6c3",
+
+    [int]$HttpLocalPort = 8080,
+    [string]$HttpToken = "b7e6c3a9f8d5b4c2a1f3e7d6c8b9a4f2",
+
     [string]$InstallDir = "C:\rathole",
     [switch]$CreateScheduledTask
 )
@@ -56,18 +61,25 @@ function Write-ClientConfig {
         [string]$TargetDir,
         [string]$Host,
         [int]$RemotePort,
-        [int]$Port,
-        [string]$Secret
+        [int]$WsPort,
+        [string]$WsSecret,
+        [int]$HttpPort,
+        [string]$HttpSecret
     )
 
     $configPath = Join-Path $TargetDir "client.toml"
-    @"
+
+@"
 [client]
 remote_addr = "$Host`:$RemotePort"
 
-[client.services.ws5000]
-token = "$Secret"
-local_addr = "127.0.0.1`:$Port"
+[client.services.ws5001]
+token = "$WsSecret"
+local_addr = "127.0.0.1`:$WsPort"
+
+[client.services.http8080]
+token = "$HttpSecret"
+local_addr = "127.0.0.1`:$HttpPort"
 "@ | Set-Content -LiteralPath $configPath -Encoding ASCII
 
     return $configPath
@@ -80,45 +92,62 @@ function Install-ScheduledTask {
     )
 
     $taskName = "RatholeClient"
+
     $existing = Get-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue
     if ($existing) {
+        Stop-ScheduledTask -TaskName $taskName -ErrorAction SilentlyContinue
         Unregister-ScheduledTask -TaskName $taskName -Confirm:$false
     }
 
-    $action = New-ScheduledTaskAction -Execute $ExePath -Argument $ConfigPath
+    $action = New-ScheduledTaskAction -Execute $ExePath -Argument "`"$ConfigPath`""
     $trigger = New-ScheduledTaskTrigger -AtStartup
     $principal = New-ScheduledTaskPrincipal -UserId "SYSTEM" -LogonType ServiceAccount -RunLevel Highest
 
-    Register-ScheduledTask -TaskName $taskName -Action $action -Trigger $trigger -Principal $principal | Out-Null
+    $settings = New-ScheduledTaskSettingsSet `
+        -AllowStartIfOnBatteries `
+        -DontStopIfGoingOnBatteries `
+        -StartWhenAvailable `
+        -RestartCount 999 `
+        -RestartInterval (New-TimeSpan -Minutes 1)
+
+    Register-ScheduledTask `
+        -TaskName $taskName `
+        -Action $action `
+        -Trigger $trigger `
+        -Principal $principal `
+        -Settings $settings | Out-Null
+
     Start-ScheduledTask -TaskName $taskName
 }
 
 Ensure-Admin
 Enable-Tls12
 
-# Verificar si Rathole ya está instalado
+New-Item -ItemType Directory -Path $InstallDir -Force | Out-Null
+
 if (Test-Path -Path (Join-Path $InstallDir "rathole.exe")) {
     Write-Status "Rathole ya está instalado. Omitiendo descarga."
     $exePath = Join-Path $InstallDir "rathole.exe"
 } else {
-    New-Item -ItemType Directory -Path $InstallDir -Force | Out-Null
     $exePath = Download-Rathole -TargetDir $InstallDir
 }
 
-# Verificar si el archivo de configuración ya existe
-if (Test-Path -Path (Join-Path $InstallDir "client.toml")) {
-    Write-Status "El archivo de configuración ya existe. Omitiendo creación."
-    $configPath = Join-Path $InstallDir "client.toml"
-} else {
-    $configPath = Write-ClientConfig -TargetDir $InstallDir -Host $VpsHost -RemotePort $TunnelPort -Port $LocalPort -Secret $Token
-    Write-Status "Configuración creada en $configPath"
-    Get-Content -LiteralPath $configPath
-}
+$configPath = Write-ClientConfig `
+    -TargetDir $InstallDir `
+    -Host $VpsHost `
+    -RemotePort $TunnelPort `
+    -WsPort $WsLocalPort `
+    -WsSecret $WsToken `
+    -HttpPort $HttpLocalPort `
+    -HttpSecret $HttpToken
+
+Write-Status "Configuración creada/actualizada en $configPath"
+Get-Content -LiteralPath $configPath
 
 if ($CreateScheduledTask) {
     Write-Status "Creando tarea automática de Windows..."
     Install-ScheduledTask -ExePath $exePath -ConfigPath $configPath
-    Write-Status "Tarea creada: RatholeClient"
+    Write-Status "Tarea creada/reiniciada: RatholeClient"
 } else {
     Write-Status "No se ha creado tarea automática."
 }
