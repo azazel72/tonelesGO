@@ -1,0 +1,1 @@
+python -m nuitka --standalone --python-flag=-m --include-module=servidor.main --output-dir=C:\xampp\htdocs\PaezLobatoServidor servidor

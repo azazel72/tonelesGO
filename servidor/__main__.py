@@ -1,6 +1,5 @@
+from servidor.main import app
 import uvicorn
 
-
 if __name__ == "__main__":
-    uvicorn.run("servidor.main:app", host="0.0.0.0", port=5001, reload=True)
-    
+    uvicorn.run(app, host="0.0.0.0", port=5001, reload=False)

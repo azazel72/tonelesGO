@@ -479,6 +479,12 @@ function routeMessage(data) {
         }
         }
         if (msg.error) {
+            if (msg.action === "login") {
+                setFeedback?.("Usuario o clave incorrectos.", true);
+                mostrarLogin?.();
+                console.error("Error login servidor:", msg.error, msg);
+                return;
+            }
             console.error("Error servidor:", msg.error, msg);
             alert(msg.error);
             return;
@@ -493,7 +499,7 @@ var ACCIONES = {
     "default": (msg) => {
         console.warn("Acción no manejada:", msg);
     },
-    "login": console.log,
+    "login": respuesta_login,
     "fabricacion_actualizar": (msg) => {
         if (
             pantallaActual === "vista_fabricacion"

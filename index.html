@@ -1136,7 +1136,7 @@
                         <div class="card shadow-sm">
                             <div class="card-header d-flex justify-content-between align-items-center gap-2">
                                 <div>
-                                    <h6 class="mb-0">Analiticas registradas</h6>
+                                    <h6 class="mb-0">Analiticas registradas </h6>
                                     <div class="small text-muted">Activas y finalizadas.</div>
                                 </div>
                                 <button type="button" class="btn btn-outline-secondary btn-sm" id="analiticas-recargar">
@@ -1320,22 +1320,23 @@
         <p class="mb-0 small text-muted">Versión v2.1.5</p>
     </footer>
 
-    <div id="login-overlay"class="overlay d-none">
+    <div id="login-overlay" class="overlay">
         <div class="login-box ws--connecting" id="login-box">
             <div class="ws-status">
                 <span class="ws-dot"></span><span id="ws-text">Conectando…</span>
             </div>
 
             <h2>Iniciar sesión</h2>
-            <div id="login-form" autocomplete="off">
-                <label for="user">Usuario</label>
-                <input id="user" name="user" type="text" disabled required>
+            <form id="login-form" autocomplete="off">
+                <label for="username">Usuario</label>
+                <input id="username" name="username" type="text" required>
 
-                <label for="pass">Clave</label>
-                <input id="pass" name="pass" type="password" disabled required>
+                <label for="password">Clave</label>
+                <input id="password" name="password" type="password" required>
 
-                <button type="button" id="login-button" class="btn btn-primary" data-action="login" disabled>Enviar</button>
-            </div>
+                <button type="button" id="login-button" class="btn btn-primary">Enviar</button>
+                <p id="login-feedback" class="login-feedback" aria-live="polite"></p>
+            </form>
         </div>
     </div>
 
@@ -1343,7 +1344,8 @@
     <script src="./static/js/bootstrap.bundle.min.js?v=20260428a"></script>
     <script src="./js/constantes.js?v=20260428a"></script>
     <script src="./js/conexiones.js?v=20260428a"></script>
-    <script src="./js/gestion-auth.js?v=20260428a"></script>
+    <script src="./js/shared-auth-token.js?v=20260428a"></script>
+    <script src="./js/terminal-auth.js?v=20260428a"></script>
     <script src="./js/terminal-recepcion.js?v=20260428a"></script>
     <script src="./js/terminal-consumo.js?v=20260428a"></script>
     <script src="./js/terminal-fabricacion.js?v=20260428a"></script>
@@ -1364,4 +1366,3 @@
 </body>
 
 </html>
-
