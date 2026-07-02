@@ -11,6 +11,7 @@ from servidor.logica.acciones import obtener_acciones
 from servidor.conexiones.request_message import RequestMessage
 from servidor.conexiones.response_message import ResponseMessage
 from servidor.conexiones.broadcast import set_registry, broadcast_error
+from servidor.conexiones.sesiones import Sesiones
 
 logger = logging.getLogger("paezlobato_crud_routes")
 
@@ -71,7 +72,12 @@ class CrudRoutes:
 
             clients.add(ws)
             client_state[ws] = {"pantalla": None, "contexto": {}}
-            await ws.send_json(ResponseMessage.ok("login", Colector.colector.maestros.usuarios.get(1)).model_dump())
+            token = ws.query_params.get("token")
+            if token:
+                sesion = Sesiones.vincular_ws(token, ws)
+                if sesion is not None:
+                    payload = Sesiones.exportar_payload(sesion)
+                    await ws.send_json(ResponseMessage.ok("login", payload).model_dump())
 
             try:
                 while True:
@@ -88,6 +94,7 @@ class CrudRoutes:
             except WebSocketDisconnect:
                 clients.discard(ws)
                 client_state.pop(ws, None)
+                Sesiones.liberar_ws(ws)
 
         # =======================
         # Broadcast común

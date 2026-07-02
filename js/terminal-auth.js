@@ -85,6 +85,14 @@ function setFeedback(texto, isError = false) {
 function enviarLogin() {
     const usuario = userInput.value.trim();
     const clave = passInput.value.trim();
+    const ws = conn && conn.socket;
+
+    if (!ws || ws.readyState !== WebSocket.OPEN) {
+        mostrarLogin();
+        mostrarDesconectado();
+        setFeedback("No hay conexión con el servidor. Espera a la reconexión.", true);
+        return;
+    }
 
     if (!usuario || !clave) {
         setFeedback("Introduce usuario y clave.", true);
@@ -119,6 +127,13 @@ function respuesta_login(response) {
 
 if (form) {
     form.addEventListener("submit", (event) => {
+        event.preventDefault();
+        enviarLogin();
+    });
+}
+
+if (loginButton) {
+    loginButton.addEventListener("click", (event) => {
         event.preventDefault();
         enviarLogin();
     });

@@ -34,6 +34,14 @@ async function GET(url) {
 
 const genId = () => (crypto?.randomUUID?.() ?? Math.random().toString(36).slice(2));
 
+function construirWsUrl(urlBase) {
+  const token = window.SharedAuthToken?.getToken?.();
+  if (!token) return urlBase;
+
+  const separador = urlBase.includes("?") ? "&" : "?";
+  return `${urlBase}${separador}token=${encodeURIComponent(token)}`;
+}
+
 function conectar(url, { onOpen, onClose, onMessage, maxDelayMs = 15000 } = {}) {
   let ws, backoff = 500, closedByUser = false;
 
@@ -41,7 +49,7 @@ function conectar(url, { onOpen, onClose, onMessage, maxDelayMs = 15000 } = {}) 
 
     setWsState('connecting');
 
-    ws = new WebSocket(url);
+    ws = new WebSocket(construirWsUrl(url));
 
     ws.onopen = () => {
       backoff = 500;
