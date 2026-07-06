@@ -8,7 +8,7 @@
         content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <link rel="stylesheet" href="./static/css/bootstrap.min.css?v=20260428a" />
     <link rel="stylesheet" href="./static/font/bootstrap-icons.css?v=20260428a">
-    <link rel="stylesheet" href="./css/app.css?v=20260428a" />
+    <link rel="stylesheet" href="./css/app.css?v=20260706f" />
     <link rel="stylesheet" href="./css/tareas.css?v=20260428a" />
     <link rel="stylesheet" href="./css/recepcion.css?v=20260428a" />
     <link rel="stylesheet" href="./css/paneles-fijos.css?v=20260428a" />
@@ -38,6 +38,13 @@
                 </div>
                 <div class="offcanvas-body">
                     <div class="offcanvas-menu">
+                        <button id="btn-logout" class="btn btn-sm btn-outline-warning w-100 text-start" type="button">
+                            <span class="navbar-text me-2">
+                                <i class="bi bi-person-circle me-1"></i> <span id="nav-username">Usuario</span>
+                            </span>
+                            <i class="bi bi-box-arrow-right float-end mt-1"></i>
+                        </button>
+
                         <button class="offcanvas-nav-btn" mostrar="vista_tareas" data-bs-dismiss="offcanvas">
                             Inicio
                         </button>
@@ -1328,8 +1335,14 @@
 
             <h2>Iniciar sesión</h2>
             <form id="login-form" autocomplete="off">
-                <label for="username">Usuario</label>
-                <input id="username" name="username" type="text" required>
+                <div class="login-user-title">
+                    <label for="username">Usuario</label>
+                    <a href="#" id="username-aliases-toggle" class="login-aliases-toggle-link" aria-expanded="false">(Ver alias)</a>
+                </div>
+                <div class="login-user-row">
+                    <input id="username" name="username" type="text" required>
+                </div>
+                <div id="username-aliases" class="login-aliases-list" hidden></div>
 
                 <label for="password">Clave</label>
                 <input id="password" name="password" type="password" required>
@@ -1345,7 +1358,7 @@
     <script src="./js/constantes.js?v=20260702a"></script>
     <script src="./js/conexiones.js?v=20260702a"></script>
     <script src="./js/shared-auth-token.js?v=20260702a"></script>
-    <script src="./js/terminal-auth.js?v=20260702a"></script>
+    <script src="./js/terminal-auth.js?v=20260706e"></script>
     <script src="./js/terminal-recepcion.js?v=20260702a"></script>
     <script src="./js/terminal-consumo.js?v=20260702a"></script>
     <script src="./js/terminal-fabricacion.js?v=20260702a"></script>
@@ -1361,7 +1374,7 @@
     <script src="./js/terminal-ambientes.js?v=20260702a"></script>
     <script src="./js/terminal-botas-diarias.js?v=20260702a"></script>
     <script src="./js/terminal-buscar-botas.js?v=20260702a"></script>
-    <script src="./js/terminal.js?v=20260702a"></script>
+    <script src="./js/terminal.js?v=20260706c"></script>
 
 </body>
 

@@ -35,6 +35,14 @@ main {
     /* invierte los colores (blanco ↔ negro)  invert(1) hue-rotate(180deg); */
 }
 
+button#btn-logout span * {
+    color: rgba(255,255,255,.5);
+}
+
+button#btn-logout:hover span * {
+    color: black;
+}
+
 section {
     display: none;
     overflow: auto;
@@ -167,6 +175,88 @@ section.pagina-activa {
 .login-box input:focus {
     border-color: #4f8cff;
     box-shadow: 0 0 0 3px rgba(79, 140, 255, 0.15);
+}
+
+.login-user-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 10px 0 6px;
+}
+
+.login-user-title label {
+    margin: 0;
+}
+
+.login-user-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.login-user-row input {
+    flex: 1 1 auto;
+    min-width: 0;
+}
+
+.login-aliases-toggle {
+    flex: 0 0 auto;
+    margin-top: 0;
+    width: auto;
+    white-space: nowrap;
+}
+
+.login-aliases-toggle-link {
+    appearance: none;
+    border: 0;
+    background: transparent;
+    padding: 0;
+    margin: 0;
+    color: #9fb0c4;
+    font-size: 12px;
+    font-weight: 600;
+    text-decoration: underline;
+    cursor: pointer;
+}
+
+.login-aliases-toggle-link:hover {
+    color: #e8eef6;
+}
+
+.login-aliases-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 8px;
+    max-height: 132px;
+    overflow: auto;
+    padding: 8px;
+    border: 1px solid #2a3240;
+    border-radius: 10px;
+    background: #0c0f13;
+}
+
+.login-alias-pill {
+    appearance: none;
+    border: 1px solid #384253;
+    background: #17202d;
+    color: #e8eef6;
+    border-radius: 999px;
+    padding: 6px 10px;
+    font-size: 13px;
+    line-height: 1;
+    cursor: pointer;
+    transition: transform 0.12s ease, border-color 0.12s ease, background-color 0.12s ease;
+}
+
+.login-alias-pill:hover {
+    transform: translateY(-1px);
+    border-color: #4f8cff;
+    background: #1d2a3b;
+}
+
+.login-aliases-list:empty {
+    display: none;
 }
 
 .login-box button {

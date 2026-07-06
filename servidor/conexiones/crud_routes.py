@@ -8,6 +8,7 @@ from pydantic import ValidationError
 
 from servidor.colector import Colector
 from servidor.logica.acciones import obtener_acciones
+from servidor.logica.autorizacion import requiere_autenticacion, tiene_permiso_para_accion
 from servidor.conexiones.request_message import RequestMessage
 from servidor.conexiones.response_message import ResponseMessage
 from servidor.conexiones.broadcast import set_registry, broadcast_error
@@ -143,6 +144,16 @@ class CrudRoutes:
                     safe_data = jsonable_encoder(rm)
                     await ws.send_json(safe_data)
                     return
+
+                sesion = Sesiones.obtener_por_ws(ws)
+                if requiere_autenticacion(msg.action) and sesion is None:
+                    await ws.send_json(ResponseMessage.fail(msg.action, "unauthorized", msg.request_id).model_dump())
+                    return
+
+                if requiere_autenticacion(msg.action) and not tiene_permiso_para_accion(sesion, msg.action):
+                    await ws.send_json(ResponseMessage.fail(msg.action, "forbidden", msg.request_id).model_dump())
+                    return
+
                 handler = ACCIONES.get(msg.action)
                 if handler:
                     print("datos recibidos", msg.data)

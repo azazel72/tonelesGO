@@ -3,10 +3,23 @@ from typing import Dict
 from servidor.colector import Colector
 from servidor.logica.login import cerrar_sesion, iniciar_sesion
 
+
+def listar_aliases_usuarios(ws, req):
+    usuarios = (Colector.colector.maestros.usuarios or {}) if Colector.colector and Colector.colector.maestros else {}
+    alias_unicos: set[str] = set()
+
+    for usuario in usuarios.values():
+        alias = (getattr(usuario, "alias", "") or "").strip()
+        if alias:
+            alias_unicos.add(alias)
+
+    return sorted(alias_unicos, key=str.casefold)
+
 def obtener_acciones() -> Dict[str, any]:
     return {
         "login": iniciar_sesion,
         "logout": cerrar_sesion,
+        "lista_aliases_usuarios": listar_aliases_usuarios,
         "maestros": lambda ws, req: Colector.colector.maestros,
         "fabricacion": lambda ws, req: Colector.colector.obtener_fabricacion(),
         "cargar_planificacion_entradas": lambda ws, req: Colector.colector.obtener_planificacion_entradas(req.data.get("año")),
@@ -34,7 +47,6 @@ def obtener_acciones() -> Dict[str, any]:
         "reasignar_consumo_negativo_cierre": lambda ws, req: Colector.colector.reasignar_consumo_negativo_cierre(req.data or {}),
         "crear_palet_procesado_desde_cierre": lambda ws, req: Colector.colector.crear_palet_procesado_desde_cierre(req.data or {}),
         "cerrar_fabricacion_semanal": lambda ws, req: Colector.colector.cerrar_fabricacion_semanal(req.data or {}),
-        "listar_palets_consumo": lambda ws, req: Colector.colector.listar_palets_consumo(),
         "listar_palets_consumo": lambda ws, req: Colector.colector.listar_palets_consumo(),
         "listar_cubicaje": lambda ws, req: Colector.colector.listar_cubicaje(),
         "obtener_contexto_consumo": lambda ws, req: Colector.colector.obtener_contexto_consumo(req.data),

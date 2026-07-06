@@ -23,17 +23,26 @@ def __iniciar_sesion(ws, username: str, password: str) -> dict | None:
     # if usuario and __verificar_contraseña(password, usuario.clave):
     #     return usuario
     # return None
-    usuario: UsuarioDTO | None = Colector.colector.maestros.buscar_usuario_por_username(username)
-    if usuario:
-        sesion = Sesiones.crear_sesion(usuario, ws=ws)
-        return Sesiones.exportar_payload(sesion)
-
-    usuario = next(iter((Colector.colector.maestros.usuarios or {}).values()), None)
+    usuario = __obtener_usuario_pruebas()
     if usuario is None:
         return None
 
     sesion = Sesiones.crear_sesion(usuario, ws=ws)
     return Sesiones.exportar_payload(sesion)
+
+
+def __obtener_usuario_pruebas() -> UsuarioDTO | None:
+    usuarios = list((Colector.colector.maestros.usuarios or {}).values())
+    if not usuarios:
+        return None
+
+    roles = Colector.colector.maestros.roles or {}
+    for usuario in usuarios:
+        rol = roles.get(usuario.rol_id) if usuario.rol_id is not None else None
+        if rol and getattr(rol, "administrador", False):
+            return usuario
+
+    return usuarios[0]
 
 def __verificar_contraseña(password: str, password_hash: str) -> bool:
     return BcryptHelper.verify_password(password or "", password_hash or "")

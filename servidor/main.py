@@ -1,5 +1,6 @@
 # app/main.py
 from datetime import datetime
+import os
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
 from fastapi.middleware.cors import CORSMiddleware
@@ -35,10 +36,26 @@ async def lifespan(app: FastAPI):
 
 app = FastAPI(lifespan=lifespan, title="Servidor FastAPI con CRUD + WebSocket", version="1.0.0")
 
+
+def obtener_allow_origins() -> list[str]:
+    raw = (os.getenv("PAEZLOBATO_ALLOW_ORIGINS") or "").strip()
+    if raw == "*":
+        return ["*"]
+    if raw:
+        return [item.strip() for item in raw.split(",") if item.strip()]
+    return [
+        "http://localhost",
+        "http://127.0.0.1",
+        "http://localhost:80",
+        "http://127.0.0.1:80",
+        "https://localhost",
+        "https://127.0.0.1",
+    ]
+
 # Middleware CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=obtener_allow_origins(),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

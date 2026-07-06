@@ -500,6 +500,8 @@ var ACCIONES = {
         console.warn("Acción no manejada:", msg);
     },
     "login": respuesta_login,
+    "logout": () => {},
+    "set_pantalla": () => {},
     "fabricacion_actualizar": (msg) => {
         if (
             pantallaActual === "vista_fabricacion"

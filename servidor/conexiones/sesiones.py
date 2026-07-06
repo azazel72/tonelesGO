@@ -2,6 +2,7 @@ from fastapi import WebSocket
 from datetime import datetime, timedelta, timezone
 import secrets
 
+from servidor.colector import Colector
 from servidor.dominio.maestros.usuario_dto import UsuarioDTO
 
 
@@ -78,7 +79,20 @@ class Sesiones:
         payload["access_token"] = sesion.sesion_id
         payload["token"] = sesion.sesion_id
         payload["token_expires_at"] = sesion.fecha_expiracion.isoformat() if sesion.fecha_expiracion else None
+        payload["aliases"] = cls.obtener_aliases_usuarios()
         return payload
+
+    @classmethod
+    def obtener_aliases_usuarios(cls) -> list[str]:
+        usuarios = (Colector.colector.maestros.usuarios or {}) if Colector.colector and Colector.colector.maestros else {}
+        alias_unicos: set[str] = set()
+
+        for usuario in usuarios.values():
+            alias = (getattr(usuario, "alias", "") or "").strip()
+            if alias:
+                alias_unicos.add(alias)
+
+        return sorted(alias_unicos, key=str.casefold)
 
 
 class Sesion:
