@@ -115,14 +115,18 @@ class Colector:
 
     def _campos_analitica(self) -> list[dict]:
         return [
-            {"clave": "grado_alcoholico", "etiqueta": "Grado alcoholico", "unidad": "% vol"},
+            {"clave": "deposito", "etiqueta": "Depósito", "unidad": ""},
+            {"clave": "litros", "etiqueta": "Litros", "unidad": "l"},
+            {"clave": "alcohol", "etiqueta": "Alcohol", "unidad": "% vol"},
+            {"clave": "av", "etiqueta": "AV", "unidad": "g/l"},
             {"clave": "ph", "etiqueta": "pH", "unidad": ""},
-            {"clave": "acidez_total", "etiqueta": "Acidez total", "unidad": "g/l"},
-            {"clave": "acidez_volatil", "etiqueta": "Acidez volatil", "unidad": "g/l"},
-            {"clave": "so2_libre", "etiqueta": "SO2 libre", "unidad": "mg/l"},
-            {"clave": "so2_total", "etiqueta": "SO2 total", "unidad": "mg/l"},
-            {"clave": "azucar_residual", "etiqueta": "Azucar residual", "unidad": "g/l"},
-            {"clave": "temperatura", "etiqueta": "Temperatura", "unidad": "C"},
+            {"clave": "ntu", "etiqueta": "NTU", "unidad": "NTU"},
+            {"clave": "azucar", "etiqueta": "Azúcar", "unidad": "g/l"},
+            {"clave": "numero_botas", "etiqueta": "nº botas", "unidad": ""},
+            {"clave": "cliente", "etiqueta": "Cliente", "unidad": ""},
+            {"clave": "tipo_bota", "etiqueta": "Tipo bota", "unidad": ""},
+            {"clave": "vo_at", "etiqueta": "vo(@)", "unidad": ""},
+            {"clave": "observaciones", "etiqueta": "Observaciones", "unidad": ""},
         ]
 
     def _normalizar_estado_analitica(self, estado: str | None) -> str:

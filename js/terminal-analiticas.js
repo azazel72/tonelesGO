@@ -53,14 +53,18 @@ function obtenerFechaHoyAnalitica() {
 
 function obtenerDefinicionCamposAnalitica() {
     return [
-        { clave: "grado_alcoholico", etiqueta: "Grado alcoholico", unidad: "% vol" },
-        { clave: "ph", etiqueta: "pH", unidad: "" },
-        { clave: "acidez_total", etiqueta: "Acidez total", unidad: "g/l" },
-        { clave: "acidez_volatil", etiqueta: "Acidez volatil", unidad: "g/l" },
-        { clave: "so2_libre", etiqueta: "SO2 libre", unidad: "mg/l" },
-        { clave: "so2_total", etiqueta: "SO2 total", unidad: "mg/l" },
-        { clave: "azucar_residual", etiqueta: "Azucar residual", unidad: "g/l" },
-        { clave: "temperatura", etiqueta: "Temperatura", unidad: "C" },
+        { clave: "deposito", etiqueta: "Depósito", unidad: "", tipo: "text" },
+        { clave: "litros", etiqueta: "Litros", unidad: "l", tipo: "number" },
+        { clave: "alcohol", etiqueta: "Alcohol", unidad: "% vol", tipo: "number" },
+        { clave: "av", etiqueta: "AV", unidad: "g/l", tipo: "number" },
+        { clave: "ph", etiqueta: "pH", unidad: "", tipo: "number" },
+        { clave: "ntu", etiqueta: "NTU", unidad: "NTU", tipo: "number" },
+        { clave: "azucar", etiqueta: "Azúcar", unidad: "g/l", tipo: "number" },
+        { clave: "numero_botas", etiqueta: "nº botas", unidad: "", tipo: "number" },
+        { clave: "cliente", etiqueta: "Cliente", unidad: "", tipo: "text" },
+        { clave: "tipo_bota", etiqueta: "Tipo bota", unidad: "", tipo: "text" },
+        { clave: "vo_at", etiqueta: "vo(@)", unidad: "", tipo: "number" },
+        { clave: "observaciones", etiqueta: "Observaciones", unidad: "", tipo: "textarea" },
     ];
 }
 
@@ -157,13 +161,24 @@ function renderizarCamposAnalitica(valores) {
                     <label class="form-label mb-0">${escapeHtmlDestinoProductos(campo.etiqueta)}</label>
                     <span class="analitica-campo-unidad">${escapeHtmlDestinoProductos(campo.unidad || "-")}</span>
                 </div>
-                <input
-                    type="text"
-                    class="form-control analitica-campo-valor"
-                    data-analitica-clave="${escapeHtmlDestinoProductos(campo.clave)}"
-                    value="${escapeHtmlDestinoProductos(valores?.[campo.clave] || "")}"
-                    maxlength="64"
-                >
+                ${campo.tipo === "textarea" ? `
+                    <textarea
+                        class="form-control analitica-campo-valor"
+                        data-analitica-clave="${escapeHtmlDestinoProductos(campo.clave)}"
+                        rows="3"
+                        maxlength="500"
+                    >${escapeHtmlDestinoProductos(valores?.[campo.clave] || "")}</textarea>
+                ` : `
+                    <input
+                        type="${escapeHtmlDestinoProductos(campo.tipo || "text") }"
+                        class="form-control analitica-campo-valor"
+                        data-analitica-clave="${escapeHtmlDestinoProductos(campo.clave)}"
+                        value="${escapeHtmlDestinoProductos(valores?.[campo.clave] || "") }"
+                        ${campo.tipo === "number" ? 'step="any" inputmode="decimal"' : ''}
+                        ${campo.clave === "numero_botas" ? 'step="1" inputmode="numeric"' : ''}
+                        maxlength="64"
+                    >
+                `}
             </div>
         </div>
     `).join("");

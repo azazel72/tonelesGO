@@ -7,5 +7,6 @@ SOURCE ./DDL/003_v2_1_pedidos_destino.sql;
 SOURCE ./DDL/004_v2_1_contenedores.sql;
 SOURCE ./DDL/005_v2_1_trazabilidad_movimientos.sql;
 SOURCE ./DDL/006_v2_1_analiticas.sql;
+SOURCE ./DDL/010_v2_1_analiticas_nuevos_campos.sql;
 SOURCE ./DDL/007_v2_1_trazabilidad_fabricacion_fabricacion_semanal_nullable.sql;
 SOURCE ./DDL/008_v2_1_puestos_trabajo_orden.sql;

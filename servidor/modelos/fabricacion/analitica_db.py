@@ -12,14 +12,18 @@ class AnaliticaDB(SQLModel, table=True):
     fecha: date
     descripcion: str
     estado: str = "ACTIVA"
-    grado_alcoholico: str | None = None
+    deposito: str | None = None
+    litros: str | None = None
+    alcohol: str | None = None
+    av: str | None = None
     ph: str | None = None
-    acidez_total: str | None = None
-    acidez_volatil: str | None = None
-    so2_libre: str | None = None
-    so2_total: str | None = None
-    azucar_residual: str | None = None
-    temperatura: str | None = None
+    ntu: str | None = None
+    azucar: str | None = None
+    numero_botas: str | None = None
+    cliente: str | None = None
+    tipo_bota: str | None = None
+    vo_at: str | None = None
+    observaciones: str | None = None
     created_at: Optional[datetime] = Field(
         default=None,
         sa_column=Column(DateTime, nullable=False, server_default=text("CURRENT_TIMESTAMP")),
