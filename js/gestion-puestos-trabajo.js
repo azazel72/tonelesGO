@@ -31,8 +31,9 @@ function openPuestosTrabajoWin() {
           { title:"ID", field:"id", width:70, hozAlign:"right"},
           { title:"Nombre", field:"nombre", editor:"input", editable: tablaEditable, cssClass: "filtrable", },
           { title:"Orden", field:"orden", editor:"number", editable: tablaEditable, hozAlign:"right", width:90, cssClass: "filtrable" },
-          { title:"Es maquinaria", field:"es_maquinaria", ...parametros_check},
+          { title:"Listado", field:"listado", ...parametros_check},
           { title:"Fabricación", field:"fabricacion", ...parametros_check},
+          { title:"Activo", field:"activo", ...parametros_check},
           CeldaAcciones,
         ],
         data: Object.values(DATOS.maestros.puestos_trabajo || {}).sort((a, b) => {

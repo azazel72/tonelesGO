@@ -6,16 +6,18 @@ class PuestoTrabajoDTO(BaseModel):
     id: int | None
     nombre: str
     orden: int = 0
-    es_maquinaria: bool = False
+    listado: bool = False
     fabricacion: bool = False
+    activo: bool = True
 
     def from_db(puesto_trabajo_db: PuestoTrabajoDB) -> "PuestoTrabajoDTO":
         return PuestoTrabajoDTO(
             id=puesto_trabajo_db.id,
             nombre=puesto_trabajo_db.nombre,
             orden=int(getattr(puesto_trabajo_db, "orden", 0) or 0),
-            es_maquinaria=bool(getattr(puesto_trabajo_db, "es_maquinaria", False)),
+            listado=bool(getattr(puesto_trabajo_db, "listado", False)),
             fabricacion=bool(getattr(puesto_trabajo_db, "fabricacion", False)),
+            activo=bool(getattr(puesto_trabajo_db, "activo", True)),
         )
     
     def to_db(self) -> "PuestoTrabajoDB":
@@ -23,6 +25,7 @@ class PuestoTrabajoDTO(BaseModel):
             id=self.id,
             nombre=self.nombre,
             orden=self.orden,
-            es_maquinaria=self.es_maquinaria,
+            listado=self.listado,
             fabricacion=self.fabricacion,
+            activo=self.activo,
         )

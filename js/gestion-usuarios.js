@@ -3,6 +3,14 @@ function openUsuariosWin() {
   const wb = comprobarVentanaAbierta("usuarios");
   if (wb) return wb;
 
+  const parametros_check = {
+    hozAlign: "center",
+    formatter: "tickCross",
+    editor: "tickCross",
+    editable: tablaEditable,
+    cssClass: "filtrable",
+  };
+
   const rolesDict = Object.values(DATOS?.maestros?.roles ?? {}).map(
     ({ id, nombre, ...resto }) => ({
       ...resto, id, nombre,
@@ -45,6 +53,7 @@ function openUsuariosWin() {
           },
           { title:"Alias", field:"alias", editor:"input", editable: tablaEditable, cssClass: "filtrable", },
           { title:"Nombre", field:"nombre", editor:"input", editable: tablaEditable, cssClass: "filtrable", },
+          { title:"Activo", field:"activo", ...parametros_check },
           {
             title:"Clave *",
             field:"clave",

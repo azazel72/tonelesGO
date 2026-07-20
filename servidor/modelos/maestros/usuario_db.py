@@ -11,4 +11,5 @@ class UsuarioDB(SQLModel, table=True):
     nombre: Optional[str] = None
     rol_id: str
     empleado: Optional[bool] = Field(default=False)
+    activo: Optional[bool] = Field(default=True)
     clave: str

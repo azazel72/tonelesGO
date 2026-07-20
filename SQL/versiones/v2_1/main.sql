@@ -13,3 +13,7 @@ SOURCE ./DDL/008_v2_1_puestos_trabajo_orden.sql;
 SOURCE ./DDL/011_v2_1_tostados.sql;
 SOURCE ./DDL/012_v2_1_estados_flejes.sql;
 SOURCE ./DDL/013_v2_1_dias_festivos.sql;
+SOURCE ./DDL/014_v2_1_desactivado_usuarios_puestos.sql;
+SOURCE ./DDL/015_v2_1_eliminar_activo_puestos_trabajo.sql;
+SOURCE ./DDL/016_v2_1_activo_usuarios_puestos.sql;
+SOURCE ./DDL/017_v2_1_puestos_trabajo_listado.sql;

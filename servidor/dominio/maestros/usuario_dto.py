@@ -9,6 +9,7 @@ class UsuarioDTO(BaseModel):
     nombre: str
     rol_id: int | None
     empleado: bool | None = Field(default=False)
+    activo: bool | None = Field(default=True)
     clave: str = Field(exclude=True)
 
     def from_db(usuario_db: UsuarioDB) -> "UsuarioDTO":
@@ -19,6 +20,7 @@ class UsuarioDTO(BaseModel):
             nombre=usuario_db.nombre,
             rol_id=usuario_db.rol_id,
             empleado=usuario_db.empleado,
+            activo=bool(getattr(usuario_db, "activo", True)),
             clave=usuario_db.clave
         )
     
@@ -30,6 +32,7 @@ class UsuarioDTO(BaseModel):
             nombre=self.nombre,
             rol_id=self.rol_id,
             empleado=self.empleado,
+            activo=self.activo,
             clave=self.clave
         )
         
