@@ -10,7 +10,7 @@ from servidor.herramientas.utilidades import obtener_anterior_dia_semana
 from servidor.herramientas.BcryptHelper import BcryptHelper
 
 from .modelos import ClienteDB, EstadoPedidoDB, EstadoFabricacionSemanalDB, EstadoProductoDB, EstadoFlejeDB, EstadoTrazabilidadFabricacionDB, EstadoPaletDB
-from .modelos import InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB, RolDB, PuestoTrabajoDB, MaterialDB, ContenedorDB, EntradaDB, LineaEntradaDB, PaletDB, ProductoDB, ProductoOperarioDB, ArchivoSubidoDB, AmbienteDB, EntradaFlejeDB, CubicajeDB, TostadoDB
+from .modelos import InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB, RolDB, PuestoTrabajoDB, MaterialDB, ContenedorDB, EntradaDB, LineaEntradaDB, PaletDB, ProductoDB, ProductoOperarioDB, ArchivoSubidoDB, AmbienteDB, DiaFestivoDB, EntradaFlejeDB, CubicajeDB, TostadoDB
 from .modelos import PedidoDB, AnaliticaDB, BotaEnvinadaAnaliticaDB, BotaEnvinadaArchivoDB
 from .modelos import TipoProductoDB, FabricacionSemanalDB, TrazabilidadProcesadoDB, TrazabilidadFabricacionDB, TrazabilidadProductoDB, ConsumoDB
 from .modelos import PlanCamionDB, PlanFacturacionDB, PlanMaterialDB, CuadranteDB, CuadranteDetalleDB
@@ -18,7 +18,7 @@ from .persistencia import GenericRepository, DB
 from sqlmodel import select
 from sqlalchemy import extract, func, or_
 from .dominio import PlanificacionEntradasDTO, MaestrosDTO, PlanMaterialDTO, PlanFacturacionDTO, PlanCamionDTO, CuadranteDTO, CuadranteDetalleDTO, FabricacionDTO
-from .dominio import ClienteDTO, EstadoPedidoDTO, EstadoFabricacionSemanalDTO, EstadoProductoDTO, EstadoFlejeDTO, EstadoTrazabilidadFabricacionDTO, EstadoPaletDTO, InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO, RolDTO, PuestoTrabajoDTO, MaterialDTO, ContenedorDTO, EntradaDTO, LineaEntradaDTO, PaletDTO, ProductoDTO, ArchivoSubidoDTO, AmbienteDTO, EntradaFlejeDTO, CubicajeDTO, TostadoDTO, CuadrantesDTO
+from .dominio import ClienteDTO, EstadoPedidoDTO, EstadoFabricacionSemanalDTO, EstadoProductoDTO, EstadoFlejeDTO, EstadoTrazabilidadFabricacionDTO, EstadoPaletDTO, InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO, RolDTO, PuestoTrabajoDTO, MaterialDTO, ContenedorDTO, EntradaDTO, LineaEntradaDTO, PaletDTO, ProductoDTO, ArchivoSubidoDTO, AmbienteDTO, DiaFestivoDTO, EntradaFlejeDTO, CubicajeDTO, TostadoDTO, CuadrantesDTO
 from .dominio import PedidoDTO, AnaliticaDTO, TipoProductoDTO, FabricacionSemanalDTO, TrazabilidadProcesadoDTO, TrazabilidadFabricacionDTO, TrazabilidadProductoDTO, ConsumoDTO
 from servidor.impresion import ImprimirEtiqueta
 from servidor.conexiones.broadcast import broadcast_error, broadcast_event
@@ -65,6 +65,7 @@ class Colector:
         self.repo_productos = GenericRepository(ProductoDB)
         self.repo_archivos_subidos = GenericRepository(ArchivoSubidoDB)
         self.repo_ambientes = GenericRepository(AmbienteDB)
+        self.repo_dias_festivos = GenericRepository(DiaFestivoDB)
         self.repo_entradas_flejes = GenericRepository(EntradaFlejeDB)
         self.repo_cubicaje = GenericRepository(CubicajeDB)
         self.repo_tostados = GenericRepository(TostadoDB)
@@ -238,6 +239,7 @@ class Colector:
             productos = self.repo_productos.list_all(session)
             archivos_subidos = self.repo_archivos_subidos.list_all(session)
             ambientes = self.repo_ambientes.list_all(session)
+            dias_festivos = self.repo_dias_festivos.list_all(session)
             entradas_flejes = self.repo_entradas_flejes.list_all(session)
             cubicajes = self.repo_cubicaje.list_all(session)
 
@@ -262,6 +264,7 @@ class Colector:
             self.maestros.productos = {producto.id: ProductoDTO.from_db(producto) for producto in productos}
             self.maestros.archivos_subidos = {archivo.id: ArchivoSubidoDTO.from_db(archivo) for archivo in archivos_subidos}
             self.maestros.ambientes = {ambiente.id: AmbienteDTO.from_db(ambiente) for ambiente in ambientes}
+            self.maestros.dias_festivos = {dia.id: DiaFestivoDTO.from_db(dia) for dia in dias_festivos}
             self.maestros.entradas_flejes = {entrada.id: EntradaFlejeDTO.from_db(entrada) for entrada in entradas_flejes}
             self.maestros.cubicaje = {cubicaje.id: CubicajeDTO.from_db(cubicaje) for cubicaje in cubicajes}
             self.maestros.tostados = {tostado.id: TostadoDTO.from_db(tostado) for tostado in tostados}
@@ -3294,6 +3297,10 @@ class Colector:
             repo = self.repo_ambientes
             maestro = self.maestros.ambientes
             objeto = AmbienteDTO
+        elif tabla == "dias_festivos":
+            repo = self.repo_dias_festivos
+            maestro = self.maestros.dias_festivos
+            objeto = DiaFestivoDTO
         elif tabla == "entradas_flejes":
             repo = self.repo_entradas_flejes
             maestro = self.maestros.entradas_flejes

@@ -21,6 +21,7 @@ from .producto_db import ProductoDB
 from .producto_operario_db import ProductoOperarioDB
 from .archivo_subido_db import ArchivoSubidoDB
 from .ambiente_db import AmbienteDB
+from .dia_festivo_db import DiaFestivoDB
 from .entrada_fleje_db import EntradaFlejeDB
 from .cubicaje_db import CubicajeDB
 from .tostado_db import TostadoDB
@@ -48,6 +49,7 @@ __all__ = [
     "ProductoOperarioDB",
     "ArchivoSubidoDB",
     "AmbienteDB",
+    "DiaFestivoDB",
     "EntradaFlejeDB",
     "CubicajeDB",
     "TostadoDB",

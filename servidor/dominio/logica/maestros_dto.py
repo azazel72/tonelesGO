@@ -23,6 +23,7 @@ from servidor.dominio.maestros.palet_dto import PaletDTO
 from servidor.dominio.maestros.producto_dto import ProductoDTO
 from servidor.dominio.maestros.archivo_subido_dto import ArchivoSubidoDTO
 from servidor.dominio.maestros.ambiente_dto import AmbienteDTO
+from servidor.dominio.maestros.dia_festivo_dto import DiaFestivoDTO
 from servidor.dominio.maestros.entrada_fleje_dto import EntradaFlejeDTO
 from servidor.dominio.maestros.cubicaje_dto import CubicajeDTO
 from servidor.dominio.maestros.tostado_dto import TostadoDTO
@@ -50,6 +51,7 @@ class MaestrosDTO(BaseModel):
     productos: Optional[Dict[int, "ProductoDTO"]] = {}
     archivos_subidos: Optional[Dict[int, "ArchivoSubidoDTO"]] = {}
     ambientes: Optional[Dict[int, "AmbienteDTO"]] = {}
+    dias_festivos: Optional[Dict[int, "DiaFestivoDTO"]] = {}
     entradas_flejes: Optional[Dict[int, "EntradaFlejeDTO"]] = {}
     cubicaje: Optional[Dict[int, "CubicajeDTO"]] = {}
     tostados: Optional[Dict[int, "TostadoDTO"]] = {}

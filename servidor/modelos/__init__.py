@@ -3,7 +3,7 @@ from .logica import PlanCamionDB, PlanFacturacionDB, PlanMaterialDB, CuadranteDB
 from .maestros import ClienteDB, EstadoPedidoDB, EstadoFabricacionSemanalDB, EstadoProductoDB, EstadoFlejeDB, EstadoTrazabilidadFabricacionDB, EstadoPaletDB
 from .maestros import InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB, RolDB, PuestoTrabajoDB
 from .maestros import MaterialDB, ContenedorDB, EntradaDB, LineaEntradaDB, PaletDB, ProductoDB, ProductoOperarioDB, ArchivoSubidoDB
-from .maestros import AmbienteDB
+from .maestros import AmbienteDB, DiaFestivoDB
 from .maestros import EntradaFlejeDB
 from .maestros import CubicajeDB
 from .maestros import TostadoDB
@@ -37,6 +37,7 @@ __all__ = [
     "ProductoOperarioDB",
     "ArchivoSubidoDB",
     "AmbienteDB",
+    "DiaFestivoDB",
     "EntradaFlejeDB",
     "CubicajeDB",
     "TostadoDB",

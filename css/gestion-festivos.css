@@ -1,0 +1,141 @@
+.dias-festivos-win {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.dias-festivos-layout {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    height: 100%;
+    padding: 12px;
+}
+
+.dias-festivos-toolbar {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+}
+
+.dias-festivos-year {
+    width: 120px;
+}
+
+.dias-festivos-body {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: 280px minmax(0, 1fr);
+    gap: 12px;
+}
+
+.dias-festivos-side,
+.dias-festivos-calendar-wrap {
+    min-height: 0;
+    border: 1px solid #dee2e6;
+    border-radius: 0.5rem;
+    background: #fff;
+    padding: 0.9rem;
+}
+
+.dias-festivos-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.45rem;
+    overflow: auto;
+    max-height: 100%;
+}
+
+.dias-festivos-list-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding: 0.45rem 0.55rem;
+    border: 1px solid #e9ecef;
+    border-radius: 0.45rem;
+    background: #f8f9fa;
+    font-size: 0.9rem;
+}
+
+.dias-festivos-calendar-wrap {
+    overflow: auto;
+}
+
+.dias-festivos-calendar {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+}
+
+.dias-festivos-month {
+    border: 1px solid #e9ecef;
+    border-radius: 0.5rem;
+    padding: 0.7rem;
+    background: #fbfbfc;
+}
+
+.dias-festivos-month-title {
+    font-weight: 700;
+    margin-bottom: 0.55rem;
+    color: #1f2937;
+}
+
+.dias-festivos-weekdays,
+.dias-festivos-days {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+    gap: 4px;
+}
+
+.dias-festivos-weekdays {
+    margin-bottom: 0.35rem;
+}
+
+.dias-festivos-weekdays span {
+    text-align: center;
+    font-size: 0.74rem;
+    color: #6b7280;
+    font-weight: 700;
+}
+
+.dias-festivos-day {
+    border: 1px solid #d7dce3;
+    border-radius: 0.4rem;
+    background: #fff;
+    min-height: 34px;
+    font-size: 0.82rem;
+    color: #1f2937;
+}
+
+.dias-festivos-day:hover {
+    background: #eef4ff;
+    border-color: #a9c2f5;
+}
+
+.dias-festivos-day.is-weekend {
+    background: #faf6f0;
+}
+
+.dias-festivos-day.is-festivo {
+    background: #d62828;
+    border-color: #b81f1f;
+    color: #fff;
+    font-weight: 700;
+}
+
+.dias-festivos-day-empty {
+    min-height: 34px;
+}
+
+@media (max-width: 992px) {
+    .dias-festivos-body {
+        grid-template-columns: 1fr;
+    }
+
+    .dias-festivos-calendar {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+}

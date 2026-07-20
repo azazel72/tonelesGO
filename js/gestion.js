@@ -60,6 +60,9 @@ window.onload = () => {
         async "ver-tostados"() {
             await openTostadosWin();
         },
+        async "ver-dias-festivos"() {
+            await openDiasFestivosWin();
+        },
 
         async "ver-entradas"() {
             await openEntradasWin();
@@ -179,6 +182,7 @@ window.onload = () => {
         puestos_trabajo: openPuestosTrabajoWin,
         materiales: openMaterialesWin,
         tostados: openTostadosWin,
+        dias_festivos: openDiasFestivosWin,
         entradas: openEntradasWin,
         lineas_entrada: openLineasEntradaWin,
         entradas_flejes: openEntradasFlejesWin,

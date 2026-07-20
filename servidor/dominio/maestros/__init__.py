@@ -21,6 +21,7 @@ from .producto_dto import ProductoDTO
 from .producto_operario_dto import ProductoOperarioDTO
 from .archivo_subido_dto import ArchivoSubidoDTO
 from .ambiente_dto import AmbienteDTO
+from .dia_festivo_dto import DiaFestivoDTO
 from .entrada_fleje_dto import EntradaFlejeDTO
 from .cubicaje_dto import CubicajeDTO
 from .tostado_dto import TostadoDTO
@@ -48,6 +49,7 @@ __all__ = [
     "ProductoOperarioDTO",
     "ArchivoSubidoDTO",
     "AmbienteDTO",
+    "DiaFestivoDTO",
     "EntradaFlejeDTO",
     "CubicajeDTO",
     "TostadoDTO",

@@ -24,6 +24,7 @@ const ACCIONES_PERMISO_GESTION = {
     "ver-ubicaciones": [],
     "ver-materiales": [],
     "ver-tostados": [],
+    "ver-dias-festivos": [],
     "ver-entradas": { permisos: [], marcarCandado: false, desactivada: false },
     "ver-lineas-entrada": { permisos: [], marcarCandado: false, desactivada: false },
     "ver-entradas-flejes": [],
