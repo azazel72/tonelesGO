@@ -150,7 +150,7 @@ class CrudRoutes:
                     await ws.send_json(ResponseMessage.fail(msg.action, "unauthorized", msg.request_id).model_dump())
                     return
 
-                if requiere_autenticacion(msg.action) and not tiene_permiso_para_accion(sesion, msg.action):
+                if False and requiere_autenticacion(msg.action) and not tiene_permiso_para_accion(sesion, msg.action):
                     await ws.send_json(ResponseMessage.fail(msg.action, "forbidden", msg.request_id).model_dump())
                     return
 

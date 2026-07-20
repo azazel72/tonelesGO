@@ -9,7 +9,7 @@ from sqlmodel import Session
 from servidor.herramientas.utilidades import obtener_anterior_dia_semana
 from servidor.herramientas.BcryptHelper import BcryptHelper
 
-from .modelos import ClienteDB, EstadoPedidoDB, EstadoFabricacionSemanalDB, EstadoProductoDB, EstadoTrazabilidadFabricacionDB, EstadoPaletDB
+from .modelos import ClienteDB, EstadoPedidoDB, EstadoFabricacionSemanalDB, EstadoProductoDB, EstadoFlejeDB, EstadoTrazabilidadFabricacionDB, EstadoPaletDB
 from .modelos import InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB, RolDB, PuestoTrabajoDB, MaterialDB, ContenedorDB, EntradaDB, LineaEntradaDB, PaletDB, ProductoDB, ProductoOperarioDB, ArchivoSubidoDB, AmbienteDB, EntradaFlejeDB, CubicajeDB, TostadoDB
 from .modelos import PedidoDB, AnaliticaDB, BotaEnvinadaAnaliticaDB, BotaEnvinadaArchivoDB
 from .modelos import TipoProductoDB, FabricacionSemanalDB, TrazabilidadProcesadoDB, TrazabilidadFabricacionDB, TrazabilidadProductoDB, ConsumoDB
@@ -18,7 +18,7 @@ from .persistencia import GenericRepository, DB
 from sqlmodel import select
 from sqlalchemy import extract, func, or_
 from .dominio import PlanificacionEntradasDTO, MaestrosDTO, PlanMaterialDTO, PlanFacturacionDTO, PlanCamionDTO, CuadranteDTO, CuadranteDetalleDTO, FabricacionDTO
-from .dominio import ClienteDTO, EstadoPedidoDTO, EstadoFabricacionSemanalDTO, EstadoProductoDTO, EstadoTrazabilidadFabricacionDTO, EstadoPaletDTO, InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO, RolDTO, PuestoTrabajoDTO, MaterialDTO, ContenedorDTO, EntradaDTO, LineaEntradaDTO, PaletDTO, ProductoDTO, ArchivoSubidoDTO, AmbienteDTO, EntradaFlejeDTO, CubicajeDTO, TostadoDTO, CuadrantesDTO
+from .dominio import ClienteDTO, EstadoPedidoDTO, EstadoFabricacionSemanalDTO, EstadoProductoDTO, EstadoFlejeDTO, EstadoTrazabilidadFabricacionDTO, EstadoPaletDTO, InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO, RolDTO, PuestoTrabajoDTO, MaterialDTO, ContenedorDTO, EntradaDTO, LineaEntradaDTO, PaletDTO, ProductoDTO, ArchivoSubidoDTO, AmbienteDTO, EntradaFlejeDTO, CubicajeDTO, TostadoDTO, CuadrantesDTO
 from .dominio import PedidoDTO, AnaliticaDTO, TipoProductoDTO, FabricacionSemanalDTO, TrazabilidadProcesadoDTO, TrazabilidadFabricacionDTO, TrazabilidadProductoDTO, ConsumoDTO
 from servidor.impresion import ImprimirEtiqueta
 from servidor.conexiones.broadcast import broadcast_error, broadcast_event
@@ -49,6 +49,7 @@ class Colector:
         self.repo_estados_pedidos = GenericRepository(EstadoPedidoDB)
         self.repo_estados_fabricacion_semanal = GenericRepository(EstadoFabricacionSemanalDB)
         self.repo_estados_productos = GenericRepository(EstadoProductoDB)
+        self.repo_estados_flejes = GenericRepository(EstadoFlejeDB)
         self.repo_estados_trazabilidad_fabricacion = GenericRepository(EstadoTrazabilidadFabricacionDB)
         self.repo_estados_palets = GenericRepository(EstadoPaletDB)
         self.repo_instalaciones = GenericRepository(InstalacionDB)
@@ -220,6 +221,7 @@ class Colector:
             estados_pedidos = self.repo_estados_pedidos.list_all(session)
             estados_fabricacion_semanal = self.repo_estados_fabricacion_semanal.list_all(session)
             estados_productos = self.repo_estados_productos.list_all(session)
+            estados_flejes = self.repo_estados_flejes.list_all(session)
             estados_trazabilidad_fabricacion = self.repo_estados_trazabilidad_fabricacion.list_all(session)
             estados_palets = self.repo_estados_palets.list_all(session)
             instalaciones = self.repo_instalaciones.list_all(session)
@@ -243,6 +245,7 @@ class Colector:
             self.maestros.estados_pedidos = {estado.id: EstadoPedidoDTO.from_db(estado) for estado in estados_pedidos}
             self.maestros.estados_fabricacion_semanal = {estado.id: EstadoFabricacionSemanalDTO.from_db(estado) for estado in estados_fabricacion_semanal}
             self.maestros.estados_productos = {estado.id: EstadoProductoDTO.from_db(estado) for estado in estados_productos}
+            self.maestros.estados_flejes = {estado.id: EstadoFlejeDTO.from_db(estado) for estado in estados_flejes}
             self.maestros.estados_trazabilidad_fabricacion = {estado.id: EstadoTrazabilidadFabricacionDTO.from_db(estado) for estado in estados_trazabilidad_fabricacion}
             self.maestros.estados_palets = {estado.id: EstadoPaletDTO.from_db(estado) for estado in estados_palets}
             self.maestros.instalaciones = {instalacion.id: InstalacionDTO.from_db(instalacion) for instalacion in instalaciones}
@@ -3223,6 +3226,10 @@ class Colector:
             repo = self.repo_estados_productos
             maestro = self.maestros.estados_productos
             objeto = EstadoProductoDTO
+        elif tabla == "estados_flejes":
+            repo = self.repo_estados_flejes
+            maestro = self.maestros.estados_flejes
+            objeto = EstadoFlejeDTO
         elif tabla == "estados_trazabilidad_fabricacion":
             repo = self.repo_estados_trazabilidad_fabricacion
             maestro = self.maestros.estados_trazabilidad_fabricacion

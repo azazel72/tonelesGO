@@ -3,6 +3,7 @@ from .cliente_dto import ClienteDTO
 from .estado_pedido_dto import EstadoPedidoDTO
 from .estado_fabricacion_semanal_dto import EstadoFabricacionSemanalDTO
 from .estado_producto_dto import EstadoProductoDTO
+from .estado_fleje_dto import EstadoFlejeDTO
 from .estado_trazabilidad_fabricacion_dto import EstadoTrazabilidadFabricacionDTO
 from .estado_palet_dto import EstadoPaletDTO
 from .instalacion_dto import InstalacionDTO
@@ -29,6 +30,7 @@ __all__ = [
     "EstadoPedidoDTO",
     "EstadoFabricacionSemanalDTO",
     "EstadoProductoDTO",
+    "EstadoFlejeDTO",
     "EstadoTrazabilidadFabricacionDTO",
     "EstadoPaletDTO",
     "InstalacionDTO",

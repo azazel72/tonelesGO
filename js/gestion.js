@@ -40,6 +40,9 @@ window.onload = () => {
         async "ver-estados-productos"() {
             await openEstadosProductosWin();
         },
+        async "ver-estados-flejes"() {
+            await openEstadosFlejesWin();
+        },
         async "ver-estados-trazabilidad-fabricacion"() {
             await openEstadosTrazabilidadFabricacionWin();
         },
@@ -170,6 +173,7 @@ window.onload = () => {
         estados_pedidos: openEstadosPedidosWin,
         estados_fabricacion_semanal: openEstadosFabricacionSemanalWin,
         estados_productos: openEstadosProductosWin,
+        estados_flejes: openEstadosFlejesWin,
         estados_trazabilidad_fabricacion: openEstadosTrazabilidadFabricacionWin,
         estados_palets: openEstadosPaletsWin,
         puestos_trabajo: openPuestosTrabajoWin,

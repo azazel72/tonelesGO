@@ -12,7 +12,29 @@ function openInventarioFlejesWin() {
     class: "btn btn-sm btn-outline-primary",
     content: "Actualizar",
   });
+  const btnExcel = crearElemento("button", {
+    id: "u-export-excel-inventario-flejes",
+    class: "btn btn-sm btn-outline-success",
+    content: '<i class="bi bi-filetype-xlsx"></i> Excel',
+  });
+  const btnPdf = crearElemento("button", {
+    id: "u-export-pdf-inventario-flejes",
+    class: "btn btn-sm btn-outline-danger",
+    content: '<i class="bi bi-filetype-pdf"></i> PDF',
+  });
+  const filtros = crearElemento("div", {
+    class: "d-flex gap-3 align-items-center flex-wrap ms-auto",
+  });
+  filtros.innerHTML = `
+    <div class="form-check form-switch mb-0">
+      <input class="form-check-input" type="checkbox" id="u-ocultar-restante-cero-flejes">
+      <label class="form-check-label" for="u-ocultar-restante-cero-flejes">Ocultar restante 0</label>
+    </div>
+  `;
   cabecera.appendChild(btnActualizar);
+  cabecera.appendChild(btnExcel);
+  cabecera.appendChild(btnPdf);
+  cabecera.appendChild(filtros);
   contenedor.appendChild(cabecera);
 
   const cuerpo = crearElemento("div", { class: "p-2 overflow-auto", style: "height: calc(100% - 52px);" });
@@ -44,19 +66,29 @@ function openInventarioFlejesWin() {
   });
   windowsRegistry.set(KEY, { wb: nueva, table: null });
 
-  btnActualizar.addEventListener("click", () => cargarInventarioFlejes(cuerpo));
-  cargarInventarioFlejes(cuerpo);
+  const recargar = () => cargarInventarioFlejes(cuerpo, {
+    ocultarRestanteCero: Boolean(contenedor.querySelector("#u-ocultar-restante-cero-flejes")?.checked),
+  });
+  btnActualizar.addEventListener("click", recargar);
+  btnExcel.addEventListener("click", () => exportarTablaHtmlInventario(cuerpo.querySelector("#tabla-inventario-flejes"), "inventario_flejes", "xlsx"));
+  btnPdf.addEventListener("click", () => exportarTablaHtmlInventario(cuerpo.querySelector("#tabla-inventario-flejes"), "inventario_flejes", "pdf"));
+  contenedor.querySelector("#u-ocultar-restante-cero-flejes")?.addEventListener("change", recargar);
+  recargar();
   return nueva;
 }
 
-async function cargarInventarioFlejes(contenedor) {
+async function cargarInventarioFlejes(contenedor, opciones = {}) {
   const tbody = contenedor.querySelector("#tabla-inventario-flejes tbody");
   if (!tbody) return;
   tbody.innerHTML = `<tr><td colspan="7">Cargando...</td></tr>`;
 
   try {
     const data = await wsRequest("inventario_flejes", {});
-    const filas = data?.inventario_flejes || [];
+    const ocultarRestanteCero = Boolean(opciones?.ocultarRestanteCero);
+    const filas = (data?.inventario_flejes || []).filter((fila) => {
+      if (!ocultarRestanteCero) return true;
+      return Number(fila?.restante || 0) !== 0;
+    });
 
     if (!filas.length) {
       tbody.innerHTML = `<tr><td colspan="7">Sin datos</td></tr>`;
@@ -113,4 +145,24 @@ async function cargarInventarioFlejes(contenedor) {
     console.error(error);
     tbody.innerHTML = `<tr><td colspan="7">Error al cargar inventario</td></tr>`;
   }
+}
+
+function exportarTablaHtmlInventario(tabla, nombreBase, formato) {
+  if (!tabla) return;
+  if (formato === "xlsx") {
+    if (!window.XLSX) {
+      alert("No está cargada la librería de Excel.");
+      return;
+    }
+    const libro = window.XLSX.utils.table_to_book(tabla, { sheet: nombreBase });
+    window.XLSX.writeFile(libro, `${nombreBase}.xlsx`);
+    return;
+  }
+  if (!window.jspdf?.jsPDF || !window.jspdf?.jsPDF.API?.autoTable) {
+    alert("No está cargada la librería de PDF.");
+    return;
+  }
+  const pdf = new window.jspdf.jsPDF({ orientation: "landscape" });
+  pdf.autoTable({ html: tabla, styles: { fontSize: 8 }, headStyles: { fillColor: [52, 58, 64] } });
+  pdf.save(`${nombreBase}.pdf`);
 }

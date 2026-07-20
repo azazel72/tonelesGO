@@ -17,10 +17,24 @@ function openInventarioDuelasWin() {
     class: "btn btn-sm btn-outline-secondary",
     content: "Plegar todo",
   });
+  const btnExcel = crearElemento("button", {
+    id: "u-export-excel-inventario-duelas",
+    class: "btn btn-sm btn-outline-success",
+    content: '<i class="bi bi-filetype-xlsx"></i> Excel',
+  });
+  const btnPdf = crearElemento("button", {
+    id: "u-export-pdf-inventario-duelas",
+    class: "btn btn-sm btn-outline-danger",
+    content: '<i class="bi bi-filetype-pdf"></i> PDF',
+  });
   const switches = crearElemento("div", {
     class: "d-flex gap-3 align-items-center flex-wrap ms-auto",
   });
   switches.innerHTML = `
+    <div class="form-check form-switch mb-0">
+      <input class="form-check-input" type="checkbox" id="u-ocultar-restante-cero-duelas">
+      <label class="form-check-label" for="u-ocultar-restante-cero-duelas">Ocultar restante 0</label>
+    </div>
     <div class="form-check form-switch mb-0">
       <input class="form-check-input" type="checkbox" id="u-agrupacion-duela" checked>
       <label class="form-check-label" for="u-agrupacion-duela">Tipo de duela</label>
@@ -36,6 +50,8 @@ function openInventarioDuelasWin() {
   `;
   cabecera.appendChild(btnActualizar);
   cabecera.appendChild(btnPlegar);
+  cabecera.appendChild(btnExcel);
+  cabecera.appendChild(btnPdf);
   cabecera.appendChild(switches);
   contenedor.appendChild(cabecera);
 
@@ -68,6 +84,7 @@ function openInventarioDuelasWin() {
   windowsRegistry.set(KEY, { wb: nueva, table: null });
 
   const obtenerAgrupacion = () => ({
+    ocultarRestanteCero: Boolean(contenedor.querySelector("#u-ocultar-restante-cero-duelas")?.checked),
     tipo: Boolean(contenedor.querySelector("#u-agrupacion-duela")?.checked),
     material: Boolean(contenedor.querySelector("#u-agrupacion-madera")?.checked),
     instalacion: Boolean(contenedor.querySelector("#u-agrupacion-instalacion")?.checked),
@@ -90,6 +107,8 @@ function openInventarioDuelasWin() {
     const contraido = btnPlegar.dataset.contraido === "1";
     aplicarEstadoGrupos(!contraido);
   });
+  btnExcel.addEventListener("click", () => exportarTablaHtmlInventarioDuelas(cuerpo.querySelector("#tabla-informe-palets-duela"), "inventario_palets", "xlsx"));
+  btnPdf.addEventListener("click", () => exportarTablaHtmlInventarioDuelas(cuerpo.querySelector("#tabla-informe-palets-duela"), "inventario_palets", "pdf"));
   contenedor.querySelectorAll(".form-check-input").forEach((input) => {
     input.addEventListener("change", recargar);
   });
@@ -111,14 +130,17 @@ function openInventarioDuelasWin() {
   return nueva;
 }
 
-async function cargarInventarioDuelas(contenedor, agrupacion = { tipo: true, material: true, instalacion: false }) {
+async function cargarInventarioDuelas(contenedor, agrupacion = { tipo: true, material: true, instalacion: false, ocultarRestanteCero: false }) {
   const tbody = contenedor.querySelector("#tabla-informe-palets-duela tbody");
   if (!tbody) return;
   tbody.innerHTML = `<tr><td colspan="6">Cargando...</td></tr>`;
 
   try {
     const data = await wsRequest("inventario_duelas", {});
-    const filas = data?.palets_por_tipo_material_ubicacion || [];
+    const filas = (data?.palets_por_tipo_material_ubicacion || []).filter((fila) => {
+      if (!agrupacion?.ocultarRestanteCero) return true;
+      return Number(fila?.total_restante || 0) !== 0;
+    });
 
     if (!filas.length) {
       tbody.innerHTML = `<tr><td colspan="6">Sin datos</td></tr>`;
@@ -187,4 +209,24 @@ async function cargarInventarioDuelas(contenedor, agrupacion = { tipo: true, mat
     console.error(error);
     tbody.innerHTML = `<tr><td colspan="6">Error al cargar inventario</td></tr>`;
   }
+}
+
+function exportarTablaHtmlInventarioDuelas(tabla, nombreBase, formato) {
+  if (!tabla) return;
+  if (formato === "xlsx") {
+    if (!window.XLSX) {
+      alert("No está cargada la librería de Excel.");
+      return;
+    }
+    const libro = window.XLSX.utils.table_to_book(tabla, { sheet: nombreBase });
+    window.XLSX.writeFile(libro, `${nombreBase}.xlsx`);
+    return;
+  }
+  if (!window.jspdf?.jsPDF || !window.jspdf?.jsPDF.API?.autoTable) {
+    alert("No está cargada la librería de PDF.");
+    return;
+  }
+  const pdf = new window.jspdf.jsPDF({ orientation: "landscape" });
+  pdf.autoTable({ html: tabla, styles: { fontSize: 8 }, headStyles: { fillColor: [52, 58, 64] } });
+  pdf.save(`${nombreBase}.pdf`);
 }

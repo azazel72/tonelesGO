@@ -14,6 +14,7 @@ const ACCIONES_PERMISO_GESTION = {
     "ver-estados-pedidos": [],
     "ver-estados-fabricacion-semanal": [],
     "ver-estados-productos": [],
+    "ver-estados-flejes": [],
     "ver-estados-trazabilidad-fabricacion": [],
     "ver-estados-palets": [],
     "ver-puestos-trabajo": [],

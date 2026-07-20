@@ -1,6 +1,6 @@
 
 from .logica import PlanificacionEntradasDTO, MaestrosDTO, PlanCamionDTO, PlanFacturacionDTO, PlanMaterialDTO, CuadrantesDTO, FabricacionDTO
-from .maestros import ClienteDTO, EstadoPedidoDTO, EstadoFabricacionSemanalDTO, EstadoProductoDTO, EstadoTrazabilidadFabricacionDTO, EstadoPaletDTO
+from .maestros import ClienteDTO, EstadoPedidoDTO, EstadoFabricacionSemanalDTO, EstadoProductoDTO, EstadoFlejeDTO, EstadoTrazabilidadFabricacionDTO, EstadoPaletDTO
 from .maestros import InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO, RolDTO, PuestoTrabajoDTO
 from .maestros import MaterialDTO, ContenedorDTO, EntradaDTO, LineaEntradaDTO, PaletDTO, ProductoDTO, ProductoOperarioDTO, ArchivoSubidoDTO
 from .maestros import AmbienteDTO
@@ -18,6 +18,7 @@ __all__ = [
     "EstadoPedidoDTO",
     "EstadoFabricacionSemanalDTO",
     "EstadoProductoDTO",
+    "EstadoFlejeDTO",
     "EstadoTrazabilidadFabricacionDTO",
     "EstadoPaletDTO",
     "InstalacionDTO",

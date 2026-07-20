@@ -14,6 +14,13 @@ function openEntradasFlejesWin() {
       label: descripcion || codigo || String(id),
     })
   );
+  const estadosFlejesDict = Object.values(DATOS?.maestros?.estados_flejes ?? {}).map(
+    ({ id, descripcion, ...resto }) => ({
+      ...resto, id, descripcion,
+      value: id,
+      label: descripcion || String(id),
+    })
+  );
 
   const configuracion = {
     KEY: "entradas_flejes",
@@ -59,7 +66,22 @@ function openEntradasFlejesWin() {
           { title:"Lote", field:"lote", editor:"input", editable: tablaEditable, cssClass: "filtrable" },
           { title:"Peso", field:"peso", editor:"number", editable: tablaEditable, cssClass: "filtrable", hozAlign:"right" },
           { title:"Consumido", field:"consumido", editor:"number", editable: tablaEditable, cssClass: "filtrable", hozAlign:"right" },
-          { title:"Estado", field:"estado", editor:"number", editable: tablaEditable, cssClass: "filtrable", hozAlign:"right" },
+          {
+            title: "Estado",
+            field: "estado",
+            editor: "list",
+            editorParams: {
+              values: estadosFlejesDict,
+              clearable: true,
+              autocomplete: true,
+              allowEmpty: true,
+              listOnEmpty: true,
+              freetext: false,
+            },
+            editable: tablaEditable,
+            cssClass: "filtrable",
+            formatter: cell => DATOS?.maestros?.estados_flejes?.[cell.getValue()]?.descripcion ?? cell.getValue(),
+          },
           CeldaAcciones,
         ],
         data: Object.values(DATOS.maestros.entradas_flejes || {}),

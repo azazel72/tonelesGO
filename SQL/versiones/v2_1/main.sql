@@ -11,3 +11,4 @@ SOURCE ./DDL/010_v2_1_analiticas_nuevos_campos.sql;
 SOURCE ./DDL/007_v2_1_trazabilidad_fabricacion_fabricacion_semanal_nullable.sql;
 SOURCE ./DDL/008_v2_1_puestos_trabajo_orden.sql;
 SOURCE ./DDL/011_v2_1_tostados.sql;
+SOURCE ./DDL/012_v2_1_estados_flejes.sql;

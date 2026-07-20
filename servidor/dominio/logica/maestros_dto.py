@@ -6,6 +6,7 @@ from servidor.dominio.maestros.cliente_dto import ClienteDTO
 from servidor.dominio.maestros.estado_pedido_dto import EstadoPedidoDTO
 from servidor.dominio.maestros.estado_fabricacion_semanal_dto import EstadoFabricacionSemanalDTO
 from servidor.dominio.maestros.estado_producto_dto import EstadoProductoDTO
+from servidor.dominio.maestros.estado_fleje_dto import EstadoFlejeDTO
 from servidor.dominio.maestros.estado_trazabilidad_fabricacion_dto import EstadoTrazabilidadFabricacionDTO
 from servidor.dominio.maestros.estado_palet_dto import EstadoPaletDTO
 from servidor.dominio.maestros.instalacion_dto import InstalacionDTO
@@ -32,6 +33,7 @@ class MaestrosDTO(BaseModel):
     estados_pedidos: Optional[Dict[int, "EstadoPedidoDTO"]] = {}
     estados_fabricacion_semanal: Optional[Dict[int, "EstadoFabricacionSemanalDTO"]] = {}
     estados_productos: Optional[Dict[int, "EstadoProductoDTO"]] = {}
+    estados_flejes: Optional[Dict[int, "EstadoFlejeDTO"]] = {}
     estados_trazabilidad_fabricacion: Optional[Dict[int, "EstadoTrazabilidadFabricacionDTO"]] = {}
     estados_palets: Optional[Dict[int, "EstadoPaletDTO"]] = {}
     instalaciones: Optional[Dict[int, InstalacionDTO]] = {}

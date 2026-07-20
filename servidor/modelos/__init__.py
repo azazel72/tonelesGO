@@ -1,6 +1,6 @@
 
 from .logica import PlanCamionDB, PlanFacturacionDB, PlanMaterialDB, CuadranteDB, CuadranteDetalleDB
-from .maestros import ClienteDB, EstadoPedidoDB, EstadoFabricacionSemanalDB, EstadoProductoDB, EstadoTrazabilidadFabricacionDB, EstadoPaletDB
+from .maestros import ClienteDB, EstadoPedidoDB, EstadoFabricacionSemanalDB, EstadoProductoDB, EstadoFlejeDB, EstadoTrazabilidadFabricacionDB, EstadoPaletDB
 from .maestros import InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB, RolDB, PuestoTrabajoDB
 from .maestros import MaterialDB, ContenedorDB, EntradaDB, LineaEntradaDB, PaletDB, ProductoDB, ProductoOperarioDB, ArchivoSubidoDB
 from .maestros import AmbienteDB
@@ -19,6 +19,7 @@ __all__ = [
     "EstadoPedidoDB",
     "EstadoFabricacionSemanalDB",
     "EstadoProductoDB",
+    "EstadoFlejeDB",
     "EstadoTrazabilidadFabricacionDB",
     "EstadoPaletDB",
     "InstalacionDB",
