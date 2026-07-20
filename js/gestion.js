@@ -139,6 +139,9 @@ window.onload = () => {
         async "ver-inventario-flejes"() {
             await openInventarioFlejesWin();
         },
+        async "ver-asistencias-mensuales"() {
+            await openAsistenciasMensualesWin();
+        },
 
         async "cerrar-maestros"() {
             cerrarVentanasMaestros();
@@ -204,6 +207,7 @@ window.onload = () => {
         cuadrantes: openCuadrantesWin,
         inventario_duelas: openInventarioDuelasWin,
         inventario_flejes: openInventarioFlejesWin,
+        asistencias_mensuales: openAsistenciasMensualesWin,
     };
 
     // Delegación de eventos (un solo listener para toda la página)

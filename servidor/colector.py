@@ -1,4 +1,5 @@
 from datetime import date, datetime, timedelta
+from calendar import monthrange
 import re
 import logging
 import sys
@@ -2964,6 +2965,134 @@ class Colector:
                     for row in rows
                 ]
             }
+
+    def listar_asistencias_mensuales(self, año: int | None, mes: int | None) -> dict:
+        año_num = int(año or 0)
+        mes_num = int(mes or 0)
+        if año_num <= 0 or mes_num < 1 or mes_num > 12:
+            raise ValueError("Mes o año no válidos.")
+
+        ultimo_dia = monthrange(año_num, mes_num)[1]
+        fecha_inicio = date(año_num, mes_num, 1)
+        fecha_fin = date(año_num, mes_num, ultimo_dia)
+
+        with DB.crear_sesion() as session:
+            detalles = session.exec(
+                select(CuadranteDetalleDB).where(
+                    CuadranteDetalleDB.fecha >= fecha_inicio,
+                    CuadranteDetalleDB.fecha <= fecha_fin,
+                )
+            ).all()
+            dias_festivos = session.exec(
+                select(DiaFestivoDB).where(
+                    DiaFestivoDB.fecha >= fecha_inicio,
+                    DiaFestivoDB.fecha <= fecha_fin,
+                )
+            ).all()
+
+            usuarios = self.repo_usuarios.list_all(session)
+            puestos = self.repo_puestos_trabajo.list_all(session)
+
+        usuarios_por_id = {int(usuario.id): usuario for usuario in usuarios if usuario.id}
+        puestos_por_id = {int(puesto.id): puesto for puesto in puestos if puesto.id}
+
+        conteos_por_usuario: dict[int, dict] = {}
+        puestos_listado_en_datos: set[int] = set()
+
+        for detalle in detalles:
+            usuario_id = int(detalle.usuario_id or 0)
+            puesto_id = int(detalle.puesto_id or 0)
+            if not usuario_id or not puesto_id:
+                continue
+
+            puesto = puestos_por_id.get(puesto_id)
+            if puesto is None:
+                continue
+
+            fila = conteos_por_usuario.setdefault(usuario_id, {
+                "asistencia_fechas": set(),
+                "puestos": {},
+            })
+
+            if bool(getattr(puesto, "listado", False)):
+                fila["puestos"][puesto_id] = int(fila["puestos"].get(puesto_id, 0)) + 1
+                puestos_listado_en_datos.add(puesto_id)
+            else:
+                if getattr(detalle, "fecha", None) is not None:
+                    fila["asistencia_fechas"].add(detalle.fecha)
+
+        usuarios_incluir: list = []
+        for usuario in usuarios:
+            if not getattr(usuario, "id", None):
+                continue
+            if bool(getattr(usuario, "empleado", False)) or int(usuario.id) in conteos_por_usuario:
+                usuarios_incluir.append(usuario)
+
+        def ordenar_usuarios(usuario):
+            codigo = str(getattr(usuario, "codigo", "") or "").strip()
+            nombre = str(getattr(usuario, "nombre", "") or getattr(usuario, "alias", "") or "")
+            return (0 if codigo else 1, codigo, nombre.casefold(), int(getattr(usuario, "id", 0) or 0))
+
+        usuarios_incluir.sort(key=ordenar_usuarios)
+
+        puestos_listado = [
+            puesto for puesto in puestos
+            if getattr(puesto, "id", None)
+            and bool(getattr(puesto, "listado", False))
+            and (
+                bool(getattr(puesto, "activo", True))
+                or int(puesto.id) in puestos_listado_en_datos
+            )
+        ]
+        puestos_listado.sort(key=lambda puesto: (
+            int(getattr(puesto, "orden", 0) or 0),
+            str(getattr(puesto, "nombre", "") or "").casefold(),
+            int(getattr(puesto, "id", 0) or 0),
+        ))
+
+        festivos_mes = {
+            dia.fecha for dia in dias_festivos
+            if getattr(dia, "fecha", None) is not None
+        }
+        dias_laborables = 0
+        cursor = fecha_inicio
+        while cursor <= fecha_fin:
+            if cursor.weekday() < 5 and cursor not in festivos_mes:
+                dias_laborables += 1
+            cursor += timedelta(days=1)
+
+        filas = []
+        for usuario in usuarios_incluir:
+            usuario_id = int(usuario.id)
+            conteos = conteos_por_usuario.get(usuario_id, {"asistencia_fechas": set(), "puestos": {}})
+            filas.append({
+                "usuario_id": usuario_id,
+                "codigo": getattr(usuario, "codigo", None),
+                "alias": getattr(usuario, "alias", None),
+                "nombre": getattr(usuario, "nombre", None),
+                "asistencia": len(conteos.get("asistencia_fechas", set()) or set()),
+                "puestos": {
+                    str(puesto.id): int(conteos["puestos"].get(int(puesto.id), 0) or 0)
+                    for puesto in puestos_listado
+                },
+            })
+
+        return {
+            "año": año_num,
+            "mes": mes_num,
+            "fecha_inicio": fecha_inicio.isoformat(),
+            "fecha_fin": fecha_fin.isoformat(),
+            "dias_laborables": dias_laborables,
+            "columnas_puestos": [
+                {
+                    "id": int(puesto.id),
+                    "nombre": str(getattr(puesto, "nombre", "") or f"Puesto {puesto.id}"),
+                    "orden": int(getattr(puesto, "orden", 0) or 0),
+                }
+                for puesto in puestos_listado
+            ],
+            "filas": filas,
+        }
     #endregion
 
     #region Métodos Cuadrantes

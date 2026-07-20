@@ -46,6 +46,7 @@ const ACCIONES_PERMISO_GESTION = {
     "ver-trazabilidad-producto": [],
     "ver-inventario-duelas": [],
     "ver-inventario-flejes": [],
+    "ver-asistencias-mensuales": [],
     "exportar-csv": [],
     "exportar-json": [],
     "subir-archivo": [],

@@ -1,0 +1,28 @@
+.gestion-asistencias-month {
+  min-width: 10rem;
+}
+
+.gestion-asistencias-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.gestion-asistencias-table th,
+.gestion-asistencias-table td {
+  white-space: nowrap;
+}
+
+.gestion-asistencias-valor-no-cero {
+  font-weight: 700;
+}
+
+.gestion-asistencias-total {
+  font-weight: 700;
+}
+
+.gestion-asistencias-total-error {
+  color: #b42318 !important;
+}

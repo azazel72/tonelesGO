@@ -62,6 +62,10 @@ def obtener_acciones() -> Dict[str, any]:
         "listar_archivos_entidad": lambda ws, req: Colector.colector.listar_archivos_entidad(req.data.get("entidad"), req.data.get("entidad_id")),
         "inventario_duelas": lambda ws, req: Colector.colector.inventario_duelas(),
         "inventario_flejes": lambda ws, req: Colector.colector.inventario_flejes(),
+        "listar_asistencias_mensuales": lambda ws, req: Colector.colector.listar_asistencias_mensuales(
+            (req.data or {}).get("año"),
+            (req.data or {}).get("mes"),
+        ),
         "siguiente_codigo_palet": lambda ws, req: Colector.colector.siguiente_codigo_palet(req.data or {}),
         "mover_stock": lambda ws, req: Colector.colector.mover_stock(req.data or {}),
         "procesar_stock": lambda ws, req: Colector.colector.procesar_stock(req.data or {}),

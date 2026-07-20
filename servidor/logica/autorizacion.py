@@ -41,6 +41,7 @@ PERMISOS_POR_ACCION = {
     "listar_archivos_entidad": {"fabricacion", "expedicion", "trazabilidad"},
     "inventario_duelas": {"recepcion", "fabricacion"},
     "inventario_flejes": {"recepcion", "fabricacion"},
+    "listar_asistencias_mensuales": {"planificacion", "fabricacion", "recepcion"},
     "listar_cubicaje": {"fabricacion"},
     "siguiente_codigo_palet": {"ubicacion", "fabricacion"},
     "mover_stock": {"ubicacion"},
