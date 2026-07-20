@@ -10,6 +10,7 @@ class FabricacionSemanalDTO(BaseModel):
     fecha_inicio: date | None = None
     tipo_producto_id: int
     material_id: int | None = None
+    tostado_id: int | None = None
     cantidad: int = 0
     cantidad_fabricada: int = 0
     estado: int | None = None
@@ -28,6 +29,7 @@ class FabricacionSemanalDTO(BaseModel):
             fecha_inicio=linea_db.fecha_inicio,
             tipo_producto_id=linea_db.tipo_producto_id,
             material_id=linea_db.material_id,
+            tostado_id=linea_db.tostado_id,
             cantidad=linea_db.cantidad,
             cantidad_fabricada=linea_db.cantidad_fabricada,
             estado=linea_db.estado,
@@ -40,6 +42,7 @@ class FabricacionSemanalDTO(BaseModel):
             fecha_inicio=self.fecha_inicio,
             tipo_producto_id=self.tipo_producto_id,
             material_id=self.material_id,
+            tostado_id=self.tostado_id,
             cantidad=self.cantidad,
             cantidad_fabricada=self.cantidad_fabricada,
             estado=self.estado,

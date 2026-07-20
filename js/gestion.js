@@ -54,6 +54,9 @@ window.onload = () => {
         async "ver-materiales"() {
             await openMaterialesWin();
         },
+        async "ver-tostados"() {
+            await openTostadosWin();
+        },
 
         async "ver-entradas"() {
             await openEntradasWin();
@@ -171,6 +174,7 @@ window.onload = () => {
         estados_palets: openEstadosPaletsWin,
         puestos_trabajo: openPuestosTrabajoWin,
         materiales: openMaterialesWin,
+        tostados: openTostadosWin,
         entradas: openEntradasWin,
         lineas_entrada: openLineasEntradaWin,
         entradas_flejes: openEntradasFlejesWin,

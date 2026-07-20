@@ -22,6 +22,7 @@ from .archivo_subido_db import ArchivoSubidoDB
 from .ambiente_db import AmbienteDB
 from .entrada_fleje_db import EntradaFlejeDB
 from .cubicaje_db import CubicajeDB
+from .tostado_db import TostadoDB
 
 __all__ = [
     "ClienteDB",
@@ -47,4 +48,5 @@ __all__ = [
     "AmbienteDB",
     "EntradaFlejeDB",
     "CubicajeDB",
+    "TostadoDB",
 ]

@@ -22,6 +22,7 @@ from .archivo_subido_dto import ArchivoSubidoDTO
 from .ambiente_dto import AmbienteDTO
 from .entrada_fleje_dto import EntradaFlejeDTO
 from .cubicaje_dto import CubicajeDTO
+from .tostado_dto import TostadoDTO
 
 __all__ = [
     "ClienteDTO",
@@ -47,4 +48,5 @@ __all__ = [
     "AmbienteDTO",
     "EntradaFlejeDTO",
     "CubicajeDTO",
+    "TostadoDTO",
 ]

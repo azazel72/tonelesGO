@@ -32,6 +32,13 @@ function openProductosWin() {
       label: descripcion || codigo || String(id),
     })
   );
+  const tostadosDict = Object.values(DATOS?.maestros?.tostados ?? {}).map(
+    ({ id, descripcion, ...resto }) => ({
+      ...resto, id, descripcion,
+      value: id,
+      label: descripcion || String(id),
+    })
+  );
   const estadosDict = Object.values(DATOS?.maestros?.estados_productos ?? {}).map(
     ({ id, descripcion, ...resto }) => ({
       ...resto, id, descripcion,
@@ -104,6 +111,22 @@ function openProductosWin() {
             editable: tablaEditable,
             cssClass: "filtrable",
             formatter: cell => DATOS?.maestros?.materiales?.[cell.getValue()]?.descripcion ?? cell.getValue(),
+          },
+          {
+            title: "Tostado",
+            field: "tostado_id",
+            editor: "list",
+            editorParams: {
+              values: tostadosDict,
+              clearable: true,
+              autocomplete: true,
+              allowEmpty: true,
+              listOnEmpty: true,
+              freetext: false,
+            },
+            editable: tablaEditable,
+            cssClass: "filtrable",
+            formatter: cell => DATOS?.maestros?.tostados?.[cell.getValue()]?.descripcion ?? cell.getValue(),
           },
           {
             title: "Ubicacion",

@@ -17,6 +17,13 @@ function openFabricacionSemanalWin() {
   );
 
   const materialesDict = construirMaterialesDict();
+  const tostadosDict = Object.values(DATOS?.maestros?.tostados ?? {}).map(
+    ({ id, descripcion, ...resto }) => ({
+      ...resto, id, descripcion,
+      value: id,
+      label: descripcion || String(id),
+    })
+  );
 
   const estadosDict = Object.values(DATOS?.maestros?.estados_fabricacion_semanal ?? {}).map(
     ({ id, descripcion, ...resto }) => ({
@@ -105,6 +112,22 @@ function openFabricacionSemanalWin() {
             cssClass: "filtrable",
             formatter: cell => DATOS?.maestros?.materiales?.[cell.getValue()]?.descripcion ?? cell.getValue(),
           },
+          {
+            title: "Tostado",
+            field: "tostado_id",
+            editor: "list",
+            editorParams: {
+              values: tostadosDict,
+              clearable: false,
+              autocomplete: true,
+              allowEmpty: false,
+              listOnEmpty: true,
+              freetext: false,
+            },
+            editable: false,
+            cssClass: "filtrable",
+            formatter: cell => DATOS?.maestros?.tostados?.[cell.getValue()]?.descripcion ?? cell.getValue(),
+          },
           { title:"Cantidad", field:"cantidad", editor:"number", editable: tablaEditable, cssClass: "filtrable", hozAlign:"right" },
           { title:"Cant. fabricada", field:"cantidad_fabricada", editor:"number", editable: tablaEditable, cssClass: "filtrable", hozAlign:"right" },
           {
@@ -154,9 +177,10 @@ function getEtiquetaPedido(pedido) {
   const cliente = DATOS?.maestros?.clientes?.[pedido.cliente_id]?.nombre || "";
   const tipo = DATOS?.fabricacion?.tipos_producto?.[pedido.tipo_producto_id]?.descripcion || "";
   const material = DATOS?.maestros?.materiales?.[pedido.material_id]?.descripcion || "";
+  const tostado = DATOS?.maestros?.tostados?.[pedido.tostado_id]?.descripcion || "";
   const cantidad = Number.parseInt(String(pedido.cantidad ?? ""), 10);
   const cantidadTxt = Number.isFinite(cantidad) ? String(cantidad) : "";
-  const partes = [descripcion, cliente, tipo, material, cantidadTxt ? `Cant. ${cantidadTxt}` : ""].filter(Boolean);
+  const partes = [descripcion, cliente, tipo, material, tostado, cantidadTxt ? `Cant. ${cantidadTxt}` : ""].filter(Boolean);
   if (partes.length) return partes.join(" | ");
   return pedido.numero || pedido.descripcion || String(pedido.id);
 }
@@ -167,9 +191,10 @@ function getEtiquetaPedidoSelector(pedido) {
   const cliente = DATOS?.maestros?.clientes?.[pedido.cliente_id]?.nombre || "";
   const tipo = DATOS?.fabricacion?.tipos_producto?.[pedido.tipo_producto_id]?.descripcion || "";
   const material = DATOS?.maestros?.materiales?.[pedido.material_id]?.descripcion || "";
+  const tostado = DATOS?.maestros?.tostados?.[pedido.tostado_id]?.descripcion || "";
   const cantidad = Number.parseInt(String(pedido.cantidad ?? ""), 10);
   const cantidadTxt = Number.isFinite(cantidad) ? `Cant. ${cantidad}` : "";
-  const partes = [descripcion, cliente, tipo, material, cantidadTxt].filter(Boolean);
+  const partes = [descripcion, cliente, tipo, material, tostado, cantidadTxt].filter(Boolean);
   if (partes.length) return partes.join(" | ");
   return pedido.numero || String(pedido.id);
 }
@@ -225,14 +250,16 @@ function actualizarLineasFabricacionEditorMateriales() {
 function obtenerDerivadosPedidoFabricacion(pedidoId) {
   const pedido = DATOS?.fabricacion?.pedidos?.[pedidoId];
   if (!pedido) {
-    return {
-      tipo_producto_id: null,
-      material_id: null,
-    };
+      return {
+        tipo_producto_id: null,
+        material_id: null,
+        tostado_id: null,
+      };
   }
   return {
     tipo_producto_id: pedido.tipo_producto_id ?? null,
     material_id: pedido.material_id ?? null,
+    tostado_id: pedido.tostado_id ?? null,
   };
 }
 
@@ -278,6 +305,6 @@ async function onPedidoCellEditedFabricacionSemanal(cell) {
     }
   } catch (e) {
     console.error("Error al sincronizar campos derivados del pedido:", e);
-    alert("No se pudieron guardar tipo/material/cantidad derivados del pedido.");
+    alert("No se pudieron guardar tipo/material/tostado derivados del pedido.");
   }
 }

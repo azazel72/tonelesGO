@@ -22,6 +22,7 @@ const ACCIONES_PERMISO_GESTION = {
     "ver-instalaciones": [],
     "ver-ubicaciones": [],
     "ver-materiales": [],
+    "ver-tostados": [],
     "ver-entradas": { permisos: [], marcarCandado: false, desactivada: false },
     "ver-lineas-entrada": { permisos: [], marcarCandado: false, desactivada: false },
     "ver-entradas-flejes": [],
@@ -162,4 +163,3 @@ function aplicarPermisosMenuGestion() {
         else bloquearAccionMenu(el);
     }
 }
-

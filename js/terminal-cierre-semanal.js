@@ -64,6 +64,7 @@ function obtenerInfoLineaSemanal(linea) {
     const pedido = terminalFabricacion?.pedidos?.[linea?.pedido_id] || null;
     const tipo = terminalFabricacion?.tipos_producto?.[linea?.tipo_producto_id]?.descripcion || "-";
     const material = terminalFabricacion?.materiales?.[linea?.material_id]?.descripcion || "-";
+    const tostado = terminalFabricacion?.tostados?.[linea?.tostado_id]?.descripcion || linea?.tostado_descripcion || "-";
     const semanaPedida = Number(linea?.cantidad || 0) || 0;
     const semanaFabricada = Number(linea?.cantidad_fabricada || 0) || 0;
     const pedidoTotal = Number(pedido?.cantidad || 0) || 0;
@@ -73,6 +74,7 @@ function obtenerInfoLineaSemanal(linea) {
         pedido,
         tipo,
         material,
+        tostado,
         pedidoDescripcion: (pedido?.descripcion || `Pedido ${linea?.pedido_id || "-"}`).trim(),
         fechaInicio: typeof formatearFechaEuropea === "function" ? formatearFechaEuropea(linea?.fecha_inicio) : (linea?.fecha_inicio || ""),
         semanaPedida,

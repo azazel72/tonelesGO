@@ -165,6 +165,7 @@ function construirColumnasPlanificacionPedidos() {
   const clientesDict = Object.values(DATOS?.maestros?.clientes ?? {}).map(({ id, nombre }) => ({ value: id, label: nombre || String(id) }));
   const tiposDict = Object.values(DATOS?.fabricacion?.tipos_producto ?? {}).map(({ id, descripcion, codigo }) => ({ value: id, label: descripcion || codigo || String(id) }));
   const materialesDict = Object.values(DATOS?.maestros?.materiales ?? {}).map(({ id, descripcion }) => ({ value: id, label: descripcion || String(id) }));
+  const tostadosDict = Object.values(DATOS?.maestros?.tostados ?? {}).map(({ id, descripcion }) => ({ value: id, label: descripcion || String(id) }));
   const estadosDict = Object.values(DATOS?.maestros?.estados_pedidos ?? {}).map(({ id, descripcion }) => ({ value: id, label: descripcion || String(id) }));
   const destinosDict = [
     { value: "C", label: "CLIENTE" },
@@ -211,6 +212,15 @@ function construirColumnasPlanificacionPedidos() {
       formatter: (cell) => DATOS?.maestros?.materiales?.[cell.getValue()]?.descripcion ?? cell.getValue(),
       minWidth: 140,
     },
+    {
+      title: "Tostado",
+      field: "tostado_id",
+      editor: "list",
+      editorParams: { values: tostadosDict, clearable: false, autocomplete: true, allowEmpty: false, listOnEmpty: true, freetext: false },
+      editable: tablaEditablePlanificacion,
+      formatter: (cell) => DATOS?.maestros?.tostados?.[cell.getValue()]?.descripcion ?? cell.getValue(),
+      minWidth: 150,
+    },
     { title: "Cantidad", field: "cantidad", editor: "number", editorParams: { min: 0, step: 1 }, editable: tablaEditablePlanificacion, hozAlign: "right", width: 95 },
     { title: "Fabricada", field: "cantidad_fabricada", editor: "number", editorParams: { min: 0, step: 1 }, editable: tablaEditablePlanificacion, hozAlign: "right", width: 95 },
     { title: "Fecha", field: "fecha", editor: "date", editable: tablaEditablePlanificacion, sorter: "date", width: 120 },
@@ -246,6 +256,13 @@ function construirColumnasPlanificacionFabricacion() {
       editable: false,
       formatter: (cell) => DATOS?.maestros?.materiales?.[cell.getValue()]?.descripcion ?? cell.getValue(),
       minWidth: 140,
+    },
+    {
+      title: "Tostado",
+      field: "tostado_id",
+      editable: false,
+      formatter: (cell) => DATOS?.maestros?.tostados?.[cell.getValue()]?.descripcion ?? cell.getValue(),
+      minWidth: 150,
     },
     { title: "Cantidad", field: "cantidad", editor: "number", editorParams: { min: 0, step: 1 }, editable: tablaEditablePlanificacion, hozAlign: "right", width: 95 },
     { title: "Fabricada", field: "cantidad_fabricada", editor: "number", editorParams: { min: 0, step: 1 }, editable: tablaEditablePlanificacion, hozAlign: "right", width: 95 },
@@ -636,6 +653,7 @@ function crearPedidoVacioPlanificacion() {
     descripcion: "",
     tipo_producto_id: null,
     material_id: null,
+    tostado_id: null,
     cantidad: 0,
     cantidad_fabricada: 0,
     fecha: null,
@@ -651,6 +669,7 @@ function crearFabricacionVaciaPlanificacion(pedido) {
     fecha_inicio: null,
     tipo_producto_id: pedido.tipo_producto_id ?? null,
     material_id: pedido.material_id ?? null,
+    tostado_id: pedido.tostado_id ?? null,
     cantidad: Number(pedido.cantidad ?? 0) || 0,
     cantidad_fabricada: 0,
     estado: primerEstado,

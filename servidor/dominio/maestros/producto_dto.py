@@ -9,6 +9,7 @@ class ProductoDTO(BaseModel):
     codigo: str
     tipo_producto_id: int | None = None
     material_id: int | None = None
+    tostado_id: int | None = None
     ubicacion_id: int | None = None
     contenedor_id: int | None = None
     produccion_id: int | None
@@ -21,6 +22,7 @@ class ProductoDTO(BaseModel):
             codigo=producto_db.codigo,
             tipo_producto_id=producto_db.tipo_producto_id,
             material_id=producto_db.material_id,
+            tostado_id=producto_db.tostado_id,
             ubicacion_id=producto_db.ubicacion_id,
             contenedor_id=producto_db.contenedor_id,
             produccion_id=producto_db.produccion_id,
@@ -34,6 +36,7 @@ class ProductoDTO(BaseModel):
             codigo=self.codigo,
             tipo_producto_id=self.tipo_producto_id,
             material_id=self.material_id,
+            tostado_id=self.tostado_id,
             ubicacion_id=self.ubicacion_id,
             contenedor_id=self.contenedor_id,
             produccion_id=self.produccion_id,

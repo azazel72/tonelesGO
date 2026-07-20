@@ -167,4 +167,4 @@ class ImprimirEtiqueta:
 
 
 ie = ImprimirEtiqueta()
-ie.imprimir_etiqueta("botas", "91AU4049811-260300003", 10)
+ie.imprimir_etiqueta("botas", "91AU4049811-260300003", 1)

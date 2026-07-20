@@ -547,6 +547,10 @@
     min-width: 0;
 }
 
+.fabricacion-card-field-semana-pedida {
+    grid-column: 1;
+}
+
 .fabricacion-card-label {
     font-size: 0.74rem;
     text-transform: uppercase;
@@ -699,4 +703,3 @@
 #modalBotasDiarias .modal-body {
     overflow: auto;
 }
-

@@ -6,6 +6,7 @@ from .maestros import MaterialDB, ContenedorDB, EntradaDB, LineaEntradaDB, Palet
 from .maestros import AmbienteDB
 from .maestros import EntradaFlejeDB
 from .maestros import CubicajeDB
+from .maestros import TostadoDB
 from .fabricacion import PedidoDB, TipoProductoDB, FabricacionSemanalDB, TrazabilidadProcesadoDB
 from .fabricacion import TrazabilidadFabricacionDB, TrazabilidadMovimientoDB, TrazabilidadProductoDB, ConsumoDB
 from .fabricacion import AnaliticaDB, BotaEnvinadaAnaliticaDB, BotaEnvinadaArchivoDB
@@ -37,6 +38,7 @@ __all__ = [
     "AmbienteDB",
     "EntradaFlejeDB",
     "CubicajeDB",
+    "TostadoDB",
     "CuadranteDB",
     "CuadranteDetalleDB",
     "PedidoDB",

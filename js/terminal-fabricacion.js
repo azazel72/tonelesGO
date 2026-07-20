@@ -83,6 +83,7 @@ const terminalFabricacion = {
     estados_trazabilidad_fabricacion: null,
     tipos_producto: null,
     materiales: null,
+    tostados: null,
     instalaciones: null,
     ubicaciones: null,
     palets: null,
@@ -99,6 +100,7 @@ async function refrescarMaestrosFabricacion() {
         terminalFabricacion.clientes = maestros?.clientes || {};
         terminalFabricacion.estados_trazabilidad_fabricacion = maestros?.estados_trazabilidad_fabricacion || {};
         terminalFabricacion.materiales = maestros?.materiales || {};
+        terminalFabricacion.tostados = maestros?.tostados || {};
         terminalFabricacion.instalaciones = maestros?.instalaciones || {};
         terminalFabricacion.ubicaciones = maestros?.ubicaciones || {};
         terminalFabricacion.palets = maestros?.palets || {};
@@ -116,6 +118,7 @@ async function asegurarDatosFabricacionTerminal() {
         terminalFabricacion.estados_trazabilidad_fabricacion &&
         terminalFabricacion.tipos_producto &&
         terminalFabricacion.materiales &&
+        terminalFabricacion.tostados &&
         terminalFabricacion.ubicaciones &&
         terminalFabricacion.usuarios
     ) return;
@@ -124,6 +127,7 @@ async function asegurarDatosFabricacionTerminal() {
         terminalFabricacion.clientes = maestros?.clientes || {};
         terminalFabricacion.estados_trazabilidad_fabricacion = maestros?.estados_trazabilidad_fabricacion || {};
         terminalFabricacion.materiales = maestros?.materiales || {};
+        terminalFabricacion.tostados = maestros?.tostados || {};
         terminalFabricacion.instalaciones = maestros?.instalaciones || {};
         terminalFabricacion.ubicaciones = maestros?.ubicaciones || {};
         terminalFabricacion.palets = maestros?.palets || {};
@@ -140,6 +144,7 @@ async function asegurarDatosFabricacionTerminal() {
         terminalFabricacion.estados_trazabilidad_fabricacion = terminalFabricacion.estados_trazabilidad_fabricacion || {};
         terminalFabricacion.tipos_producto = terminalFabricacion.tipos_producto || {};
         terminalFabricacion.materiales = terminalFabricacion.materiales || {};
+        terminalFabricacion.tostados = terminalFabricacion.tostados || {};
         terminalFabricacion.instalaciones = terminalFabricacion.instalaciones || {};
         terminalFabricacion.ubicaciones = terminalFabricacion.ubicaciones || {};
         terminalFabricacion.palets = terminalFabricacion.palets || {};
@@ -212,11 +217,15 @@ async function mostrarLineaFabricacion(fila) {
             pedido_id: pedidoIdData,
             tipo_producto_id: tipoId,
             material_id: lineaFabricacionMaterialActualId,
+            tostado_id: Number(fila.dataset.tostadoId || 0) || null,
             cantidad: cantidadFabricar,
             cantidad_fabricada: cantidadFabricada,
         })
         : null;
-    const resumenProducto = `Tipo: ${descripcionProducto} | Madera: ${descripcionMaterial}`;
+    const descripcionTostado =
+        (lineaFabricacionActualId && terminalFabricacion.tostados?.[Number(fila.dataset.tostadoId || 0)]?.descripcion) ||
+        (infoLinea?.tostado || "-");
+    const resumenProducto = `Tipo: ${descripcionProducto} | Madera: ${descripcionMaterial} | Tostado: ${descripcionTostado}`;
     const titulo = document.getElementById("botas-producto-orden");
     if (titulo) {
         titulo.textContent = resumenProducto;
@@ -266,6 +275,7 @@ function actualizarCardsFabricacionSemanalBotas(lineas) {
         card.dataset.lineaId = linea.id ?? "";
         card.dataset.tipoProductoId = linea.tipo_producto_id ?? "";
         card.dataset.materialId = linea.material_id ?? "";
+        card.dataset.tostadoId = linea.tostado_id ?? "";
         card.dataset.pedidoId = linea.pedido_id ?? "";
         card.dataset.cantidadFabricar = linea.cantidad ?? "";
         card.dataset.cantidadFabricada = linea.cantidad_fabricada ?? "";
@@ -280,6 +290,7 @@ function actualizarCardsFabricacionSemanalBotas(lineas) {
                 fechaInicio: formatearFechaEuropea(linea.fecha_inicio),
                 tipo: terminalFabricacion.tipos_producto?.[linea.tipo_producto_id]?.descripcion || "-",
                 material: terminalFabricacion.materiales?.[linea.material_id]?.descripcion || "-",
+                tostado: terminalFabricacion.tostados?.[linea.tostado_id]?.descripcion || "-",
                 semanaPedida: Number(linea.cantidad) || 0,
                 semanaFabricada: Number(linea.cantidad_fabricada) || 0,
                 pedidoTotal: Number(pedido?.cantidad) || 0,
@@ -303,6 +314,10 @@ function actualizarCardsFabricacionSemanalBotas(lineas) {
           <span class="fabricacion-card-value">${info.material}</span>
         </div>
         <div class="fabricacion-card-field">
+          <span class="fabricacion-card-label">Tostado</span>
+          <span class="fabricacion-card-value">${info.tostado || "-"}</span>
+        </div>
+        <div class="fabricacion-card-field fabricacion-card-field-semana-pedida">
           <span class="fabricacion-card-label">Semana pedida</span>
           <span class="fabricacion-card-value">${info.semanaPedida}</span>
         </div>

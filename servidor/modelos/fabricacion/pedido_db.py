@@ -13,6 +13,7 @@ class PedidoDB(SQLModel, table=True):
     cliente_id: int | None = None
     tipo_producto_id: int | None = None
     material_id: int | None = None
+    tostado_id: int | None = None
     cantidad: int = 0
     cantidad_fabricada: int = 0
     fecha: date | None = None

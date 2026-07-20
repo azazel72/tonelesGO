@@ -136,6 +136,7 @@ function abrirModalBuscarBota(productoId) {
             <div class="botas-diarias-detalle-linea"><span class="text-muted">Pedido</span><strong>${item.pedido_descripcion || item.pedido_numero || "-"}</strong></div>
             <div class="botas-diarias-detalle-linea"><span class="text-muted">Tipo</span><strong>${item.tipo_producto_descripcion || "-"}</strong></div>
             <div class="botas-diarias-detalle-linea"><span class="text-muted">Material</span><strong>${item.material_descripcion || "-"}</strong></div>
+            <div class="botas-diarias-detalle-linea"><span class="text-muted">Tostado</span><strong>${item.tostado_descripcion || "-"}</strong></div>
             <div class="botas-diarias-detalle-linea"><span class="text-muted">Batidero</span><strong>${item.codigo_batidero || "-"}</strong></div>
             <div class="botas-diarias-detalle-linea"><span class="text-muted">Operarios</span><strong>${operarios}</strong></div>
             <div class="botas-diarias-detalle-linea"><span class="text-muted">Lotes</span><strong>${lotes}</strong></div>

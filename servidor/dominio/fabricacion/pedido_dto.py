@@ -11,6 +11,7 @@ class PedidoDTO(BaseModel):
     cliente_id: int | None = None
     tipo_producto_id: int | None = None
     material_id: int | None = None
+    tostado_id: int | None = None
     cantidad: int = 0
     cantidad_fabricada: int = 0
     fecha: date | None = None
@@ -26,6 +27,7 @@ class PedidoDTO(BaseModel):
             cliente_id=orden_db.cliente_id,
             tipo_producto_id=orden_db.tipo_producto_id,
             material_id=orden_db.material_id,
+            tostado_id=orden_db.tostado_id,
             cantidad=orden_db.cantidad,
             cantidad_fabricada=orden_db.cantidad_fabricada,
             fecha=orden_db.fecha,
@@ -42,6 +44,7 @@ class PedidoDTO(BaseModel):
             cliente_id=self.cliente_id,
             tipo_producto_id=self.tipo_producto_id,
             material_id=self.material_id,
+            tostado_id=self.tostado_id,
             cantidad=self.cantidad,
             cantidad_fabricada=self.cantidad_fabricada,
             fecha=self.fecha,

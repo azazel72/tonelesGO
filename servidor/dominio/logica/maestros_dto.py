@@ -24,6 +24,7 @@ from servidor.dominio.maestros.archivo_subido_dto import ArchivoSubidoDTO
 from servidor.dominio.maestros.ambiente_dto import AmbienteDTO
 from servidor.dominio.maestros.entrada_fleje_dto import EntradaFlejeDTO
 from servidor.dominio.maestros.cubicaje_dto import CubicajeDTO
+from servidor.dominio.maestros.tostado_dto import TostadoDTO
 
 
 class MaestrosDTO(BaseModel):
@@ -49,6 +50,7 @@ class MaestrosDTO(BaseModel):
     ambientes: Optional[Dict[int, "AmbienteDTO"]] = {}
     entradas_flejes: Optional[Dict[int, "EntradaFlejeDTO"]] = {}
     cubicaje: Optional[Dict[int, "CubicajeDTO"]] = {}
+    tostados: Optional[Dict[int, "TostadoDTO"]] = {}
 
     def buscar_usuario_por_username(self, username: str) -> UsuarioDTO | None:
         buscado = (username or "").strip().lower()

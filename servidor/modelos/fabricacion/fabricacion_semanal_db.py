@@ -12,6 +12,7 @@ class FabricacionSemanalDB(SQLModel, table=True):
     fecha_inicio: date | None = None
     tipo_producto_id: int
     material_id: int | None = None
+    tostado_id: int | None = None
     cantidad: int = 0
     cantidad_fabricada: int = 0
     estado: int | None = None

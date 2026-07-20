@@ -10,7 +10,7 @@ from servidor.herramientas.utilidades import obtener_anterior_dia_semana
 from servidor.herramientas.BcryptHelper import BcryptHelper
 
 from .modelos import ClienteDB, EstadoPedidoDB, EstadoFabricacionSemanalDB, EstadoProductoDB, EstadoTrazabilidadFabricacionDB, EstadoPaletDB
-from .modelos import InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB, RolDB, PuestoTrabajoDB, MaterialDB, ContenedorDB, EntradaDB, LineaEntradaDB, PaletDB, ProductoDB, ProductoOperarioDB, ArchivoSubidoDB, AmbienteDB, EntradaFlejeDB, CubicajeDB
+from .modelos import InstalacionDB, UbicacionDB, ProveedorDB, UsuarioDB, RolDB, PuestoTrabajoDB, MaterialDB, ContenedorDB, EntradaDB, LineaEntradaDB, PaletDB, ProductoDB, ProductoOperarioDB, ArchivoSubidoDB, AmbienteDB, EntradaFlejeDB, CubicajeDB, TostadoDB
 from .modelos import PedidoDB, AnaliticaDB, BotaEnvinadaAnaliticaDB, BotaEnvinadaArchivoDB
 from .modelos import TipoProductoDB, FabricacionSemanalDB, TrazabilidadProcesadoDB, TrazabilidadFabricacionDB, TrazabilidadProductoDB, ConsumoDB
 from .modelos import PlanCamionDB, PlanFacturacionDB, PlanMaterialDB, CuadranteDB, CuadranteDetalleDB
@@ -18,7 +18,7 @@ from .persistencia import GenericRepository, DB
 from sqlmodel import select
 from sqlalchemy import extract, func, or_
 from .dominio import PlanificacionEntradasDTO, MaestrosDTO, PlanMaterialDTO, PlanFacturacionDTO, PlanCamionDTO, CuadranteDTO, CuadranteDetalleDTO, FabricacionDTO
-from .dominio import ClienteDTO, EstadoPedidoDTO, EstadoFabricacionSemanalDTO, EstadoProductoDTO, EstadoTrazabilidadFabricacionDTO, EstadoPaletDTO, InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO, RolDTO, PuestoTrabajoDTO, MaterialDTO, ContenedorDTO, EntradaDTO, LineaEntradaDTO, PaletDTO, ProductoDTO, ArchivoSubidoDTO, AmbienteDTO, EntradaFlejeDTO, CubicajeDTO, CuadrantesDTO
+from .dominio import ClienteDTO, EstadoPedidoDTO, EstadoFabricacionSemanalDTO, EstadoProductoDTO, EstadoTrazabilidadFabricacionDTO, EstadoPaletDTO, InstalacionDTO, UbicacionDTO, ProveedorDTO, UsuarioDTO, RolDTO, PuestoTrabajoDTO, MaterialDTO, ContenedorDTO, EntradaDTO, LineaEntradaDTO, PaletDTO, ProductoDTO, ArchivoSubidoDTO, AmbienteDTO, EntradaFlejeDTO, CubicajeDTO, TostadoDTO, CuadrantesDTO
 from .dominio import PedidoDTO, AnaliticaDTO, TipoProductoDTO, FabricacionSemanalDTO, TrazabilidadProcesadoDTO, TrazabilidadFabricacionDTO, TrazabilidadProductoDTO, ConsumoDTO
 from servidor.impresion import ImprimirEtiqueta
 from servidor.conexiones.broadcast import broadcast_error, broadcast_event
@@ -66,6 +66,7 @@ class Colector:
         self.repo_ambientes = GenericRepository(AmbienteDB)
         self.repo_entradas_flejes = GenericRepository(EntradaFlejeDB)
         self.repo_cubicaje = GenericRepository(CubicajeDB)
+        self.repo_tostados = GenericRepository(TostadoDB)
         self.repo_pedidos = GenericRepository(PedidoDB)
         self.repo_analiticas = GenericRepository(AnaliticaDB)
         self.repo_bota_envinada_analitica = GenericRepository(BotaEnvinadaAnaliticaDB)
@@ -107,6 +108,14 @@ class Colector:
             return str(material_id)
         return material.descripcion or str(material_id)
 
+    def _descripcion_tostado(self, tostado_id: int | None) -> str:
+        if not tostado_id:
+            return "-"
+        tostado = self.maestros.tostados.get(int(tostado_id)) if self.maestros.tostados else None
+        if not tostado:
+            return str(tostado_id)
+        return tostado.descripcion or str(tostado_id)
+
     def _es_tipo_duela(self, tipo_producto_id: int | None) -> bool:
         if not tipo_producto_id:
             return False
@@ -134,6 +143,41 @@ class Colector:
         if valor not in {"ACTIVA", "FINALIZADA"}:
             return "ACTIVA"
         return valor
+
+    def _obtener_campos_derivados_pedido(self, pedido_id: int | None) -> dict:
+        pedido = self.fabricacion.pedidos.get(int(pedido_id or 0)) if pedido_id else None
+        if not pedido:
+            return {
+                "tipo_producto_id": None,
+                "material_id": None,
+                "tostado_id": None,
+            }
+        return {
+            "tipo_producto_id": pedido.tipo_producto_id if pedido.tipo_producto_id not in ("", None) else None,
+            "material_id": pedido.material_id if pedido.material_id not in ("", None) else None,
+            "tostado_id": pedido.tostado_id if pedido.tostado_id not in ("", None) else None,
+        }
+
+    def _validar_tostado_pedido(self, data: dict | None, obligatorio: bool = True):
+        tostado_id = (data or {}).get("tostado_id")
+        if tostado_id in (None, ""):
+            if obligatorio:
+                raise ValueError("El tostado es obligatorio en cada linea de pedido.")
+            return
+        if int(tostado_id) not in (self.maestros.tostados or {}):
+            raise ValueError("tostado_id no valido.")
+
+    def _sincronizar_tostado_pedido_en_fabricacion(self, session: Session, pedido_id: int | None, tostado_id: int | None):
+        if not pedido_id:
+            return
+        lineas = session.exec(
+            select(FabricacionSemanalDB).where(FabricacionSemanalDB.pedido_id == int(pedido_id))
+        ).all()
+        for linea in lineas:
+            linea.tostado_id = int(tostado_id) if tostado_id not in (None, "") else None
+            session.add(linea)
+            if linea.id and self.fabricacion.fabricacion_semanal.get(int(linea.id)):
+                self.fabricacion.fabricacion_semanal[int(linea.id)].tostado_id = linea.tostado_id
 
     def _actualizar_cache_analitica(self, analitica: AnaliticaDB | None):
         if not analitica or not analitica.id:
@@ -171,6 +215,7 @@ class Colector:
 
     def obtener_datos_maestros(self) -> dict:
         with DB.crear_sesion() as session:
+            tostados = self.repo_tostados.list_all(session)
             clientes = self.repo_clientes.list_all(session)
             estados_pedidos = self.repo_estados_pedidos.list_all(session)
             estados_fabricacion_semanal = self.repo_estados_fabricacion_semanal.list_all(session)
@@ -216,6 +261,7 @@ class Colector:
             self.maestros.ambientes = {ambiente.id: AmbienteDTO.from_db(ambiente) for ambiente in ambientes}
             self.maestros.entradas_flejes = {entrada.id: EntradaFlejeDTO.from_db(entrada) for entrada in entradas_flejes}
             self.maestros.cubicaje = {cubicaje.id: CubicajeDTO.from_db(cubicaje) for cubicaje in cubicajes}
+            self.maestros.tostados = {tostado.id: TostadoDTO.from_db(tostado) for tostado in tostados}
 
             #print("Datos maestros cargados:", self.maestros)
             #print("Datos clientes cargados:", self.maestros.clientes)
@@ -280,6 +326,13 @@ class Colector:
                 valor = self._normalizar_estado_analitica(valor)
             valor = self._normalizar_vacio_numerico(objeto, campo, valor)
             setattr(DTO, campo, valor)
+            if tabla == "pedidos":
+                self._validar_tostado_pedido(DTO.model_dump(), obligatorio=(campo == "tostado_id"))
+            if tabla == "fabricacion_semanal" and campo == "pedido_id":
+                derivados = self._obtener_campos_derivados_pedido(DTO.pedido_id)
+                DTO.tipo_producto_id = derivados["tipo_producto_id"]
+                DTO.material_id = derivados["material_id"]
+                DTO.tostado_id = derivados["tostado_id"]
             if tabla == "palets" and campo == "linea_entrada_id":
                 linea = self.maestros.lineas_entrada.get(int(valor)) if valor not in (None, "") else None
                 DTO.tipo_producto_id = linea.tipo_producto_id if linea else None
@@ -291,6 +344,13 @@ class Colector:
             updated = DTO.to_db()
             repo.update(session, updated)
             maestro[entrada_id] = DTO
+            if tabla == "pedidos" and campo == "tostado_id":
+                self._sincronizar_tostado_pedido_en_fabricacion(session, entrada_id, DTO.tostado_id)
+                try:
+                    session.commit()
+                except Exception:
+                    session.rollback()
+                    raise
             valor_respuesta = "" if (tabla == "usuarios" and campo == "clave") else valor
             valor_log = "<oculto>" if (tabla == "usuarios" and campo == "clave") else valor
             logger.info(f"Entrada ID {entrada_id} modificada: {campo} = {valor_log}")
@@ -299,6 +359,12 @@ class Colector:
                 respuesta["valores"] = {
                     "tipo_producto_id": DTO.tipo_producto_id,
                     "material_id": DTO.material_id,
+                }
+            if tabla == "fabricacion_semanal" and campo == "pedido_id":
+                respuesta["valores"] = {
+                    "tipo_producto_id": DTO.tipo_producto_id,
+                    "material_id": DTO.material_id,
+                    "tostado_id": DTO.tostado_id,
                 }
             return respuesta
 
@@ -339,6 +405,15 @@ class Colector:
                         raise ValueError("linea_entrada_id no valido.")
                     data["tipo_producto_id"] = linea.tipo_producto_id
                     data["material_id"] = linea.material_id
+            if tabla == "pedidos":
+                data = dict(data or {})
+                self._validar_tostado_pedido(data)
+            if tabla == "fabricacion_semanal":
+                data = dict(data or {})
+                derivados = self._obtener_campos_derivados_pedido(data.get("pedido_id"))
+                data["tipo_producto_id"] = derivados["tipo_producto_id"]
+                data["material_id"] = derivados["material_id"]
+                data["tostado_id"] = derivados["tostado_id"]
             if tabla == "usuarios":
                 data = dict(data or {})
                 data["alias"] = data.get("alias")
@@ -509,23 +584,25 @@ class Colector:
     def listar_resumen_fabricacion_consumo(self):
         with DB.crear_sesion() as session:
             statement = (
-                select(FabricacionSemanalDB, PedidoDB, TipoProductoDB, MaterialDB)
+                select(FabricacionSemanalDB, PedidoDB, TipoProductoDB, MaterialDB, TostadoDB)
                 .join(PedidoDB, PedidoDB.id == FabricacionSemanalDB.pedido_id, isouter=True)
                 .join(TipoProductoDB, TipoProductoDB.id == FabricacionSemanalDB.tipo_producto_id, isouter=True)
                 .join(MaterialDB, MaterialDB.id == FabricacionSemanalDB.material_id, isouter=True)
+                .join(TostadoDB, TostadoDB.id == FabricacionSemanalDB.tostado_id, isouter=True)
                 .where(FabricacionSemanalDB.estado == 2)
                 .order_by(FabricacionSemanalDB.fecha_inicio.desc(), FabricacionSemanalDB.id.desc())
             )
             filas = session.exec(statement).all()
 
             resumen = []
-            for linea, pedido, tipo, material in filas:
+            for linea, pedido, tipo, material, tostado in filas:
                 resumen.append({
                     "id": linea.id,
                     "pedido_id": linea.pedido_id,
                     "fecha_inicio": linea.fecha_inicio.isoformat() if linea.fecha_inicio else None,
                     "tipo_producto_id": linea.tipo_producto_id,
                     "material_id": linea.material_id,
+                    "tostado_id": linea.tostado_id,
                     "cantidad": int(linea.cantidad or 0),
                     "cantidad_fabricada": int(linea.cantidad_fabricada or 0),
                     "pedido_descripcion": (pedido.descripcion if pedido else None) or f"Pedido {linea.pedido_id or '-'}",
@@ -533,6 +610,7 @@ class Colector:
                     "pedido_fabricado": int((pedido.cantidad_fabricada if pedido else 0) or 0),
                     "tipo_descripcion": ((tipo.descripcion if tipo else None) or (tipo.codigo if tipo else None) or "-"),
                     "material_descripcion": ((material.descripcion if material else None) or "-"),
+                    "tostado_descripcion": ((tostado.descripcion if tostado else None) or "-"),
                 })
             return resumen
 
@@ -939,6 +1017,8 @@ class Colector:
                     "tipo_producto_descripcion": getattr(tipo_bota, "descripcion", None) or getattr(tipo_bota, "codigo", None) or "",
                     "material_id": linea.material_id,
                     "material_descripcion": getattr(material, "descripcion", None) or "",
+                    "tostado_id": linea.tostado_id,
+                    "tostado_descripcion": self._descripcion_tostado(linea.tostado_id),
                     "cantidad": int(linea.cantidad or 0),
                     "cantidad_fabricada": cantidad_bbdd_semana,
                     "estado": int(linea.estado or 0) if linea.estado is not None else None,
@@ -2349,6 +2429,7 @@ class Colector:
                             codigo=codigo,
                             tipo_producto_id=linea_ref.tipo_producto_id if linea_ref else None,
                             material_id=linea_ref.material_id if linea_ref else None,
+                            tostado_id=linea_ref.tostado_id if linea_ref else None,
                             produccion_id=produccion_id,
                             estado=1,
                         )
@@ -3214,6 +3295,10 @@ class Colector:
             repo = self.repo_cubicaje
             maestro = self.maestros.cubicaje
             objeto = CubicajeDTO
+        elif tabla == "tostados":
+            repo = self.repo_tostados
+            maestro = self.maestros.tostados
+            objeto = TostadoDTO
         elif tabla == "pedidos":
             repo = self.repo_pedidos
             maestro = self.fabricacion.pedidos
@@ -3537,6 +3622,8 @@ class Colector:
                     "tipo_producto_descripcion": getattr(tipo, "descripcion", None) or getattr(tipo, "codigo", None) or "",
                     "material_id": getattr(linea, "material_id", None),
                     "material_descripcion": getattr(material, "descripcion", None) or "",
+                    "tostado_id": getattr(linea, "tostado_id", None),
+                    "tostado_descripcion": self._descripcion_tostado(getattr(linea, "tostado_id", None)),
                     "palets": palets_codigo,
                     "lotes": lotes,
                 })
@@ -3724,6 +3811,8 @@ class Colector:
                     "tipo_producto_descripcion": getattr(tipo, "descripcion", None) or getattr(tipo, "codigo", None) or "",
                     "material_id": getattr(linea, "material_id", None),
                     "material_descripcion": getattr(material, "descripcion", None) or "",
+                    "tostado_id": getattr(linea, "tostado_id", None),
+                    "tostado_descripcion": self._descripcion_tostado(getattr(linea, "tostado_id", None)),
                     "palets": palets_codigo,
                     "lotes": lotes,
                 })
