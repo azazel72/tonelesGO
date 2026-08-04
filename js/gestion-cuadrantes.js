@@ -34,16 +34,18 @@ function openCuadrantesWin() {
 }
 
 // ====== MUESTRA LA VENTANA DE CUADRANTES ======
-function mostrar_cuadrantes(response) {
+async function mostrar_cuadrantes(response) {
   DATOS.cuadrante = response.data ?? [];
-  
-  if (response.data && windowsRegistry.has("cuadrantes")) {
-    const { wb, table } = windowsRegistry.get("cuadrantes");
+  await cargarFestivosSemanaCuadrante(DATOS?.cuadrante?.fecha_inicio);
 
-    table.setColumns(crearColumnasCuadrantes(DATOS.cuadrante));
-    table.setData(crearDatosCuadrantes(DATOS.cuadrante));
-    
-    openCuadrantesWin();
+  if (response.data && windowsRegistry.has("cuadrantes")) {
+    const { table, wb } = windowsRegistry.get("cuadrantes");
+    if (table) {
+      table.setColumns(crearColumnasCuadrantes(DATOS.cuadrante));
+      table.setData(crearDatosCuadrantes(DATOS.cuadrante));
+      repintarEstadoUsoCuadrante(table, wb?.body || document);
+      actualizarIndicadoresFaltasCuadrante();
+    }
   }
 }
 
@@ -51,22 +53,77 @@ function mostrar_cuadrantes(response) {
 
 // --- UTILIDADES ---
 
+function obtenerFechasSemanaCuadrante(fechaInicio) {
+  if (!fechaInicio) return [];
+  return [
+    { letra: "J", nombre: "Jue", fecha: sumarDiasYYYYMMDD(fechaInicio, 0) },
+    { letra: "V", nombre: "Vie", fecha: sumarDiasYYYYMMDD(fechaInicio, 1) },
+    { letra: "L", nombre: "Lun", fecha: sumarDiasYYYYMMDD(fechaInicio, 4) },
+    { letra: "M", nombre: "Mar", fecha: sumarDiasYYYYMMDD(fechaInicio, 5) },
+    { letra: "X", nombre: "Mié", fecha: sumarDiasYYYYMMDD(fechaInicio, 6) },
+  ];
+}
+
+function obtenerFechasFestivasCuadrante() {
+  const fechas = new Set();
+  const festivos = DATOS?.festivos?.cuadrante_semana || [];
+  festivos.forEach((item) => {
+    const fecha = String(item?.fecha || "").trim();
+    if (fecha) fechas.add(fecha);
+  });
+  return fechas;
+}
+
+async function cargarFestivosSemanaCuadrante(fechaInicio) {
+  DATOS.festivos = DATOS.festivos || { anio: [], cuadrante_semana: [] };
+  if (!fechaInicio) {
+    DATOS.festivos.cuadrante_semana = [];
+    return [];
+  }
+  const fechaFin = sumarDiasYYYYMMDD(fechaInicio, 6);
+  try {
+    const festivos = await wsRequest("listar_dias_festivos_rango", {
+      fecha_inicio: fechaInicio,
+      fecha_fin: fechaFin,
+    }) || [];
+    DATOS.festivos.cuadrante_semana = Array.isArray(festivos) ? festivos : [];
+  } catch (_err) {
+    DATOS.festivos.cuadrante_semana = Object.values(DATOS?.maestros?.dias_festivos || {})
+      .filter((item) => {
+        const fecha = String(item?.fecha || "");
+        return fecha && fecha >= String(fechaInicio) && fecha <= String(fechaFin);
+      })
+      .sort((a, b) => String(a?.fecha || "").localeCompare(String(b?.fecha || "")));
+  }
+  return DATOS.festivos.cuadrante_semana;
+}
+
+function esFechaFestivaCuadrante(fecha) {
+  return Boolean(fecha) && obtenerFechasFestivasCuadrante().has(String(fecha));
+}
+
+function obtenerDiasCuadranteSemanaCompleta() {
+  return obtenerFechasSemanaCuadrante(DATOS?.cuadrante?.fecha_inicio).map((dia) => ({
+    ...dia,
+    festivo: esFechaFestivaCuadrante(dia.fecha),
+  }));
+}
+
 // === construcción de columnas ===
 function crearColumnasCuadrantes(cuadrante) {
-  const jue = sumarDiasYYYYMMDD(cuadrante?.fecha_inicio, 0);
-  const vie = sumarDiasYYYYMMDD(cuadrante?.fecha_inicio, 1);
-  const lun = sumarDiasYYYYMMDD(cuadrante?.fecha_inicio, 4);
-  const mar = sumarDiasYYYYMMDD(cuadrante?.fecha_inicio, 5);
-  const mie = sumarDiasYYYYMMDD(cuadrante?.fecha_inicio, 6);
+  const diasSemana = obtenerFechasSemanaCuadrante(cuadrante?.fecha_inicio);
 
   const columnas = [
     { title: "ID", field: "id", visible: false, headerSort: false },
     { title: "Puesto", field: "nombre", width: 180, frozen: true, headerSort: true, formatter: formatterPuestoCuadranteConOrden, sorter: sorterPuestoCuadrantePorOrden },
-    { title: crearTituloClonableDia("Jue", jue), field: jue, formatter: formatterColumnasCuadrante, variableHeight: true, cssClass: "celda-cuadrante", headerSort: false },
-    { title: crearTituloClonableDia("Vie", vie), field: vie, formatter: formatterColumnasCuadrante, variableHeight: true, cssClass: "celda-cuadrante", headerSort: false },
-    { title: crearTituloClonableDia("Lun", lun), field: lun, formatter: formatterColumnasCuadrante, variableHeight: true, cssClass: "celda-cuadrante", headerSort: false },
-    { title: crearTituloClonableDia("Mar", mar), field: mar, formatter: formatterColumnasCuadrante, variableHeight: true, cssClass: "celda-cuadrante", headerSort: false },
-    { title: crearTituloClonableDia("Mié", mie), field: mie, formatter: formatterColumnasCuadrante, variableHeight: true, cssClass: "celda-cuadrante", headerSort: false },
+    ...diasSemana.map((dia) => ({
+      title: crearTituloClonableDia(dia.nombre, dia.fecha),
+      field: dia.fecha,
+      formatter: formatterColumnasCuadrante,
+      variableHeight: true,
+      cssClass: `celda-cuadrante${esFechaFestivaCuadrante(dia.fecha) ? " celda-cuadrante-festiva" : ""}`,
+      headerSort: false,
+    })),
   ];
   return columnas;
 }
@@ -93,8 +150,12 @@ function sorterPuestoCuadrantePorOrden(a, b, aRow, bRow) {
 }
 
 function crearTituloClonableDia(dia, fecha) {
+  const festivo = esFechaFestivaCuadrante(fecha);
+  const title = festivo
+    ? "Día festivo. No permite asignaciones ni clonado."
+    : "Arrastra esta columna a otro día para clonar";
   return `
-    <div class="cuadrante-header-title" draggable="true" title="Arrastra esta columna a otro día para clonar">
+    <div class="cuadrante-header-title${festivo ? " cuadrante-header-title-festivo" : ""}" draggable="${festivo ? "false" : "true"}" title="${title}">
       <span>${titulo_con_fecha(dia, fecha)}</span>
     </div>
   `;
@@ -141,20 +202,12 @@ function compararUsuariosCuadrantePorCodigo(a, b) {
 }
 
 function obtenerDiasCuadranteActivos() {
-  const fechaInicio = DATOS.cuadrante?.fecha_inicio;
-  if (!fechaInicio) return [];
-  return [
-    { letra: "J", fecha: sumarDiasYYYYMMDD(fechaInicio, 0) },
-    { letra: "V", fecha: sumarDiasYYYYMMDD(fechaInicio, 1) },
-    { letra: "L", fecha: sumarDiasYYYYMMDD(fechaInicio, 4) },
-    { letra: "M", fecha: sumarDiasYYYYMMDD(fechaInicio, 5) },
-    { letra: "X", fecha: sumarDiasYYYYMMDD(fechaInicio, 6) },
-  ];
+  return obtenerDiasCuadranteSemanaCompleta().filter((dia) => !dia.festivo);
 }
 
 function obtenerAsignacionesUsuarioPorDia(tabla, usuarioId) {
   const estado = {};
-  const dias = obtenerDiasCuadranteActivos();
+  const dias = obtenerDiasCuadranteSemanaCompleta();
   dias.forEach((dia) => {
     estado[dia.fecha] = false;
   });
@@ -176,7 +229,7 @@ function actualizarIndicadoresFaltasCuadrante() {
   const registro = windowsRegistry.get("cuadrantes");
   const tabla = registro?.table;
   const contenedor = registro?.wb?.body?.querySelector?.("#contenedor-cuadrante") || document.querySelector("#contenedor-cuadrante");
-  const dias = obtenerDiasCuadranteActivos();
+  const dias = obtenerDiasCuadranteSemanaCompleta();
   if (!contenedor || !dias.length) return;
 
   contenedor.querySelectorAll(".usuario-pill").forEach((pill) => {
@@ -193,6 +246,13 @@ function actualizarIndicadoresFaltasCuadrante() {
     Array.from(avisos.children).forEach((marca, index) => {
       const dia = dias[index];
       if (!dia) return;
+      if (dia.festivo) {
+        marca.classList.remove("falta-dia", "cubre-dia");
+        marca.classList.add("festivo-dia");
+        return;
+      }
+
+      marca.classList.remove("festivo-dia");
       const asignado = Boolean(asignaciones[dia.fecha]);
       marca.classList.toggle("falta-dia", !asignado);
       marca.classList.toggle("cubre-dia", asignado);
@@ -215,8 +275,10 @@ function formatterColumnasCuadrante(cell, formatterParams, onRendered) {
     const el = cell.getElement();
     const value = cell.getValue() || [];
     const field = cell.getField();
-    const rowId = cell.getRow().getData().id;
+    const rowData = cell.getRow().getData() || {};
+    const esFestivo = esFechaFestivaCuadrante(field);
     el.innerHTML = "";
+    el.classList.toggle("celda-cuadrante-festiva", esFestivo);
 
     // Pintar cada pill
     [...value].forEach((detalle, index) => {
@@ -250,11 +312,13 @@ function formatterColumnasCuadrante(cell, formatterParams, onRendered) {
       el.dataset.dndBound = "1";
 
       el.addEventListener("dragenter", (e) => {
+        if (esFechaFestivaCuadrante(cell.getField())) return;
         e.preventDefault();
         el.classList.add("drop-target");
       });
 
       el.addEventListener("dragover", (e) => {
+        if (esFechaFestivaCuadrante(cell.getField())) return;
         e.preventDefault();
         e.dataTransfer.dropEffect = "move";
         el.classList.add("drop-target");
@@ -265,6 +329,7 @@ function formatterColumnasCuadrante(cell, formatterParams, onRendered) {
       });
 
       el.addEventListener("drop", (e) => {
+        if (esFechaFestivaCuadrante(cell.getField())) return;
         e.preventDefault();
         el.classList.remove("drop-target");
         manejarDropEnCelda(e, cell);
@@ -288,6 +353,12 @@ async function manejarDropEnCelda(e, cellDestino) {
   const rowDestino = cellDestino.getRow();
   const dataRowDestino = rowDestino.getData();
   let valoresDestino = cellDestino.getValue() || [];
+
+  if (esFechaFestivaCuadrante(fieldDestino)) {
+    alert("No se pueden asignar empleados en un día festivo.");
+    return;
+  }
+
   const detalleOrigenId = origen?.id ? Number(origen.id) : null;
 
   const conflictos = buscarAsignacionesUsuarioEnFecha(tabla, Number(origen.usuario_id), fieldDestino, detalleOrigenId);
@@ -362,14 +433,49 @@ function buscarAsignacionesUsuarioEnFecha(tabla, usuarioId, fecha, excluirDetall
   return encontrados;
 }
 
+function obtenerIdsUsadosCuadrante(cuadrante = DATOS?.cuadrante) {
+  const puestoIds = new Set();
+  const usuarioIds = new Set();
+  (cuadrante?.detalles || []).forEach((detalle) => {
+    const puestoId = Number(detalle?.puesto_id || 0);
+    const usuarioId = Number(detalle?.usuario_id || 0);
+    if (puestoId) puestoIds.add(puestoId);
+    if (usuarioId) usuarioIds.add(usuarioId);
+  });
+  return { puestoIds, usuarioIds };
+}
+
+function repintarEstadoUsoCuadrante(table, scope = document) {
+  const { puestoIds, usuarioIds } = obtenerIdsUsadosCuadrante(DATOS?.cuadrante);
+
+  scope.querySelectorAll?.(".usuario-pill").forEach((pill) => {
+    const usuarioId = Number(pill.dataset.usuarioId || 0);
+    const usuario = DATOS?.maestros?.usuarios?.[usuarioId];
+    pill.classList.toggle("inactivo", usuario?.activo === false);
+    pill.classList.toggle("usado", usuarioIds.has(usuarioId));
+  });
+
+  let visibleIndex = 0;
+  (table?.getRows?.() || []).forEach((row) => {
+    const data = row.getData() || {};
+    const puestoId = Number(data.id || 0);
+    const puesto = DATOS?.maestros?.puestos_trabajo?.[puestoId];
+    const rowEl = row.getElement?.();
+    if (!rowEl) return;
+    rowEl.classList.toggle("inactivo", puesto?.activo === false);
+    rowEl.classList.toggle("usado", puestoIds.has(puestoId));
+    const visible = !rowEl.classList.contains("inactivo") || rowEl.classList.contains("usado");
+    console.log(rowEl.classList.contains("inactivo"), rowEl.classList.contains("usado"),visible, visibleIndex);
+    if (!visible) return;
+    rowEl.classList.remove("tabulator-row-even", "tabulator-row-odd");
+    rowEl.classList.add(++visibleIndex % 2 === 0 ? "tabulator-row-even" : "tabulator-row-odd");
+  });
+}
+
 function crearDatosCuadrantes(cuadrante) {
   if (!cuadrante?.fecha_inicio) return [];
 
-  const jue = sumarDiasYYYYMMDD(cuadrante?.fecha_inicio, 0);
-  const vie = sumarDiasYYYYMMDD(cuadrante?.fecha_inicio, 1);
-  const lun = sumarDiasYYYYMMDD(cuadrante?.fecha_inicio, 4);
-  const mar = sumarDiasYYYYMMDD(cuadrante?.fecha_inicio, 5);
-  const mie = sumarDiasYYYYMMDD(cuadrante?.fecha_inicio, 6);
+  const diasSemana = obtenerFechasSemanaCuadrante(cuadrante?.fecha_inicio);
   const datos = Object.values(DATOS.maestros.puestos_trabajo)
     .sort((a, b) => {
       const ordenA = Number(a?.orden || 0);
@@ -381,21 +487,14 @@ function crearDatosCuadrantes(cuadrante) {
     id: puesto.id,
     nombre: puesto.nombre,
     orden: Number(puesto?.orden || 0),
-    [jue]: cuadrante.detalles.filter(d => d.puesto_id === puesto.id && d.fecha === jue).map(d => {
-      return {...d, empleado: DATOS.maestros.usuarios[d.usuario_id]};
-    }),
-    [vie]: cuadrante.detalles.filter(d => d.puesto_id === puesto.id && d.fecha === vie).map(d => {
-      return {...d, empleado: DATOS.maestros.usuarios[d.usuario_id]};
-    }),
-    [lun]: cuadrante.detalles.filter(d => d.puesto_id === puesto.id && d.fecha === lun).map(d => {
-      return {...d, empleado: DATOS.maestros.usuarios[d.usuario_id]};
-    }),
-    [mar]: cuadrante.detalles.filter(d => d.puesto_id === puesto.id && d.fecha === mar).map(d => {
-      return {...d, empleado: DATOS.maestros.usuarios[d.usuario_id]};
-    }),
-    [mie]: cuadrante.detalles.filter(d => d.puesto_id === puesto.id && d.fecha === mie).map(d => {
-      return {...d, empleado: DATOS.maestros.usuarios[d.usuario_id]};
-    }),
+    ...Object.fromEntries(
+      diasSemana.map((dia) => [
+        dia.fecha,
+        cuadrante.detalles
+          .filter(d => d.puesto_id === puesto.id && d.fecha === dia.fecha)
+          .map(d => ({ ...d, empleado: DATOS.maestros.usuarios[d.usuario_id] })),
+      ])
+    ),
   }));
   DATOS.cuadrante_dinamico = datos;
   return datos;
@@ -425,6 +524,7 @@ function crearVentanaCuadrantes(configuracion, show=true) {
   inicializarUiClonadoColumnas(contenedor, tabla);
 
   windowsRegistry.set(configuracion.KEY, { wb: wb, table: tabla });
+  repintarEstadoUsoCuadrante(tabla, contenedor);
 
   agregarEventosCuadrantes(wb, configuracion, contenedor);
 
@@ -505,7 +605,7 @@ function bindInteraccionesCabeceraCuadrantes(tabla) {
     if (!title) return;
     const colEl = title.closest(".tabulator-col");
     const field = colEl?.getAttribute("tabulator-field");
-    if (!esCampoDiaCuadrante(field)) return;
+    if (!esCampoDiaCuadrante(field) || esFechaFestivaCuadrante(field)) return;
     e.dataTransfer.setData("text/cuadrante-col-field", field);
     e.dataTransfer.effectAllowed = "copy";
     aplicarClaseColumnaCompleta(tabla, "cuadrante-columna-origen", field);
@@ -520,7 +620,7 @@ function bindInteraccionesCabeceraCuadrantes(tabla) {
     if (!e.dataTransfer?.types?.includes("text/cuadrante-col-field")) return;
     const colEl = e.target.closest(".tabulator-col");
     const field = colEl?.getAttribute("tabulator-field");
-    if (!esCampoDiaCuadrante(field)) return;
+    if (!esCampoDiaCuadrante(field) || esFechaFestivaCuadrante(field)) return;
     e.preventDefault();
     e.dataTransfer.dropEffect = "copy";
     aplicarClaseColumnaCompleta(tabla, "cuadrante-columna-destino", field);
@@ -539,7 +639,7 @@ function bindInteraccionesCabeceraCuadrantes(tabla) {
     if (!fieldOrigen) return;
     const colEl = e.target.closest(".tabulator-col");
     const fieldDestino = colEl?.getAttribute("tabulator-field");
-    if (!esCampoDiaCuadrante(fieldDestino) || fieldDestino === fieldOrigen) return;
+    if (!esCampoDiaCuadrante(fieldDestino) || fieldDestino === fieldOrigen || esFechaFestivaCuadrante(fieldOrigen) || esFechaFestivaCuadrante(fieldDestino)) return;
     e.preventDefault();
     limpiarClaseColumnaCompleta(tabla, "cuadrante-columna-origen");
     limpiarClaseColumnaCompleta(tabla, "cuadrante-columna-destino");
@@ -551,12 +651,12 @@ function obtenerColumnasDiasCuadrante(tabla) {
   return tabla.getColumns()
     .filter((col) => {
       const field = col.getField?.();
-      return field && field !== "id" && field !== "nombre";
+      return esCampoDiaCuadrante(field);
     })
     .map((col) => {
       const field = col.getField();
       const titulo = col.getElement()?.querySelector(".cuadrante-header-title span")?.textContent?.trim();
-      return { field, label: titulo || field };
+      return { field, label: titulo || field, festivo: esFechaFestivaCuadrante(field) };
     });
 }
 
@@ -584,7 +684,11 @@ function abrirModalClonadoCuadrantes(tabla, fieldOrigen = null, fieldDestino = n
   const btnConfirmar = modalEl.querySelector("#cuadrantes-clonar-confirmar");
   if (!selectOrigen || !selectDestino || !checkMantenerDestino || !btnConfirmar) return;
 
-  const columnasDias = obtenerColumnasDiasCuadrante(tabla);
+  const columnasDias = obtenerColumnasDiasCuadrante(tabla).filter((col) => !col.festivo);
+  if (!columnasDias.length) {
+    alert("No hay días laborables disponibles para clonar.");
+    return;
+  }
   const optionsHtml = columnasDias.map((col) => `<option value="${col.field}">${col.label}</option>`).join("");
   selectOrigen.innerHTML = optionsHtml;
   selectDestino.innerHTML = optionsHtml;
@@ -646,7 +750,7 @@ function completarEmpleadosCuadrantes(key, listaUsuarios, usuarios, configuracio
     if (element.empleado) {
       const pill = crearElemento("div",
         { value: element.id,
-          class: "usuario-pill badge m-1 p-2",
+          class: `usuario-pill badge m-1 p-2${element.activo === false ? " inactivo" : ""}`,
           draggable: "true",
           style: getPillColorByIndex(element.id),
         }
@@ -690,6 +794,7 @@ function completarEmpleadosCuadrantes(key, listaUsuarios, usuarios, configuracio
     actualizarIndicadoresFaltasCuadrante();
   });
 
+  repintarEstadoUsoCuadrante(windowsRegistry.get(key)?.table, listaUsuarios.closest(".contenedor-winbox") || document);
   actualizarIndicadoresFaltasCuadrante();
 }
 

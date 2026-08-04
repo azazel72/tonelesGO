@@ -1,5 +1,6 @@
 from typing import Type, List
 from sqlmodel import Session, select
+from datetime import date
 
 class GenericRepository:
     def __init__(self, model: Type):
@@ -11,6 +12,11 @@ class GenericRepository:
 
     def list_by_year(self, session: Session, año: int) -> List:
         statement = select(self.model).where(self.model.año == año)
+        return session.exec(statement).all()
+
+    def list_by_date_range(self, session: Session, campo: str, fecha_inicio: date, fecha_fin: date) -> List:
+        columna = getattr(self.model, campo)
+        statement = select(self.model).where(columna >= fecha_inicio, columna <= fecha_fin)
         return session.exec(statement).all()
     
     def list_by_start_date(self, session: Session, fecha: str):

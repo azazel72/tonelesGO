@@ -66,6 +66,10 @@ def obtener_acciones() -> Dict[str, any]:
             (req.data or {}).get("año"),
             (req.data or {}).get("mes"),
         ),
+        "listar_dias_festivos_rango": lambda ws, req: Colector.colector.listar_dias_festivos_rango(
+            (req.data or {}).get("fecha_inicio"),
+            (req.data or {}).get("fecha_fin"),
+        ),
         "siguiente_codigo_palet": lambda ws, req: Colector.colector.siguiente_codigo_palet(req.data or {}),
         "mover_stock": lambda ws, req: Colector.colector.mover_stock(req.data or {}),
         "procesar_stock": lambda ws, req: Colector.colector.procesar_stock(req.data or {}),

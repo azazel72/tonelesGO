@@ -1,5 +1,9 @@
 const DATOS = {
     maestros: {},
+    festivos: {
+        anio: [],
+        cuadrante_semana: [],
+    },
     fabricacion: {},
     planificacion_entradas: { planificacion: {} },
     salidas: { planificacion: {} },

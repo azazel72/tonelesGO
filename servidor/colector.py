@@ -3117,7 +3117,21 @@ class Colector:
                 self.cuadrante = cuadrante_dto
 
             return cuadrante_dto
-        
+
+    def listar_dias_festivos_rango(self, fecha_inicio: str, fecha_fin: str) -> list[DiaFestivoDTO]:
+        if not fecha_inicio or not fecha_fin:
+            raise ValueError("fecha_inicio y fecha_fin son requeridas")
+
+        fecha_inicio_dt = date.fromisoformat(str(fecha_inicio))
+        fecha_fin_dt = date.fromisoformat(str(fecha_fin))
+        if fecha_fin_dt < fecha_inicio_dt:
+            raise ValueError("fecha_fin no puede ser anterior a fecha_inicio")
+
+        with DB.crear_sesion() as session:
+            dias = self.repo_dias_festivos.list_by_date_range(session, "fecha", fecha_inicio_dt, fecha_fin_dt)
+            dias.sort(key=lambda item: (getattr(item, "fecha", None), getattr(item, "id", 0) or 0))
+            return [DiaFestivoDTO.from_db(dia) for dia in dias]
+
     def insertar_cuadrante(self, fecha: date) -> CuadranteDB:
         with DB.crear_sesion() as session:
             DTO = CuadranteDTO(
@@ -3130,17 +3144,42 @@ class Colector:
             )
             return self.repo_cuadrantes.insert(session, DTO.to_db())
 
+    def _obtener_fechas_festivas(self, session: Session, fecha_inicio: date, fecha_fin: date) -> set[date]:
+        return {
+            item.fecha
+            for item in self.repo_dias_festivos.list_by_date_range(session, "fecha", fecha_inicio, fecha_fin)
+            if getattr(item, "fecha", None) is not None
+        }
+
+    def _validar_nueva_asignacion_cuadrante(
+        self,
+        session: Session,
+        *,
+        fecha: date,
+        puesto_id: int,
+        usuario_id: int,
+    ) -> None:
+        if fecha in self._obtener_fechas_festivas(session, fecha, fecha):
+            raise ValueError("No se pueden crear nuevas asignaciones en un día festivo.")
+
     def insertar_detalle_cuadrante(self, data) -> CuadranteDetalleDTO:
         cuadrante_id = data.get("cuadrante_id")
         fecha = data.get("fecha")
         puesto_id = data.get("puesto_id")
         usuario_id = data.get("usuario_id")
         with DB.crear_sesion() as session:
+            fecha_dt = date.fromisoformat(fecha)
+            self._validar_nueva_asignacion_cuadrante(
+                session,
+                fecha=fecha_dt,
+                puesto_id=int(puesto_id),
+                usuario_id=int(usuario_id),
+            )
             DTO = CuadranteDetalleDTO(
                 id=None,
                 cuadrante_id=cuadrante_id,
                 puesto_id=puesto_id,
-                fecha=date.fromisoformat(fecha),
+                fecha=fecha_dt,
                 usuario_id=usuario_id,
             )
             return CuadranteDetalleDTO.from_db(self.repo_cuadrante_detalles.insert(session, DTO.to_db()))
@@ -3153,11 +3192,18 @@ class Colector:
         usuario_id = data.get("usuario_id")
 
         with DB.crear_sesion() as session:
+            fecha_dt = date.fromisoformat(fecha)
+            self._validar_nueva_asignacion_cuadrante(
+                session,
+                fecha=fecha_dt,
+                puesto_id=int(puesto_id),
+                usuario_id=int(usuario_id),
+            )
             DTO = CuadranteDetalleDTO(
                 id=entrada_id,
                 cuadrante_id=cuadrante_id,
                 puesto_id=puesto_id,
-                fecha=date.fromisoformat(fecha),
+                fecha=fecha_dt,
                 usuario_id=usuario_id,
             )
             updated = CuadranteDetalleDTO.to_db(DTO)
@@ -3222,6 +3268,14 @@ class Colector:
             if not cuadrante:
                 raise ValueError(f"No existe cuadrante con id {cuadrante_id}")
 
+            fechas_festivas = self._obtener_fechas_festivas(
+                session,
+                min(fecha_origen_date, fecha_destino_date),
+                max(fecha_origen_date, fecha_destino_date),
+            )
+            if fecha_origen_date in fechas_festivas or fecha_destino_date in fechas_festivas:
+                raise ValueError("No se puede clonar desde o hacia un día festivo.")
+
             detalles = self.repo_cuadrante_detalles.list_by_cuadrante_id(session, cuadrante_id)
             detalles_origen = [d for d in detalles if d.fecha == fecha_origen_date]
             detalles_destino = [d for d in detalles if d.fecha == fecha_destino_date]
@@ -3285,6 +3339,11 @@ class Colector:
             if not cuadrante:
                 raise ValueError(f"No existe cuadrante con id {cuadrante_id}")
 
+            fechas_festivas = self._obtener_fechas_festivas(
+                session,
+                fecha_jueves,
+                max(fechas_destino),
+            )
             detalles = self.repo_cuadrante_detalles.list_by_cuadrante_id(session, cuadrante_id)
             detalles_jueves = [d for d in detalles if d.fecha == fecha_jueves]
             if not detalles_jueves:
@@ -3299,7 +3358,9 @@ class Colector:
             batidero_ids = [p.id for p in puestos_batidero if p.id is not None]
             batidero_index = {puesto_id: idx for idx, puesto_id in enumerate(batidero_ids)}
 
-            for indice_destino, fecha_destino in enumerate(fechas_destino):
+            fechas_destino_laborables = [fecha_destino for fecha_destino in fechas_destino if fecha_destino not in fechas_festivas]
+
+            for indice_destino, fecha_destino in enumerate(fechas_destino_laborables):
                 # Borrar previamente todo lo del dia destino para este cuadrante
                 for det in [d for d in detalles if d.fecha == fecha_destino]:
                     session.delete(det)

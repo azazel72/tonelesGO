@@ -1,8 +1,8 @@
-function openDiasFestivosWin() {
+async function openDiasFestivosWin() {
   const KEY = "dias_festivos";
   const wb = comprobarVentanaAbierta(KEY);
   if (wb) {
-    refrescarDiasFestivosWin();
+    await refrescarDiasFestivosWin();
     return wb;
   }
 
@@ -42,20 +42,22 @@ function openDiasFestivosWin() {
     wb: ventana,
     contenedor,
     year: obtenerAnioActualDiasFestivos(),
+    festivos: [],
+    loadedYear: null,
   };
   windowsRegistry.set(KEY, state);
 
-  contenedor.querySelector("#df-prev-year")?.addEventListener("click", () => {
+  contenedor.querySelector("#df-prev-year")?.addEventListener("click", async () => {
     state.year -= 1;
-    renderDiasFestivosWin(state);
+    await renderDiasFestivosWin(state, { forceReload: true });
   });
-  contenedor.querySelector("#df-next-year")?.addEventListener("click", () => {
+  contenedor.querySelector("#df-next-year")?.addEventListener("click", async () => {
     state.year += 1;
-    renderDiasFestivosWin(state);
+    await renderDiasFestivosWin(state, { forceReload: true });
   });
-  contenedor.querySelector("#df-year")?.addEventListener("change", (event) => {
+  contenedor.querySelector("#df-year")?.addEventListener("change", async (event) => {
     state.year = Number(event.target.value || obtenerAnioActualDiasFestivos());
-    renderDiasFestivosWin(state);
+    await renderDiasFestivosWin(state, { forceReload: true });
   });
   contenedor.querySelector("#df-add-date")?.addEventListener("click", async () => {
     const input = contenedor.querySelector("#df-date");
@@ -68,28 +70,28 @@ function openDiasFestivosWin() {
       alert("La fecha debe pertenecer al año seleccionado.");
       return;
     }
-    await agregarDiaFestivo(fecha);
+    await agregarDiaFestivo(fecha, state);
     input.value = "";
-    renderDiasFestivosWin(state);
+    await renderDiasFestivosWin(state, { forceReload: true });
   });
   contenedor.querySelector("#df-calendar")?.addEventListener("click", async (event) => {
     const button = event.target.closest("[data-fecha]");
     if (!button) return;
     const fecha = button.getAttribute("data-fecha");
     if (!fecha) return;
-    await toggleDiaFestivo(fecha);
-    renderDiasFestivosWin(state);
+    await toggleDiaFestivo(fecha, state);
+    await renderDiasFestivosWin(state, { forceReload: true });
   });
   contenedor.querySelector("#df-list")?.addEventListener("click", async (event) => {
     const button = event.target.closest("[data-delete-fecha]");
     if (!button) return;
     const fecha = button.getAttribute("data-delete-fecha");
     if (!fecha) return;
-    await eliminarDiaFestivoPorFecha(fecha);
-    renderDiasFestivosWin(state);
+    await eliminarDiaFestivoPorFecha(fecha, state);
+    await renderDiasFestivosWin(state, { forceReload: true });
   });
 
-  renderDiasFestivosWin(state);
+  await renderDiasFestivosWin(state, { forceReload: true });
   return ventana;
 }
 
@@ -97,35 +99,52 @@ function obtenerAnioActualDiasFestivos() {
   return new Date().getFullYear();
 }
 
-function obtenerDiasFestivosTodos() {
+function obtenerRangoAnualDiasFestivos(anio) {
+  return {
+    fecha_inicio: `${anio}-01-01`,
+    fecha_fin: `${anio}-12-31`,
+  };
+}
+
+function obtenerDiasFestivosTodos(state = null) {
+  if (state?.festivos?.length) return state.festivos;
+  const cacheAnual = DATOS?.festivos?.anio || [];
+  if (cacheAnual.length) return cacheAnual;
   return Object.values(DATOS?.maestros?.dias_festivos || {});
 }
 
 function obtenerAniosDisponiblesDiasFestivos(anioSeleccionado) {
-  const anios = new Set([obtenerAnioActualDiasFestivos(), Number(anioSeleccionado || 0)]);
-  for (const item of obtenerDiasFestivosTodos()) {
-    const fecha = String(item?.fecha || "");
-    const anio = Number(fecha.slice(0, 4) || 0);
-    if (anio) anios.add(anio);
+  const base = Number(anioSeleccionado || obtenerAnioActualDiasFestivos());
+  const anios = [];
+  for (let offset = -2; offset <= 2; offset += 1) {
+    anios.push(base + offset);
   }
-  return Array.from(anios).filter(Boolean).sort((a, b) => a - b);
+  return anios;
 }
 
-function obtenerDiasFestivosPorAnio(anio) {
-  return obtenerDiasFestivosTodos()
-    .filter((item) => String(item?.fecha || "").startsWith(`${anio}-`))
-    .sort((a, b) => String(a.fecha || "").localeCompare(String(b.fecha || "")));
+async function cargarDiasFestivosPorRango(fecha_inicio, fecha_fin) {
+  try {
+    const respuesta = await wsRequest("listar_dias_festivos_rango", { fecha_inicio, fecha_fin });
+    return Array.isArray(respuesta) ? respuesta : [];
+  } catch (_err) {
+    return Object.values(DATOS?.maestros?.dias_festivos || {})
+      .filter((item) => {
+        const fecha = String(item?.fecha || "");
+        return fecha && fecha >= String(fecha_inicio) && fecha <= String(fecha_fin);
+      })
+      .sort((a, b) => String(a?.fecha || "").localeCompare(String(b?.fecha || "")));
+  }
 }
 
-function construirMapaDiasFestivos(anio) {
+function construirMapaDiasFestivos(festivos) {
   const mapa = new Map();
-  for (const item of obtenerDiasFestivosPorAnio(anio)) {
+  for (const item of festivos || []) {
     mapa.set(String(item.fecha), item);
   }
   return mapa;
 }
 
-function renderDiasFestivosWin(state) {
+async function renderDiasFestivosWin(state, { forceReload = false } = {}) {
   if (!state?.contenedor) return;
   const anio = Number(state.year || obtenerAnioActualDiasFestivos());
   state.year = anio;
@@ -138,20 +157,20 @@ function renderDiasFestivosWin(state) {
   if (select) {
     const anios = obtenerAniosDisponiblesDiasFestivos(anio);
     select.innerHTML = anios.map((item) => `<option value="${item}" ${item === anio ? "selected" : ""}>${item}</option>`).join("");
-    if (!anios.includes(anio)) {
-      const option = document.createElement("option");
-      option.value = String(anio);
-      option.textContent = String(anio);
-      option.selected = true;
-      select.appendChild(option);
-    }
   }
 
   if (inputFecha) {
     inputFecha.value = `${anio}-01-01`;
   }
 
-  const festivos = obtenerDiasFestivosPorAnio(anio);
+  if (forceReload || state.loadedYear !== anio) {
+    const rango = obtenerRangoAnualDiasFestivos(anio);
+    state.festivos = await cargarDiasFestivosPorRango(rango.fecha_inicio, rango.fecha_fin);
+    state.loadedYear = anio;
+    DATOS.festivos.anio = state.festivos;
+  }
+
+  const festivos = obtenerDiasFestivosTodos(state);
   if (lista) {
     if (!festivos.length) {
       lista.innerHTML = `<div class="text-muted small">No hay festivos cargados para ${anio}.</div>`;
@@ -168,7 +187,7 @@ function renderDiasFestivosWin(state) {
   }
 
   if (calendario) {
-    calendario.innerHTML = construirCalendarioAnualDiasFestivos(anio, construirMapaDiasFestivos(anio));
+    calendario.innerHTML = construirCalendarioAnualDiasFestivos(anio, construirMapaDiasFestivos(festivos));
   }
 }
 
@@ -220,37 +239,55 @@ function construirCalendarioAnualDiasFestivos(anio, mapaFestivos) {
   }).join("");
 }
 
-async function agregarDiaFestivo(fecha) {
-  const existente = obtenerDiasFestivosTodos().find((item) => String(item?.fecha || "") === String(fecha));
+async function agregarDiaFestivo(fecha, state = null) {
+  const existente = obtenerDiasFestivosTodos(state).find((item) => String(item?.fecha || "") === String(fecha));
   if (existente) return existente;
   const respuesta = await wsRequest("insertar_maestro", { tabla: "dias_festivos", fecha });
   if (respuesta?.id) {
     DATOS.maestros.dias_festivos = DATOS.maestros.dias_festivos || {};
     DATOS.maestros.dias_festivos[respuesta.id] = respuesta;
   }
+  await recargarFestivosRelacionados(state);
   return respuesta;
 }
 
-async function eliminarDiaFestivoPorFecha(fecha) {
-  const existente = obtenerDiasFestivosTodos().find((item) => String(item?.fecha || "") === String(fecha));
+async function eliminarDiaFestivoPorFecha(fecha, state = null) {
+  const existente = obtenerDiasFestivosTodos(state).find((item) => String(item?.fecha || "") === String(fecha));
   if (!existente?.id) return;
   const respuesta = await wsRequest("eliminar_maestro", { tabla: "dias_festivos", id: existente.id });
   if (respuesta?.id && DATOS?.maestros?.dias_festivos) {
     delete DATOS.maestros.dias_festivos[respuesta.id];
   }
+  await recargarFestivosRelacionados(state);
+  return respuesta;
 }
 
-async function toggleDiaFestivo(fecha) {
-  const existente = obtenerDiasFestivosTodos().find((item) => String(item?.fecha || "") === String(fecha));
+async function toggleDiaFestivo(fecha, state = null) {
+  const existente = obtenerDiasFestivosTodos(state).find((item) => String(item?.fecha || "") === String(fecha));
   if (existente?.id) {
-    await eliminarDiaFestivoPorFecha(fecha);
+    await eliminarDiaFestivoPorFecha(fecha, state);
     return;
   }
-  await agregarDiaFestivo(fecha);
+  await agregarDiaFestivo(fecha, state);
 }
 
-function refrescarDiasFestivosWin() {
+async function recargarFestivosRelacionados(state = null) {
+  if (state) {
+    state.loadedYear = null;
+  }
+  if (DATOS?.cuadrante?.fecha_inicio && typeof cargarFestivosSemanaCuadrante === "function") {
+    await cargarFestivosSemanaCuadrante(DATOS.cuadrante.fecha_inicio);
+    if (windowsRegistry.has("cuadrantes")) {
+      const { table } = windowsRegistry.get("cuadrantes");
+      table.setColumns(crearColumnasCuadrantes(DATOS.cuadrante));
+      table.setData(crearDatosCuadrantes(DATOS.cuadrante));
+      actualizarIndicadoresFaltasCuadrante();
+    }
+  }
+}
+
+async function refrescarDiasFestivosWin() {
   const state = windowsRegistry.get("dias_festivos");
   if (!state) return;
-  renderDiasFestivosWin(state);
+  await renderDiasFestivosWin(state, { forceReload: true });
 }

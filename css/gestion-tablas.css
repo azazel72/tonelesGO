@@ -83,11 +83,23 @@ div.contenedor-tabla {
     padding: 2px;
 }
 
+#tablaCuadrante .celda-cuadrante.celda-cuadrante-festiva {
+    background-color: rgba(108, 117, 125, 0.18);
+}
+
 /* Cuando es objetivo de drop */
 #tablaCuadrante .celda-cuadrante.drop-target {
     outline: 2px dashed #0d6efd;              /* borde azul tipo Bootstrap */
     outline-offset: -2px;
     background-color: rgba(13, 110, 253, .08); /* azul muy suave de fondo */
+}
+.cuadrante-header-title-festivo {
+  background-color: rgba(108, 117, 125, 0.18);
+  border-radius: 0.25rem;
+}
+.usuario-pill-avisos .festivo-dia {
+  opacity: 0.45;
+  color: #6c757d;
 }
 .usuario-pill {
   cursor: pointer;
@@ -95,6 +107,12 @@ div.contenedor-tabla {
   display: inline-flex;
   align-items: stretch;
   padding-top: 0.35rem !important;
+}
+.usuario-pill.inactivo:not(.usado) {
+  display: none;
+}
+#tablaCuadrante .tabulator-row.inactivo:not(.usado) {
+  display: none;
 }
 .usuario-pill-contenido {
   display: flex;
