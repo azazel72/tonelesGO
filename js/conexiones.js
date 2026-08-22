@@ -34,6 +34,17 @@ async function GET(url) {
 
 const genId = () => (crypto?.randomUUID?.() ?? Math.random().toString(36).slice(2));
 
+function diagnosticoAutenticacionWs() {
+  const token = String(window.SharedAuthToken?.getToken?.() || "");
+  const ws = conn && conn.socket;
+  return {
+    token_presente: Boolean(token),
+    token_huella: token ? `${token.length}:${token.slice(-6)}` : null,
+    pantalla: typeof pantallaActual !== "undefined" ? pantallaActual : null,
+    websocket_estado: ws?.readyState ?? null,
+  };
+}
+
 function construirWsUrl(urlBase) {
   const token = window.SharedAuthToken?.getToken?.();
   if (!token) return urlBase;
@@ -46,19 +57,26 @@ function conectar(url, { onOpen, onClose, onMessage, maxDelayMs = 15000 } = {}) 
   let ws, backoff = 500, closedByUser = false;
 
   const connect = () => {
-
     setWsState('connecting');
-
-    ws = new WebSocket(construirWsUrl(url));
+    const urlConexion = construirWsUrl(url);
+    console.info("[ws-auth] conectando", diagnosticoAutenticacionWs());
+    ws = new WebSocket(urlConexion);
 
     ws.onopen = () => {
       backoff = 500;
+      console.info("[ws-auth] conectado", diagnosticoAutenticacionWs());
       onOpen?.(ws);
     };
 
     ws.onmessage = (ev) => onMessage?.(ev.data);
 
-    ws.onclose = () => {
+    ws.onclose = (event) => {
+      console.warn("[ws-auth] desconectado", {
+        ...diagnosticoAutenticacionWs(),
+        codigo: event.code,
+        motivo: event.reason || null,
+        cierre_limpio: event.wasClean,
+      });
       onClose?.();
       if (!closedByUser) {
         const delay = Math.min(backoff, maxDelayMs);
@@ -68,6 +86,7 @@ function conectar(url, { onOpen, onClose, onMessage, maxDelayMs = 15000 } = {}) 
     };
 
     ws.onerror = () => {
+      console.warn("[ws-auth] error de WebSocket", diagnosticoAutenticacionWs());
       try { ws.close(); } catch {}
     };
   };
@@ -93,6 +112,7 @@ async function wsRequest(action, data={}) {
     const msg = JSON.stringify({ action: action, data: data, request_id: requestId });
     const ws = conn && conn.socket;
     if (ws && ws.readyState === WebSocket.OPEN) {
+      console.debug("[ws-auth] solicitud", { action, request_id: requestId, ...diagnosticoAutenticacionWs() });
       pendingWsRequests.set(requestId, { resolve, reject });
       ws.send(msg);
       setTimeout(() => {

@@ -1,14 +1,23 @@
 from fastapi import WebSocket
 from datetime import datetime, timedelta, timezone
+import logging
 import secrets
 
 from servidor.colector import Colector
 from servidor.dominio.maestros.usuario_dto import UsuarioDTO
 
 
+logger = logging.getLogger("paezlobato_sesiones")
+
+
 class Sesiones:
     sesiones: dict[str, "Sesion"] = {}
     sesiones_por_ws: dict[WebSocket, str] = {}
+
+    @staticmethod
+    def huella_token(token: str | None) -> str | None:
+        token = str(token or "")
+        return f"{len(token)}:{token[-6:]}" if token else None
 
     @classmethod
     def generar_sesion_id(cls) -> str:
@@ -28,6 +37,10 @@ class Sesiones:
         cls.sesiones[sesion_id] = sesion
         if ws is not None:
             cls.sesiones_por_ws[ws] = sesion_id
+        logger.info(
+            "sesion creada: sesion_huella=%s usuario_id=%s ws_id=%s expira=%s",
+            cls.huella_token(sesion_id), getattr(usuario, "id", None), id(ws) if ws else None, sesion.fecha_expiracion,
+        )
         return sesion
 
     @classmethod
@@ -46,11 +59,13 @@ class Sesiones:
     def vincular_ws(cls, sesion_id: str, ws: WebSocket) -> "Sesion | None":
         sesion = cls.obtener_sesion(sesion_id)
         if sesion is None:
+            logger.warning("vinculacion de ws rechazada: sesion_huella=%s ws_id=%s", cls.huella_token(sesion_id), id(ws))
             return None
         if sesion.ws is not None:
             cls.sesiones_por_ws.pop(sesion.ws, None)
         sesion.ws = ws
         cls.sesiones_por_ws[ws] = sesion_id
+        logger.info("ws vinculado a sesion: sesion_huella=%s ws_id=%s", cls.huella_token(sesion_id), id(ws))
         return sesion
 
     @classmethod
@@ -66,12 +81,14 @@ class Sesiones:
         sesion = cls.sesiones.get(sesion_id)
         if sesion and sesion.ws is ws:
             sesion.ws = None
+        logger.info("ws liberado de sesion: sesion_huella=%s ws_id=%s", cls.huella_token(sesion_id), id(ws))
 
     @classmethod
     def cerrar_sesion(cls, sesion_id: str) -> None:
         sesion = cls.sesiones.pop(sesion_id, None)
         if sesion and sesion.ws is not None:
             cls.sesiones_por_ws.pop(sesion.ws, None)
+        logger.info("sesion cerrada: sesion_huella=%s encontrada=%s", cls.huella_token(sesion_id), bool(sesion))
 
     @classmethod
     def exportar_payload(cls, sesion: "Sesion") -> dict:

@@ -27,6 +27,8 @@ PERMISOS_POR_ACCION = {
     "obtener_cierre_semanal": {"fabricacion"},
     "reasignar_consumo_negativo_cierre": {"fabricacion"},
     "crear_palet_procesado_desde_cierre": {"fabricacion"},
+    "trasladar_sobrantes_cierre_semanal": {"fabricacion"},
+    "actualizar_cambios_cierre_semanal": {"fabricacion"},
     "cerrar_fabricacion_semanal": {"fabricacion"},
     "listar_palets_consumo": {"fabricacion"},
     "obtener_contexto_consumo": {"fabricacion"},

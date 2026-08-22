@@ -952,13 +952,13 @@
                     </details>
 
                     <div class="cierre-semanal-bloque">
-                        <h6 class="cierre-semanal-bloque-titulo">Los cambios de esta pantalla son temporales hasta pulsar Finalizar.</h6>
+                        <h6 class="cierre-semanal-bloque-titulo">Los cambios de esta pantalla son temporales hasta pulsar Actualizar cambios.</h6>
                         <div class="cierre-semanal-acciones">
                             <button type="button" class="btn btn-outline-secondary" id="cierre-semanal-reset">
                                 <i class="bi bi-arrow-counterclockwise"></i> Restablecer cambios
                             </button>
-                            <button type="button" class="btn btn-primary" id="cierre-semanal-cerrar">
-                                <i class="bi bi-check2-circle"></i> Finalizar cierre
+                            <button type="button" class="btn btn-dark" id="cierre-semanal-cerrar">
+                                <i class="bi bi-check2-circle"></i> Actualizar cambios
                             </button>
                         </div>
                         <div class="cierre-semanal-nota" id="cierre-semanal-nota-acciones"></div>
@@ -967,7 +967,11 @@
                             <select id="cierre-semanal-siguiente-linea" class="form-select form-select-sm">
                                 <option value="">Seleccione producción semanal...</option>
                             </select>
-                            <button type="button" class="btn btn-outline-dark" id="cierre-semanal-trasladar-semana">
+                            <label class="form-check mt-2 mb-2">
+                                <input class="form-check-input" type="checkbox" id="cierre-semanal-crear-palet-hijo">
+                                <span class="form-check-label">Crear palés hijos para los sobrantes</span>
+                            </label>
+                            <button type="button" class="btn btn-primary" id="cierre-semanal-trasladar-semana">
                                 <i class="bi bi-box-arrow-right"></i> Trasladar a siguiente semana
                             </button>
                         </div>

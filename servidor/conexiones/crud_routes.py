@@ -74,11 +74,16 @@ class CrudRoutes:
             clients.add(ws)
             client_state[ws] = {"pantalla": None, "contexto": {}}
             token = ws.query_params.get("token")
+            sesion = None
             if token:
                 sesion = Sesiones.vincular_ws(token, ws)
                 if sesion is not None:
                     payload = Sesiones.exportar_payload(sesion)
                     await ws.send_json(ResponseMessage.ok("login", payload).model_dump())
+            logger.info(
+                "ws conectado: ws_id=%s token_presente=%s token_huella=%s sesion_vinculada=%s sesiones_activas=%s",
+                id(ws), bool(token), Sesiones.huella_token(token), bool(sesion), len(Sesiones.sesiones),
+            )
 
             try:
                 while True:
@@ -147,6 +152,11 @@ class CrudRoutes:
 
                 sesion = Sesiones.obtener_por_ws(ws)
                 if requiere_autenticacion(msg.action) and sesion is None:
+                    logger.warning(
+                        "ws unauthorized: action=%s request_id=%s ws_id=%s token_presente=%s token_huella=%s sesiones_activas=%s",
+                        msg.action, msg.request_id, id(ws), bool(ws.query_params.get("token")),
+                        Sesiones.huella_token(ws.query_params.get("token")), len(Sesiones.sesiones),
+                    )
                     await ws.send_json(ResponseMessage.fail(msg.action, "unauthorized", msg.request_id).model_dump())
                     return
 

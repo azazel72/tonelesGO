@@ -37,13 +37,13 @@ function asegurarEstructuraVistaCierreSemanal() {
         </details>
 
         <div class="cierre-semanal-bloque">
-            <h6 class="cierre-semanal-bloque-titulo">Los cambios de esta pantalla son temporales hasta pulsar Finalizar.</h6>
+            <h6 class="cierre-semanal-bloque-titulo">Los cambios de esta pantalla son temporales hasta pulsar Actualizar cambios.</h6>
             <div class="cierre-semanal-acciones">
                 <button type="button" class="btn btn-outline-secondary" id="cierre-semanal-reset">
                     <i class="bi bi-arrow-counterclockwise"></i> Restablecer cambios
                 </button>
-                <button type="button" class="btn btn-primary" id="cierre-semanal-cerrar">
-                    <i class="bi bi-check2-circle"></i> Finalizar cierre
+                <button type="button" class="btn btn-dark" id="cierre-semanal-cerrar">
+                    <i class="bi bi-check2-circle"></i> Actualizar cambios
                 </button>
             </div>
             <div class="cierre-semanal-nota" id="cierre-semanal-nota-acciones"></div>
@@ -52,7 +52,11 @@ function asegurarEstructuraVistaCierreSemanal() {
                 <select id="cierre-semanal-siguiente-linea" class="form-select form-select-sm">
                     <option value="">Seleccione producción semanal...</option>
                 </select>
-                <button type="button" class="btn btn-outline-dark" id="cierre-semanal-trasladar-semana">
+                <label class="form-check mt-2 mb-2">
+                    <input class="form-check-input" type="checkbox" id="cierre-semanal-crear-palet-hijo">
+                    <span class="form-check-label">Crear palés hijos para los sobrantes</span>
+                </label>
+                <button type="button" class="btn btn-primary" id="cierre-semanal-trasladar-semana">
                     <i class="bi bi-box-arrow-right"></i> Trasladar a siguiente semana
                 </button>
             </div>
@@ -206,10 +210,49 @@ function registrarOperacionTemporalCierre(tipo, detalle) {
         tipo,
         detalle,
     });
+    renderizarNotaCambiosCierreSemanal();
     console.log("cierre_semanal_borrador", {
         operaciones: estadoCierreSemanal.borrador.operaciones,
         lotes: estadoCierreSemanal.borrador.lotes,
     });
+}
+
+function formatearOperacionCierreSemanal(operacion) {
+    const detalle = operacion?.detalle || {};
+    const m3 = formatearValorSemanal(detalle.m3);
+    if (operacion?.tipo === "reasignar") {
+        return `Reasignar sobrante ${m3} m3: lote ${detalle.origen} a lote ${detalle.destino}.`;
+    }
+    if (operacion?.tipo === "reasignar_consumo") {
+        return `Reasignar ${m3} m3 de consumo entre los palés seleccionados.`;
+    }
+    if (operacion?.tipo === "procesado") {
+        return `Enviar ${m3} m3 del lote ${detalle.lote} a procesado (${detalle.palet_destino_codigo}).`;
+    }
+    if (operacion?.tipo === "desperdicio") {
+        return `Registrar ${m3} m3 de desperdicio en el lote ${detalle.lote}.`;
+    }
+    return `${operacion?.tipo || "Cambio"}: ${m3} m3.`;
+}
+
+function renderizarNotaCambiosCierreSemanal() {
+    const nota = document.getElementById("cierre-semanal-nota-acciones");
+    if (!nota) return;
+    const operaciones = estadoCierreSemanal.borrador?.operaciones || [];
+    nota.replaceChildren();
+    if (!operaciones.length) {
+        nota.textContent = "No hay cambios pendientes de actualizar.";
+        return;
+    }
+    const resumen = document.createElement("div");
+    resumen.textContent = `Cambios pendientes: ${operaciones.length}`;
+    const lista = document.createElement("ul");
+    operaciones.forEach((operacion) => {
+        const item = document.createElement("li");
+        item.textContent = formatearOperacionCierreSemanal(operacion);
+        lista.appendChild(item);
+    });
+    nota.append(resumen, lista);
 }
 
 function obtenerValorNumericoInput(selector) {
@@ -283,9 +326,19 @@ function renderizarLotesCierreSemanal(info) {
         const claseEstado = restante < 0
             ? " cierre-semanal-lote-negativo"
             : (restante > 0 ? " cierre-semanal-lote-positivo" : "");
-        const destinos = lotes
+        const destinos = (estadoCierreSemanal.data?.palets || [])
+            .filter((palet) => String(palet?.lote || "") !== String(lote.id))
+            .map((palet) => ({
+                trazabilidadId: Number(palet?.trazabilidad_id || 0),
+                codigo: String(palet?.palet_codigo || palet?.palet_id || "").trim(),
+                lote: String(palet?.lote || "").trim(),
+            }))
+            .filter((palet) => palet.trazabilidadId && palet.codigo)
+            .map((palet) => `<option value="${palet.trazabilidadId}">${palet.codigo} · Lote ${palet.lote}</option>`)
+            .join("");
+        const destinosSobrante = lotes
             .filter((destino) => destino.id !== lote.id)
-            .map((destino) => `<option value="${destino.id}">${destino.lote}</option>`)
+            .map((destino) => `<option value="${destino.id}">Lote ${destino.lote}</option>`)
             .join("");
         return `
         <article class="cierre-semanal-lote${claseEstado}" data-cierre-lote="${lote.id}">
@@ -300,16 +353,31 @@ function renderizarLotesCierreSemanal(info) {
             </div>
             <div class="cierre-semanal-lote-acciones mt-3">
                 <details class="cierre-semanal-lote-form cierre-semanal-lote-form-full">
-                    <summary class="cierre-semanal-operacion-titulo">Reasignar m3 a otro lote</summary>
+                    <summary class="cierre-semanal-operacion-titulo">Reasignar consumo a otro palé</summary>
                     <div class="cierre-semanal-operacion-cuerpo">
                         <select class="form-select form-select-sm" data-cierre-destino-lote="${lote.id}">
-                            <option value="">Seleccione lote destino...</option>
+                            <option value="">Seleccione palé destino...</option>
                             ${destinos}
                         </select>
                         <div class="cierre-semanal-lote-inline">
                             <input class="form-control form-control-sm" type="number" step="0.001" value="${formatearValorSemanal(restante).replace(',', '.')}" data-cierre-m3-reasignar="${lote.id}">
                             <button type="button" class="btn btn-sm btn-outline-primary" data-action="reasignar-lote" data-lote-id="${lote.id}">
-                                Reasignar
+                                Reasignar consumo
+                            </button>
+                        </div>
+                    </div>
+                </details>
+                <details class="cierre-semanal-lote-form cierre-semanal-lote-form-full">
+                    <summary class="cierre-semanal-operacion-titulo">Reasignar sobrante a otro lote</summary>
+                    <div class="cierre-semanal-operacion-cuerpo">
+                        <select class="form-select form-select-sm" data-cierre-destino-sobrante="${lote.id}">
+                            <option value="">Seleccione lote destino...</option>
+                            ${destinosSobrante}
+                        </select>
+                        <div class="cierre-semanal-lote-inline">
+                            <input class="form-control form-control-sm" type="number" step="0.001" value="${formatearValorSemanal(Math.max(restante, 0)).replace(',', '.')}" data-cierre-m3-sobrante="${lote.id}">
+                            <button type="button" class="btn btn-sm btn-outline-primary" data-action="reasignar-sobrante" data-lote-id="${lote.id}">
+                                Reasignar sobrante
                             </button>
                         </div>
                     </div>
@@ -401,6 +469,27 @@ function renderizarCodigosCierreSemanal(codigos) {
     `;
 }
 
+// NOTA: Mostrar datos del cierre por consola.
+function registrarBotasReferidasCierreSemanal(lineaId, data = {}) {
+    const codigos = Array.isArray(data?.codigos_botas) ? data.codigos_botas : [];
+    const porPalet = Array.isArray(data?.palets)
+        ? data.palets
+            .filter((item) => Array.isArray(item?.codigos_botas) && item.codigos_botas.length)
+            .map((item) => ({
+                trazabilidad_id: Number(item?.trazabilidad_id || 0) || null,
+                palet_codigo: String(item?.palet_codigo || "").trim(),
+                lote: String(item?.lote || "").trim(),
+                codigos_botas: item.codigos_botas.map((codigo) => String(codigo || "").trim()).filter(Boolean),
+            }))
+        : [];
+    console.log("[cierre-semanal] botas referidas", {
+        fabricacion_semanal_id: Number(lineaId || 0) || null,
+        total_codigos: codigos.length,
+        codigos_botas: codigos,
+        por_palet: porPalet,
+    });
+}
+
 async function abrirVistaCierreSemanalDesdeLinea(lineaId, origenVista = "vista_fabricacion_semanal") {
     estadoCierreSemanal.lineaId = Number(lineaId || 0) || null;
     estadoCierreSemanal.pedidoId = null;
@@ -408,7 +497,6 @@ async function abrirVistaCierreSemanalDesdeLinea(lineaId, origenVista = "vista_f
     if (typeof contextoNavegacion !== "undefined") {
         contextoNavegacion.cierreSemanalOrigen = estadoCierreSemanal.origenVista;
     }
-    await cargarVistaCierreSemanal();
     mostrarSeccion?.("vista_cierre_semanal");
 }
 
@@ -446,6 +534,8 @@ async function cargarVistaCierreSemanal() {
             .sort((a, b) => String(a?.fecha_inicio || "").localeCompare(String(b?.fecha_inicio || "")));
         estadoCierreSemanal.data = data;
         estadoCierreSemanal.borrador = crearBorradorCierreSemanal(items);
+        renderizarNotaCambiosCierreSemanal();
+        //registrarBotasReferidasCierreSemanal(lineaId, data);
 
         const titulo = document.getElementById("cierre-semanal-titulo");
         const subtitulo = document.getElementById("cierre-semanal-subtitulo");
@@ -469,6 +559,7 @@ function prepararEventosCierreSemanal() {
     if (btnReset) {
         btnReset.addEventListener("click", () => {
             estadoCierreSemanal.borrador = crearBorradorCierreSemanal(estadoCierreSemanal.data?.palets || []);
+            renderizarNotaCambiosCierreSemanal();
             const info = obtenerInfoLineaSemanal(estadoCierreSemanal.data?.linea || {});
             actualizarCabeceraCierreSemanal(info);
             renderizarLotesCierreSemanal(info);
@@ -477,45 +568,45 @@ function prepararEventosCierreSemanal() {
     }
     const btnTrasladarSemana = document.getElementById("cierre-semanal-trasladar-semana");
     if (btnTrasladarSemana) {
-        btnTrasladarSemana.addEventListener("click", () => {
-            const info = obtenerInfoLineaSemanal(estadoCierreSemanal.data?.linea || {});
+        btnTrasladarSemana.addEventListener("click", async () => {
             const destinoId = Number(document.getElementById("cierre-semanal-siguiente-linea")?.value || 0);
-            const destino = (estadoCierreSemanal.siguientesSemanas || []).find((item) => Number(item?.id || 0) === destinoId);
-            if (!destino) {
-                alert("Debes seleccionar una producción semanal destino.");
-                return;
+            try {
+                const respuesta = await wsRequest("trasladar_sobrantes_cierre_semanal", {
+                    fabricacion_semanal_id: estadoCierreSemanal.lineaId,
+                    fabricacion_semanal_destino_id: destinoId || null,
+                    crear_palet_hijo: Boolean(document.getElementById("cierre-semanal-crear-palet-hijo")?.checked),
+                });
+                alert(`Fabricación semanal finalizada. Palés asignados al destino: ${respuesta?.palets_asignados?.length || 0}.`);
+                await cargarVistaCierreSemanal();
+            } catch (err) {
+                console.error(err);
+                alert("No se pudieron trasladar los sobrantes.");
             }
-            const lotes = estadoCierreSemanal.borrador?.lotes || [];
-            const trasladados = lotes
-                .map((lote) => ({ lote, restante: obtenerRestanteLoteCierre(lote) }))
-                .filter((item) => item.restante > 0);
-            if (!trasladados.length) {
-                alert("No hay sobrantes positivos para trasladar a la siguiente semana.");
-                return;
-            }
-            trasladados.forEach(({ lote, restante }) => {
-                lote.trasladado += restante;
-            });
-            registrarOperacionTemporalCierre("trasladar_siguiente_semana", {
-                fabricacion_semanal_destino_id: destinoId,
-                lotes: trasladados.map((item) => ({
-                    lote: item.lote.id,
-                    m3: item.restante,
-                    palets: item.lote.palets,
-                })),
-            });
-            actualizarCabeceraCierreSemanal(info);
-            refrescarResumenLotesCierreSemanal();
-            trasladados.forEach(({ lote }) => refrescarLoteCierreSemanal(lote.id));
         });
     }
     const btnCerrar = document.getElementById("cierre-semanal-cerrar");
     if (btnCerrar) {
-        btnCerrar.addEventListener("click", () => {
-            const operaciones = estadoCierreSemanal.borrador?.operaciones?.length || 0;
-            alert(operaciones
-                ? `Hay ${operaciones} cambios temporales preparados. La persistencia final se implementará al definir la lógica de cierre.`
-                : "No hay cambios temporales pendientes.");
+        btnCerrar.addEventListener("click", async () => {
+            const operaciones = estadoCierreSemanal.borrador?.operaciones || [];
+            if (!operaciones.length) {
+                alert("No hay cambios pendientes de actualizar.");
+                return;
+            }
+            try {
+                btnCerrar.disabled = true;
+                const respuesta = await wsRequest("actualizar_cambios_cierre_semanal", {
+                    fabricacion_semanal_id: estadoCierreSemanal.lineaId,
+                    operaciones,
+                });
+                estadoCierreSemanal.data = respuesta?.cierre || null;
+                await cargarVistaCierreSemanal();
+                alert("Cambios actualizados.");
+            } catch (err) {
+                console.error(err);
+                alert("No se pudieron actualizar los cambios del cierre.");
+            } finally {
+                btnCerrar.disabled = false;
+            }
         });
     }
     const listaLotes = document.getElementById("cierre-semanal-lotes");
@@ -523,24 +614,51 @@ function prepararEventosCierreSemanal() {
         listaLotes.dataset.bindCierreSemanal = "1";
         listaLotes.addEventListener("click", (event) => {
             const info = obtenerInfoLineaSemanal(estadoCierreSemanal.data?.linea || {});
+            const btnReasignarSobrante = event.target.closest("[data-action='reasignar-sobrante']");
+            if (btnReasignarSobrante) {
+                const origenId = btnReasignarSobrante.getAttribute("data-lote-id") || "";
+                const destinoId = String(document.querySelector(`[data-cierre-destino-sobrante="${origenId}"]`)?.value || "");
+                const m3 = obtenerMagnitudNumericaInput(`[data-cierre-m3-sobrante="${origenId}"]`);
+                const origen = obtenerLoteBorradorCierre(origenId);
+                const destino = obtenerLoteBorradorCierre(destinoId);
+                const sobrante = obtenerRestanteLoteCierre(origen);
+                if (!origen || !destino || !Number.isFinite(m3) || m3 <= 0 || m3 > sobrante) {
+                    alert("Indica un lote destino y un m3 que no supere el sobrante del origen.");
+                    return;
+                }
+                origen.m3Original -= m3;
+                destino.m3Original += m3;
+                registrarOperacionTemporalCierre("reasignar", { origen: origenId, destino: destinoId, m3 });
+                actualizarCabeceraCierreSemanal(info);
+                renderizarLotesCierreSemanal(info);
+                return;
+            }
             const btnReasignarItem = event.target.closest("[data-action='reasignar-lote']");
             if (btnReasignarItem) {
                 const origenId = btnReasignarItem.getAttribute("data-lote-id") || "";
-                const destinoId = String(document.querySelector(`[data-cierre-destino-lote="${origenId}"]`)?.value || "").trim();
+                const destinoTrazabilidadId = Number(document.querySelector(`[data-cierre-destino-lote="${origenId}"]`)?.value || 0);
                 const m3 = obtenerMagnitudNumericaInput(`[data-cierre-m3-reasignar="${origenId}"]`);
                 const origen = obtenerLoteBorradorCierre(origenId);
-                const destino = obtenerLoteBorradorCierre(destinoId);
-                if (!origen || !destino || !Number.isFinite(m3) || m3 <= 0) {
-                    alert("Debes indicar un lote destino y m3 válidos.");
+                const trazaOrigen = (estadoCierreSemanal.data?.palets || []).find((palet) => (
+                    String(palet?.lote || "") === String(origenId) && Boolean(palet?.negativo)
+                ));
+                if (!origen || !trazaOrigen || !destinoTrazabilidadId || !Number.isFinite(m3) || m3 <= 0) {
+                    alert("Debes indicar un palé destino y el lote origen debe tener un palé con sobreconsumo.");
                     return;
                 }
-                origen.m3Consumido -= m3;
-                destino.m3Consumido += m3;
-                registrarOperacionTemporalCierre("reasignar", { origen: origenId, destino: destinoId, m3 });
+                const negativoOrigen = Math.abs(obtenerNumeroSemanal(trazaOrigen.m3_sobrante));
+                if (m3 > negativoOrigen) {
+                    alert("No puedes reasignar más m3 que el sobreconsumo del palé origen.");
+                    return;
+                }
+                registrarOperacionTemporalCierre("reasignar_consumo", {
+                    trazabilidad_origen_id: Number(trazaOrigen.trazabilidad_id),
+                    trazabilidad_destino_id: destinoTrazabilidadId,
+                    m3,
+                });
                 actualizarCabeceraCierreSemanal(info);
                 refrescarResumenLotesCierreSemanal();
                 refrescarLoteCierreSemanal(origenId);
-                refrescarLoteCierreSemanal(destinoId);
                 return;
             }
             const btnProcesarItem = event.target.closest("[data-action='procesar-lote']");

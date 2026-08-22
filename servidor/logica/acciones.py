@@ -46,6 +46,8 @@ def obtener_acciones() -> Dict[str, any]:
         "obtener_cierre_semanal": lambda ws, req: Colector.colector.obtener_cierre_semanal(req.data.get("fabricacion_semanal_id")),
         "reasignar_consumo_negativo_cierre": lambda ws, req: Colector.colector.reasignar_consumo_negativo_cierre(req.data or {}),
         "crear_palet_procesado_desde_cierre": lambda ws, req: Colector.colector.crear_palet_procesado_desde_cierre(req.data or {}),
+        "trasladar_sobrantes_cierre_semanal": lambda ws, req: Colector.colector.trasladar_sobrantes_cierre_semanal(req.data or {}),
+        "actualizar_cambios_cierre_semanal": lambda ws, req: Colector.colector.actualizar_cambios_cierre_semanal(req.data or {}),
         "cerrar_fabricacion_semanal": lambda ws, req: Colector.colector.cerrar_fabricacion_semanal(req.data or {}),
         "listar_palets_consumo": lambda ws, req: Colector.colector.listar_palets_consumo(),
         "listar_cubicaje": lambda ws, req: Colector.colector.listar_cubicaje(),

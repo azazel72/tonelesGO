@@ -80,6 +80,11 @@ function mostrarSeccion(id) {
     }
     const seccionActiva = document.getElementById(id);
     if (seccionActiva) {
+        console.info("[ws-auth] cambio de ventana", {
+            anterior: pantallaActual,
+            destino: id,
+            ...(typeof diagnosticoAutenticacionWs === "function" ? diagnosticoAutenticacionWs() : {}),
+        });
         // Oculta todas las secciones
         const secciones = document.querySelectorAll("section");
         secciones.forEach(function (seccion) {
@@ -469,6 +474,13 @@ function routeMessage(data) {
         if (pending) {
             pendingWsRequests.delete(msg.request_id);
             if (msg.error) {
+                if (msg.error === "unauthorized") {
+                    console.error("[ws-auth] respuesta no autorizada", {
+                        action: msg.action,
+                        request_id: msg.request_id,
+                        ...(typeof diagnosticoAutenticacionWs === "function" ? diagnosticoAutenticacionWs() : {}),
+                    });
+                }
                 const error = new Error(msg.error);
                 pending.reject(error);
                 alert(msg.error);
