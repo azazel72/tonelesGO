@@ -930,7 +930,11 @@ class Colector:
 
             trazas = session.exec(
                 select(TrazabilidadFabricacionDB).where(
-                    TrazabilidadFabricacionDB.fabricacion_semanal_id == fabricacion_semanal_id
+                    or_(
+                        TrazabilidadFabricacionDB.fabricacion_semanal_id == fabricacion_semanal_id,
+                        TrazabilidadFabricacionDB.fabricacion_semanal_id.is_(None),
+                    ),
+                    TrazabilidadFabricacionDB.estado == 0,
                 )
             ).all()
             traza_ids = [int(t.id) for t in trazas if t.id]
@@ -1126,8 +1130,6 @@ class Colector:
             raise ValueError("m3_mover es obligatorio.")
 
         m3_mover_val = float(m3_mover)
-        if m3_mover_val <= 0:
-            raise ValueError("m3_mover debe ser mayor que 0.")
 
         with DB.crear_sesion() as session:
             traza_origen = session.get(TrazabilidadFabricacionDB, int(trazabilidad_origen_id))
@@ -1139,83 +1141,23 @@ class Colector:
             if int(traza_origen.id or 0) == int(traza_destino.id or 0):
                 raise ValueError("Origen y destino deben ser diferentes.")
 
-            linea = session.get(FabricacionSemanalDB, int(traza_origen.fabricacion_semanal_id))
-            if not linea:
-                raise ValueError("No se encontró la línea de fabricación semanal.")
-            consumo_bota = self._obtener_consumo_unitario_bota_session(session, int(linea.tipo_producto_id or 0))
-            if consumo_bota <= 0:
-                raise ValueError("No se pudo resolver el consumo unitario de la bota.")
-
             palet_origen = session.get(PaletDB, int(traza_origen.palet_id or 0))
             palet_destino = session.get(PaletDB, int(traza_destino.palet_id or 0))
             if not palet_origen or not palet_destino:
                 raise ValueError("No se encontró el palet origen o destino.")
 
-            deficit_origen = max(float(palet_origen.consumido or 0) - float(palet_origen.cubicaje or 0), 0.0)
-            capacidad_destino = max(float(palet_destino.cubicaje or 0) - float(palet_destino.consumido or 0), 0.0)
-            if deficit_origen <= 0:
-                raise ValueError("La traza origen no tiene consumo negativo.")
-            if m3_mover_val > deficit_origen + 0.000001:
-                raise ValueError("El m3 a mover supera el negativo del origen.")
-            if m3_mover_val > capacidad_destino + 0.000001:
-                raise ValueError("El m3 a mover supera el sobrante del destino.")
-
-            botas_mover_float = float(m3_mover_val) / float(consumo_bota)
-            botas_mover = int(round(botas_mover_float))
-            if abs(botas_mover_float - botas_mover) > 0.000001 or botas_mover <= 0:
-                raise ValueError("El cubicaje a mover debe corresponder a un número entero de botas.")
-            if int(traza_origen.cantidad_fabricada or 0) < botas_mover:
-                raise ValueError("La traza origen no tiene suficientes botas para mover.")
-
-            enlaces = session.exec(
-                select(TrazabilidadProductoDB).where(
-                    TrazabilidadProductoDB.trazabilidad_fabricacion_id == int(traza_origen.id)
-                )
-            ).all()
-            productos = {}
-            if enlaces:
-                productos = {
-                    int(p.id): p
-                    for p in session.exec(
-                        select(ProductoDB).where(
-                            ProductoDB.id.in_([int(e.producto_id) for e in enlaces if e.producto_id])
-                        )
-                    ).all()
-                    if p.id
-                }
-            enlaces_bota = [
-                e for e in enlaces
-                if str(getattr(productos.get(int(e.producto_id or 0)), "tipo", "")).strip().upper() == "BOTA"
-            ]
-            enlaces_bota.sort(key=lambda e: int(e.id or 0))
-            if len(enlaces_bota) < botas_mover:
-                raise ValueError("No hay suficientes botas enlazadas para reasignar esa cantidad.")
-
-            mover_enlaces = enlaces_bota[-botas_mover:]
-            for enlace in mover_enlaces:
-                enlace.trazabilidad_fabricacion_id = int(traza_destino.id)
-                session.add(enlace)
-
-            traza_origen.cantidad_fabricada = int(traza_origen.cantidad_fabricada or 0) - botas_mover
-            traza_destino.cantidad_fabricada = int(traza_destino.cantidad_fabricada or 0) + botas_mover
-            palet_origen.consumido = float(palet_origen.consumido or 0) - m3_mover_val
-            palet_destino.consumido = float(palet_destino.consumido or 0) + m3_mover_val
-            session.add(traza_origen)
-            session.add(traza_destino)
+            consumo_origen = float(palet_origen.consumido or 0) - m3_mover_val
+            consumo_destino = float(palet_destino.consumido or 0) + m3_mover_val
+            palet_origen.consumido = consumo_origen
+            palet_destino.consumido = consumo_destino
             session.add(palet_origen)
             session.add(palet_destino)
             session.commit()
-            session.refresh(traza_origen)
-            session.refresh(traza_destino)
             session.refresh(palet_origen)
             session.refresh(palet_destino)
 
-            self._actualizar_cache_traza_fabricacion(traza_origen)
-            self._actualizar_cache_traza_fabricacion(traza_destino)
             self._actualizar_cache_palet(palet_origen)
             self._actualizar_cache_palet(palet_destino)
-            for enlace in mover_enlaces:
-                self._actualizar_cache_traza_producto(enlace)
 
             return self.obtener_cierre_semanal(int(traza_origen.fabricacion_semanal_id))
 
@@ -1466,8 +1408,13 @@ class Colector:
             raise ValueError("fabricacion_semanal_id y operaciones son obligatorios.")
         with DB.crear_sesion() as session:
             trazas = session.exec(select(TrazabilidadFabricacionDB).where(
-                TrazabilidadFabricacionDB.fabricacion_semanal_id == linea_id
+                or_(
+                    TrazabilidadFabricacionDB.fabricacion_semanal_id == linea_id,
+                    TrazabilidadFabricacionDB.fabricacion_semanal_id.is_(None),
+                ),
+                TrazabilidadFabricacionDB.estado == 0,
             )).all()
+            trazas_ids_cierre = {int(traza.id) for traza in trazas if traza.id}
             palets_por_lote = {}
             for traza in trazas:
                 palet = session.get(PaletDB, int(traza.palet_id or 0))
@@ -1481,18 +1428,31 @@ class Colector:
                     raise ValueError(f"No hay palets para el lote {lote}.")
                 return palets
 
-            def consumir(palets, cantidad):
-                pendiente = float(cantidad)
-                for palet in palets:
+            def ajustar_consumo(palets, cantidad):
+                pendiente = abs(float(cantidad))
+                if cantidad > 0:
+                    for palet in palets:
+                        if pendiente <= 0:
+                            break
+                        disponible = max(float(palet.cubicaje or 0) - float(palet.consumido or 0), 0.0)
+                        delta = min(disponible, pendiente)
+                        palet.consumido = float(palet.consumido or 0) + delta
+                        session.add(palet)
+                        pendiente -= delta
+                    if pendiente > 0.000001:
+                        raise ValueError("El lote no tiene m3 sobrantes suficientes.")
+                    return
+
+                for palet in reversed(palets):
                     if pendiente <= 0:
                         break
-                    disponible = max(float(palet.cubicaje or 0) - float(palet.consumido or 0), 0.0)
-                    delta = min(disponible, pendiente)
-                    palet.consumido = float(palet.consumido or 0) + delta
+                    consumido = max(float(palet.consumido or 0), 0.0)
+                    delta = min(consumido, pendiente)
+                    palet.consumido = float(palet.consumido or 0) - delta
                     session.add(palet)
                     pendiente -= delta
                 if pendiente > 0.000001:
-                    raise ValueError("El lote no tiene m3 sobrantes suficientes.")
+                    raise ValueError("El lote no tiene m3 consumidos suficientes para revertir el ajuste.")
 
             for operacion in operaciones:
                 tipo = str(operacion.get("tipo") or "")
@@ -1500,35 +1460,32 @@ class Colector:
                 m3 = float(detalle.get("m3") or 0)
                 if tipo == "reasignar":
                     origen, destino = palets_lote(detalle.get("origen")), palets_lote(detalle.get("destino"))
-                    palet_origen = origen[-1]
-                    palet_destino = destino[-1]
-                    if m3 <= 0 or float(palet_origen.cubicaje or 0) + 0.000001 < m3:
-                        raise ValueError("Reasignación de m3 no válida.")
-                    palet_origen.cubicaje = float(palet_origen.cubicaje or 0) - m3
-                    palet_destino.cubicaje = float(palet_destino.cubicaje or 0) + m3
+                    palet_origen, palet_destino = origen[-1], destino[-1]
+                    cubicaje_origen = float(palet_origen.cubicaje or 0) - m3
+                    cubicaje_destino = float(palet_destino.cubicaje or 0) + m3
+                    palet_origen.cubicaje = cubicaje_origen
+                    palet_destino.cubicaje = cubicaje_destino
                     session.add(palet_origen)
                     session.add(palet_destino)
                 elif tipo == "reasignar_consumo":
                     traza_origen = session.get(TrazabilidadFabricacionDB, int(detalle.get("trazabilidad_origen_id") or 0))
                     traza_destino = session.get(TrazabilidadFabricacionDB, int(detalle.get("trazabilidad_destino_id") or 0))
-                    if not traza_origen or not traza_destino or int(traza_origen.fabricacion_semanal_id or 0) != linea_id or int(traza_destino.fabricacion_semanal_id or 0) != linea_id:
-                        raise ValueError("Las trazabilidades de reasignación no pertenecen a la fabricación semanal.")
+                    if not traza_origen or not traza_destino or int(traza_origen.id or 0) not in trazas_ids_cierre or int(traza_destino.id or 0) not in trazas_ids_cierre:
+                        raise ValueError("Las trazabilidades de reasignación no pertenecen al cierre semanal.")
                     palet_origen = session.get(PaletDB, int(traza_origen.palet_id or 0))
                     palet_destino = session.get(PaletDB, int(traza_destino.palet_id or 0))
                     if not palet_origen or not palet_destino:
                         raise ValueError("No se encontraron los palés de reasignación.")
-                    negativo = float(palet_origen.consumido or 0) - float(palet_origen.cubicaje or 0)
-                    disponible = float(palet_destino.cubicaje or 0) - float(palet_destino.consumido or 0)
-                    if m3 <= 0 or m3 > negativo + 0.000001 or m3 > disponible + 0.000001:
-                        raise ValueError("La reasignación de consumo no es válida.")
-                    palet_origen.consumido = float(palet_origen.consumido or 0) - m3
-                    palet_destino.consumido = float(palet_destino.consumido or 0) + m3
+                    consumo_origen = float(palet_origen.consumido or 0) - m3
+                    consumo_destino = float(palet_destino.consumido or 0) + m3
+                    palet_origen.consumido = consumo_origen
+                    palet_destino.consumido = consumo_destino
                     session.add(palet_origen)
                     session.add(palet_destino)
                 elif tipo == "desperdicio":
                     if m3 <= 0:
                         raise ValueError("El desperdicio debe ser mayor que cero.")
-                    consumir(palets_lote(detalle.get("lote")), m3)
+                    ajustar_consumo(palets_lote(detalle.get("lote")), m3)
                 elif tipo == "procesado":
                     origen = palets_lote(detalle.get("lote"))
                     if m3 <= 0:
@@ -1536,7 +1493,7 @@ class Colector:
                     codigo = str(detalle.get("palet_destino_codigo") or "").strip()
                     if not codigo or session.exec(select(PaletDB).where(PaletDB.codigo == codigo)).first():
                         raise ValueError("El código de palet procesado es obligatorio y debe ser único.")
-                    consumir(origen, m3)
+                    ajustar_consumo(origen, m3)
                     palet_hijo = PaletDB(codigo=codigo, tipo_producto_id=origen[0].tipo_producto_id,
                         material_id=origen[0].material_id, cubicaje=m3, consumido=0.0, estado=1,
                         ubicacion_id=origen[0].ubicacion_id, procesado=True)

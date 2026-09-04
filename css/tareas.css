@@ -92,6 +92,10 @@
     height: auto;
 }
 
+[id^="vista_menu_"] {
+    overflow: hidden;
+}
+
 .boton-con-icono {
     display: flex;
     align-items: center;

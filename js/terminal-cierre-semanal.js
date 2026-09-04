@@ -132,6 +132,7 @@ function obtenerLoteItemCierreSemanal(item, indice = 0) {
 
 function crearBorradorCierreSemanal(items = []) {
     const lotesMap = new Map();
+    const consumosPalets = {};
     items.forEach((item, indice) => {
         const loteId = obtenerLoteItemCierreSemanal(item, indice);
         if (!lotesMap.has(loteId)) {
@@ -153,6 +154,10 @@ function crearBorradorCierreSemanal(items = []) {
         lote.m3Original += obtenerNumeroSemanal(item?.m3_total ?? item?.palet_cubicaje);
         lote.m3Consumido += obtenerNumeroSemanal(item?.m3_consumidos ?? item?.palet_consumido);
         lote.botasFabricadas += obtenerNumeroSemanal(item?.botas_registradas ?? item?.cantidad_fabricada);
+        const trazabilidadId = Number(item?.trazabilidad_id || 0);
+        if (trazabilidadId) {
+            consumosPalets[trazabilidadId] = obtenerNumeroSemanal(item?.m3_consumidos ?? item?.palet_consumido);
+        }
     });
     const lotes = Array.from(lotesMap.values())
         .map((lote) => ({
@@ -162,6 +167,7 @@ function crearBorradorCierreSemanal(items = []) {
         .sort((a, b) => a.lote.localeCompare(b.lote, "es", { numeric: true, sensitivity: "base" }));
     return {
         lotes,
+        consumosPalets,
         operaciones: [],
         secuencia: 0,
     };
@@ -261,9 +267,12 @@ function obtenerValorNumericoInput(selector) {
     return Number.isFinite(numero) ? numero : NaN;
 }
 
-function obtenerMagnitudNumericaInput(selector) {
-    const numero = obtenerValorNumericoInput(selector);
-    return Number.isFinite(numero) ? Math.abs(numero) : NaN;
+function obtenerPaletsNegativosCierreSemanal() {
+    return (estadoCierreSemanal.data?.palets || []).filter((palet) => (
+        obtenerNumeroSemanal(palet?.palet_cubicaje) < 0
+        || obtenerNumeroSemanal(palet?.palet_consumido) < 0
+        || obtenerNumeroSemanal(palet?.m3_sobrante) < 0
+    ));
 }
 
 function actualizarCabeceraCierreSemanal(info) {
@@ -323,6 +332,7 @@ function renderizarLotesCierreSemanal(info) {
     }
     lista.innerHTML = lotes.map((lote) => {
         const restante = obtenerRestanteLoteCierre(lote);
+        const consumoReasignable = Math.max(lote.m3Consumido - lote.m3Original, 0);
         const claseEstado = restante < 0
             ? " cierre-semanal-lote-negativo"
             : (restante > 0 ? " cierre-semanal-lote-positivo" : "");
@@ -360,7 +370,7 @@ function renderizarLotesCierreSemanal(info) {
                             ${destinos}
                         </select>
                         <div class="cierre-semanal-lote-inline">
-                            <input class="form-control form-control-sm" type="number" step="0.001" value="${formatearValorSemanal(restante).replace(',', '.')}" data-cierre-m3-reasignar="${lote.id}">
+                            <input class="form-control form-control-sm" type="number" step="0.001" value="${formatearValorSemanal(consumoReasignable).replace(',', '.')}" data-cierre-m3-reasignar="${lote.id}">
                             <button type="button" class="btn btn-sm btn-outline-primary" data-action="reasignar-lote" data-lote-id="${lote.id}">
                                 Reasignar consumo
                             </button>
@@ -375,7 +385,7 @@ function renderizarLotesCierreSemanal(info) {
                             ${destinosSobrante}
                         </select>
                         <div class="cierre-semanal-lote-inline">
-                            <input class="form-control form-control-sm" type="number" step="0.001" value="${formatearValorSemanal(Math.max(restante, 0)).replace(',', '.')}" data-cierre-m3-sobrante="${lote.id}">
+                            <input class="form-control form-control-sm" type="number" step="0.001" value="${formatearValorSemanal(restante).replace(',', '.')}" data-cierre-m3-sobrante="${lote.id}">
                             <button type="button" class="btn btn-sm btn-outline-primary" data-action="reasignar-sobrante" data-lote-id="${lote.id}">
                                 Reasignar sobrante
                             </button>
@@ -570,6 +580,13 @@ function prepararEventosCierreSemanal() {
     if (btnTrasladarSemana) {
         btnTrasladarSemana.addEventListener("click", async () => {
             const destinoId = Number(document.getElementById("cierre-semanal-siguiente-linea")?.value || 0);
+            const paletsNegativos = obtenerPaletsNegativosCierreSemanal();
+            if (paletsNegativos.length) {
+                const codigos = paletsNegativos
+                    .map((palet) => String(palet?.palet_codigo || palet?.palet_id || "sin código"))
+                    .join(", ");
+                alert(`Atención: se cerrará la fabricación con ${paletsNegativos.length} palet(s) con valores negativos: ${codigos}.`);
+            }
             try {
                 const respuesta = await wsRequest("trasladar_sobrantes_cierre_semanal", {
                     fabricacion_semanal_id: estadoCierreSemanal.lineaId,
@@ -618,12 +635,11 @@ function prepararEventosCierreSemanal() {
             if (btnReasignarSobrante) {
                 const origenId = btnReasignarSobrante.getAttribute("data-lote-id") || "";
                 const destinoId = String(document.querySelector(`[data-cierre-destino-sobrante="${origenId}"]`)?.value || "");
-                const m3 = obtenerMagnitudNumericaInput(`[data-cierre-m3-sobrante="${origenId}"]`);
+                const m3 = obtenerValorNumericoInput(`[data-cierre-m3-sobrante="${origenId}"]`);
                 const origen = obtenerLoteBorradorCierre(origenId);
                 const destino = obtenerLoteBorradorCierre(destinoId);
-                const sobrante = obtenerRestanteLoteCierre(origen);
-                if (!origen || !destino || !Number.isFinite(m3) || m3 <= 0 || m3 > sobrante) {
-                    alert("Indica un lote destino y un m3 que no supere el sobrante del origen.");
+                if (!origen || !destino) {
+                    alert("Indica un lote destino.");
                     return;
                 }
                 origen.m3Original -= m3;
@@ -637,18 +653,24 @@ function prepararEventosCierreSemanal() {
             if (btnReasignarItem) {
                 const origenId = btnReasignarItem.getAttribute("data-lote-id") || "";
                 const destinoTrazabilidadId = Number(document.querySelector(`[data-cierre-destino-lote="${origenId}"]`)?.value || 0);
-                const m3 = obtenerMagnitudNumericaInput(`[data-cierre-m3-reasignar="${origenId}"]`);
+                const m3 = obtenerValorNumericoInput(`[data-cierre-m3-reasignar="${origenId}"]`);
                 const origen = obtenerLoteBorradorCierre(origenId);
                 const trazaOrigen = (estadoCierreSemanal.data?.palets || []).find((palet) => (
-                    String(palet?.lote || "") === String(origenId) && Boolean(palet?.negativo)
+                    String(palet?.lote || "") === String(origenId)
                 ));
-                if (!origen || !trazaOrigen || !destinoTrazabilidadId || !Number.isFinite(m3) || m3 <= 0) {
+                const trazaDestino = (estadoCierreSemanal.data?.palets || []).find((palet) => (
+                    Number(palet?.trazabilidad_id || 0) === destinoTrazabilidadId
+                ));
+                const destino = obtenerLoteBorradorCierre(String(trazaDestino?.lote || ""));
+                if (!origen || !trazaOrigen || !destinoTrazabilidadId) {
                     alert("Debes indicar un palé destino y el lote origen debe tener un palé con sobreconsumo.");
                     return;
                 }
-                const negativoOrigen = Math.abs(obtenerNumeroSemanal(trazaOrigen.m3_sobrante));
-                if (m3 > negativoOrigen) {
-                    alert("No puedes reasignar más m3 que el sobreconsumo del palé origen.");
+                const consumosPalets = estadoCierreSemanal.borrador?.consumosPalets || {};
+                const consumoOrigen = obtenerNumeroSemanal(consumosPalets[trazaOrigen.trazabilidad_id]);
+                const consumoDestino = obtenerNumeroSemanal(consumosPalets[trazaDestino?.trazabilidad_id]);
+                if (!trazaDestino) {
+                    alert("No se encontró el palé destino.");
                     return;
                 }
                 registrarOperacionTemporalCierre("reasignar_consumo", {
@@ -656,16 +678,19 @@ function prepararEventosCierreSemanal() {
                     trazabilidad_destino_id: destinoTrazabilidadId,
                     m3,
                 });
+                consumosPalets[trazaOrigen.trazabilidad_id] = consumoOrigen - m3;
+                consumosPalets[trazaDestino.trazabilidad_id] = consumoDestino + m3;
+                origen.m3Consumido -= m3;
+                if (destino && destino !== origen) destino.m3Consumido += m3;
                 actualizarCabeceraCierreSemanal(info);
-                refrescarResumenLotesCierreSemanal();
-                refrescarLoteCierreSemanal(origenId);
+                renderizarLotesCierreSemanal(info);
                 return;
             }
             const btnProcesarItem = event.target.closest("[data-action='procesar-lote']");
             if (btnProcesarItem) {
                 const loteId = btnProcesarItem.getAttribute("data-lote-id") || "";
                 const lote = obtenerLoteBorradorCierre(loteId);
-                const m3 = obtenerMagnitudNumericaInput(`[data-cierre-m3-procesado="${loteId}"]`);
+                const m3 = obtenerValorNumericoInput(`[data-cierre-m3-procesado="${loteId}"]`);
                 const codigoPalet = String(document.querySelector(`[data-cierre-codigo-procesado="${loteId}"]`)?.value || "").trim();
                 const restante = obtenerRestanteLoteCierre(lote);
                 if (!lote || !Number.isFinite(m3) || m3 <= 0) {
@@ -676,7 +701,7 @@ function prepararEventosCierreSemanal() {
                     alert("Debes indicar el codigo de palet destino para procesado.");
                     return;
                 }
-                if (restante <= 0 || m3 > restante) {
+                if (restante < m3) {
                     alert("No puedes enviar a procesado más m3 de los restantes positivos del lote.");
                     return;
                 }
@@ -690,18 +715,18 @@ function prepararEventosCierreSemanal() {
             if (btnDesperdicio) {
                 const loteId = btnDesperdicio.getAttribute("data-lote-id") || "";
                 const lote = obtenerLoteBorradorCierre(loteId);
-                const m3 = obtenerMagnitudNumericaInput(`[data-cierre-m3-desperdicio="${loteId}"]`);
+                const m3 = obtenerValorNumericoInput(`[data-cierre-m3-desperdicio="${loteId}"]`);
                 const restante = obtenerRestanteLoteCierre(lote);
-                if (!lote || !Number.isFinite(m3) || m3 <= 0 || restante === 0) {
+                if (!lote || !Number.isFinite(m3) || m3 <= 0) {
                     alert("Ese lote no tiene restante pendiente para llevar a desperdicio.");
                     return;
                 }
-                if (Math.abs(m3) > Math.abs(restante)) {
-                    alert("No puedes llevar a desperdicio más cantidad que el restante actual del lote.");
+                if (restante < m3) {
+                    alert("No puedes llevar a desperdicio más cantidad que el restante positivo del lote.");
                     return;
                 }
-                lote.desperdicio += restante < 0 ? -m3 : m3;
-                registrarOperacionTemporalCierre("desperdicio", { lote: loteId, m3: restante < 0 ? -m3 : m3 });
+                lote.desperdicio += m3;
+                registrarOperacionTemporalCierre("desperdicio", { lote: loteId, m3 });
                 actualizarCabeceraCierreSemanal(info);
                 renderizarLotesCierreSemanal(info);
             }
